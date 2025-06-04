@@ -24,4 +24,5 @@ public class GameData
     public PlayerData[] players;
     public int playersOnline;
     public GameOptionsData options;
+    public WorldData world;
 }
