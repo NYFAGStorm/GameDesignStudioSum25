@@ -666,6 +666,7 @@ GameObject:
   m_Component:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
+  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -739,6 +740,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
+--- !u!114 &963194229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91639726277a9c24caa52505b0eceb3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 0
+  cameraTargetPosition: {x: 0, y: 0, z: 0}
+  cameraTargetRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &964324588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1474,29 +1490,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3232420859449547436, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1516638560763939039}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
 --- !u!4 &1516638560763939037 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3494834401035346939, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
   m_PrefabInstance: {fileID: 1516638560763939036}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1516638560763939038 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3232420859449547436, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
-  m_PrefabInstance: {fileID: 1516638560763939036}
-  m_PrefabAsset: {fileID: 0}
---- !u!81 &1516638560763939039
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1516638560763939038}
-  m_Enabled: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
