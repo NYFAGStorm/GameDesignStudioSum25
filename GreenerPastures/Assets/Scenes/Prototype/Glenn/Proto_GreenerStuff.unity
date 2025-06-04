@@ -119,6 +119,114 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &18056864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 18056866}
+  - component: {fileID: 18056865}
+  m_Layer: 0
+  m_Name: Random Example
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &18056865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18056864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f30ef28f6777646a76847b7ec92599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  typeOfRandom: 0
+  randomResult: 0
+  multiplier: 5
+  additional: 1
+  roundResult: 1
+  finalResult: 0
+  rollRandom: 0
+--- !u!4 &18056866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18056864}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &123493969
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 123493971}
+  - component: {fileID: 123493970}
+  m_Layer: 0
+  m_Name: Array Example
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &123493970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123493969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c691ebbe3fcbed49b6e3f1ca1277bb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myArray:
+  - Fred
+  - Wilma
+  - Barney
+  - Betty
+  toAdd: 
+  add: 0
+  toRemove: 0
+  remove: 0
+  shuffleArray: 0
+  isDirty: 0
+  sortAscending: 0
+  sortDescending: 0
+--- !u!4 &123493971
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123493969}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &201487894
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,7 +1016,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1196294188
 Transform:
   m_ObjectHideFlags: 0
@@ -938,7 +1046,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSpriteData:
     sprites: []
-  itemSprites: []
+  itemSprites:
+  - {fileID: 0}
 --- !u!1 &1339543633
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,3 +1293,5 @@ SceneRoots:
   - {fileID: 2024616523}
   - {fileID: 201487895}
   - {fileID: 1196294188}
+  - {fileID: 123493971}
+  - {fileID: 18056866}
