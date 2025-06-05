@@ -24,7 +24,7 @@ public class TimeManager : MonoBehaviour
     private long globalTimeProgress;
 
     const float SUNLIGHTINTENSITY = 1f;
-    const float MOONLIGHTINTENSITY = 0.381f;
+    const float MOONLIGHTINTENSITY = 0.1f;
     const float WORLDTIMEMULTIPLIER = 60f; // set to 600f, 6000f, 60000f, for testing
     const float BASETEMPERATURE = 20f; // C
     const float TEMPERATUREVARIANCE = 10f;
@@ -120,7 +120,7 @@ public class TimeManager : MonoBehaviour
             sunLight.intensity = SUNLIGHTINTENSITY - ((dayProgress - 0.7f) * 10f * SUNLIGHTINTENSITY);
             moonLight.intensity = ((dayProgress - 0.7f) * 10f * MOONLIGHTINTENSITY);
         }
-        RenderSettings.ambientIntensity = 0.1f + (sunLight.intensity * 0.9f);
+        RenderSettings.ambientIntensity = MOONLIGHTINTENSITY + (sunLight.intensity * (1f-MOONLIGHTINTENSITY));
 
         // REVIEW: base temperature based on season cycle
         // FIXME: the bottom seems 'to bounce' and not like a sine wave
