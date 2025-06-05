@@ -32,7 +32,8 @@ public enum PlayerAction
     Planting,
     Watering,
     Harvesting,
-    Casting
+    Casting,
+    Teleporting
 }
 
 // if there are discrete effects that can be applied to a player character

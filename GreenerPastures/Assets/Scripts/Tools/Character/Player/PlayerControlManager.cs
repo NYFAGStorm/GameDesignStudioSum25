@@ -25,6 +25,8 @@ public class PlayerControlManager : MonoBehaviour
     public KeyCode rightKey = KeyCode.D;
     public KeyCode actionAKey = KeyCode.E;
 
+    public bool characterFrozen;
+
     private Vector3 characterMove;
 
     private CameraManager cam;
@@ -55,6 +57,9 @@ public class PlayerControlManager : MonoBehaviour
 
     void Update()
     {
+        if (characterFrozen)
+            return;
+
         // read input
         ReadMoveInput();
         // move
