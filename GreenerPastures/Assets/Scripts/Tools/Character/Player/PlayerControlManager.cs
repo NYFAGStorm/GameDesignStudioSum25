@@ -63,7 +63,7 @@ public class PlayerControlManager : MonoBehaviour
         if (characterFrozen)
             return;
 
-        // read input
+        // read move input
         ReadMoveInput();
         // move
         DoCharacterMove();
@@ -76,6 +76,10 @@ public class PlayerControlManager : MonoBehaviour
         }
         // check near plot
         CheckNearPlot();
+
+        // check action input
+        if (ReadActionInput() == PlayerControlType.ActionA && activePlot)
+            activePlot.WorkLand();
     }
 
     void ReadMoveInput()
@@ -140,5 +144,16 @@ public class PlayerControlManager : MonoBehaviour
                 break;
             }
         }
+    }
+
+    // temp
+    PlayerControlType ReadActionInput()
+    {
+        PlayerControlType retInput = PlayerControlType.Default;
+
+        if (Input.GetKeyDown(actionAKey))
+            retInput = PlayerControlType.ActionA;
+
+        return retInput;
     }
 }

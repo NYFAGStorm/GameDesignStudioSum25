@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d18e074b7357a42488f807f306731bab, type: 2}
+  - {fileID: 2100000, guid: b5a74362374390847a908254b746eb2f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -150,7 +150,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 24017c27e91628740bcbc31741ca4dcb, type: 2}
+  - {fileID: 2100000, guid: 99eb3b7a12939774393c02bbc15d29fd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -204,6 +204,7 @@ Transform:
   m_Children:
   - {fileID: 1804661651993381905}
   - {fileID: 2669614518212341118}
+  - {fileID: 8699433995045753525}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7704067636505778414
@@ -218,3 +219,79 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac9bb1df037b33d47933dd89b4318717, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  plot:
+    condition: 0
+    sun: 0
+    water: 0
+    plant:
+      plantName: No Plant
+      plantType: 0
+      plantGrowth: 0
+      plantHealth: 0
+      plantLight: 0
+      plantWater: 0
+      plantQuality: 0
+      plantEffects: 
+    plotEffects: 
+--- !u!1001 &7508639278377329754
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3707677030043376523}
+    m_Modifications:
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6551273960196989655, guid: ad79192300726d740a094bfa43815104, type: 3}
+      propertyPath: m_Name
+      value: Plot Wild Grasses
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ad79192300726d740a094bfa43815104, type: 3}
+--- !u!4 &8699433995045753525 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1193052048469341935, guid: ad79192300726d740a094bfa43815104, type: 3}
+  m_PrefabInstance: {fileID: 7508639278377329754}
+  m_PrefabAsset: {fileID: 0}
