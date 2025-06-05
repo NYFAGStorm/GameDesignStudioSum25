@@ -151,7 +151,11 @@ public class TeleportManager : MonoBehaviour
     public void LaunchTeleportEffects()
     {
         teleportCheckTimer = 3f;
-        // TODO: vfx
+        // vfx
+        GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+        vfx.transform.position = transform.position;
+        vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = Color.yellow;
+        Destroy(vfx, 1f);
         // TODO: sfx
     }
 }
