@@ -18,8 +18,10 @@ public class TimeManager : MonoBehaviour
     public WorldSeason season;
 
     // TODO: link to game for world data, run time based on game seed
-    //private long gameSeedTime;
-    private float sunRotX;
+    // TODO: revise UpdateGlobalTimeProgress() to include total game time
+    // TODO: migrate temperature to weather manager
+    private long gameSeedTime;
+    private long globalTimeProgress;
 
     const float SUNLIGHTINTENSITY = 1f;
     const float MOONLIGHTINTENSITY = 0.381f;
@@ -110,6 +112,7 @@ public class TimeManager : MonoBehaviour
             // dawn fade
             sunLight.intensity = (dayProgress - 0.2f) * 10f * SUNLIGHTINTENSITY;
             moonLight.intensity = MOONLIGHTINTENSITY - ( (dayProgress - 0.2f) * 10f * MOONLIGHTINTENSITY);
+
         }
         if (dayProgress > 0.7f && dayProgress < 0.8f)
         {
@@ -117,11 +120,12 @@ public class TimeManager : MonoBehaviour
             sunLight.intensity = SUNLIGHTINTENSITY - ((dayProgress - 0.7f) * 10f * SUNLIGHTINTENSITY);
             moonLight.intensity = ((dayProgress - 0.7f) * 10f * MOONLIGHTINTENSITY);
         }
+        RenderSettings.ambientIntensity = 0.1f + (sunLight.intensity * 0.9f);
 
         // REVIEW: base temperature based on season cycle
         // FIXME: the bottom seems 'to bounce' and not like a sine wave
-        float seasonprogress = ((1 / 30) + (((dayProgress + dayOfMonth) / 30) + (int)monthOfYear)) / 12;
-        baseTemperature = BASETEMPERATURE + (((Mathf.Sin(Mathf.PI * seasonprogress) * 2f) - 1f) * TEMPERATUREVARIANCE);
+        float seasonProgress = ((1 / 30) + (((dayProgress + dayOfMonth) / 30) + (int)monthOfYear)) / 12;
+        baseTemperature = BASETEMPERATURE + (((Mathf.Sin(Mathf.PI * seasonProgress) * 2f) - 1f) * TEMPERATUREVARIANCE);
         baseTemperature = Mathf.RoundToInt(baseTemperature * 10f) / 10f;
 
         // vary current temperature from base by day/night cycle
@@ -130,5 +134,27 @@ public class TimeManager : MonoBehaviour
 
         currentTempC = Mathf.RoundToInt(currentTempC * 10f) / 10f;
         currentTempF = Mathf.RoundToInt(currentTempF * 10f) / 10f;
+
+        UpdateGlobalTimeProgres(seasonProgress);
+    }
+
+    void UpdateGlobalTimeProgres( float seasonProgress )
+    {
+        // TODO: also add game data total game time
+        globalTimeProgress = gameSeedTime + (long)(seasonProgress * WORLDTIMEMULTIPLIER);
+    }
+
+    /// <summary>
+    /// Gets the global time progress from game initialization until current time
+    /// </summary>
+    /// <returns>global time progress value</returns>
+    public long GetGlobalTimeProgress()
+    {
+        return globalTimeProgress;
+    }
+
+    public float GetWorldTimeMultiplier()
+    {
+        return WORLDTIMEMULTIPLIER;
     }
 }
