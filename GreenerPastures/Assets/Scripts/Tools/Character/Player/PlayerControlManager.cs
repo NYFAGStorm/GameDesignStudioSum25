@@ -28,9 +28,12 @@ public class PlayerControlManager : MonoBehaviour
     public bool characterFrozen;
 
     private Vector3 characterMove;
+    private PlotManager activePlot;
 
     private CameraManager cam;
     private PlayerAnimManager pam;
+
+    const float PROXIMITYRANGE = 0.381f;
 
 
     void Start()
@@ -64,6 +67,15 @@ public class PlayerControlManager : MonoBehaviour
         ReadMoveInput();
         // move
         DoCharacterMove();
+
+        // clear active plot if moving
+        if (characterMove != Vector3.zero && activePlot != null)
+        {
+            activePlot.SetCursorPulse(false);
+            activePlot = null;
+        }
+        // check near plot
+        CheckNearPlot();
     }
 
     void ReadMoveInput()
@@ -111,5 +123,22 @@ public class PlayerControlManager : MonoBehaviour
         if (characterMove.x > 0f)
             pam.spriteFlipped = false;
         gameObject.transform.position = pos;
+    }
+
+    void CheckNearPlot()
+    {
+        if (activePlot != null)
+            return;
+
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i=0; i<plots.Length; i++)
+        {
+            if (Vector3.Distance(plots[i].gameObject.transform.position,gameObject.transform.position) < PROXIMITYRANGE)
+            {
+                activePlot = plots[i];
+                plots[i].SetCursorPulse(true);
+                break;
+            }
+        }
     }
 }
