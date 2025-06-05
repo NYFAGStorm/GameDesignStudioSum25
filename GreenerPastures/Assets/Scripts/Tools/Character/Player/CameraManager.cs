@@ -28,10 +28,11 @@ public class CameraManager : MonoBehaviour
     private Vector3 savedPostion;
     private Vector3 savedRotation;
 
-    private Vector3 followMoveOffset = new Vector3(0f, 3.5f, -7f);
-    private Vector3 followRotOffset = new Vector3(30f, 0f, 0f);
+    private Vector3 followMoveOffset = new Vector3(0f, 2.5f, -5f);
+    private Vector3 followRotOffset = new Vector3(20f, 0f, 0f);
 
     // TODO: utilitze an animation curve for ease-in and ease-out motion
+    // TODO: migrate the calculations done below to world system script
 
     const float CAMERAPAUSEDURATION = 0.381f;
     const float CAMERAMOVEDURATION = 1f;
