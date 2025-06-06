@@ -15,10 +15,25 @@ public class PlotManager : MonoBehaviour
     private float cursorTimer;
     private float plotTimer;
 
+    private bool actionDirty; // complete, not yet cleared
+    private bool actionClear; // no action pressed
+    private bool actionProgressDisplay;
+    private float actionProgress;
+    private float actionLimit;
+    private string actionLabel;
+    private float actionCompleteTimer;
+
     const float CURSORPULSEDURATION = 0.5f;
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
     const float PLOTCHECKINTERVAL = 1f;
+    // action hold time windows to complete
+    const float WORKLANDWINDOW = 2f;
+    const float WATERWINDOW = 1f;
+    const float PLANTWINDOW = .5f;
+    const float HARVESTWINDOW = 1.5f;
+    const float UPROOTWINDOW = 2.5f;
+    const float ACTIONCOMPLETEDURATION = 1f;
 
 
     void Start()
@@ -62,6 +77,18 @@ public class PlotManager : MonoBehaviour
                 data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * Time.deltaTime * PLOTCHECKINTERVAL));
             }
         }
+
+        // run action complete timer
+        if ( actionCompleteTimer > 0f )
+        {
+            actionCompleteTimer -= Time.deltaTime;
+            if ( actionCompleteTimer < 0f )
+            {
+                actionCompleteTimer = 0f;
+                actionLabel = "";
+                actionProgressDisplay = false;
+            }
+        }
     }
 
     void CheckCursor()
@@ -95,10 +122,56 @@ public class PlotManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Signals that no player plot action is currently active
+    /// </summary>
+    public void ActionClear()
+    {
+        actionDirty = false;
+        actionClear = true;
+        actionProgress = 0f;
+        actionLimit = 5f;
+    }
+
+    bool ActionComplete( float limit, string label )
+    {
+        bool retBool = false;
+
+        actionProgressDisplay = true;
+        actionLimit = limit;
+        actionLabel = label;
+        actionProgress += Time.deltaTime;
+        if (actionProgress >= actionLimit)
+        {
+            actionCompleteTimer = ACTIONCOMPLETEDURATION;
+            actionDirty = true;
+            actionClear = false;
+            retBool = true;
+        }
+
+        return retBool;
+    }
+
+    // TODO: prevent using one progress for another, remember which is current
+
+    /// <summary>
     /// Works the land, turning from wild to dirt to tilled
     /// </summary>
     public void WorkLand()
     {
+        if (actionDirty)
+            return;
+
+        if (actionCompleteTimer > 0f && !actionClear)
+            return;
+
+        if (data.condition == PlotCondition.Tilled)
+        {
+            if (!ActionComplete(PLANTWINDOW, "PLANTING..."))
+                return;
+        }
+        else if (!ActionComplete(WORKLANDWINDOW,"WORKING..."))
+            return;
+
         Renderer r = gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
         switch (data.condition)
         {
@@ -152,11 +225,33 @@ public class PlotManager : MonoBehaviour
     /// </summary>
     public void WaterPlot()
     {
+        if (actionDirty)
+            return;
+
+        if (actionCompleteTimer > 0f && !actionClear)
+            return;
+
+        if (!ActionComplete(WATERWINDOW, "WATERING..."))
+            return;
+
         data.water = 1f;
     }
 
     public void HarvestPlant()
     {
+        if (actionDirty)
+            return;
+
+        if (actionCompleteTimer > 0f && !actionClear)
+            return;
+
+        // cannot harvest unless plant at 100% growth
+        if (data.plant.growth < 1f)
+            return;
+
+        if (!ActionComplete(HARVESTWINDOW,"HARVESTING..."))
+            return;
+
         if ( data.condition == PlotCondition.Growing )
         {
             // harvest if plant is 100% grown and not yet harvested
@@ -175,6 +270,19 @@ public class PlotManager : MonoBehaviour
 
     public void UprootPlot()
     {
+        if (actionDirty)
+            return;
+
+        if (actionCompleteTimer > 0f && !actionClear)
+            return;
+
+        // cannot uproot unless plant exists in this plot
+        if (plant == null)
+            return;
+
+        if (!ActionComplete(UPROOTWINDOW, "UPROOTING..."))
+            return;
+
         Renderer r = gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
         // change ground texture
         if (r == null)
@@ -186,5 +294,59 @@ public class PlotManager : MonoBehaviour
         Destroy(plant);
         data.plant = PlantSystem.InitializePlant();
         data.condition = PlotCondition.Uprooted;
+    }
+
+    void OnGUI()
+    {
+        if (!actionProgressDisplay)
+            return;
+
+        Rect r = new Rect();
+        float w = Screen.width;
+        float h = Screen.height;
+        GUIStyle g = new GUIStyle(GUI.skin.label);
+        g.fontSize = Mathf.RoundToInt( 12f * (w/1024f) );
+        g.fontStyle = FontStyle.Bold;
+        g.alignment = TextAnchor.LowerCenter;
+        string s = actionLabel;
+
+        // temp, temp, temp (will visually put over plot)
+        r.x = 0.05f * w;
+        r.y = 0.05f * h;
+        r.width = 0.1f * w;
+        r.height = 0.05f * h;
+
+        // display action label
+        GUI.Label(r,s,g);
+
+        if (actionCompleteTimer != 0f && 
+            actionCompleteTimer < ACTIONCOMPLETEDURATION * 0.5f)
+            return;
+
+        Texture2D t = Texture2D.grayTexture;
+        Color c = Color.white;
+        c.a = 0.381f;
+        GUI.color = c;
+
+        // display progress bar background
+        r.y += 0.05f * h;
+        GUI.DrawTexture(r, t);
+
+        t = Texture2D.whiteTexture;
+        c = Color.green;
+        c.r = (actionCompleteTimer/ACTIONCOMPLETEDURATION);
+        c.b = (actionCompleteTimer/ACTIONCOMPLETEDURATION);
+        c.a = 0.618f;
+        GUI.color = c;
+
+        // display progress bar foreground
+        // scale and position for 'inside' bg bar
+        r.x += 0.00618f * w;
+        r.y += 0.01f * h;
+        r.width -= 0.01238f * w;
+        r.height -= 0.02f * h;
+        // scale for progress
+        r.width = (actionProgress/actionLimit) * r.width;
+        GUI.DrawTexture(r, t);
     }
 }

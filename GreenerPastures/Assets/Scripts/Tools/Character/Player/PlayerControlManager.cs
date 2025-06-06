@@ -19,6 +19,15 @@ public class PlayerControlManager : MonoBehaviour
         ActionC,
         ActionD
     }
+
+    public struct PlayerActions
+    {
+        public bool actionA;
+        public bool actionB;
+        public bool actionC;
+        public bool actionD;
+    }
+
     public KeyCode upKey = KeyCode.W;
     public KeyCode downKey = KeyCode.S;
     public KeyCode leftKey = KeyCode.A;
@@ -32,6 +41,7 @@ public class PlayerControlManager : MonoBehaviour
 
     private Vector3 characterMove;
     private PlotManager activePlot;
+    private PlayerActions characterActions;
 
     private CameraManager cam;
     private PlayerAnimManager pam;
@@ -81,15 +91,25 @@ public class PlayerControlManager : MonoBehaviour
         CheckNearPlot();
 
         // check action input
+        ReadActionInput();
         // temp (a = work land, b = water plot , c = harvest plant, d = uproot plot)
-        if (ReadActionInput() == PlayerControlType.ActionA && activePlot)
-            activePlot.WorkLand();
-        if (ReadActionInput() == PlayerControlType.ActionB && activePlot)
-            activePlot.WaterPlot();
-        if (ReadActionInput() == PlayerControlType.ActionC && activePlot)
-            activePlot.HarvestPlant();
-        if (ReadActionInput() == PlayerControlType.ActionD && activePlot)
-            activePlot.UprootPlot();
+        // temp (hold-type control detection)
+        if (activePlot)
+        {
+            // REVIEW: order?
+            if (characterActions.actionA)
+                activePlot.WorkLand();
+            if (characterActions.actionB)
+                activePlot.WaterPlot();
+            if (characterActions.actionC)
+                activePlot.HarvestPlant();
+            if (characterActions.actionD)
+                activePlot.UprootPlot();
+            // if all controls un-pressed, signal plot action clear
+            if (!characterActions.actionA && !characterActions.actionB &&
+                !characterActions.actionC && !characterActions.actionD)
+                activePlot.ActionClear();
+        }
     }
 
     void ReadMoveInput()
@@ -156,20 +176,13 @@ public class PlayerControlManager : MonoBehaviour
         }
     }
 
-    // temp
-    PlayerControlType ReadActionInput()
+    void ReadActionInput()
     {
-        PlayerControlType retInput = PlayerControlType.Default;
+        characterActions = new PlayerActions();
 
-        if (Input.GetKeyDown(actionAKey))
-            retInput = PlayerControlType.ActionA;
-        if (Input.GetKeyDown(actionBKey))
-            retInput = PlayerControlType.ActionB;
-        if (Input.GetKeyDown(actionCKey))
-            retInput = PlayerControlType.ActionC;
-        if (Input.GetKeyDown(actionDKey))
-            retInput = PlayerControlType.ActionD;
-
-        return retInput;
+        characterActions.actionA = Input.GetKey(actionAKey);
+        characterActions.actionB = Input.GetKey(actionBKey);
+        characterActions.actionC = Input.GetKey(actionCKey);
+        characterActions.actionD = Input.GetKey(actionDKey);
     }
 }
