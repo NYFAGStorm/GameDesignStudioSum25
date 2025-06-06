@@ -5,6 +5,16 @@ public class PlotManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles a single plot of land that is able to hold a single plant
 
+    public enum CurrentAction
+    {
+        None,
+        Working,
+        Planting,
+        Watering,
+        Harvesting,
+        Uprooting
+    }
+
     public PlotData data;
     public GameObject plant;
 
@@ -15,6 +25,7 @@ public class PlotManager : MonoBehaviour
     private float cursorTimer;
     private float plotTimer;
 
+    private CurrentAction action;
     private bool actionDirty; // complete, not yet cleared
     private bool actionClear; // no action pressed
     private bool actionProgressDisplay;
@@ -108,6 +119,8 @@ public class PlotManager : MonoBehaviour
         SetCursorHighlight(0f);
         cursorTimer = 0f;
         cursor.enabled = active;
+        ActionClear();
+        actionProgressDisplay = false;
     }
 
     void SetCursorHighlight( float value )
@@ -130,6 +143,7 @@ public class PlotManager : MonoBehaviour
         actionClear = true;
         actionProgress = 0f;
         actionLimit = 5f;
+        action = CurrentAction.None;
     }
 
     bool ActionComplete( float limit, string label )
@@ -145,13 +159,12 @@ public class PlotManager : MonoBehaviour
             actionCompleteTimer = ACTIONCOMPLETEDURATION;
             actionDirty = true;
             actionClear = false;
+            action = CurrentAction.None;
             retBool = true;
         }
 
         return retBool;
     }
-
-    // TODO: prevent using one progress for another, remember which is current
 
     /// <summary>
     /// Works the land, turning from wild to dirt to tilled
@@ -166,11 +179,26 @@ public class PlotManager : MonoBehaviour
 
         if (data.condition == PlotCondition.Tilled)
         {
+            if (action != CurrentAction.Planting && action != CurrentAction.None)
+                return;
+            action = CurrentAction.Planting;
+
             if (!ActionComplete(PLANTWINDOW, "PLANTING..."))
                 return;
         }
-        else if (!ActionComplete(WORKLANDWINDOW,"WORKING..."))
-            return;
+        else
+        {
+            // cannot work the land if planted
+            if (plant != null)
+                return;
+
+            if (action != CurrentAction.Working && action != CurrentAction.None)
+                return;
+            action = CurrentAction.Working;
+
+            if (!ActionComplete(WORKLANDWINDOW, "WORKING..."))
+                return;
+        }
 
         Renderer r = gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
         switch (data.condition)
@@ -231,6 +259,10 @@ public class PlotManager : MonoBehaviour
         if (actionCompleteTimer > 0f && !actionClear)
             return;
 
+        if (action != CurrentAction.Watering && action != CurrentAction.None)
+            return;
+        action = CurrentAction.Watering;
+
         if (!ActionComplete(WATERWINDOW, "WATERING..."))
             return;
 
@@ -248,6 +280,10 @@ public class PlotManager : MonoBehaviour
         // cannot harvest unless plant at 100% growth
         if (data.plant.growth < 1f)
             return;
+
+        if (action != CurrentAction.Harvesting && action != CurrentAction.None)
+            return;
+        action = CurrentAction.Harvesting;
 
         if (!ActionComplete(HARVESTWINDOW,"HARVESTING..."))
             return;
@@ -280,6 +316,10 @@ public class PlotManager : MonoBehaviour
         if (plant == null)
             return;
 
+        if (action != CurrentAction.Uprooting && action != CurrentAction.None)
+            return;
+        action = CurrentAction.Uprooting;
+
         if (!ActionComplete(UPROOTWINDOW, "UPROOTING..."))
             return;
 
@@ -305,48 +345,67 @@ public class PlotManager : MonoBehaviour
         float w = Screen.width;
         float h = Screen.height;
         GUIStyle g = new GUIStyle(GUI.skin.label);
-        g.fontSize = Mathf.RoundToInt( 12f * (w/1024f) );
+        g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
         g.fontStyle = FontStyle.Bold;
-        g.alignment = TextAnchor.LowerCenter;
+        g.alignment = TextAnchor.MiddleCenter;
         string s = actionLabel;
 
-        // temp, temp, temp (will visually put over plot)
-        r.x = 0.05f * w;
-        r.y = 0.05f * h;
+        // locate display over plot
+        Vector3 disp = Camera.main.WorldToViewportPoint(gameObject.transform.position);
+        disp.y = 1f - disp.y;
+
+        r.x = (disp.x - 0.05f) * w;
+        r.y = disp.y * h;
+        r.y -= 0.25f * h;
         r.width = 0.1f * w;
         r.height = 0.05f * h;
 
-        // display action label
+        // display action label with drop shadow
+        GUI.color = Color.black;
+        r.x += 0.000618f * w;
+        r.y += 0.001f * h;
+        GUI.Label(r,s,g);
+        GUI.color = Color.white;
+        r.x -= 0.0012382f * w;
+        r.y -= 0.002f * h;
         GUI.Label(r,s,g);
 
         if (actionCompleteTimer != 0f && 
             actionCompleteTimer < ACTIONCOMPLETEDURATION * 0.5f)
             return;
 
+        r.height = 0.1f * h;
         Texture2D t = Texture2D.grayTexture;
         Color c = Color.white;
-        c.a = 0.381f;
-        GUI.color = c;
-
-        // display progress bar background
-        r.y += 0.05f * h;
-        GUI.DrawTexture(r, t);
-
-        t = Texture2D.whiteTexture;
-        c = Color.green;
-        c.r = (actionCompleteTimer/ACTIONCOMPLETEDURATION);
-        c.b = (actionCompleteTimer/ACTIONCOMPLETEDURATION);
         c.a = 0.618f;
         GUI.color = c;
 
+        // display progress bar background
+        GUI.depth = 2;
+        GUI.DrawTexture(r, t);
+
+        t = Texture2D.whiteTexture;
+        c = Color.blue;
+        c.r = 0.1f;
+        c.g = 0.1f;
+        if (actionCompleteTimer > 0f)
+            c.b = 0f;
+        c.r = (actionCompleteTimer / ACTIONCOMPLETEDURATION);
+        c.g = (actionCompleteTimer / ACTIONCOMPLETEDURATION);
+        c.a = 1f;
+        GUI.color = c;
+
         // display progress bar foreground
+        r.y += 0.05f * h;
+        r.height = 0.05f * h;
+        GUI.depth = 1;
         // scale and position for 'inside' bg bar
         r.x += 0.00618f * w;
         r.y += 0.01f * h;
         r.width -= 0.01238f * w;
         r.height -= 0.02f * h;
         // scale for progress
-        r.width = (actionProgress/actionLimit) * r.width;
+        r.width = (actionProgress / actionLimit) * r.width;
         GUI.DrawTexture(r, t);
     }
 }
