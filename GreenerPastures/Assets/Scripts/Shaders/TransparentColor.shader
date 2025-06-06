@@ -1,4 +1,4 @@
-Shader "Unlit/UnlitTransparentColor"
+Shader "Unlit/Transparent Color"
 {
     Properties
     {
