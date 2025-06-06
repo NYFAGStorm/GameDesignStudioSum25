@@ -20,10 +20,10 @@ public static class FarmSystem
         FarmData retFarm = new FarmData();
 
         // initialize
-        retFarm.farmPlots = new PlotData[TOTALFARMPLOTS];
+        retFarm.plots = new PlotData[TOTALFARMPLOTS];
         for (int i=0; i<TOTALFARMPLOTS; i++)
         {
-            retFarm.farmPlots[i] = InitializePlot();
+            retFarm.plots[i] = InitializePlot();
         }
         retFarm.farmEffects = new FarmEffects[0];
 

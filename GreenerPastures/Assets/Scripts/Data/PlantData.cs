@@ -10,6 +10,13 @@ public enum PlantType
     TypeD
 }
 
+public enum PlantSegment
+{
+    Default,
+    Fruit,
+    Stalk
+}
+
 // if there are discrete effects that can be applied to a plant
 // each effect can then apply separate rules in a modular way
 public enum PlantEffect
@@ -26,11 +33,11 @@ public enum PlantEffect
 public class PlantData
 {
     public string plantName; // REVIEW: necessary?
-    public PlantType plantType;
-    public float plantGrowth;
-    public float plantHealth;
-    public float plantLight;
-    public float plantWater;
-    public float plantQuality;
+    public PlantType type;
+    public PlantSegment segment;
+    public float growth;
+    public float vitality;
+    public float health;
+    public float quality;
     public PlantEffect[] plantEffects;
 }

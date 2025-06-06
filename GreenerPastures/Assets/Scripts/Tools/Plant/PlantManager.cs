@@ -10,7 +10,9 @@ public class PlantManager : MonoBehaviour
     private Renderer plantSprite;
     private PlotManager plot;
 
-    const float PLANTSTAGEDURATION = 5f;
+    // temp (use time manager multiplier)
+    const float PLANTSTAGEDURATION = 10f;
+    const float PLANTCHECKINTERVAL = 1f;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -32,7 +34,7 @@ public class PlantManager : MonoBehaviour
         // initialize
         if ( enabled )
         {
-            plantTimer = PLANTSTAGEDURATION;
+            plantTimer = PLANTCHECKINTERVAL;
         }
     }
 
@@ -45,17 +47,36 @@ public class PlantManager : MonoBehaviour
             if ( plantTimer < 0f )
             {
                 // temp
-                plot.data.plant.plantGrowth = Mathf.Clamp01(plot.data.plant.plantGrowth+0.2f);
-                Grow(plot.data.plant.plantGrowth);
-                if (plot.data.plant.plantGrowth < 1f)
-                    plantTimer = PLANTSTAGEDURATION;
+                float progress = ( PLANTCHECKINTERVAL / PLANTSTAGEDURATION );
+
+                // find resources amount as 50% sun and 50% water of plot
+                float resources = ((0.5f * plot.data.sun) + (0.5f * plot.data.water));
+                // calculate vitality
+                float vitalityDelta = (0.5f - resources) * -0.1f;
+                plot.data.plant.vitality = Mathf.Clamp01(plot.data.plant.vitality + vitalityDelta);
+                // calculate health
+                float healthDelta = (0.5f - plot.data.plant.vitality) + (0.5f - resources);
+                healthDelta *= -0.001f;
+                plot.data.plant.health = Mathf.Clamp01(plot.data.plant.health+healthDelta);
+                // calculate growth
+                float growthDelta = resources * 0.2f * progress * plot.data.plant.vitality;
+                if (plot.data.plant.growth < 1f)
+                {
+                    plot.data.plant.growth = Mathf.Clamp01(plot.data.plant.growth + growthDelta);
+                    // show growth change
+                    Grow(plot.data.plant.growth);
+                    // calculate quality
+                    plot.data.plant.quality += growthDelta * plot.data.plant.vitality;
+                }
+
+                plantTimer = PLANTCHECKINTERVAL;
             }
         }
     }
 
     void Grow( float growth )
     {
-        int growNumber = Mathf.RoundToInt(growth * 5f);
+        int growNumber = Mathf.RoundToInt(growth * 4f);
         switch (growNumber)
         {
             case 0:

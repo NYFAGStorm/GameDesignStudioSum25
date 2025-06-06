@@ -12,6 +12,7 @@ public static class PlantSystem
 
         // initialize
         retPlant.plantName = "No Plant";
+        retPlant.health = 1f;
         retPlant.plantEffects = new PlantEffect[0];
 
         return retPlant;

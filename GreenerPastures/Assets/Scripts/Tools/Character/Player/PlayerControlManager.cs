@@ -16,14 +16,17 @@ public class PlayerControlManager : MonoBehaviour
         Right,
         ActionA,
         ActionB,
-        ActionX,
-        ActionY
+        ActionC,
+        ActionD
     }
     public KeyCode upKey = KeyCode.W;
     public KeyCode downKey = KeyCode.S;
     public KeyCode leftKey = KeyCode.A;
     public KeyCode rightKey = KeyCode.D;
     public KeyCode actionAKey = KeyCode.E;
+    public KeyCode actionBKey = KeyCode.F;
+    public KeyCode actionCKey = KeyCode.C;
+    public KeyCode actionDKey = KeyCode.V;
 
     public bool characterFrozen;
 
@@ -78,8 +81,15 @@ public class PlayerControlManager : MonoBehaviour
         CheckNearPlot();
 
         // check action input
+        // temp (a = work land, b = water plot , c = harvest plant, d = uproot plot)
         if (ReadActionInput() == PlayerControlType.ActionA && activePlot)
             activePlot.WorkLand();
+        if (ReadActionInput() == PlayerControlType.ActionB && activePlot)
+            activePlot.WaterPlot();
+        if (ReadActionInput() == PlayerControlType.ActionC && activePlot)
+            activePlot.HarvestPlant();
+        if (ReadActionInput() == PlayerControlType.ActionD && activePlot)
+            activePlot.UprootPlot();
     }
 
     void ReadMoveInput()
@@ -153,6 +163,12 @@ public class PlayerControlManager : MonoBehaviour
 
         if (Input.GetKeyDown(actionAKey))
             retInput = PlayerControlType.ActionA;
+        if (Input.GetKeyDown(actionBKey))
+            retInput = PlayerControlType.ActionB;
+        if (Input.GetKeyDown(actionCKey))
+            retInput = PlayerControlType.ActionC;
+        if (Input.GetKeyDown(actionDKey))
+            retInput = PlayerControlType.ActionD;
 
         return retInput;
     }

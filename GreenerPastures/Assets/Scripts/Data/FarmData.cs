@@ -51,6 +51,6 @@ public enum FarmEffects
 [System.Serializable]
 public class FarmData
 {
-    public PlotData[] farmPlots;
+    public PlotData[] plots;
     public FarmEffects[] farmEffects;
 }

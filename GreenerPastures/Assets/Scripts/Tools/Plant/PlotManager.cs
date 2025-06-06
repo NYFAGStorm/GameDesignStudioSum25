@@ -8,16 +8,28 @@ public class PlotManager : MonoBehaviour
     public PlotData data;
     public GameObject plant;
 
+    private TimeManager tim;
+
     private Renderer cursor;
     private bool cursorActive;
     private float cursorTimer;
+    private float plotTimer;
 
     const float CURSORPULSEDURATION = 0.5f;
+    // temp use time manager multiplier
+    const float WATERDRAINRATE = 0.25f;
+    const float PLOTCHECKINTERVAL = 1f;
 
 
     void Start()
     {
         // validate
+        tim = GameObject.FindAnyObjectByType<TimeManager>();
+        if ( tim == null )
+        {
+            Debug.LogError("--- PlotManager [Start] : no time manager found in scene. aborting.");
+            enabled = false;
+        }
         cursor = gameObject.transform.Find("Cursor").GetComponent<Renderer>();
         if ( cursor == null )
         {
@@ -29,6 +41,7 @@ public class PlotManager : MonoBehaviour
         {
             data = FarmSystem.InitializePlot();
             cursor.enabled = false;
+            plotTimer = 0.1f;
         }
     }
 
@@ -36,6 +49,19 @@ public class PlotManager : MonoBehaviour
     {
         CheckCursor();
 
+        // run plot timer
+        if ( plotTimer > 0f )
+        {
+            plotTimer -= Time.deltaTime;
+            if ( plotTimer < 0f )
+            {
+                plotTimer = PLOTCHECKINTERVAL;
+                // set sun
+                data.sun = Mathf.Clamp01(Mathf.Sin((tim.dayProgress - .25f) * 2f * Mathf.PI));
+                // water drain
+                data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * Time.deltaTime * PLOTCHECKINTERVAL));
+            }
+        }
     }
 
     void CheckCursor()
@@ -108,17 +134,6 @@ public class PlotManager : MonoBehaviour
                 plant.transform.position = transform.position;
                 data.condition = PlotCondition.Growing;
                 break;
-            case PlotCondition.Growing:
-                // change ground texture
-                if (r == null)
-                    Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
-                else
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
-                // remove plant
-                Destroy(plant); // temp
-                data.plant = PlantSystem.InitializePlant();
-                data.condition = PlotCondition.Uprooted;
-                break;
             case PlotCondition.Uprooted:
                 // change ground texture
                 if (r == null)
@@ -127,6 +142,49 @@ public class PlotManager : MonoBehaviour
                     r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
                 data.condition = PlotCondition.Dirt;
                 break;
+            default:
+                break;
         }       
+    }
+
+    /// <summary>
+    /// Waters this plot
+    /// </summary>
+    public void WaterPlot()
+    {
+        data.water = 1f;
+    }
+
+    public void HarvestPlant()
+    {
+        if ( data.condition == PlotCondition.Growing )
+        {
+            // harvest if plant is 100% grown and not yet harvested
+            if (data.plant.growth < 1f)
+                return;
+            if (data.plant.segment == PlantSegment.Default)
+            {
+                data.plant.segment = PlantSegment.Stalk;
+                plant.transform.Find("Plant Sprite").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+                // player would collect fruit as inventory at this point
+
+                print("- player harvests plant fruit of "+(Mathf.RoundToInt(data.plant.quality*10000f)/100f)+"% quality. -");
+            }
+        }
+    }
+
+    public void UprootPlot()
+    {
+        Renderer r = gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
+        // change ground texture
+        if (r == null)
+            Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
+        else
+            r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
+        // player would collect stalk or full plant as inventory at this point
+        // remove plant
+        Destroy(plant);
+        data.plant = PlantSystem.InitializePlant();
+        data.condition = PlotCondition.Uprooted;
     }
 }
