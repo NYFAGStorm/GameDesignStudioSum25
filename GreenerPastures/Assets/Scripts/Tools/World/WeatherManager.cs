@@ -6,10 +6,11 @@ public class WeatherManager : MonoBehaviour
     // This handles the world weather
 
     public float windAmount;
+    public float windDirection; // negative is left to right, positive right to left
     public float cloudAmount;
 
     private float windFactor;
-    private float windVector;
+    private float windVector; // the delta of wind factor (not direction)
     private float cloudFactor;
     private float cloudVector;
 
@@ -76,6 +77,19 @@ public class WeatherManager : MonoBehaviour
         windAmount = Mathf.Clamp01(windAmount - WINDWEIGHT + (windVector * WINDCHANGEMULTIPLIER));
         // adjust cloud
         cloudAmount = Mathf.Clamp01(cloudAmount - CLOUDWEIGHT + (cloudVector * CLOUDCHANGEMULTIPLIER));
+
+        // calculate wind direction
+        windDirection = ((windFactor * 2f) - 1f) / Mathf.Abs( (windFactor * 2f) - 1f );
+        if (windAmount == 0)
+            windDirection = 0f;
+
+        // use wind and cloud to adjust temperature (on time manager)
+        if ( windAmount > 0f || cloudAmount > 0f )
+        {
+            // NOTE: if this method is not called, this adjustment settles
+            float adjust = (windAmount * windDirection) + (cloudAmount * -2f);
+            tim.SetTemperatureAdjust(adjust);
+        }
     }
 
     float GetProceduralResult( float inputX, float inputY )

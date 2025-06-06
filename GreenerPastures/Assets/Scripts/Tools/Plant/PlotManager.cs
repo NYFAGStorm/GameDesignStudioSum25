@@ -374,7 +374,8 @@ public class PlotManager : MonoBehaviour
             actionCompleteTimer < ACTIONCOMPLETEDURATION * 0.5f)
             return;
 
-        r.height = 0.1f * h;
+        r.y += 0.01f * h;
+        r.height = 0.08f * h;
         Texture2D t = Texture2D.grayTexture;
         Color c = Color.white;
         c.a = 0.618f;
@@ -396,7 +397,7 @@ public class PlotManager : MonoBehaviour
         GUI.color = c;
 
         // display progress bar foreground
-        r.y += 0.05f * h;
+        r.y += 0.03f * h;
         r.height = 0.05f * h;
         GUI.depth = 1;
         // scale and position for 'inside' bg bar

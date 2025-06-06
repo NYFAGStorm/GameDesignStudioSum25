@@ -17,6 +17,8 @@ public class TimeManager : MonoBehaviour
     public WorldMonth monthOfYear;
     public WorldSeason season;
 
+    public float temperatureAdjust;
+
     // TODO: link to game for world data, run time based on game seed
     // TODO: revise UpdateGlobalTimeProgress() to include total game time
     // TODO: migrate temperature to weather manager
@@ -36,7 +38,8 @@ public class TimeManager : MonoBehaviour
     // WINTER 7am-5pm day, 5pm-7am night (10 hr days), base 10C
     // day/night cycles vary temperature from base by 10C
     // (cool down until dawn, warm up until dusk)
-    // weather effects temp as well
+    // weather effects temp as well (as temperatureAdjust)
+    const float TEMPADJUSTSETTLERATE = 0.01f;
 
 
     void Start()
@@ -126,6 +129,7 @@ public class TimeManager : MonoBehaviour
         // FIXME: the bottom seems 'to bounce' and not like a sine wave
         float seasonProgress = ((1 / 30) + (((dayProgress + dayOfMonth) / 30) + (int)monthOfYear)) / 12;
         baseTemperature = BASETEMPERATURE + (((Mathf.Sin(Mathf.PI * seasonProgress) * 2f) - 1f) * TEMPERATUREVARIANCE);
+        baseTemperature += temperatureAdjust;
         baseTemperature = Mathf.RoundToInt(baseTemperature * 10f) / 10f;
 
         // vary current temperature from base by day/night cycle
@@ -134,6 +138,14 @@ public class TimeManager : MonoBehaviour
 
         currentTempC = Mathf.RoundToInt(currentTempC * 10f) / 10f;
         currentTempF = Mathf.RoundToInt(currentTempF * 10f) / 10f;
+
+        // settle temperature adjustment from weather manager
+        if (temperatureAdjust > 0f)
+            temperatureAdjust -= (TEMPADJUSTSETTLERATE * Time.deltaTime) / WORLDTIMEMULTIPLIER;
+        if (temperatureAdjust < 0f)
+            temperatureAdjust += ( TEMPADJUSTSETTLERATE * Time.deltaTime ) / WORLDTIMEMULTIPLIER;
+        if (Mathf.Abs(temperatureAdjust) < 0.001f)
+            temperatureAdjust = 0f;
 
         UpdateGlobalTimeProgres(seasonProgress);
     }
@@ -153,8 +165,33 @@ public class TimeManager : MonoBehaviour
         return globalTimeProgress;
     }
 
+    /// <summary>
+    /// Gets the world time multiplier
+    /// </summary>
+    /// <returns>world time multiplier</returns>
     public float GetWorldTimeMultiplier()
     {
         return WORLDTIMEMULTIPLIER;
+    }
+
+    /// <summary>
+    /// Gets the current temperature in either C or F
+    /// </summary>
+    /// <returns>current temp</returns>
+    public float GetCurrentTemperature( bool F )
+    {
+        if (F)
+            return currentTempF;
+        else
+            return currentTempC;
+    }
+
+    /// <summary>
+    /// Sets temperature adjust, a settling value added to base temperature
+    /// </summary>
+    /// <param name="adjust">amount of temp adjustment in C</param>
+    public void SetTemperatureAdjust( float adjust )
+    {
+        temperatureAdjust = adjust;
     }
 }
