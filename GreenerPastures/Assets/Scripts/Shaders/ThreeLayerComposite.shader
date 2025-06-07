@@ -1,13 +1,19 @@
-Shader "Unlit/One Layer Composite"
+Shader "Unlit/Three Layer Composite"
 {
     // Author: Glenn Storm
-    // composite one-layer unlit with transparency, rendered both sides
+    // composite three-layer unlit with transparency, rendered both sides
     // _LineArt outline,
+    // _AccentFill fill image, AccentCol color property for accent fill
+    // _AltFill fill image, _AltCol color property for alt fill
     // _Maintex fill image, _Color property for fill
 
     Properties
     {
         _LineArt ("Texture", 2D) = "white" {}
+        _AccentFill ("Texture", 2D) = "white" {}
+        _AccentCol ("Color", Color) = (1,1,1,1)
+        _AltFill ("Textue", 2D) = "white" {}
+        _AltCol ("Color", Color) = (1,1,1,1)
         _MainTex ("Texture", 2D) = "white" {}
         _Color ("Color", Color) = (1,1,1,1)
     }
@@ -48,9 +54,15 @@ Shader "Unlit/One Layer Composite"
             };
 
             sampler2D _LineArt;
+            sampler2D _AccentFill;
+            sampler2D _AltFill;
             sampler2D _MainTex;
             float4 _LineArt_ST;
+            float4 _AccentFill_ST;
+            float4 _AltFill_ST;
             float4 _MainTex_ST;
+            float4 _AccentCol;
+            float4 _AltCol;
             float4 _Color;
 
             v2f vert (appdata v)
@@ -66,13 +78,23 @@ Shader "Unlit/One Layer Composite"
             {
                 // sample fill texture
                 fixed4 lin = tex2D(_LineArt, i.uv);
+                fixed4 acc = tex2D(_AccentFill, i.uv);
+                fixed4 alt = tex2D(_AltFill, i.uv);
                 fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fill color
+                // apply accent fill color
+                acc = acc + _AccentCol;
+                // apply alt fill color
+                alt = alt * _AltCol;
+                // apply main fill color
                 col = col * _Color;
+                // lay alt on top of main
+                col = lerp(col,alt,alt.a);
+                // lay accent on top of main
+                col = lerp(col,acc,acc.a);
                 // lay line on top of main
                 col = lerp(col,lin,lin.a);
-                // clamp add alpha from both
-                col.a = clamp(lin.a + col.a,0,1);
+                // clamp add alpha from all
+                col.a = clamp(lin.a + acc.a + alt.a + col.a,0,1);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;

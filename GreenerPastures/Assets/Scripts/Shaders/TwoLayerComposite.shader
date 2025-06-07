@@ -76,11 +76,11 @@ Shader "Unlit/Two Layer Composite"
                 fixed4 col = tex2D(_MainTex, i.uv);
                 // apply alt fill color
                 alt = alt * _AltCol;
-                // apply fill color
+                // apply main fill color
                 col = col * _Color;
                 // lay alt on top of main
                 col = lerp(col,alt,alt.a);
-                // lay line on top
+                // lay line on top of main
                 col = lerp(col,lin,lin.a);
                 // clamp add alpha from all
                 col.a = clamp(lin.a + alt.a + col.a,0,1);
