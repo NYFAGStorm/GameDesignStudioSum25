@@ -49,9 +49,10 @@ public class PlantManager : MonoBehaviour
                 float progress = ( PLANTCHECKINTERVAL / PLANTSTAGEDURATION );
 
                 // find resources amount as an average of sun, water and soil quality
-                float resources = (plot.data.sun + plot.data.water + plot.data.soil) / 3f;
+                // if even a little (25%) sun is available, this counts as 100% sun resource
+                float resources = (Mathf.Clamp01(plot.data.sun*4f) + plot.data.water + plot.data.soil) / 3f;
                 // calculate vitality
-                float vitalityDelta = (0.5f - resources) * -0.1f;
+                float vitalityDelta = (0.667f - resources) * -0.1f;
                 plot.data.plant.vitality = Mathf.Clamp01(plot.data.plant.vitality + vitalityDelta);
                 // calculate health
                 float healthDelta = (0.5f - plot.data.plant.vitality) + (0.5f - resources);
