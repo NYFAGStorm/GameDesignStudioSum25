@@ -40,6 +40,7 @@ public class PlayerControlManager : MonoBehaviour
     public bool characterFrozen;
 
     private Vector3 characterMove;
+    private LooseItemManager activeItem;
     private PlotManager activePlot;
     private PlayerActions characterActions;
 
@@ -80,6 +81,28 @@ public class PlayerControlManager : MonoBehaviour
         ReadMoveInput();
         // move
         DoCharacterMove();
+        // check action input
+        ReadActionInput();
+
+        // clear active loose item if moving
+        if (characterMove != Vector3.zero && activeItem != null)
+        {
+            activeItem.SetItemPulse(false);
+            activeItem = null;
+        }
+        // check near loose item
+        CheckNearItem();
+        // check action input (pickup)
+        if ( activeItem != null )
+        {
+            if (characterActions.actionA)
+            {
+                // pick up loose item, transfer to inventory
+                print("- player picks up '" + activeItem.looseItem.inv.items[0].name +"' -");
+            }
+            return;
+        }
+        // NOTE: if loose item active, skip plot activity altogether
 
         // clear active plot if moving
         if (characterMove != Vector3.zero && activePlot != null)
@@ -90,11 +113,9 @@ public class PlayerControlManager : MonoBehaviour
         // check near plot
         CheckNearPlot();
 
-        // check action input
-        ReadActionInput();
         // temp (a = work land, b = water plot , c = harvest plant, d = uproot plot)
         // temp (hold-type control detection)
-        if (activePlot)
+        if (activePlot != null)
         {
             // REVIEW: order?
             if (characterActions.actionA)
@@ -157,6 +178,23 @@ public class PlayerControlManager : MonoBehaviour
         if (characterMove.x > 0f)
             pam.spriteFlipped = false;
         gameObject.transform.position = pos;
+    }
+
+    void CheckNearItem()
+    {
+        if (activeItem != null)
+            return;
+
+        LooseItemManager[] items = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+        for (int i=0; i<items.Length; i++)
+        {
+            if (Vector3.Distance(items[i].gameObject.transform.position, gameObject.transform.position) < PROXIMITYRANGE)
+            {
+                activeItem = items[i];
+                items[i].SetItemPulse(true);
+                break;
+            }
+        }
     }
 
     void CheckNearPlot()

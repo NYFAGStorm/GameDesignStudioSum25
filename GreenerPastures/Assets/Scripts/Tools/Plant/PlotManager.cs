@@ -277,8 +277,8 @@ public class PlotManager : MonoBehaviour
         if (actionCompleteTimer > 0f && !actionClear)
             return;
 
-        // cannot harvest unless plant at 100% growth
-        if (data.plant.growth < 1f)
+        // cannot harvest unless plant at 100% growth and not yet harvested
+        if (data.plant.growth < 1f && data.plant.segment != PlantSegment.Default)
             return;
 
         if (action != CurrentAction.Harvesting && action != CurrentAction.None)
@@ -298,7 +298,7 @@ public class PlotManager : MonoBehaviour
                 data.plant.segment = PlantSegment.Stalk;
                 plant.transform.Find("Plant Sprite").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // player would collect fruit as inventory at this point
-
+                // drop as loose item
                 print("- player harvests plant fruit of "+(Mathf.RoundToInt(data.plant.quality*10000f)/100f)+"% quality. -");
             }
         }
@@ -330,6 +330,7 @@ public class PlotManager : MonoBehaviour
         else
             r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
         // player would collect stalk or full plant as inventory at this point
+        // drop as loose item
         // remove plant
         Destroy(plant);
         data.plant = PlantSystem.InitializePlant();

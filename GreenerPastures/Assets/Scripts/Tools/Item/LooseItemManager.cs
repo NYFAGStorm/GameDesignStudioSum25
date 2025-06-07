@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LooseItemManager : MonoBehaviour
@@ -17,8 +15,11 @@ public class LooseItemManager : MonoBehaviour
 
     private float spriteTimer;
     private SpriteRenderer spriteRenderer;
+    private bool pulseActive;
+    private float pulseTimer;
 
     const float MINIMUMFRAMETIME = 0.05f; // max animation fps is 20
+    const float ITEMPULSEDURATION = 0.5f;
 
 
     void Start()
@@ -46,6 +47,8 @@ public class LooseItemManager : MonoBehaviour
             enabled = false;
             return;
         }
+
+        CheckItemPulse();
 
         // configure horizontal flip
         spriteRenderer.flipX = looseItem.flipped;
@@ -173,5 +176,36 @@ public class LooseItemManager : MonoBehaviour
     public void AdjustItemDurability( float value )
     {
         looseItem.inv.items[0].durability = Mathf.Clamp01(looseItem.inv.items[0].durability + value);
+    }
+
+    void CheckItemPulse()
+    {
+        if (!pulseActive)
+            return;
+        pulseTimer += Time.deltaTime;
+        float pulse = 1f - ((pulseTimer % ITEMPULSEDURATION) * 0.9f);
+        SetItemHighlight(pulse);
+    }
+
+    /// <summary>
+    /// Sets the item pulse
+    /// </summary>
+    /// <param name="active">pulse if true</param>
+    public void SetItemPulse(bool active)
+    {
+        pulseActive = active;
+        SetItemHighlight(1f);
+        pulseTimer = 0f;
+    }
+
+    void SetItemHighlight(float value)
+    {
+        // REVIEW: need another way to highlight, for any color sprite
+        Color c = spriteRenderer.material.color;
+        c.r = 1f;
+        c.g = value;
+        c.b = 1f;
+        c.a = 1f;
+        spriteRenderer.material.color = c;
     }
 }
