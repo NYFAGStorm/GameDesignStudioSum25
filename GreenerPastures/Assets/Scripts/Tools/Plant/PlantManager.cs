@@ -5,7 +5,6 @@ public class PlantManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles a single plant object
 
-
     private float plantTimer;
     private Renderer plantSprite;
     private PlotManager plot;
@@ -49,8 +48,8 @@ public class PlantManager : MonoBehaviour
                 // temp
                 float progress = ( PLANTCHECKINTERVAL / PLANTSTAGEDURATION );
 
-                // find resources amount as 50% sun and 50% water of plot
-                float resources = ((0.5f * plot.data.sun) + (0.5f * plot.data.water));
+                // find resources amount as an average of sun, water and soil quality
+                float resources = (plot.data.sun + plot.data.water + plot.data.soil) / 3f;
                 // calculate vitality
                 float vitalityDelta = (0.5f - resources) * -0.1f;
                 plot.data.plant.vitality = Mathf.Clamp01(plot.data.plant.vitality + vitalityDelta);

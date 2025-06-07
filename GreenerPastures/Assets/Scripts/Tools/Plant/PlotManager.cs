@@ -289,8 +289,9 @@ public class PlotManager : MonoBehaviour
         if (actionCompleteTimer > 0f && !actionClear)
             return;
 
-        // cannot harvest unless plant at 100% growth and not yet harvested
-        if (data.plant.growth < 1f && data.plant.segment != PlantSegment.Default)
+        // cannot harvest unless a plant exists, plant at 100% growth and not yet harvested
+        if (plant == null || data.plant.growth < 1f || 
+            data.plant.segment != PlantSegment.Default)
             return;
 
         if (action != CurrentAction.Harvesting && action != CurrentAction.None)
