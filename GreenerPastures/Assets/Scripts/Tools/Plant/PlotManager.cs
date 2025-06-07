@@ -34,6 +34,9 @@ public class PlotManager : MonoBehaviour
     private string actionLabel;
     private float actionCompleteTimer;
 
+    private float harvestDisplayTimer;
+    private float harvestQualityValue;
+
     const float CURSORPULSEDURATION = 0.5f;
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
@@ -47,6 +50,7 @@ public class PlotManager : MonoBehaviour
     const float HARVESTWINDOW = 1.5f;
     const float UPROOTWINDOW = 2.5f;
     const float ACTIONCOMPLETEDURATION = 0.5f;
+    const float HARVESTDISPLAYDURATION = 1f;
 
 
     void Start()
@@ -107,6 +111,14 @@ public class PlotManager : MonoBehaviour
                 actionLabel = "";
                 actionProgressDisplay = false;
             }
+        }
+
+        // run harvest display timer
+        if ( harvestDisplayTimer > 0f )
+        {
+            harvestDisplayTimer -= Time.deltaTime;
+            if ( harvestDisplayTimer < 0f )
+                harvestDisplayTimer = 0f;
         }
     }
 
@@ -312,7 +324,10 @@ public class PlotManager : MonoBehaviour
                 plant.transform.Find("Plant Sprite").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // player would collect fruit as inventory at this point
                 // drop as loose item
-                print("- player harvests plant fruit of "+(Mathf.RoundToInt(data.plant.quality*10000f)/100f)+"% quality. -");
+                // harvest results display
+                harvestDisplayTimer = HARVESTDISPLAYDURATION;
+                harvestQualityValue = data.plant.quality;
+                //print("- player harvests plant fruit of "+(100f * data.plant.quality).ToString("00.0")+"% quality. -");
             }
         }
     }
@@ -352,7 +367,7 @@ public class PlotManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (!cursorActive && !actionProgressDisplay)
+        if (!cursorActive && !actionProgressDisplay && harvestDisplayTimer <= 0f)
             return;
 
         Rect r = new Rect();
@@ -369,6 +384,27 @@ public class PlotManager : MonoBehaviour
         // locate display over plot
         Vector3 disp = Camera.main.WorldToViewportPoint(gameObject.transform.position);
         disp.y = (1f - disp.y);
+
+        if (harvestDisplayTimer > 0f)
+        {
+            float progress = 1f - (harvestDisplayTimer / HARVESTDISPLAYDURATION);
+            float fade = Mathf.Clamp01( (1f - progress) * 3f);
+
+            r.x = (disp.x - 0.05f) * w;
+            r.y = disp.y * h;
+            r.y -= (0.355f + (progress * 0.025f)) * h;
+            r.width = 0.1f * w;
+            r.height = 0.075f * h;
+
+            g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
+            s = "Quality: " + (harvestQualityValue * 100f).ToString("00.0") + "%";
+            c = Color.yellow;
+            c.a = fade;
+            GUI.color = c;
+            GUI.depth = -3;
+
+            GUI.Label(r, s, g);
+        }
 
         if (!actionProgressDisplay)
         {
