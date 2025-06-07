@@ -25,9 +25,11 @@ public class TimeManager : MonoBehaviour
     private long gameSeedTime;
     private long globalTimeProgress;
 
+    private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
+
     const float SUNLIGHTINTENSITY = 1f;
     const float MOONLIGHTINTENSITY = 0.1f;
-    const float WORLDTIMEMULTIPLIER = 60f; // set to 600f, 6000f, 60000f, for testing
+    const float WORLDTIMEMULTIPLIER = 60f; // default time rate
     const float BASETEMPERATURE = 20f; // C
     const float TEMPERATUREVARIANCE = 10f;
     const float DAYNIGHTTEMPVARIANCE = 5f;
@@ -73,7 +75,7 @@ public class TimeManager : MonoBehaviour
 
     void Update()
     {
-        dayProgress += Time.deltaTime * WORLDTIMEMULTIPLIER * (1f/(60f*60f*24f));
+        dayProgress += Time.deltaTime * (WORLDTIMEMULTIPLIER * cheatTimeScale) * (1f/(60f*60f*24f));
         if ( dayProgress > 1f )
         {
             dayProgress = 0f;
@@ -96,7 +98,7 @@ public class TimeManager : MonoBehaviour
             }
         }
         // rotate sky lights object once per game day
-        float sunRotX = Time.deltaTime * WORLDTIMEMULTIPLIER * (360f / (24f * 60f * 60f));
+        float sunRotX = Time.deltaTime * (WORLDTIMEMULTIPLIER * cheatTimeScale) * (360f / (24f * 60f * 60f));
         skyLightObject.transform.Rotate(sunRotX, 0f, 0f);
         // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
         
@@ -141,9 +143,9 @@ public class TimeManager : MonoBehaviour
 
         // settle temperature adjustment from weather manager
         if (temperatureAdjust > 0f)
-            temperatureAdjust -= (TEMPADJUSTSETTLERATE * Time.deltaTime) / WORLDTIMEMULTIPLIER;
+            temperatureAdjust -= (TEMPADJUSTSETTLERATE * Time.deltaTime) / (WORLDTIMEMULTIPLIER * cheatTimeScale);
         if (temperatureAdjust < 0f)
-            temperatureAdjust += ( TEMPADJUSTSETTLERATE * Time.deltaTime ) / WORLDTIMEMULTIPLIER;
+            temperatureAdjust += ( TEMPADJUSTSETTLERATE * Time.deltaTime ) / (WORLDTIMEMULTIPLIER * cheatTimeScale);
         if (Mathf.Abs(temperatureAdjust) < 0.001f)
             temperatureAdjust = 0f;
 
@@ -153,7 +155,7 @@ public class TimeManager : MonoBehaviour
     void UpdateGlobalTimeProgres( float seasonProgress )
     {
         // TODO: also add game data total game time
-        globalTimeProgress = gameSeedTime + (long)(seasonProgress * WORLDTIMEMULTIPLIER);
+        globalTimeProgress = gameSeedTime + (long)(seasonProgress * (WORLDTIMEMULTIPLIER * cheatTimeScale));
     }
 
     /// <summary>
@@ -171,7 +173,16 @@ public class TimeManager : MonoBehaviour
     /// <returns>world time multiplier</returns>
     public float GetWorldTimeMultiplier()
     {
-        return WORLDTIMEMULTIPLIER;
+        return (WORLDTIMEMULTIPLIER * cheatTimeScale);
+    }
+
+    /// <summary>
+    /// Sets the cheat time scale to adjust world time multiplier
+    /// </summary>
+    /// <param name="cheatScale">time scale (default 1f)</param>
+    public void SetCheatTimeScale( float cheatScale )
+    {
+        cheatTimeScale = cheatScale;
     }
 
     /// <summary>
