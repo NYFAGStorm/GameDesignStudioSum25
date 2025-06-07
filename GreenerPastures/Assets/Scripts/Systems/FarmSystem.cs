@@ -9,6 +9,7 @@ public static class FarmSystem
         PlotData retPlot = new PlotData();
 
         retPlot.condition = PlotCondition.Wild;
+        retPlot.soil = 0.5f;
         retPlot.plant = PlantSystem.InitializePlant();
         retPlot.plotEffects = new PlotEffect[0];
 

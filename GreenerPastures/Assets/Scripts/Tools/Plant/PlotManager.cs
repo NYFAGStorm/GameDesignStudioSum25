@@ -37,6 +37,8 @@ public class PlotManager : MonoBehaviour
     const float CURSORPULSEDURATION = 0.5f;
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
+    const float WATERDRAINWITHPLANTRATE = 0.1f;
+    const float SOILDEGRADERATE = 0.1f;
     const float PLOTCHECKINTERVAL = 1f;
     // action hold time windows to complete
     const float WORKLANDWINDOW = 2f;
@@ -44,7 +46,7 @@ public class PlotManager : MonoBehaviour
     const float PLANTWINDOW = .5f;
     const float HARVESTWINDOW = 1.5f;
     const float UPROOTWINDOW = 2.5f;
-    const float ACTIONCOMPLETEDURATION = 1f;
+    const float ACTIONCOMPLETEDURATION = 0.5f;
 
 
     void Start()
@@ -86,6 +88,12 @@ public class PlotManager : MonoBehaviour
                 data.sun = Mathf.Clamp01(Mathf.Sin((tim.dayProgress - .25f) * 2f * Mathf.PI));
                 // water drain
                 data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * Time.deltaTime * PLOTCHECKINTERVAL));
+                // water drain faster if plant, based on plant growth
+                if (plant != null)
+                    data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * Time.deltaTime * PLOTCHECKINTERVAL));
+                // soil degrade, if plant exists
+                if ( plant != null )
+                    data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * SOILDEGRADERATE * Time.deltaTime * PLOTCHECKINTERVAL));
             }
         }
 
@@ -219,6 +227,8 @@ public class PlotManager : MonoBehaviour
                 else
                     r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
                 data.condition = PlotCondition.Dirt;
+                // soil quality improved
+                data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
                 break;
             case PlotCondition.Dirt:
                 // change ground texture
@@ -227,6 +237,8 @@ public class PlotManager : MonoBehaviour
                 else
                     r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
                 data.condition = PlotCondition.Tilled;
+                // soil quality improved
+                data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
                 break;
             case PlotCondition.Tilled:
                 // plant seed
@@ -339,7 +351,7 @@ public class PlotManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (!actionProgressDisplay)
+        if (!cursorActive && !actionProgressDisplay)
             return;
 
         Rect r = new Rect();
@@ -350,10 +362,107 @@ public class PlotManager : MonoBehaviour
         g.fontStyle = FontStyle.Bold;
         g.alignment = TextAnchor.MiddleCenter;
         string s = actionLabel;
+        Texture2D t = Texture2D.whiteTexture;
+        Color c = Color.white;
 
         // locate display over plot
         Vector3 disp = Camera.main.WorldToViewportPoint(gameObject.transform.position);
-        disp.y = 1f - disp.y;
+        disp.y = (1f - disp.y);
+
+        if (!actionProgressDisplay)
+        {
+            r.x = (disp.x - 0.05f) * w;
+            r.y = disp.y * h;
+            r.y -= 0.3f * h;
+            r.width = 0.1f * w;
+            if (plant == null)
+                r.height = 0.08f * h;
+            else
+                r.height = 0.15f * h;
+
+            // display stats background
+            c = Color.gray;
+            c.a = .8f;
+            GUI.color = c;
+            GUI.depth = 2;
+
+            GUI.DrawTexture(r, t);
+
+            // plot stats display
+            r.x += 0.01f * w;
+            if (plant == null)
+                r.y -= 0.025f * h;
+            else
+                r.y -= 0.05f * h;
+            g.fontSize = Mathf.RoundToInt(10f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleLeft;
+
+            GUI.color = Color.white;
+            c.a = 1f;
+            GUI.depth = 0;
+
+            // stats drop shadow first, then text
+            GUI.color = Color.black;
+            r.x += 0.0005f * w;
+            r.y += 0.001f * h;
+
+            s = "Sun      : " + (data.sun * 100f).ToString("00.0") + "%";
+            GUI.Label(r, s, g);
+
+            r.y += 0.025f * h;
+            s = "Water   : " + (data.water * 100f).ToString("00.0") + "%";
+            GUI.Label(r, s, g);
+
+            r.y += 0.025f * h;
+            s = "Soil      : " + (data.soil * 100f).ToString("00.0") + "%";
+            GUI.Label(r, s, g);
+
+            if (plant != null)
+            {
+                r.y += 0.025f * h;
+                s = "Growth : " + (data.plant.growth * 100f).ToString("00.0")+"%";
+                GUI.Label(r, s, g);
+
+                r.y += 0.025f * h;
+                s = "Quality : " + (data.plant.quality * 100f).ToString("00.0") + "%";
+                GUI.Label(r, s, g);
+            }
+
+            // reset to top to draw text again
+            if (plant == null)
+                r.y -= 0.05f * h;
+            else
+                r.y -= 0.1f * h;
+            GUI.color = Color.white;
+            r.x -= 0.001f * w;
+            r.y -= 0.002f * h;
+
+            s = "Sun      : " + (data.sun * 100f).ToString("00.0") + "%";
+            GUI.Label(r, s, g);
+
+            r.y += 0.025f * h;
+            s = "Water   : " + (data.water * 100f).ToString("00.0") + "%";
+            GUI.Label(r, s, g);
+
+            r.y += 0.025f * h;
+            s = "Soil      : " + (data.soil * 100f).ToString("00.0") + "%";
+            GUI.Label(r, s, g);
+
+            if (plant != null)
+            {
+                r.y += 0.025f * h;
+                s = "Growth : " + (data.plant.growth * 100f).ToString("00.0") + "%";
+                GUI.Label(r, s, g);
+
+                r.y += 0.025f * h;
+                s = "Quality : " + (data.plant.quality * 100f).ToString("00.0") + "%";
+                GUI.Label(r, s, g);
+            }
+        }
+
+        if (!actionProgressDisplay)
+            return;
 
         r.x = (disp.x - 0.05f) * w;
         r.y = disp.y * h;
@@ -361,32 +470,39 @@ public class PlotManager : MonoBehaviour
         r.width = 0.1f * w;
         r.height = 0.05f * h;
 
+        g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+        g.fontStyle = FontStyle.Bold;
+        g.alignment = TextAnchor.MiddleCenter;
+
         // display action label with drop shadow
         GUI.color = Color.black;
-        r.x += 0.000618f * w;
+        GUI.depth = 0;
+        r.x += 0.0005f * w;
         r.y += 0.001f * h;
+
         GUI.Label(r,s,g);
+
         GUI.color = Color.white;
-        r.x -= 0.0012382f * w;
+        r.x -= 0.001f * w;
         r.y -= 0.002f * h;
+
         GUI.Label(r,s,g);
 
         if (actionCompleteTimer != 0f && 
             actionCompleteTimer < ACTIONCOMPLETEDURATION * 0.5f)
             return;
 
-        r.y += 0.01f * h;
-        r.height = 0.08f * h;
-        Texture2D t = Texture2D.grayTexture;
-        Color c = Color.white;
-        c.a = 0.618f;
-        GUI.color = c;
-
         // display progress bar background
+        r.y += 0.05f * h;
+        r.height = 0.05f * h;
+        c = Color.gray;
+        c.a = .8f;
+        GUI.color = c;
         GUI.depth = 2;
+
         GUI.DrawTexture(r, t);
 
-        t = Texture2D.whiteTexture;
+        // display progress bar foreground
         c = Color.blue;
         c.r = 0.1f;
         c.g = 0.1f;
@@ -397,8 +513,6 @@ public class PlotManager : MonoBehaviour
         c.a = 1f;
         GUI.color = c;
 
-        // display progress bar foreground
-        r.y += 0.03f * h;
         r.height = 0.05f * h;
         GUI.depth = 1;
         // scale and position for 'inside' bg bar
@@ -408,6 +522,7 @@ public class PlotManager : MonoBehaviour
         r.height -= 0.02f * h;
         // scale for progress
         r.width = (actionProgress / actionLimit) * r.width;
+
         GUI.DrawTexture(r, t);
     }
 }

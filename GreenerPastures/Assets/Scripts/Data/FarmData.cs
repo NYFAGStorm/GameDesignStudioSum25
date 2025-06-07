@@ -27,6 +27,7 @@ public class PlotData
     public PlotCondition condition;
     public float sun;
     public float water;
+    public float soil;
     public PlantData plant;
     public PlotEffect[] plotEffects;
 }
