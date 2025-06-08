@@ -14,6 +14,7 @@ public class CreditsScreen : MonoBehaviour
     public Rect title;
 
     public Font titleFont;
+    public FontStyle titleFontStyle;
     public Color titleFontColor = Color.white;
     [Tooltip("Font will scale appropriately based on active screen width, using this 1024 size")]
     public int titleFontSizeAt1024 = 60;
@@ -27,6 +28,7 @@ public class CreditsScreen : MonoBehaviour
     }
     public CreditListing[] credits;
     public Font creditFont;
+    public FontStyle creditsFontStyle;
     public Color creditFontColor = Color.white;
     public int creditFontSizeAt1024 = 40;
 
@@ -34,6 +36,7 @@ public class CreditsScreen : MonoBehaviour
     public Rect backButton;
 
     public Font buttonFont;
+    public FontStyle buttonFontStyle;
     public Color buttonFontColor = Color.white;
     [Tooltip("Font will scale appropriately based on active screen width, using this 1024 size")]
     public int backButtonFontSizeAt1024 = 48;
@@ -56,6 +59,7 @@ public class CreditsScreen : MonoBehaviour
         float h = Screen.height;
         GUIStyle g = new GUIStyle();
         g.font = titleFont;
+        g.fontStyle = titleFontStyle;
         g.fontSize = Mathf.RoundToInt(titleFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
@@ -78,6 +82,7 @@ public class CreditsScreen : MonoBehaviour
             r.width *= w;
             r.height *= h;
             g.font = creditFont;
+            g.fontStyle = creditsFontStyle;
             g.fontSize = Mathf.RoundToInt(creditFontSizeAt1024 * (w / 1024f));
             g.alignment = TextAnchor.MiddleLeft;
             if ( credits[i].alignRight )
@@ -94,6 +99,7 @@ public class CreditsScreen : MonoBehaviour
         r.height *= h;
         g = new GUIStyle(GUI.skin.button);
         g.font = buttonFont;
+        g.fontStyle = buttonFontStyle;
         g.fontSize = Mathf.RoundToInt(backButtonFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;

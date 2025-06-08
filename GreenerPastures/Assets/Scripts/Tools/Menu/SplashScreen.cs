@@ -14,6 +14,7 @@ public class SplashScreen : MonoBehaviour
     public Rect title;
 
     public Font titleFont;
+    public FontStyle titleFontStyle;
     public Color titleFontColor = Color.white;
     [Tooltip("Font will scale appropriately based on active screen width, using this 1024 size")]
     public int titleFontSizeAt1024 = 60;
@@ -22,6 +23,7 @@ public class SplashScreen : MonoBehaviour
     public Rect startButton;
 
     public Font buttonFont;
+    public FontStyle buttonFontStyle;
     public Color buttonFontColor = Color.white;
     public int buttonFontSizeAt1024 = 48;
 
@@ -43,10 +45,11 @@ public class SplashScreen : MonoBehaviour
         float h = Screen.height;
         GUIStyle g = new GUIStyle();
         g.font = titleFont;
+        g.fontStyle = titleFontStyle;
         g.fontSize = Mathf.RoundToInt(titleFontSizeAt1024 * (w/1024f));
         g.alignment = TextAnchor.MiddleCenter;
-        g.normal.textColor = buttonFontColor;
-        g.active.textColor = buttonFontColor;
+        g.normal.textColor = titleFontColor;
+        g.active.textColor = titleFontColor;
         string s = titleText;
 
         r = title;
@@ -64,7 +67,10 @@ public class SplashScreen : MonoBehaviour
         r.height *= h;
         g = new GUIStyle(GUI.skin.button);
         g.font = buttonFont;
+        g.fontStyle = buttonFontStyle;
         g.fontSize = Mathf.RoundToInt(buttonFontSizeAt1024 * (w / 1024f));
+        g.normal.textColor = buttonFontColor;
+        g.active.textColor = buttonFontColor;
         s = startButtonText;
 
         if (GUI.Button(r,s,g))
