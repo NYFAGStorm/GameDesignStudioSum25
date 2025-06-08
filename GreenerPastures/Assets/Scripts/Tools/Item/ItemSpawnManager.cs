@@ -103,7 +103,8 @@ public class ItemSpawnManager : MonoBehaviour
                 }
                 if (drops[i].dropItem == null)
                 {
-                    Debug.LogWarning("--- ItemSpawnManager [Update] : drop item ["+i+"] lost. will ignore.");
+                    // this happens if player takes it while in animation
+                    //Debug.LogWarning("--- ItemSpawnManager [Update] : drop item ["+i+"] lost. will ignore.");
                     drops[i].dropTimer = 0f;
                     continue;
                 }

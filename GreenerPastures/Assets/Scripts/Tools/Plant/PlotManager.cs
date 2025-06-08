@@ -329,7 +329,8 @@ public class PlotManager : MonoBehaviour
                 else
                 {
                     Vector3 target = gameObject.transform.position;
-                    target.x += (RandomSystem.GaussianRandom01() * .25f) - .5f;
+                    target.x += (RandomSystem.GaussianRandom01() * 1f) - .5f;
+                    target.z -= 0.01f; // in front of plant
                     LooseItemData loose = InventorySystem.CreateItem(ItemType.ItemB);
                     // TODO: transfer quality of fruit to item (revise item data)
                     ism.SpawnItem(loose, gameObject.transform.position, target);
