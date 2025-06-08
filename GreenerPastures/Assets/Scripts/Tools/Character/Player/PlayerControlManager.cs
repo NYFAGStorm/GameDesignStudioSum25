@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class PlayerControlManager : MonoBehaviour
 {
@@ -115,8 +114,12 @@ public class PlayerControlManager : MonoBehaviour
 
         // clear active loose item if moving
         ClearActiveItem();
-        // check near loose item
-        CheckNearItem();
+        // disallow item pick up if player inventory is full
+        if (playerInventory.items.Length < playerInventory.maxSlots)
+        {
+            // check near loose item
+            CheckNearItem();
+        }
         // check action input (pickup)
         if ( activeItem != null )
         {
