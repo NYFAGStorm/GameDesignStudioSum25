@@ -1653,11 +1653,13 @@ MonoBehaviour:
   itemSpriteData:
     sprites:
     - name: Item Fertilizer
+      type: 1
       spriteIndexBase: 0
       spriteAnimLength: 0
       animFrameTime: 0
       animLoop: 0
     - name: Item Flower
+      type: 2
       spriteIndexBase: 1
       spriteAnimLength: 0
       animFrameTime: 0
@@ -2361,6 +2363,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 727019979}
     m_Modifications:
+    - target: {fileID: 261740017079920572, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
+      propertyPath: playerInventory.items.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 261740017079920572, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
+      propertyPath: playerInventory.items.Array.data[0].type
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 261740017079920572, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
+      propertyPath: playerInventory.items.Array.data[1].type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 261740017079920572, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
+      propertyPath: playerInventory.items.Array.data[2].type
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3232420859449547436, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
       propertyPath: m_Name
       value: Player Character

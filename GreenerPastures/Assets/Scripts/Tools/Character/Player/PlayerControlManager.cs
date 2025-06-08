@@ -44,10 +44,16 @@ public class PlayerControlManager : MonoBehaviour
     private PlotManager activePlot;
     private PlayerActions characterActions;
 
+    private InventoryData playerInventory;
+    private int currentInventorySelection;
+    private float inventorySelectionTimer;
+
     private CameraManager cam;
     private PlayerAnimManager pam;
+    private SpriteLibraryManager slm;
 
     const float PROXIMITYRANGE = 0.381f;
+    const float INVENTORYSELECTIONTIME = 2f;
 
 
     void Start()
@@ -65,10 +71,25 @@ public class PlayerControlManager : MonoBehaviour
             Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no player anim manager found in children. aborting.");
             enabled = false;
         }
+        slm = GameObject.FindFirstObjectByType<SpriteLibraryManager>();
+        if (slm == null)
+        {
+            Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no sprite library manager found. aborting.");
+            enabled = false;
+        }
         // initialize
         if (enabled)
         {
             cam.SetPlayer(this);
+            playerInventory = InventorySystem.InitializeInventory(5);
+            currentInventorySelection = 2;
+            // temp - fill player inventory for testing
+            playerInventory.items = new ItemData[5];
+            playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.ItemA);
+            playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.ItemB);
+            playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.ItemB);
+            playerInventory.items[3] = InventorySystem.InitializeItem(ItemType.Default);
+            playerInventory.items[4] = InventorySystem.InitializeItem(ItemType.Default);
         }
     }
 
@@ -83,6 +104,30 @@ public class PlayerControlManager : MonoBehaviour
         DoCharacterMove();
         // check action input
         ReadActionInput();
+
+        // detect inventory selection input
+        // REVIEW: controls for inventory selection
+        if ( Input.GetKeyDown(KeyCode.LeftBracket) )
+        {
+            inventorySelectionTimer = INVENTORYSELECTIONTIME;
+            currentInventorySelection--;
+            if (currentInventorySelection < 0)
+                currentInventorySelection = playerInventory.maxSlots - 1;
+        }
+        if ( Input.GetKeyDown(KeyCode.RightBracket) )
+        {
+            inventorySelectionTimer = INVENTORYSELECTIONTIME;
+            currentInventorySelection++;
+            if (currentInventorySelection > playerInventory.maxSlots - 1)
+                currentInventorySelection = 0;
+        }
+        // run inventory selection timer
+        if ( inventorySelectionTimer > 0f )
+        {
+            inventorySelectionTimer -= Time.deltaTime;
+            if ( inventorySelectionTimer < 0f )
+                inventorySelectionTimer = 0f;
+        }
 
         // clear active loose item if moving
         if (characterMove != Vector3.zero && activeItem != null)
@@ -222,5 +267,53 @@ public class PlayerControlManager : MonoBehaviour
         characterActions.actionB = Input.GetKey(actionBKey);
         characterActions.actionC = Input.GetKey(actionCKey);
         characterActions.actionD = Input.GetKey(actionDKey);
+    }
+
+    void OnGUI()
+    {
+        Rect r = new Rect();
+        float w = Screen.width;
+        float h = Screen.height;
+
+        Texture2D t = Texture2D.whiteTexture;
+        Color c = Color.white;
+
+        r.x = 0.475f * w;
+        r.y = 0.01f * h;
+        r.width = 0.05f * w;
+        r.height = r.width;
+
+        r.x -= (0.05f * w) * ((playerInventory.maxSlots/2f) + 0.5f);
+        for (int i=0; i<5; i++)
+        {
+            r.x += 0.05f * w;
+            if (playerInventory.items != null && playerInventory.items.Length > i)
+            {
+                if (playerInventory.items[i].type != ItemType.Default)
+                {
+                    // adjust smaller
+                    r.x += 0.005f * w;
+                    r.y += (0.005f * w);
+                    r.width -= (0.01f * w);
+                    r.height -= (0.01f * w);
+                    // draw inventory item
+                    t = (Texture2D)slm.itemSprites[slm.GetSpriteData(playerInventory.items[i].type).spriteIndexBase].texture;
+                    GUI.DrawTexture(r, t);
+                    // re-adjust larger again
+                    r.x -= 0.005f * w;
+                    r.y -= (0.005f * w);
+                    r.width += (0.01f * w);
+                    r.height += (0.01f * w);
+                }
+            }
+            // draw inventory slot frame
+            t = (Texture2D)Resources.Load("Plot_Cursor");
+            c = Color.white;
+            if (i == currentInventorySelection && inventorySelectionTimer > 0f)
+                c = Color.yellow;
+            GUI.color = c;
+            GUI.DrawTexture(r, t);
+            GUI.color = Color.white;
+        }
     }
 }

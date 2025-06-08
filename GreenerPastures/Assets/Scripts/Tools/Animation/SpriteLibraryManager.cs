@@ -58,7 +58,7 @@ public class SpriteLibraryManager : MonoBehaviour
         int index = -1;
         for (int i=0; i<itemSpriteData.sprites.Length; i++)
         {
-            if (itemSpriteData.sprites[i].name == itemType.ToString())
+            if (itemSpriteData.sprites[i].type == itemType)
             {
                 found = true;
                 index = i;
