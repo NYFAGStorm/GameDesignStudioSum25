@@ -47,6 +47,7 @@ public class PlayerControlManager : MonoBehaviour
     private InventoryData playerInventory;
     private int currentInventorySelection;
     private float inventorySelectionTimer;
+    private bool itemTakenAction;
 
     private CameraManager cam;
     private PlayerAnimManager pam;
@@ -84,12 +85,10 @@ public class PlayerControlManager : MonoBehaviour
             playerInventory = InventorySystem.InitializeInventory(5);
             currentInventorySelection = 2;
             // temp - fill player inventory for testing
-            playerInventory.items = new ItemData[5];
+            playerInventory.items = new ItemData[3];
             playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.ItemA);
             playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.ItemB);
             playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.ItemB);
-            playerInventory.items[3] = InventorySystem.InitializeItem(ItemType.Default);
-            playerInventory.items[4] = InventorySystem.InitializeItem(ItemType.Default);
         }
     }
 
@@ -104,6 +103,10 @@ public class PlayerControlManager : MonoBehaviour
         DoCharacterMove();
         // check action input
         ReadActionInput();
+
+        // reset item taken action
+        if (itemTakenAction && !characterActions.actionA)
+            itemTakenAction = false;
 
         // detect inventory selection input
         // REVIEW: controls for inventory selection
@@ -130,7 +133,7 @@ public class PlayerControlManager : MonoBehaviour
             else
             {
                 // handle drop item selected
-                if (characterActions.actionC && playerInventory.items[currentInventorySelection].type != ItemType.Default)
+                if (characterActions.actionC && currentInventorySelection < playerInventory.items.Length)
                 {
                     inventorySelectionTimer = 0f; // prevents dropping multiple items
                     // spawn loose item dropped from inventory
@@ -162,10 +165,18 @@ public class PlayerControlManager : MonoBehaviour
         // check action input (pickup)
         if ( activeItem != null )
         {
-            if (characterActions.actionA)
+            if (characterActions.actionA && !itemTakenAction)
             {
+                // validate
+                if (activeItem.looseItem.inv.items.Length == 0)
+                {
+                    Debug.LogWarning("--- PlayerControlManager [Update] : trying to take empty loose item. will ignore.");
+                    return;
+                }
                 // pick up loose item, transfer to inventory
-                print("- player picks up '" + activeItem.looseItem.inv.items[0].name +"' -");
+                playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
+                activeItem = null;
+                itemTakenAction = true; // player must un-press action button to take again
             }
             return;
         }

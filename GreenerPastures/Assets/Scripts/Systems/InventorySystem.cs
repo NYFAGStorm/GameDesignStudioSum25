@@ -55,9 +55,7 @@ public static class InventorySystem
         if (item == null || item.inv.items[0] == null)
             return retInv;
         // store loose item into inventory
-        StoreItem(item.inv.items[0], item.inv, inv, out item.inv, out retInv);
-        // remove item from returned loose item data as well
-        RemoveItemFromInventory(item.inv, item.inv.items[0]);
+        StoreItem(item.inv.items[0], item.inv, inv, out retItem.inv, out retInv);       
         // flag loose item for deletion
         retItem.deleteMe = true;
 
@@ -78,11 +76,8 @@ public static class InventorySystem
         retFrom = from;
         retTo = to;
 
-        AddToInventory(to, item);
-        RemoveItemFromInventory(from, item);
-
-        retFrom = from;
-        retTo = to;
+        retTo = AddToInventory(to, item);
+        retFrom = RemoveItemFromInventory(from, item);
     }
 
     /// <summary>

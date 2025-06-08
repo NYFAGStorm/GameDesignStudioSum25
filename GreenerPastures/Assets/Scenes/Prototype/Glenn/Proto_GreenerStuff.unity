@@ -655,7 +655,7 @@ GameObject:
   - component: {fileID: 527706816}
   - component: {fileID: 527706818}
   m_Layer: 0
-  m_Name: Loose Item Prototype
+  m_Name: Item TypeA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -745,7 +745,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   looseItem:
     inv:
-      maxSlots: 0
+      maxSlots: 1
       items:
       - name: Fertilizer
         type: 1
@@ -1346,7 +1346,7 @@ GameObject:
   - component: {fileID: 1036132232}
   - component: {fileID: 1036132231}
   m_Layer: 0
-  m_Name: Loose Item Prototype
+  m_Name: Item TypeB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1381,7 +1381,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   looseItem:
     inv:
-      maxSlots: 0
+      maxSlots: 1
       items:
       - name: Flower
         type: 2
