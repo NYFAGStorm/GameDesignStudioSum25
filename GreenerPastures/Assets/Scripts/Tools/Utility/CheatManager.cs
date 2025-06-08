@@ -24,7 +24,7 @@ public class CheatManager : MonoBehaviour
     private float codeTimer;
     private int validCode;
 
-    const int TOTALCHEATCODES = 5;
+    const int TOTALCHEATCODES = 6;
     const float CHEATCODEWINDOW = 1f;
 
 
@@ -149,6 +149,10 @@ public class CheatManager : MonoBehaviour
                 n = "timesthousand";
                 d = "Sets time rate to 1000x default";
                 break;
+            case 5:
+                n = "playerlight";
+                d = "Toggles a light over the player";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -177,6 +181,23 @@ public class CheatManager : MonoBehaviour
                 break;
             case 4:
                 GameObject.FindAnyObjectByType<TimeManager>().SetCheatTimeScale(1000f);
+                break;
+            case 5:
+                if (GameObject.Find("player light") == null)
+                {
+                    GameObject player = GameObject.Find("Player Character");
+                    GameObject light = new GameObject();
+                    light.name = "player light";
+                    light.transform.position = player.transform.position + Vector3.up;
+                    light.transform.parent = player.transform;
+                    Light l = light.AddComponent<Light>();
+                    l.range = 3.81f;
+                    l.intensity = .618f;
+                    l.bounceIntensity = 0f;
+                    l.shadows = LightShadows.Hard;
+                }
+                else
+                    Destroy(GameObject.Find("player light").gameObject);
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");

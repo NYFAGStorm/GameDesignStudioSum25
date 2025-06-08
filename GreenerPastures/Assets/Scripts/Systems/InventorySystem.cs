@@ -40,12 +40,12 @@ public static class InventorySystem
     }
 
     /// <summary>
-    /// Transfer loose item from game world into an inventory
+    /// Transfer loose item from game world into an inventory, if empty slot available
     /// </summary>
     /// <param name="item">loose item data</param>
     /// <param name="retItem">result loose item data (use same reference)</param>
     /// <param name="inv">inventory data</param>
-    /// <returns>inventory data with item added, if item existed as loose item</returns>
+    /// <returns>inventory data with item added, if loose item and empty slot existed</returns>
     public static InventoryData TakeItem(LooseItemData item, out LooseItemData retItem, InventoryData inv)
     {
         InventoryData retInv = inv;
@@ -55,9 +55,10 @@ public static class InventorySystem
         if (item == null || item.inv.items[0] == null)
             return retInv;
         // store loose item into inventory
-        StoreItem(item.inv.items[0], item.inv, inv, out retItem.inv, out retInv);       
-        // flag loose item for deletion
-        retItem.deleteMe = true;
+        if (StoreItem(item.inv.items[0], item.inv, inv, out retItem.inv, out retInv))
+            retItem.deleteMe = true; // flag empty loose item for deletion
+        else
+            UnityEngine.Debug.LogWarning("--- InventorySystem [TakeItem] : no empty slot available. will ignore item take.");
 
         return retInv;
     }
@@ -70,14 +71,22 @@ public static class InventorySystem
     /// <param name="to">inventory data to transfer to</param>
     /// <param name="retFrom">result from inventory data (use same reference)</param>
     /// <param name="retTo">result to inventory data (use same reference)</param>  
-    public static void StoreItem(ItemData item, InventoryData from, InventoryData to,
+    /// <returns>true if succeeded, false if failed (no empty slot available in 'to' inv)</returns>
+    public static bool StoreItem(ItemData item, InventoryData from, InventoryData to,
         out InventoryData retFrom, out InventoryData retTo)
     {
+        bool retBool = InvHasSlot(to);
+
         retFrom = from;
         retTo = to;
 
-        retTo = AddToInventory(to, item);
-        retFrom = RemoveItemFromInventory(from, item);
+        if (retBool)
+        {
+            retTo = AddToInventory(to, item);
+            retFrom = RemoveItemFromInventory(from, item);
+        }
+
+        return retBool;
     }
 
     /// <summary>
@@ -258,7 +267,11 @@ public static class InventorySystem
 
         // validate (empty slot available)
         if (GetEmptySlotsInInv(inv) < 1)
+        {
+            // be noisy when this fails, no empty slot available
+            UnityEngine.Debug.LogWarning("--- InventorySystem [AddToInventory] : no empty slot available. will ignore (item lost).");
             return retInv;
+        }
         // add item
         ItemData[] tmp = new ItemData[retInv.items.Length + 1];
         for (int i=0; i<retInv.items.Length; i++)
