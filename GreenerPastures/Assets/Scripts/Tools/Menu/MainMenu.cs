@@ -89,7 +89,11 @@ public class MainMenu : MonoBehaviour
             if (GUI.Button(r,s,g))
             {
                 if (buttons[i].sceneName != "")
+                {
+                    // disable menu vfx when not in menu
+                    GameObject.Find("VFX_Splash").SetActive(!(buttons[i].sceneName == "Proto_GreenerStuff"));
                     SceneManager.LoadScene(buttons[i].sceneName);
+                }
                 else
                     Application.Quit();
             }

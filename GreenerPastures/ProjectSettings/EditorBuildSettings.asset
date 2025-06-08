@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Working/TempGame.unity
     guid: fb47e64478fe7d74ca0f50ab91c350d1
+  - enabled: 1
+    path: Assets/Scenes/Prototype/Glenn/Proto_GreenerStuff.unity
+    guid: fca87c942d3f5fe4893b7ccbec95c873
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

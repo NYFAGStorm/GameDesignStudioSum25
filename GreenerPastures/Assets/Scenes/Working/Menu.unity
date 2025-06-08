@@ -393,7 +393,7 @@ MonoBehaviour:
       y: 0.3
       width: 0.4
       height: 0.09
-    sceneName: TempGame
+    sceneName: Proto_GreenerStuff
   - buttonText: Credits
     buttonPos:
       serializedVersion: 2
