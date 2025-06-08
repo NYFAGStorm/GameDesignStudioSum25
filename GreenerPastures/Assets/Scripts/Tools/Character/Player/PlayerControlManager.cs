@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerControlManager : MonoBehaviour
 {
@@ -105,61 +106,15 @@ public class PlayerControlManager : MonoBehaviour
         ReadActionInput();
 
         // reset item taken action
-        if (itemTakenAction && !characterActions.actionA)
-            itemTakenAction = false;
+        ResetItemTakenAction();
 
         // detect inventory selection input
-        // REVIEW: controls for inventory selection
-        if ( Input.GetKeyDown(KeyCode.LeftBracket) )
-        {
-            inventorySelectionTimer = INVENTORYSELECTIONTIME;
-            currentInventorySelection--;
-            if (currentInventorySelection < 0)
-                currentInventorySelection = playerInventory.maxSlots - 1;
-        }
-        if ( Input.GetKeyDown(KeyCode.RightBracket) )
-        {
-            inventorySelectionTimer = INVENTORYSELECTIONTIME;
-            currentInventorySelection++;
-            if (currentInventorySelection > playerInventory.maxSlots - 1)
-                currentInventorySelection = 0;
-        }
+        DetectInventorySelectionInput();
         // run inventory selection timer
-        if ( inventorySelectionTimer > 0f )
-        {
-            inventorySelectionTimer -= Time.deltaTime;
-            if ( inventorySelectionTimer < 0f )
-                inventorySelectionTimer = 0f;
-            else
-            {
-                // handle drop item selected
-                if (characterActions.actionC && currentInventorySelection < playerInventory.items.Length)
-                {
-                    inventorySelectionTimer = 0f; // prevents dropping multiple items
-                    // spawn loose item dropped from inventory
-                    ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
-                    if ( ism == null )
-                        Debug.LogWarning("--- PlayerControlManager [Update] : no item spawn manager found in scene. will ignore.");
-                    else
-                    {
-                        LooseItemData lid = InventorySystem.DropItem(playerInventory.items[currentInventorySelection], playerInventory, out playerInventory);
-                        Vector3 pos = gameObject.transform.position;
-                        if (pam.spriteFlipped)
-                            pos += Vector3.left * PROXIMITYRANGE;
-                        else
-                            pos += Vector3.right * PROXIMITYRANGE;
-                        ism.SpawnItem(lid, gameObject.transform.position, pos);
-                    }
-                }
-            }
-        }
+        CheckInventorySelectionDrop();
 
         // clear active loose item if moving
-        if (characterMove != Vector3.zero && activeItem != null)
-        {
-            activeItem.SetItemPulse(false);
-            activeItem = null;
-        }
+        ClearActiveItem();
         // check near loose item
         CheckNearItem();
         // check action input (pickup)
@@ -183,11 +138,7 @@ public class PlayerControlManager : MonoBehaviour
         // NOTE: if loose item active, skip plot activity altogether
 
         // clear active plot if moving
-        if (characterMove != Vector3.zero && activePlot != null)
-        {
-            activePlot.SetCursorPulse(false);
-            activePlot = null;
-        }
+        ClearActivePlot();
         // check near plot
         CheckNearPlot();
 
@@ -300,6 +251,82 @@ public class PlayerControlManager : MonoBehaviour
         characterActions.actionB = Input.GetKey(actionBKey);
         characterActions.actionC = Input.GetKey(actionCKey);
         characterActions.actionD = Input.GetKey(actionDKey);
+    }
+
+    void ResetItemTakenAction()
+    {
+        if (itemTakenAction && !characterActions.actionA)
+            itemTakenAction = false;
+    }
+
+    void DetectInventorySelectionInput()
+    {
+        // REVIEW: controls for inventory selection
+        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        {
+            inventorySelectionTimer = INVENTORYSELECTIONTIME;
+            currentInventorySelection--;
+            if (currentInventorySelection < 0)
+                currentInventorySelection = playerInventory.maxSlots - 1;
+        }
+        if (Input.GetKeyDown(KeyCode.RightBracket))
+        {
+            inventorySelectionTimer = INVENTORYSELECTIONTIME;
+            currentInventorySelection++;
+            if (currentInventorySelection > playerInventory.maxSlots - 1)
+                currentInventorySelection = 0;
+        }
+    }
+
+    void CheckInventorySelectionDrop()
+    {
+        if (inventorySelectionTimer > 0f)
+        {
+            inventorySelectionTimer -= Time.deltaTime;
+            if (inventorySelectionTimer < 0f)
+                inventorySelectionTimer = 0f;
+            else
+            {
+                // handle drop item selected
+                if (characterActions.actionC && currentInventorySelection < playerInventory.items.Length)
+                {
+                    inventorySelectionTimer = 0f; // prevents dropping multiple items
+                    // spawn loose item dropped from inventory
+                    ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+                    if (ism == null)
+                        Debug.LogWarning("--- PlayerControlManager [Update] : no item spawn manager found in scene. will ignore.");
+                    else
+                    {
+                        LooseItemData lid = InventorySystem.DropItem(playerInventory.items[currentInventorySelection], playerInventory, out playerInventory);
+                        Vector3 pos = gameObject.transform.position;
+                        if (pam.spriteFlipped)
+                            pos += Vector3.left * PROXIMITYRANGE;
+                        else
+                            pos += Vector3.right * PROXIMITYRANGE;
+                        pos.x += (RandomSystem.GaussianRandom01() * PROXIMITYRANGE) - (PROXIMITYRANGE / 2f);
+                        ism.SpawnItem(lid, gameObject.transform.position, pos);
+                    }
+                }
+            }
+        }
+    }
+
+    void ClearActiveItem()
+    {
+        if (characterMove != Vector3.zero && activeItem != null)
+        {
+            activeItem.SetItemPulse(false);
+            activeItem = null;
+        }
+    }
+
+    void ClearActivePlot()
+    {
+        if (characterMove != Vector3.zero && activePlot != null)
+        {
+            activePlot.SetCursorPulse(false);
+            activePlot = null;
+        }
     }
 
     void OnGUI()

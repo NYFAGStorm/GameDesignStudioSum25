@@ -33,8 +33,8 @@ public static class InventorySystem
     {
         LooseItemData retLooseItem = new LooseItemData();
 
-        retLooseItem.inv = InitializeInventory();
-        retLooseItem.inv.items[0] = InitializeItem(type);
+        retLooseItem.inv = InitializeInventory(1);
+        retLooseItem.inv = AddToInventory(retLooseItem.inv, InitializeItem(type));
 
         return retLooseItem;
     }

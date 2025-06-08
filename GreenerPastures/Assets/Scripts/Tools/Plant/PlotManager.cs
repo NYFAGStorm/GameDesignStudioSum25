@@ -322,12 +322,21 @@ public class PlotManager : MonoBehaviour
             {
                 data.plant.segment = PlantSegment.Stalk;
                 plant.transform.Find("Plant Sprite").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
-                // player would collect fruit as inventory at this point
-                // drop as loose item
+                // drop as loose item fruit
+                ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+                if (ism == null)
+                    Debug.LogWarning("--- PlotManager [HarvestPlant] : "+gameObject.name+" no item spawn manager found in scene. will ignore.");
+                else
+                {
+                    Vector3 target = gameObject.transform.position;
+                    target.x += (RandomSystem.GaussianRandom01() * .25f) - .5f;
+                    LooseItemData loose = InventorySystem.CreateItem(ItemType.ItemB);
+                    // TODO: transfer quality of fruit to item (revise item data)
+                    ism.SpawnItem(loose, gameObject.transform.position, target);
+                }
                 // harvest results display
                 harvestDisplayTimer = HARVESTDISPLAYDURATION;
                 harvestQualityValue = data.plant.quality;
-                //print("- player harvests plant fruit of "+(100f * data.plant.quality).ToString("00.0")+"% quality. -");
             }
         }
     }

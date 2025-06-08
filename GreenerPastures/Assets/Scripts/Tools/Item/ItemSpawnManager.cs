@@ -1,17 +1,22 @@
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class ItemSpawnManager : MonoBehaviour
 {
     // Author: Glenn Storm
     // Handles loose item spawning for dropped items
+    // -- also handles specific affects for dropped items when settled --
+    // (fertilizer on uprooted plot for improving soil quality)
 
     public AnimationCurve dropCurve;
 
-    private GameObject dropItem;
-    private Vector3 spawnPoint;
-    private Vector3 dropTarget;
-    private float dropTimer;
+    private struct DroppedItem
+    {
+        public GameObject dropItem;
+        public Vector3 spawnPoint;
+        public Vector3 dropTarget;
+        public float dropTimer;
+    }
+    private DroppedItem[] drops = new DroppedItem[0];
 
     const float DROPTIME = 1f;
     const float VERTICALORIGIN = 0.125f;
@@ -34,37 +39,97 @@ public class ItemSpawnManager : MonoBehaviour
 
     void Update()
     {
-        // run drop timer
-        if ( dropTimer > 0f )
+        CheckDrops();
+    }
+
+    void AddDrop( GameObject item, Vector3 start, Vector3 end )
+    {
+        DroppedItem[] tmp = new DroppedItem[drops.Length + 1];
+
+        for (int i=0;i<drops.Length;i++)
         {
-            dropTimer -= Time.deltaTime;
-            if ( dropTimer < 0f )
+            tmp[i] = drops[i];
+        }
+        tmp[drops.Length].dropItem = item;
+        tmp[drops.Length].spawnPoint = start;
+        tmp[drops.Length].dropTarget = end;
+        tmp[drops.Length].dropTimer = DROPTIME;
+
+        drops = tmp;
+    }
+
+    void RemoveDrop( int index )
+    {
+        DroppedItem[] tmp = new DroppedItem[drops.Length - 1];
+
+        int count = 0;
+        for (int i=0;i<drops.Length;i++)
+        {
+            if (i != index)
             {
-                dropTimer = 0f;
-                Vector3 land = dropTarget + (Vector3.up * VERTICALORIGIN);
-                dropItem.transform.position = land;
-                dropItem = null;
-                spawnPoint = Vector3.zero;
-                dropTarget = Vector3.zero;
-                return;
+                tmp[count] = drops[i];
+                count++;
             }
-            if (dropItem == null)
+        }
+
+        drops = tmp;
+    }
+
+    void CheckDrops()
+    {
+        for (int i=0; i<drops.Length; i++)
+        {
+            // run drop timer
+            if (drops[i].dropTimer > 0f)
             {
-                Debug.LogWarning("--- ItemSpawnManager [Update] : drop item lost. will ignore.");
-                dropTimer = 0f;
-                return;
-            }
-            else
-            {
-                Vector3 pos = Vector3.Lerp(spawnPoint,dropTarget, 1f-(dropTimer/DROPTIME));
-                pos.y = dropCurve.Evaluate(1f - (dropTimer / DROPTIME)) + VERTICALORIGIN;
-                dropItem.transform.position = pos;
+                drops[i].dropTimer -= Time.deltaTime;
+                if (drops[i].dropTimer < 0f)
+                {
+                    drops[i].dropTimer = 0f;
+                    Vector3 land = drops[i].dropTarget + (Vector3.up * VERTICALORIGIN);
+                    drops[i].dropItem.transform.position = land;
+
+                    // drop item affects
+                    LooseItemManager looseD = drops[i].dropItem.GetComponent<LooseItemManager>();
+                    // fertilizer dropped in uprooted plot
+                    if (looseD.looseItem.inv.items[0].type == ItemType.ItemA)
+                    {
+                        if (CheckFertilizerDrop(i))
+                            looseD.looseItem.deleteMe = true;
+                    }
+
+                    RemoveDrop(i);
+                    continue;
+                }
+                if (drops[i].dropItem == null)
+                {
+                    Debug.LogWarning("--- ItemSpawnManager [Update] : drop item ["+i+"] lost. will ignore.");
+                    drops[i].dropTimer = 0f;
+                    continue;
+                }
+                else
+                {
+                    Vector3 pos = Vector3.Lerp(drops[i].spawnPoint, drops[i].dropTarget, 1f - (drops[i].dropTimer / DROPTIME));
+                    pos.y = dropCurve.Evaluate(1f - (drops[i].dropTimer / DROPTIME)) + VERTICALORIGIN;
+                    drops[i].dropItem.transform.position = pos;
+                }
             }
         }
     }
 
     /// <summary>
-    /// Spawns a loose item to live in the game world
+    /// Creates new loose item data and spawns loose item object
+    /// </summary>
+    /// <param name="type">item type</param>
+    /// <param name="spawnAt">spawn location</param>
+    /// <param name="dropTo">drop target location</param>
+    public void SpawnNewItem( ItemType type, Vector3 spawnAt, Vector3 dropTo )
+    {
+        SpawnItem(InventorySystem.CreateItem(type), spawnAt, dropTo);
+    }
+
+    /// <summary>
+    /// Spawns a loose item object from given loose item data
     /// </summary>
     /// <param name="item">loose item data</param>
     /// <param name="location">position in world to put item</param>
@@ -84,10 +149,27 @@ public class ItemSpawnManager : MonoBehaviour
         sr.sprite = lim.sprites[0];
         sr.flipX = lim.looseItem.flipped;
 
-        // hand drop animation
-        dropItem = looseItem.gameObject;
-        spawnPoint = spawnLocation;
-        dropTarget = dropLocation;
-        dropTimer = DROPTIME;
+        // handle drop animation
+        AddDrop(looseItem.gameObject, spawnLocation, dropLocation);
+    }
+
+    bool CheckFertilizerDrop( int index )
+    {
+        bool retBool = false;
+
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i=0; i<plots.Length; i++)
+        {
+            float dist = Vector3.Distance(drops[index].dropTarget, plots[i].gameObject.transform.position);
+            if (dist < 0.25f && plots[i].data.condition == PlotCondition.Uprooted)
+            {
+                // soil quality improved ~.5 (0-1, gaussian random distribution)
+                plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + RandomSystem.GaussianRandom01());
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
     }
 }
