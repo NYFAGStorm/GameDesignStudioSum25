@@ -41,7 +41,7 @@ public class PlotManager : MonoBehaviour
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
     const float WATERDRAINWITHPLANTRATE = 0.1f;
-    const float SOILDEGRADERATE = 0.1f;
+    const float SOILDEGRADERATE = 2f;
     const float PLOTCHECKINTERVAL = 1f;
     // action hold time windows to complete
     const float WORKLANDWINDOW = 2f;
@@ -97,7 +97,7 @@ public class PlotManager : MonoBehaviour
                     data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * Time.deltaTime * PLOTCHECKINTERVAL));
                 // soil degrade, if plant exists
                 if ( plant != null )
-                    data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * SOILDEGRADERATE * Time.deltaTime * PLOTCHECKINTERVAL));
+                    data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * Time.deltaTime * PLOTCHECKINTERVAL));
             }
         }
 
