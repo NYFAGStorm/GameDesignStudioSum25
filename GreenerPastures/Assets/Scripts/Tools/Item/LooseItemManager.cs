@@ -200,6 +200,8 @@ public class LooseItemManager : MonoBehaviour
 
     void SetItemHighlight(float value)
     {
+        if (spriteRenderer == null)
+            return;
         // REVIEW: need another way to highlight, for any color sprite
         Color c = spriteRenderer.material.color;
         c.r = 1f;

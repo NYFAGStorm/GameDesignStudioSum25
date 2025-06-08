@@ -95,6 +95,7 @@ public static class InventorySystem
     public static LooseItemData DropItem( ItemData item, InventoryData inv, out InventoryData retInv )
     {
         LooseItemData retLooseItem = new LooseItemData();
+        retLooseItem.inv = InitializeInventory(1);
         retInv = inv;
 
         // transfer item from inventory to game world as new loose item

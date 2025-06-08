@@ -127,6 +127,28 @@ public class PlayerControlManager : MonoBehaviour
             inventorySelectionTimer -= Time.deltaTime;
             if ( inventorySelectionTimer < 0f )
                 inventorySelectionTimer = 0f;
+            else
+            {
+                // handle drop item selected
+                if (characterActions.actionC && playerInventory.items[currentInventorySelection].type != ItemType.Default)
+                {
+                    inventorySelectionTimer = 0f; // prevents dropping multiple items
+                    // spawn loose item dropped from inventory
+                    ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+                    if ( ism == null )
+                        Debug.LogWarning("--- PlayerControlManager [Update] : no item spawn manager found in scene. will ignore.");
+                    else
+                    {
+                        LooseItemData lid = InventorySystem.DropItem(playerInventory.items[currentInventorySelection], playerInventory, out playerInventory);
+                        Vector3 pos = gameObject.transform.position;
+                        if (pam.spriteFlipped)
+                            pos += Vector3.left * PROXIMITYRANGE;
+                        else
+                            pos += Vector3.right * PROXIMITYRANGE;
+                        ism.SpawnItem(lid, gameObject.transform.position, pos);
+                    }
+                }
+            }
         }
 
         // clear active loose item if moving
