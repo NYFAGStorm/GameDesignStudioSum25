@@ -213,11 +213,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edae5d2d49b64c642bc39e601032ac08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &281888159 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8522118660625570473, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-  m_PrefabInstance: {fileID: 740425298}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &315054321
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,8 +356,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 740425299}
+  m_Children: []
   m_Father: {fileID: 54550881}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &465892699
@@ -421,68 +415,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edae5d2d49b64c642bc39e601032ac08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &740425298
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 465892698}
-    m_Modifications:
-    - target: {fileID: 8522118660625570473, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_Name
-      value: VFX_Splash
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
---- !u!4 &740425299 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-  m_PrefabInstance: {fileID: 740425298}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &803100179
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -491,10 +423,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1568004407}
     m_Modifications:
-    - target: {fileID: 733416940364259210, guid: b480d98b9e7ac154f93ed25232630a54, type: 3}
-      propertyPath: layers.Array.data[0].layerObj
-      value: 
-      objectReference: {fileID: 281888159}
     - target: {fileID: 1522454714249385201, guid: b480d98b9e7ac154f93ed25232630a54, type: 3}
       propertyPath: m_Name
       value: Menu Cinematic Layers

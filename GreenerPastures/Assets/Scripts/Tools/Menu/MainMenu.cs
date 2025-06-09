@@ -106,8 +106,6 @@ public class MainMenu : MonoBehaviour
                     {
                         // little cinematic menu fun
                         GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 2;
-                        // disable menu vfx when not in menu
-                        GameObject.Find("VFX_Splash").SetActive(false);
                         sceneSwitchName = buttons[i].sceneName;
                         sceneSwitchTimer = 4f;
                     }

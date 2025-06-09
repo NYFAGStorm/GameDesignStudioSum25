@@ -48,7 +48,7 @@ public class QuitOnEscape : MonoBehaviour
         if (GUI.Button(r, s, g))
         {
             popup = false;
-            SceneManager.LoadScene("Menu");
+            SceneManager.LoadScene("Splash");
         }
 
         r.x = 0.55f * w;

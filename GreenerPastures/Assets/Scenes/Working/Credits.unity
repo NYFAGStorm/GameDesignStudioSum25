@@ -222,7 +222,7 @@ MonoBehaviour:
   - creditText: Ellington
     creditPos:
       serializedVersion: 2
-      x: 0.05
+      x: 0.1
       y: 0.25
       width: 0.4
       height: 0.09
@@ -230,23 +230,23 @@ MonoBehaviour:
   - creditText: Esther
     creditPos:
       serializedVersion: 2
-      x: 0.55
-      y: 0.45
+      x: 0.5
+      y: 0.25
       width: 0.4
       height: 0.09
     alignRight: 1
   - creditText: 'Grayson '
     creditPos:
       serializedVersion: 2
-      x: 0.05
-      y: 0.45
+      x: 0.1
+      y: 0.35
       width: 0.4
       height: 0.09
     alignRight: 0
   - creditText: Gustavo
     creditPos:
       serializedVersion: 2
-      x: 0.55
+      x: 0.5
       y: 0.35
       width: 0.4
       height: 0.09
@@ -254,23 +254,23 @@ MonoBehaviour:
   - creditText: Huch
     creditPos:
       serializedVersion: 2
-      x: 0.55
-      y: 0.25
-      width: 0.4
-      height: 0.09
-    alignRight: 1
-  - creditText: Li-Ai
-    creditPos:
-      serializedVersion: 2
-      x: 0.05
-      y: 0.35
+      x: 0.1
+      y: 0.45
       width: 0.4
       height: 0.09
     alignRight: 0
+  - creditText: Li-Ai
+    creditPos:
+      serializedVersion: 2
+      x: 0.5
+      y: 0.45
+      width: 0.4
+      height: 0.09
+    alignRight: 1
   - creditText: Tia
     creditPos:
       serializedVersion: 2
-      x: 0.05
+      x: 0.1
       y: 0.55
       width: 0.4
       height: 0.09

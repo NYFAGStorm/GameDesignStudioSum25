@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuLayerManager : MonoBehaviour
 {
     // Author: Glenn Storm
     // This handles bg layer movement for menus
+    // (NOTE: while not in menus, layers hidden)
 
     [System.Serializable]
     public struct BGLayer
@@ -19,6 +21,7 @@ public class MenuLayerManager : MonoBehaviour
     public int targetKey = 0;
 
     private float currentAnimProgress;
+    private string previousSceneName;
 
     const int TOTALANIMKEYS = 3;
     const float ANIMATIONINTERPDURATION = 3f;
@@ -35,6 +38,8 @@ public class MenuLayerManager : MonoBehaviour
         // initialize
         if (enabled)
         {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            previousSceneName = "Splash";
             for (int i=0; i<layers.Length; i++)
             {
                 layers[i].savedVerticalPos = layers[i].layerObj.transform.localPosition.y;
@@ -62,5 +67,38 @@ public class MenuLayerManager : MonoBehaviour
         }
 
         // apply color to layers
+    }
+
+    void SetAnimProgress( float progress )
+    {
+        currentAnimProgress = progress * 0.5f;
+        verticalMovement = animCurve.Evaluate(currentAnimProgress) * -60f;
+        targetKey = Mathf.RoundToInt(progress);
+    }
+
+    void OnSceneLoaded(Scene s, LoadSceneMode mode)
+    {
+        // hide all layers if in game
+        if (s.name == "Proto_GreenerStuff" && previousSceneName == "Menu")
+        {
+            for (int i=0; i<layers.Length; i++)
+            {
+                layers[i].layerObj.SetActive(false);
+            }
+        }
+        else if (previousSceneName == "Proto_GreenerStuff")
+        {
+            for (int i = 0; i < layers.Length; i++)
+            {
+                layers[i].layerObj.SetActive(true);
+            }
+        }
+        // reconfigure layers for this scene instantly, unless animating splash->menu->game
+        if (s.name == "Menu" && previousSceneName != "Splash" && previousSceneName != "Credits")
+            SetAnimProgress(1);
+        else if (s.name == "Splash")
+            SetAnimProgress(0);
+
+        previousSceneName = s.name;
     }
 }
