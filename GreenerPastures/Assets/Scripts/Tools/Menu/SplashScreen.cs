@@ -75,6 +75,8 @@ public class SplashScreen : MonoBehaviour
 
         if (GUI.Button(r,s,g))
         {
+            // little cinematic menu fun
+            GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 1;
             SceneManager.LoadScene("Menu");
         }
     }

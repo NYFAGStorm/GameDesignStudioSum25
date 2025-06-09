@@ -34,6 +34,9 @@ public class MainMenu : MonoBehaviour
     [Tooltip("Font will scale appropriately based on active screen width, using this 1024 size")]
     public int buttonFontSizeAt1024 = 48;
 
+    private float sceneSwitchTimer;
+    private string sceneSwitchName;
+
 
     void Start()
     {
@@ -42,11 +45,20 @@ public class MainMenu : MonoBehaviour
 
     void Update()
     {
-
+        // run switch timer
+        if ( sceneSwitchTimer > 0f )
+        {
+            sceneSwitchTimer -= Time.deltaTime;
+            if ( sceneSwitchTimer < .1f )
+                SceneManager.LoadScene(sceneSwitchName);
+        }
     }
 
     void OnGUI()
     {
+        if (sceneSwitchTimer > 0f)
+            return;
+
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;
@@ -90,9 +102,17 @@ public class MainMenu : MonoBehaviour
             {
                 if (buttons[i].sceneName != "")
                 {
-                    // disable menu vfx when not in menu
-                    GameObject.Find("VFX_Splash").SetActive(!(buttons[i].sceneName == "Proto_GreenerStuff"));
-                    SceneManager.LoadScene(buttons[i].sceneName);
+                    if ((buttons[i].sceneName == "Proto_GreenerStuff"))
+                    {
+                        // little cinematic menu fun
+                        GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 2;
+                        // disable menu vfx when not in menu
+                        GameObject.Find("VFX_Splash").SetActive(false);
+                        sceneSwitchName = buttons[i].sceneName;
+                        sceneSwitchTimer = 4f;
+                    }
+                    else
+                        SceneManager.LoadScene(buttons[i].sceneName);
                 }
                 else
                     Application.Quit();

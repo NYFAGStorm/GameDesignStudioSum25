@@ -443,7 +443,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -473,32 +473,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1559292382740570580, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8522118660625570473, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 740425303}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
 --- !u!4 &740425299 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8522118660625570474, guid: 327e84f15d47efd44a245fde7056e3d8, type: 3}
   m_PrefabInstance: {fileID: 740425298}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &740425303
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 281888159}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb2949f4ca392f94a85ce209b7cf865a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &803100179
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -507,6 +491,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1568004407}
     m_Modifications:
+    - target: {fileID: 733416940364259210, guid: b480d98b9e7ac154f93ed25232630a54, type: 3}
+      propertyPath: layers.Array.data[0].layerObj
+      value: 
+      objectReference: {fileID: 281888159}
     - target: {fileID: 1522454714249385201, guid: b480d98b9e7ac154f93ed25232630a54, type: 3}
       propertyPath: m_Name
       value: Menu Cinematic Layers
@@ -729,7 +717,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
+  m_BackGroundColor: {r: 0.81, g: 0.93743896, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
