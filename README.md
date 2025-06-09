@@ -1,6 +1,9 @@
 # GameDesignStudioSum25
 New York Film Academy - Burbank CA - 3D Game Design Studio - Summer 2025
 
+### NOTE: make public if ppl have problem cloning repo
+
+
 ## First Thing : Generate an Access Token for this Repository to last all semester
 
 Ensure you have access all semester, click on your profile icon in the corner, then go to Settings -> Developer Settings -> Personal Access Tokens to "Generate A New Token" associated with your local machine all semester. You can customize the length of time (to end of 2025) and select access to read/write to this repository. The token generated is a long string of characters that you then use _as your password_ when cloning this repository to a local machine for the first time using TortoiseGit.
