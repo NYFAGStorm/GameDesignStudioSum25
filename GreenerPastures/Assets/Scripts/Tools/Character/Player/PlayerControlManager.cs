@@ -54,7 +54,7 @@ public class PlayerControlManager : MonoBehaviour
     private SpriteLibraryManager slm;
 
     const float PROXIMITYRANGE = 0.381f;
-    const float INVENTORYSELECTIONTIME = 2f;
+    const float INVENTORYSELECTIONTIME = 10f; // was 2f
 
 
     void Start()
