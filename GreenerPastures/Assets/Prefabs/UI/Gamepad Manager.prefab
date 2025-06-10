@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6234045084068330245
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5894453599269177714}
+  - component: {fileID: 5299298239324559372}
+  - component: {fileID: 4814205762840662608}
+  m_Layer: 0
+  m_Name: Gamepad Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5894453599269177714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6234045084068330245}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5299298239324559372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6234045084068330245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4799dc8a2fd2d047b1e54891553df60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numPads: 0
+  p1PadActive: 0
+  p2PadActive: 0
+  gamepads:
+  - playerName: 
+    isActive: 0
+    startButton: 0
+    backButton: 0
+    modeButton: 0
+    centerButton: 0
+    XaxisL: 0
+    YaxisL: 0
+    LJoyPress: 0
+    XaxisR: 0
+    YaxisR: 0
+    RJoyPress: 0
+    DpadPress: 0
+    DpadUp: 0
+    DpadDown: 0
+    DpadLeft: 0
+    DpadRight: 0
+    aButton: 0
+    bButton: 0
+    xButton: 0
+    yButton: 0
+    LBump: 0
+    LTrigger: 0
+    RBump: 0
+    RTrigger: 0
+  - playerName: 
+    isActive: 0
+    startButton: 0
+    backButton: 0
+    modeButton: 0
+    centerButton: 0
+    XaxisL: 0
+    YaxisL: 0
+    LJoyPress: 0
+    XaxisR: 0
+    YaxisR: 0
+    RJoyPress: 0
+    DpadPress: 0
+    DpadUp: 0
+    DpadDown: 0
+    DpadLeft: 0
+    DpadRight: 0
+    aButton: 0
+    bButton: 0
+    xButton: 0
+    yButton: 0
+    LBump: 0
+    LTrigger: 0
+    RBump: 0
+    RTrigger: 0
+  gamepadIcon: {fileID: 2800000, guid: 6b58668442a5f5a40801a2e4b15e66d7, type: 3}
+  hideCursorIfGamepad: 0
+--- !u!114 &4814205762840662608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6234045084068330245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb2949f4ca392f94a85ce209b7cf865a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

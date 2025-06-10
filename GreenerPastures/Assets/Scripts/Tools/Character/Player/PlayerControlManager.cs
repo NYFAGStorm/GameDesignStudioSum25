@@ -49,6 +49,9 @@ public class PlayerControlManager : MonoBehaviour
     private float inventorySelectionTimer;
     private bool itemTakenAction;
 
+    private MultiGamepad padMgr;
+    private bool bumpPressed;
+
     private CameraManager cam;
     private PlayerAnimManager pam;
     private SpriteLibraryManager slm;
@@ -60,6 +63,9 @@ public class PlayerControlManager : MonoBehaviour
     void Start()
     {
         // validate
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if (padMgr == null )
+            Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no pad manager. will ignore.");
         cam = GameObject.FindFirstObjectByType<CameraManager>();
         if ( cam == null )
         {
@@ -169,32 +175,58 @@ public class PlayerControlManager : MonoBehaviour
     {
         // reset character move
         characterMove = Vector3.zero;
-        // in each direction, test physics collision first, apply move if clear
-        if (Input.GetKey(upKey))
+
+        // reset gamepad input
+        float upPad = 0f;
+        float downPad = 0f;
+        float leftPad = 0f;
+        float rightPad = 0f;
+
+        // check gamepad move input
+        if ( padMgr != null )
         {
+            float padX = padMgr.gamepads[0].XaxisL;
+            float padY = padMgr.gamepads[0].YaxisL;
+            upPad = Mathf.Clamp01(padY);
+            downPad = Mathf.Clamp01(-padY);
+            leftPad = Mathf.Clamp01(-padX);
+            rightPad = Mathf.Clamp01(padX);
+        }
+
+        // in each direction, test physics collision first, apply move if clear
+        if (Input.GetKey(upKey) || upPad > 0f)
+        {
+            if (upPad == 0f)
+                upPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.forward * characterSpeed * Time.deltaTime;
+            check += Vector3.forward * upPad * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.forward * characterSpeed * Time.deltaTime;
         }
-        if (Input.GetKey(downKey))
+        if (Input.GetKey(downKey) || downPad > 0f)
         {
+            if (downPad == 0f)
+                downPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.back * characterSpeed * Time.deltaTime;
+            check += Vector3.back * downPad * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.back * characterSpeed * Time.deltaTime;
         }
-        if (Input.GetKey(leftKey))
+        if (Input.GetKey(leftKey) || leftPad > 0f)
         {
+            if (leftPad == 0f)
+                leftPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.left * characterSpeed * Time.deltaTime;
+            check += Vector3.left * leftPad * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.left * characterSpeed * Time.deltaTime;
         }
-        if (Input.GetKey(rightKey))
+        if (Input.GetKey(rightKey) || rightPad > 0f)
         {
+            if (rightPad == 0f)
+                rightPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.right * characterSpeed * Time.deltaTime;
+            check += Vector3.right * rightPad * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.right * characterSpeed * Time.deltaTime;
         }
@@ -254,6 +286,14 @@ public class PlayerControlManager : MonoBehaviour
         characterActions.actionB = Input.GetKey(actionBKey);
         characterActions.actionC = Input.GetKey(actionCKey);
         characterActions.actionD = Input.GetKey(actionDKey);
+
+        if (padMgr != null)
+        {
+            characterActions.actionA = padMgr.gamepads[0].aButton;
+            characterActions.actionB = padMgr.gamepads[0].bButton;
+            characterActions.actionC = padMgr.gamepads[0].xButton;
+            characterActions.actionD = padMgr.gamepads[0].yButton;
+        }
     }
 
     void ResetItemTakenAction()
@@ -264,15 +304,30 @@ public class PlayerControlManager : MonoBehaviour
 
     void DetectInventorySelectionInput()
     {
+        bool lbump = false;
+        bool rbump = false;
+        if (padMgr != null)
+        {
+            if (bumpPressed)
+            {
+                if (!padMgr.gamepads[0].LBump && !padMgr.gamepads[0].RBump)
+                    bumpPressed = false;
+                return;
+            }
+            lbump = padMgr.gamepads[0].LBump;
+            rbump = padMgr.gamepads[0].RBump;
+            bumpPressed = (lbump || rbump);
+        }
+
         // REVIEW: controls for inventory selection
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        if (Input.GetKeyDown(KeyCode.LeftBracket) || lbump)
         {
             inventorySelectionTimer = INVENTORYSELECTIONTIME;
             currentInventorySelection--;
             if (currentInventorySelection < 0)
                 currentInventorySelection = playerInventory.maxSlots - 1;
         }
-        if (Input.GetKeyDown(KeyCode.RightBracket))
+        if (Input.GetKeyDown(KeyCode.RightBracket) || rbump)
         {
             inventorySelectionTimer = INVENTORYSELECTIONTIME;
             currentInventorySelection++;

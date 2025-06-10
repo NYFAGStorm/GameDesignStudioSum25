@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,15 +25,50 @@ public class SplashScreen : MonoBehaviour
     public Color buttonFontColor = Color.white;
     public int buttonFontSizeAt1024 = 48;
 
+    private MultiGamepad padMgr;
+    private int padButtonSelection = -1;
+    private int padMaxButton = 0;
+    private bool padPressed;
+
+    private bool splashLaunched;
+
 
     void Start()
     {
-        
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if (padMgr == null)
+        {
+            Debug.LogError("--- SplashScreen [Start] : no pad manager found in scene. aborting.");
+            enabled = false;
+        }
     }
 
     void Update()
     {
-        
+        if (splashLaunched)
+            SceneManager.LoadScene("Menu");
+
+        // game pad input
+        if (padPressed)
+        {
+            if (padMgr.gamepads[0].YaxisL == 0f)
+                padPressed = false;
+            return;
+        }
+        if (padMgr.gamepads[0].YaxisL > 0f)
+        {
+            padButtonSelection--;
+            if (padButtonSelection < 0)
+                padButtonSelection = padMaxButton;
+            padPressed = true;
+        }
+        else if (padMgr.gamepads[0].YaxisL < 0f)
+        {
+            padButtonSelection++;
+            if (padButtonSelection > padMaxButton)
+                padButtonSelection = 0;
+            padPressed = true;
+        }
     }
 
     void OnGUI()
@@ -70,14 +103,17 @@ public class SplashScreen : MonoBehaviour
         g.fontStyle = buttonFontStyle;
         g.fontSize = Mathf.RoundToInt(buttonFontSizeAt1024 * (w / 1024f));
         g.normal.textColor = buttonFontColor;
+        if (padButtonSelection == 0)
+            g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         s = startButtonText;
 
-        if (GUI.Button(r,s,g))
+        if (GUI.Button(r,s,g) ||
+            padButtonSelection == 0 && padMgr.gamepads[0].aButton)
         {
             // little cinematic menu fun
             GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 1;
-            SceneManager.LoadScene("Menu");
+            splashLaunched = true;
         }
     }
 }

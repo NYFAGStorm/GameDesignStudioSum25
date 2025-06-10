@@ -415,6 +415,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edae5d2d49b64c642bc39e601032ac08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &768314209 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+  m_PrefabInstance: {fileID: 6457786741936658156}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &803100179
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -744,6 +749,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1689334036}
+  - {fileID: 768314209}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1568004405
@@ -1040,6 +1046,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6457786741936658156
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1144461551}
+    m_Modifications:
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6234045084068330245, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
+      propertyPath: m_Name
+      value: Gamepad Manager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

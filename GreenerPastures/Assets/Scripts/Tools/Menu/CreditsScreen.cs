@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -41,15 +39,45 @@ public class CreditsScreen : MonoBehaviour
     [Tooltip("Font will scale appropriately based on active screen width, using this 1024 size")]
     public int backButtonFontSizeAt1024 = 48;
 
+    private MultiGamepad padMgr;
+    private int padButtonSelection = -1;
+    private int padMaxButton = 0;
+    private bool padPressed;
+
 
     void Start()
     {
-
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if (padMgr == null)
+        {
+            Debug.LogError("--- SplashScreen [Start] : no pad manager found in scene. aborting.");
+            enabled = false;
+        }
     }
 
     void Update()
     {
-
+        // game pad input
+        if (padPressed)
+        {
+            if (padMgr.gamepads[0].YaxisL == 0f)
+                padPressed = false;
+            return;
+        }
+        if (padMgr.gamepads[0].YaxisL > 0f)
+        {
+            padButtonSelection--;
+            if (padButtonSelection < 0)
+                padButtonSelection = padMaxButton;
+            padPressed = true;
+        }
+        else if (padMgr.gamepads[0].YaxisL < 0f)
+        {
+            padButtonSelection++;
+            if (padButtonSelection > padMaxButton)
+                padButtonSelection = 0;
+            padPressed = true;
+        }
     }
 
     void OnGUI()
@@ -103,9 +131,13 @@ public class CreditsScreen : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(backButtonFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
+        if (padButtonSelection == 0)
+            g.normal.textColor = Color.white;
+        g.active.textColor = buttonFontColor;
         s = backButtonText;
 
-        if (GUI.Button(r, s, g))
+        if (GUI.Button(r, s, g) ||
+            padButtonSelection == 0 && padMgr.gamepads[0].aButton)
         {
             SceneManager.LoadScene("Menu");
         }
