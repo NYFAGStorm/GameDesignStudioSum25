@@ -4,17 +4,26 @@
 public enum PlantType
 {
     Default,
-    TypeA,
-    TypeB,
-    TypeC,
-    TypeD
+    Corn,
+    Tomato,
+    Carrot,
+    Poppy,
+    Rose,
+    Sunflower,
+    Moonflower,
+    Apple,
+    Orange,
+    Lemon
 }
 
-public enum PlantSegment
+public enum PlantRarity
 {
     Default,
-    Fruit,
-    Stalk
+    Common,
+    Uncommon,
+    Rare,
+    Special,
+    Unique
 }
 
 // if there are discrete effects that can be applied to a plant
@@ -32,12 +41,22 @@ public enum PlantEffect
 [System.Serializable]
 public class PlantData
 {
-    public string plantName; // REVIEW: necessary?
+    public string plantName;
     public PlantType type;
-    public PlantSegment segment;
+    public PlantRarity rarity;
+    public float growthRate; // 100% = base growth rate of all plant types
+    public bool isDarkPlant;
+    public bool canReFruit; // when stalk only, does growth reduce to 90% for re-fruiting?
+    public bool isHarvested; // stalk only, can be grafted with plant fruit item
     public float growth;
     public float vitality;
     public float health;
-    public float quality;
+    public float quality; // does not improve if isHarvested, so canReFruit growth reduction is okay
+    public float springVitality;
+    public float summerVitality;
+    public float fallVitality;
+    public float winterVitality;
+    public int harvestAmount;
+    public float seedPotential;
     public PlantEffect[] plantEffects;
 }

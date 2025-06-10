@@ -1,12 +1,15 @@
 // REVIEW: necessary namespaces
 
+// REVIEW: using 'seed', 'plant', 'stalk' and 'fruit'; relying on plant type property
 public enum ItemType
 {
     Default,
-    ItemA,
-    ItemB,
-    ItemC,
-    ItemD
+    Fertilizer,
+    Seed,
+    Plant,
+    Stalk,
+    Fruit,
+    Rock // REVIEW:
 }
 
 // if there are discrete effects that can be applied to an item
@@ -23,9 +26,13 @@ public enum ItemEffects
 [System.Serializable]
 public class ItemData
 {
+    // REVIEW: this is messy with just necessary plant data, need another way?
     public string name; // REVIEW: necessary?
     public ItemType type;
-    public float durability; // item 'health'
+    public int plantIndex; // if plant or seed is plant type, else is ?
+    public float size; // if plant is growth, else is item size? item amount? (default 1f)
+    public float health; // if plant is health, else is item durability (default 1f)
+    public float quality; // if plant is quality, else is item quality? (default 1f)
     public ItemEffects[] effects;
 }
 

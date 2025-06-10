@@ -302,8 +302,7 @@ public class PlotManager : MonoBehaviour
             return;
 
         // cannot harvest unless a plant exists, plant at 100% growth and not yet harvested
-        if (plant == null || data.plant.growth < 1f || 
-            data.plant.segment != PlantSegment.Default)
+        if (plant == null || data.plant.growth < 1f || data.plant.isHarvested)
             return;
 
         if (action != CurrentAction.Harvesting && action != CurrentAction.None)
@@ -318,9 +317,9 @@ public class PlotManager : MonoBehaviour
             // harvest if plant is 100% grown and not yet harvested
             if (data.plant.growth < 1f)
                 return;
-            if (data.plant.segment == PlantSegment.Default)
+            if (!data.plant.isHarvested)
             {
-                data.plant.segment = PlantSegment.Stalk;
+                data.plant.isHarvested = true;
                 plant.transform.Find("Plant Sprite").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // drop as loose item fruit
                 ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
@@ -329,11 +328,33 @@ public class PlotManager : MonoBehaviour
                 else
                 {
                     Vector3 target = gameObject.transform.position;
-                    target.x += (RandomSystem.GaussianRandom01() * 1f) - .5f;
+                    target.x += RandomSystem.GaussianRandom01() - .5f;
                     target.z -= 0.01f; // in front of plant
-                    LooseItemData loose = InventorySystem.CreateItem(ItemType.ItemB);
-                    // TODO: transfer quality of fruit to item (revise item data)
+                    // harvesting drops fruit
+                    LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
+                    // transfer properties of fruit to item (revise item data)
+                    loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
                     ism.SpawnItem(loose, gameObject.transform.position, target);
+                    // harvesting may drop seed
+                    if ( RandomSystem.FlatRandom01() < data.plant.seedPotential )
+                    {
+                        // calculate number of seed items
+                        int numberOfSeeds = 1;
+                        if ( data.plant.seedPotential > 0.5f )
+                        {
+                            // += Mathf.RoundToInt(((seedPotential - .5f) / .2f) + .5f)
+                            numberOfSeeds += Mathf.RoundToInt(((data.plant.seedPotential - .5f) / .2f) + .5f);
+                            // REVIEW: gaussian random distribution from 1 to numberOfSeeds
+                            numberOfSeeds = 1 + Mathf.RoundToInt((RandomSystem.GaussianRandom01() * (numberOfSeeds - 1)) + 0.5f);
+                            Debug.Log(" plant seed potential: "+data.plant.seedPotential+" , resulting number of seed items: "+numberOfSeeds);
+                        }
+                        for (int i=0; i<numberOfSeeds; i++)
+                        {
+                            target.x += RandomSystem.GaussianRandom01() - .5f;
+                            loose.inv.items[0].type = ItemType.Seed; // the rest of this data is the same
+                            ism.SpawnItem(loose, gameObject.transform.position, target);
+                        }
+                    }
                 }
                 // harvest results display
                 harvestDisplayTimer = HARVESTDISPLAYDURATION;
@@ -371,7 +392,7 @@ public class PlotManager : MonoBehaviour
         // drop as loose item
         // remove plant
         Destroy(plant);
-        data.plant = PlantSystem.InitializePlant();
+        data.plant = PlantSystem.InitializePlant(PlantType.Default);
         data.condition = PlotCondition.Uprooted;
     }
 

@@ -92,7 +92,7 @@ public class ItemSpawnManager : MonoBehaviour
                     // drop item affects
                     LooseItemManager looseD = drops[i].dropItem.GetComponent<LooseItemManager>();
                     // fertilizer dropped in uprooted plot
-                    if (looseD.looseItem.inv.items[0].type == ItemType.ItemA)
+                    if (looseD.looseItem.inv.items[0].type == ItemType.Fertilizer)
                     {
                         if (CheckFertilizerDrop(i))
                             looseD.looseItem.deleteMe = true;

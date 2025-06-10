@@ -77,7 +77,7 @@ public class LooseItemManager : MonoBehaviour
 
         // detect durability failure or empty inventory, flag for deletion
         if (looseItem != null && (looseItem.inv.items.Length == 0 || 
-            looseItem.inv.items[0].durability <= 0f) )
+            looseItem.inv.items[0].health <= 0f) )
         {
             looseItem.deleteMe = true;
         }
@@ -152,30 +152,30 @@ public class LooseItemManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the durability of this item
+    /// Gets the health / durability of this item
     /// </summary>
-    /// <returns>durabilty percentage (0-1)</returns>
-    public float GetItemDurability()
+    /// <returns>health percentage (0-1)</returns>
+    public float GetItemHealth()
     {
-        return looseItem.inv.items[0].durability;
+        return looseItem.inv.items[0].health;
     }
 
     /// <summary>
-    /// Sets the durability of this item
+    /// Sets the health / durability of this item
     /// </summary>
-    /// <param name="value">durability percentage (0-1)</param>
-    public void SetItemDurability( float value )
+    /// <param name="value">health percentage (0-1)</param>
+    public void SetItemHealth( float value )
     {
-        looseItem.inv.items[0].durability = value;
+        looseItem.inv.items[0].health = value;
     }
 
     /// <summary>
-    /// Adjusts the durability of this item
+    /// Adjusts the health / durability of this item
     /// </summary>
-    /// <param name="value">durability percentage (0-1), to be added, result clamped</param>
-    public void AdjustItemDurability( float value )
+    /// <param name="value">health percentage (0-1), to be added, result clamped</param>
+    public void AdjustItemHealth( float value )
     {
-        looseItem.inv.items[0].durability = Mathf.Clamp01(looseItem.inv.items[0].durability + value);
+        looseItem.inv.items[0].health = Mathf.Clamp01(looseItem.inv.items[0].health + value);
     }
 
     void CheckItemPulse()

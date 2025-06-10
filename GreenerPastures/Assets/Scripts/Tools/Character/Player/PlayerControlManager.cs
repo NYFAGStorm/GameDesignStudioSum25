@@ -93,9 +93,9 @@ public class PlayerControlManager : MonoBehaviour
             currentInventorySelection = 2;
             // temp - fill player inventory for testing
             playerInventory.items = new ItemData[3];
-            playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.ItemA);
-            playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.ItemB);
-            playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.ItemB);
+            playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.Fertilizer);
+            playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.Seed);
+            playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.Seed);
         }
     }
 

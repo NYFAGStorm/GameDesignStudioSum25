@@ -121,8 +121,31 @@ public static class InventorySystem
         // initialize
         retItem.name = type.ToString();
         retItem.type = type;
-        retItem.durability = 1f;
+        retItem.plantIndex = -1; // no plant by default
+        retItem.size = 1f;
+        retItem.health = 1f;
+        retItem.quality = 1f;
         retItem.effects = new ItemEffects[0];
+
+        return retItem;
+    }
+
+    /// <summary>
+    /// Configures the properties of a specific plant to this item
+    /// </summary>
+    /// <param name="item">item data</param>
+    /// <param name="plant">plant data</param>
+    /// <returns>item data with plant configurations</returns>
+    public static ItemData SetItemAsPlant(ItemData item, PlantData plant)
+    {
+        ItemData retItem = item;
+
+        retItem.name += " (" + plant.plantName + ")";
+        retItem.plantIndex = (int)plant.type;
+        retItem.size = plant.growth;
+        retItem.health = plant.health;
+        retItem.quality = plant.quality;
+        // TODO: transfer plant effects to item somehow (need mirror item effects?)
 
         return retItem;
     }
