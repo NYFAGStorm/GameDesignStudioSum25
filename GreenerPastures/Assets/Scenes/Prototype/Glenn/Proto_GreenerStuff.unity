@@ -1234,10 +1234,6 @@ PrefabInstance:
       value: Quit On Escape
       objectReference: {fileID: 0}
     - target: {fileID: 7091691130716672438, guid: 875a80e959f662540a8e87ee3b06aec7, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7091691130716672438, guid: 875a80e959f662540a8e87ee3b06aec7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}

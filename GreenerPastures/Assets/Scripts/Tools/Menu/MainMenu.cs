@@ -38,7 +38,6 @@ public class MainMenu : MonoBehaviour
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 2;
-    private bool padPressed;
 
 
     void Start()
@@ -46,7 +45,7 @@ public class MainMenu : MonoBehaviour
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
         {
-            Debug.LogError("--- SplashScreen [Start] : no pad manager found in scene. aborting.");
+            Debug.LogError("--- MainMenu [Start] : no pad manager found in scene. aborting.");
             enabled = false;
         }
     }
@@ -61,26 +60,18 @@ public class MainMenu : MonoBehaviour
                 SceneManager.LoadScene(sceneSwitchName);
         }
 
-        // game pad input
-        if (padPressed)
-        {
-            if (padMgr.gamepads[0].YaxisL == 0f)
-                padPressed = false;
-            return;
-        }
-        if (padMgr.gamepads[0].YaxisL > 0f)
+        // determine ui selection from game pad input
+        if (padMgr.gPadDown[0].YaxisL > 0f)
         {
             padButtonSelection--;
             if (padButtonSelection < 0)
                 padButtonSelection = padMaxButton;
-            padPressed = true;
         }
-        else if (padMgr.gamepads[0].YaxisL < 0f)
+        else if (padMgr.gPadDown[0].YaxisL < 0f)
         {
             padButtonSelection++;
             if (padButtonSelection > padMaxButton)
                 padButtonSelection = 0;
-            padPressed = true;
         }
     }
 
@@ -134,7 +125,7 @@ public class MainMenu : MonoBehaviour
             s = buttons[i].buttonText;
 
             if (GUI.Button(r,s,g) ||
-            padButtonSelection == i && padMgr.gamepads[0].aButton)
+            padButtonSelection == i && padMgr.gPadDown[0].aButton)
             {
                 if (buttons[i].sceneName != "")
                 {

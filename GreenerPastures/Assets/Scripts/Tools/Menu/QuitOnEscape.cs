@@ -7,12 +7,15 @@ public class QuitOnEscape : MonoBehaviour
     // Author: Glenn Storm
     // This quits to the main menu if ESC is pressed
 
+    public Font textFont;
+    public FontStyle textStyle;
+    public Color textColor = Color.white;
+
     private bool popup;
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 1;
-    private bool padPressed;
 
     const int FONTSIZEAT1024 = 36;
 
@@ -20,11 +23,10 @@ public class QuitOnEscape : MonoBehaviour
     void Start()
     {
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        // TODO: change this to error and abort if no gamepad manager found (allow no pad for testing)
+        // (then clean up below checks for padMgr existing)
         if (padMgr == null)
-        {
-            Debug.LogError("--- SplashScreen [Start] : no pad manager found in scene. aborting.");
-            enabled = false;
-        }
+            Debug.LogWarning("--- QuitOnEscape [Start] : no pad manager found in scene. will ignore.");
     }
 
     void Update()
@@ -33,26 +35,21 @@ public class QuitOnEscape : MonoBehaviour
             (padMgr != null && padMgr.gamepads[0].startButton))
 			popup = true;
 
-        // game pad input
-        if (padPressed)
+        // determine ui selection from game pad input
+        if (padMgr != null)
         {
-            if (!padMgr.gamepads[0].LBump && !padMgr.gamepads[0].RBump)
-                padPressed = false;
-            return;
-        }
-        if (padMgr.gamepads[0].LBump)
-        {
-            padButtonSelection--;
-            if (padButtonSelection < 0)
-                padButtonSelection = padMaxButton;
-            padPressed = true;
-        }
-        else if (padMgr.gamepads[0].RBump)
-        {
-            padButtonSelection++;
-            if (padButtonSelection > padMaxButton)
-                padButtonSelection = 0;
-            padPressed = true;
+            if (padMgr.gPadDown[0].XaxisL < 0f)
+            {
+                padButtonSelection--;
+                if (padButtonSelection < 0)
+                    padButtonSelection = padMaxButton;
+            }
+            else if (padMgr.gPadDown[0].XaxisL > 0f)
+            {
+                padButtonSelection++;
+                if (padButtonSelection > padMaxButton)
+                    padButtonSelection = 0;
+            }
         }
     }
 
@@ -72,6 +69,8 @@ public class QuitOnEscape : MonoBehaviour
         r.width = 0.6f * w;
         r.height = 0.4f * h;
         g = GUI.skin.box;
+        g.font = textFont;
+        g.fontStyle = textStyle;
         g.fontSize = Mathf.RoundToInt( FONTSIZEAT1024 * (w/1024f) );
         g.alignment = TextAnchor.UpperCenter;
         g.normal.textColor = Color.white;
@@ -82,29 +81,33 @@ public class QuitOnEscape : MonoBehaviour
         r.y = 0.55f * h;
         r.width = 0.2f * w;
         r.height = 0.1f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.font = textFont;
+        g.fontStyle = textStyle;
+        g.fontSize = Mathf.RoundToInt(FONTSIZEAT1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
-        g.normal.textColor = Color.white;
+        g.normal.textColor = textColor;
         if (padButtonSelection == 0)
-            g.normal.textColor = Color.yellow;
-        g.active.textColor = Color.white;
+            g.normal.textColor = Color.white;
+        g.active.textColor = textColor;
         s = "QUIT";
 
         if (GUI.Button(r, s, g) ||
-            padButtonSelection == 0 && padMgr.gamepads[0].aButton)
+            (padMgr != null && padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
         {
             popup = false;
             SceneManager.LoadScene("Splash");
         }
 
         r.x = 0.55f * w;
-        g.normal.textColor = Color.white;
+        g.normal.textColor = textColor;
         if (padButtonSelection == 1)
-            g.normal.textColor = Color.yellow;
-        g.active.textColor = Color.white;
+            g.normal.textColor = Color.white;
+        g.active.textColor = textColor;
         s = "CANCEL";
 
-        if ( GUI.Button(r,s,g) ||
-            padButtonSelection == 1 && padMgr.gamepads[0].aButton)
+        if ( GUI.Button(r,s,g) || 
+            (padMgr != null && padButtonSelection == 1 && padMgr.gPadDown[0].aButton ) )
         {
             popup = false;
         }

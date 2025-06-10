@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,6 +6,13 @@ public class MultiGamepad : MonoBehaviour
 {
     // Author: Glenn Storm
     // This manages the connection to multiple game pad inputs
+
+    // REVIEW: consider additional properties, handled in this manager
+    // - a set of values that track if this control has been 'first' pressed any amount
+    // - for controls that are not already bool (pressLeftXaxisL, pressRightXaxisL)
+    // - and for controls that need to be 'first frame press only' (like get key down)
+    // - where activation of any amount causes press, no control = un-presses
+    // - (this is used in multiple menu scripts, and could be handled here)
 
     [System.Serializable]
     public struct GamepadStatus
@@ -42,6 +48,12 @@ public class MultiGamepad : MonoBehaviour
     public bool p1PadActive;
     public bool p2PadActive;
     public GamepadStatus[] gamepads = new GamepadStatus[2];
+
+    // gPadDown records 'first frame down' control any amount (must un-press to clear)
+    public GamepadStatus[] gPadDown = new GamepadStatus[2];
+    // gPadPrev records previous frame status of control to determine gPadDown results
+    private GamepadStatus[] gPadPrev = new GamepadStatus[2];
+
     public Texture2D gamepadIcon;
     public bool hideCursorIfGamepad;
 
@@ -154,7 +166,7 @@ public class MultiGamepad : MonoBehaviour
             }
         }
 
-        // init gamepade data
+        // init gamepad data
         gamepads[0].isActive = false;
         gamepads[1].isActive = false;
         gamepads[0].playerName = "";
@@ -184,7 +196,11 @@ public class MultiGamepad : MonoBehaviour
         // show / hide cursor
         if (hideCursorIfGamepad)
             CursorHide(gamepads[0].isActive || gamepads[1].isActive);
-     }
+
+        // init gPadPrev data (prev frame values of all gamepad controls)
+        gPadPrev[0] = gamepads[0];
+        gPadPrev[1] = gamepads[1];
+    }
 
     void GetPadStatus()
     {
@@ -216,6 +232,72 @@ public class MultiGamepad : MonoBehaviour
                 gamepads[i].LTrigger = Gamepad.all[i].leftTrigger.value;
                 gamepads[i].RBump = Gamepad.all[i].rightShoulder.isPressed;
                 gamepads[i].RTrigger = Gamepad.all[i].rightTrigger.value;
+            }
+        }
+
+        HandGamepadFirstPressStatus();
+    }
+
+    void HandGamepadFirstPressStatus()
+    {
+        // determine 'first press' state of gamepads controls as gPadDown
+        for (int i = 0; i < gamepads.Length; i++)
+        {
+            if (i < Gamepad.all.Count)
+            {
+                // clear gPadDown, as 'first frame control' has happened last frame
+                gPadDown[i] = new GamepadStatus();
+                gPadDown[i].playerName = gPadPrev[i].playerName;
+                gPadDown[i].isActive = gPadPrev[i].isActive;
+
+                // determine gPadDown status by 'this frame change has happened'
+                // all joystick/trigger values are 0f, -1f or 1f for this 'first press' signal
+                if (gPadPrev[i].startButton != gamepads[i].startButton)
+                    gPadDown[i].startButton = gamepads[i].startButton;
+                if (gPadPrev[i].backButton != gamepads[i].backButton)
+                    gPadDown[i].backButton = gamepads[i].backButton;
+                //gamepads[i].modeButton = Gamepad.all[i].;
+                //gamepads[i].centerButton = Gamepad.all[i].;
+                if ((gPadPrev[i].XaxisL != 0f) != (gamepads[i].XaxisL != 0f))
+                    gPadDown[i].XaxisL = (gamepads[i].XaxisL / Mathf.Abs(gamepads[i].XaxisL));
+                if ((gPadPrev[i].YaxisL != 0f) != (gamepads[i].YaxisL != 0f))
+                    gPadDown[i].YaxisL = (gamepads[i].YaxisL / Mathf.Abs(gamepads[i].YaxisL));
+                if (gPadPrev[i].LJoyPress != gamepads[i].LJoyPress)
+                    gPadDown[i].LJoyPress = gamepads[i].LJoyPress;
+                if ((gPadPrev[i].XaxisR != 0f) != (gamepads[i].XaxisR != 0f))
+                    gPadDown[i].XaxisR = (gamepads[i].XaxisR / Mathf.Abs(gamepads[i].XaxisR));
+                if ((gPadPrev[i].YaxisR != 0f) != (gamepads[i].YaxisR != 0f))
+                    gPadDown[i].YaxisR = (gamepads[i].YaxisR / Mathf.Abs(gamepads[i].YaxisR));
+                if (gPadPrev[i].RJoyPress != gamepads[i].RJoyPress)
+                    gPadDown[i].RJoyPress = gamepads[i].RJoyPress;
+                //gamepads[i].DpadPress = Gamepad.all[i].;
+                if (gPadPrev[i].DpadUp != gamepads[i].DpadUp)
+                    gPadDown[i].DpadUp = gamepads[i].DpadUp;
+                if (gPadPrev[i].DpadDown != gamepads[i].DpadDown)
+                    gPadDown[i].DpadDown = gamepads[i].DpadDown;
+                if (gPadPrev[i].DpadLeft != gamepads[i].DpadLeft)
+                    gPadDown[i].DpadLeft = gamepads[i].DpadLeft;
+                if (gPadPrev[i].DpadRight != gamepads[i].DpadRight)
+                    gPadDown[i].DpadRight = gamepads[i].DpadRight;
+                if (gPadPrev[i].aButton != gamepads[i].aButton)
+                    gPadDown[i].aButton = gamepads[i].aButton;
+                if (gPadPrev[i].bButton != gamepads[i].bButton)
+                    gPadDown[i].bButton = gamepads[i].bButton;
+                if (gPadPrev[i].xButton != gamepads[i].xButton)
+                    gPadDown[i].xButton = gamepads[i].xButton;
+                if (gPadPrev[i].yButton != gamepads[i].yButton)
+                    gPadDown[i].yButton = gamepads[i].yButton;
+                if (gPadPrev[i].LBump != gamepads[i].LBump)
+                    gPadDown[i].LBump = gamepads[i].LBump;
+                if ((gPadPrev[i].LTrigger != 0f) != (gamepads[i].LTrigger != 0f))
+                    gPadDown[i].LTrigger = ( gamepads[i].LTrigger / Mathf.Abs(gamepads[i].LTrigger) );
+                if (gPadPrev[i].RBump != gamepads[i].RBump)
+                    gPadDown[i].RBump = gamepads[i].RBump;
+                if ((gPadPrev[i].RTrigger != 0f) != (gamepads[i].RTrigger != 0f))
+                    gPadDown[i].RTrigger = (gamepads[i].RTrigger / Mathf.Abs(gamepads[i].RTrigger));
+
+                // hold previous frame state in gPadPrev for comparison next frame
+                gPadPrev[i] = gamepads[i];
             }
         }
     }

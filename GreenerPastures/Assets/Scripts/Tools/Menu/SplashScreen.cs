@@ -28,7 +28,6 @@ public class SplashScreen : MonoBehaviour
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 0;
-    private bool padPressed;
 
     private bool splashLaunched;
 
@@ -48,26 +47,18 @@ public class SplashScreen : MonoBehaviour
         if (splashLaunched)
             SceneManager.LoadScene("Menu");
 
-        // game pad input
-        if (padPressed)
-        {
-            if (padMgr.gamepads[0].YaxisL == 0f)
-                padPressed = false;
-            return;
-        }
-        if (padMgr.gamepads[0].YaxisL > 0f)
+        // determine ui selection from game pad input
+        if (padMgr.gPadDown[0].YaxisL > 0f)
         {
             padButtonSelection--;
             if (padButtonSelection < 0)
                 padButtonSelection = padMaxButton;
-            padPressed = true;
         }
-        else if (padMgr.gamepads[0].YaxisL < 0f)
+        else if (padMgr.gPadDown[0].YaxisL < 0f)
         {
             padButtonSelection++;
             if (padButtonSelection > padMaxButton)
                 padButtonSelection = 0;
-            padPressed = true;
         }
     }
 
@@ -108,8 +99,8 @@ public class SplashScreen : MonoBehaviour
         g.active.textColor = buttonFontColor;
         s = startButtonText;
 
-        if (GUI.Button(r,s,g) ||
-            padButtonSelection == 0 && padMgr.gamepads[0].aButton)
+        if (GUI.Button(r,s,g) || 
+            padMgr != null && padMgr.gPadDown[0].aButton)
         {
             // little cinematic menu fun
             GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 1;

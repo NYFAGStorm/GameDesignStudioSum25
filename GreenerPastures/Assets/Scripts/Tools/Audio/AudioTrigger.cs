@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NYFA Studio/Audio/AudioTrigger")]
@@ -112,6 +110,14 @@ public class AudioTrigger : MonoBehaviour
 
     void DoTrigger()
     {
+        // validate
+        if (am == null)
+        {
+            // audio managers can be 'lost' in result of singleton pattern
+            //Debug.LogWarning("--- AudioTrigger [DoTrigger] : audio manager lost. will ignore.");
+            return;
+        }
+
         triggered = true;
 
         // handle 3D sound

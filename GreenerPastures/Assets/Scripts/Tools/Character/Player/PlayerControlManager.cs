@@ -50,7 +50,6 @@ public class PlayerControlManager : MonoBehaviour
     private bool itemTakenAction;
 
     private MultiGamepad padMgr;
-    private bool bumpPressed;
 
     private CameraManager cam;
     private PlayerAnimManager pam;
@@ -64,6 +63,8 @@ public class PlayerControlManager : MonoBehaviour
     {
         // validate
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        // TODO: change this to error and abort if no gamepad manager found (allow no pad for testing)
+        // (then clean up below checks for padMgr existing)
         if (padMgr == null )
             Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no pad manager. will ignore.");
         cam = GameObject.FindFirstObjectByType<CameraManager>();
@@ -289,6 +290,7 @@ public class PlayerControlManager : MonoBehaviour
 
         if (padMgr != null)
         {
+            // use standard 'hold' signals from gamepad for these buttons
             characterActions.actionA = padMgr.gamepads[0].aButton;
             characterActions.actionB = padMgr.gamepads[0].bButton;
             characterActions.actionC = padMgr.gamepads[0].xButton;
@@ -304,30 +306,17 @@ public class PlayerControlManager : MonoBehaviour
 
     void DetectInventorySelectionInput()
     {
-        bool lbump = false;
-        bool rbump = false;
-        if (padMgr != null)
-        {
-            if (bumpPressed)
-            {
-                if (!padMgr.gamepads[0].LBump && !padMgr.gamepads[0].RBump)
-                    bumpPressed = false;
-                return;
-            }
-            lbump = padMgr.gamepads[0].LBump;
-            rbump = padMgr.gamepads[0].RBump;
-            bumpPressed = (lbump || rbump);
-        }
-
         // REVIEW: controls for inventory selection
-        if (Input.GetKeyDown(KeyCode.LeftBracket) || lbump)
+        if (Input.GetKeyDown(KeyCode.LeftBracket) || 
+            padMgr != null && padMgr.gPadDown[0].LBump)
         {
             inventorySelectionTimer = INVENTORYSELECTIONTIME;
             currentInventorySelection--;
             if (currentInventorySelection < 0)
                 currentInventorySelection = playerInventory.maxSlots - 1;
         }
-        if (Input.GetKeyDown(KeyCode.RightBracket) || rbump)
+        if (Input.GetKeyDown(KeyCode.RightBracket) ||
+            padMgr != null && padMgr.gPadDown[0].RBump)
         {
             inventorySelectionTimer = INVENTORYSELECTIONTIME;
             currentInventorySelection++;

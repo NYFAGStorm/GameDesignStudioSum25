@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("NYFA Studio/Audio/AudioManager")]
@@ -51,7 +49,7 @@ public class AudioManager : MonoBehaviour
         public float playTimer; // delay to play, or loop
         public GameObject externalObj; // use this game object to play in 3D space
     }
-    public APlay[] plays;
+    public APlay[] plays = new APlay[0];
 
     private bool musicCrossfading;
     private float musicCrossProgress;
