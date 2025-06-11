@@ -23,9 +23,17 @@ public class PlayerControlManager : MonoBehaviour
     public struct PlayerActions
     {
         public bool actionA;
+        public bool actionADown; // 'first press' frame signal only (must un-press)
         public bool actionB;
+        public bool actionBDown;
         public bool actionC;
+        public bool actionCDown;
         public bool actionD;
+        public bool actionDDown;
+        public bool lBump;
+        public bool lBumpDown;
+        public bool rBump;
+        public bool rBumpDown;
     }
 
     public KeyCode upKey = KeyCode.W;
@@ -36,6 +44,8 @@ public class PlayerControlManager : MonoBehaviour
     public KeyCode actionBKey = KeyCode.F;
     public KeyCode actionCKey = KeyCode.C;
     public KeyCode actionDKey = KeyCode.V;
+    public KeyCode lBumpKey = KeyCode.LeftBracket;
+    public KeyCode rBumpKey = KeyCode.RightBracket;
 
     public bool characterFrozen;
 
@@ -46,8 +56,6 @@ public class PlayerControlManager : MonoBehaviour
 
     private InventoryData playerInventory;
     private int currentInventorySelection;
-    private float inventorySelectionTimer;
-    private bool itemTakenAction;
 
     private MultiGamepad padMgr;
 
@@ -111,9 +119,6 @@ public class PlayerControlManager : MonoBehaviour
         // check action input
         ReadActionInput();
 
-        // reset item taken action
-        ResetItemTakenAction();
-
         // detect inventory selection input
         DetectInventorySelectionInput();
         // run inventory selection timer
@@ -130,7 +135,8 @@ public class PlayerControlManager : MonoBehaviour
         // check action input (pickup)
         if ( activeItem != null )
         {
-            if (characterActions.actionA && !itemTakenAction)
+            // uses 'first press' control signal
+            if (characterActions.actionADown)
             {
                 // validate
                 if (activeItem.looseItem.inv.items.Length == 0)
@@ -141,7 +147,6 @@ public class PlayerControlManager : MonoBehaviour
                 // pick up loose item, transfer to inventory
                 playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
                 activeItem = null;
-                itemTakenAction = true; // player must un-press action button to take again
             }
             return;
         }
@@ -156,7 +161,6 @@ public class PlayerControlManager : MonoBehaviour
         // temp (hold-type control detection)
         if (activePlot != null)
         {
-            // REVIEW: order?
             if (characterActions.actionA)
                 activePlot.WorkLand();
             if (characterActions.actionB)
@@ -284,41 +288,47 @@ public class PlayerControlManager : MonoBehaviour
         characterActions = new PlayerActions();
 
         characterActions.actionA = Input.GetKey(actionAKey);
+        characterActions.actionADown = Input.GetKeyDown(actionAKey);
         characterActions.actionB = Input.GetKey(actionBKey);
+        characterActions.actionBDown = Input.GetKeyDown(actionBKey);
         characterActions.actionC = Input.GetKey(actionCKey);
+        characterActions.actionCDown = Input.GetKeyDown(actionCKey);
         characterActions.actionD = Input.GetKey(actionDKey);
+        characterActions.actionDDown = Input.GetKeyDown(actionDKey);
+        characterActions.lBump = Input.GetKey(lBumpKey);
+        characterActions.lBumpDown = Input.GetKeyDown(lBumpKey);
+        characterActions.rBump = Input.GetKey(rBumpKey);
+        characterActions.rBumpDown = Input.GetKeyDown(rBumpKey);
 
         if (padMgr != null && padMgr.gamepads[0].isActive)
         {
             // use standard 'hold' signals from gamepad for these buttons
             characterActions.actionA = padMgr.gamepads[0].aButton;
+            characterActions.actionADown = padMgr.gPadDown[0].aButton;
             characterActions.actionB = padMgr.gamepads[0].bButton;
+            characterActions.actionBDown = padMgr.gPadDown[0].bButton;
             characterActions.actionC = padMgr.gamepads[0].xButton;
+            characterActions.actionCDown = padMgr.gPadDown[0].xButton;
             characterActions.actionD = padMgr.gamepads[0].yButton;
+            characterActions.actionDDown = padMgr.gPadDown[0].yButton;
+            characterActions.lBump = padMgr.gamepads[0].LBump;
+            characterActions.lBumpDown = padMgr.gPadDown[0].LBump;
+            characterActions.rBump = padMgr.gamepads[0].RBump;
+            characterActions.rBumpDown = padMgr.gPadDown[0].RBump;
         }
-    }
-
-    void ResetItemTakenAction()
-    {
-        if (itemTakenAction && !characterActions.actionA)
-            itemTakenAction = false;
     }
 
     void DetectInventorySelectionInput()
     {
-        // REVIEW: controls for inventory selection
-        if (Input.GetKeyDown(KeyCode.LeftBracket) || 
-            padMgr != null && padMgr.gPadDown[0].LBump)
+        // uses 'first press' control signal
+        if (characterActions.lBumpDown)
         {
-            inventorySelectionTimer = INVENTORYSELECTIONTIME;
             currentInventorySelection--;
             if (currentInventorySelection < 0)
                 currentInventorySelection = playerInventory.maxSlots - 1;
         }
-        if (Input.GetKeyDown(KeyCode.RightBracket) ||
-            padMgr != null && padMgr.gPadDown[0].RBump)
+        if (characterActions.rBumpDown)
         {
-            inventorySelectionTimer = INVENTORYSELECTIONTIME;
             currentInventorySelection++;
             if (currentInventorySelection > playerInventory.maxSlots - 1)
                 currentInventorySelection = 0;
@@ -327,33 +337,23 @@ public class PlayerControlManager : MonoBehaviour
 
     void CheckInventorySelectionDrop()
     {
-        if (inventorySelectionTimer > 0f)
+        // handle drop item selected, uses 'first press' control signal
+        if (characterActions.actionCDown && currentInventorySelection < playerInventory.items.Length)
         {
-            inventorySelectionTimer -= Time.deltaTime;
-            if (inventorySelectionTimer < 0f)
-                inventorySelectionTimer = 0f;
+            // spawn loose item dropped from inventory
+            ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+            if (ism == null)
+                Debug.LogWarning("--- PlayerControlManager [Update] : no item spawn manager found in scene. will ignore.");
             else
             {
-                // handle drop item selected
-                if (characterActions.actionC && currentInventorySelection < playerInventory.items.Length)
-                {
-                    inventorySelectionTimer = 0f; // prevents dropping multiple items
-                    // spawn loose item dropped from inventory
-                    ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
-                    if (ism == null)
-                        Debug.LogWarning("--- PlayerControlManager [Update] : no item spawn manager found in scene. will ignore.");
-                    else
-                    {
-                        LooseItemData lid = InventorySystem.DropItem(playerInventory.items[currentInventorySelection], playerInventory, out playerInventory);
-                        Vector3 pos = gameObject.transform.position;
-                        if (pam.imageFlipped)
-                            pos += Vector3.left * PROXIMITYRANGE;
-                        else
-                            pos += Vector3.right * PROXIMITYRANGE;
-                        pos.x += (RandomSystem.GaussianRandom01() * PROXIMITYRANGE) - (PROXIMITYRANGE / 2f);
-                        ism.SpawnItem(lid, gameObject.transform.position, pos);
-                    }
-                }
+                LooseItemData lid = InventorySystem.DropItem(playerInventory.items[currentInventorySelection], playerInventory, out playerInventory);
+                Vector3 pos = gameObject.transform.position;
+                if (pam.imageFlipped)
+                    pos += Vector3.left * PROXIMITYRANGE;
+                else
+                    pos += Vector3.right * PROXIMITYRANGE;
+                pos.x += (RandomSystem.GaussianRandom01() * PROXIMITYRANGE) - (PROXIMITYRANGE / 2f);
+                ism.SpawnItem(lid, gameObject.transform.position, pos);
             }
         }
     }
@@ -416,11 +416,35 @@ public class PlayerControlManager : MonoBehaviour
             // draw inventory slot frame
             t = (Texture2D)Resources.Load("Plot_Cursor");
             c = Color.white;
-            if (i == currentInventorySelection && inventorySelectionTimer > 0f)
+            if (i == currentInventorySelection)
                 c = Color.yellow;
             GUI.color = c;
             GUI.DrawTexture(r, t);
             GUI.color = Color.white;
         }
+
+        if (currentInventorySelection >= playerInventory.items.Length)
+            return;
+
+        // label for current item selected
+        r.x = 0.25f * w;
+        r.y = 0.075f * h;
+        r.width = 0.5f * w;
+        r.height = 0.1f * h;
+        GUIStyle g = new GUIStyle(GUI.skin.label);
+        g.alignment = TextAnchor.MiddleCenter;
+        g.fontSize = Mathf.RoundToInt( 22f * (w/1204f));
+        g.fontStyle = FontStyle.Bold;
+        string s = playerInventory.items[currentInventorySelection].name;
+
+        r.x += 0.0005f * w;
+        r.y += 0.0008f * w;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+
+        r.x -= 0.001f * w;
+        r.y -= 0.0016f * w;
+        GUI.color = Color.white;
+        GUI.Label(r, s, g);
     }
 }
