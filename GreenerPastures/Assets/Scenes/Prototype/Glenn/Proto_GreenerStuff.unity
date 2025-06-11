@@ -1555,7 +1555,7 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: 72b7f0b33e9254a4fbb4fb5cd2af0fcb, type: 3}
     - target: {fileID: 9105255155821836046, guid: f79b3031df76e5a4c882d7bfbe9c44fc, type: 3}
       propertyPath: looseItem.inv.items.Array.data[0].name
-      value: Seed
+      value: Seed (Corn)
       objectReference: {fileID: 0}
     - target: {fileID: 9105255155821836046, guid: f79b3031df76e5a4c882d7bfbe9c44fc, type: 3}
       propertyPath: looseItem.inv.items.Array.data[0].size

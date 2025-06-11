@@ -99,11 +99,16 @@ public class PlayerControlManager : MonoBehaviour
             cam.SetPlayer(this);
             playerInventory = InventorySystem.InitializeInventory(5);
             currentInventorySelection = 2;
+
             // temp - fill player inventory for testing
             playerInventory.items = new ItemData[3];
             playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.Fertilizer);
             playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.Seed);
+            playerInventory.items[1].name += " (Carrot)";
+            playerInventory.items[1].plantIndex = 2;
             playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.Seed);
+            playerInventory.items[2].name += " (Tomato)";
+            playerInventory.items[2].plantIndex = 1;
         }
     }
 
@@ -426,11 +431,22 @@ public class PlayerControlManager : MonoBehaviour
         if (currentInventorySelection >= playerInventory.items.Length)
             return;
 
-        // label for current item selected
-        r.x = 0.25f * w;
-        r.y = 0.075f * h;
-        r.width = 0.5f * w;
-        r.height = 0.1f * h;
+        // bg and label for current item selected
+        r.x = 0.375f * w;
+        r.y = 0.1f * h;
+        r.width = 0.25f * w;
+        r.height = 0.05f * h;
+
+        t = Texture2D.whiteTexture;
+        c = Color.white;
+        c.r = .1f;
+        c.g = .1f;
+        c.b = .1f;
+        c.a = 0.25f;
+        GUI.color = c;
+        GUI.DrawTexture(r, t);
+        GUI.color = Color.white;
+
         GUIStyle g = new GUIStyle(GUI.skin.label);
         g.alignment = TextAnchor.MiddleCenter;
         g.fontSize = Mathf.RoundToInt( 22f * (w/1204f));
