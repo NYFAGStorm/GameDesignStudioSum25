@@ -6,7 +6,7 @@ public class PlantManager : MonoBehaviour
     // This handles a single plant object
 
     private float plantTimer;
-    private Renderer plantSprite;
+    private Renderer plantImage;
     private PlotManager plot;
 
     // temp (use time manager multiplier)
@@ -24,8 +24,8 @@ public class PlantManager : MonoBehaviour
             Debug.LogError("--- PlantManager [Start] : "+gameObject.name+" no parent plot found. aborting.");
             enabled = false;
         }
-        plantSprite = transform.Find("Plant Sprite").gameObject.GetComponent<Renderer>();
-        if ( plantSprite == null )
+        plantImage = transform.Find("Plant Image").gameObject.GetComponent<Renderer>();
+        if ( plantImage == null )
         {
             Debug.LogError("--- PlantManager [Start] : " + gameObject.name + " no renderer found in children. aborting.");
             enabled = false;
@@ -82,16 +82,16 @@ public class PlantManager : MonoBehaviour
             case 0:
                 break;
             case 1:
-                plantSprite.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant01"); ;
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant01"); ;
                 break;
             case 2:
-                plantSprite.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant02"); ;
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant02"); ;
                 break;
             case 3:
-                plantSprite.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant03"); ;
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant03"); ;
                 break;
             case 4:
-                plantSprite.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant04"); ;
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant04"); ;
                 break;
         }
     }

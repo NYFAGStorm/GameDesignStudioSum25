@@ -237,7 +237,7 @@ public class PlayerControlManager : MonoBehaviour
     {
         Vector3 pos = gameObject.transform.position;
         pos += characterMove;
-        // handle character sprite flip
+        // handle character art flip
         if (characterMove.x < 0f)
             pam.imageFlipped = true;
         if (characterMove.x > 0f)

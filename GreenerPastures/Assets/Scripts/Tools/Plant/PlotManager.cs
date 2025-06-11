@@ -320,7 +320,7 @@ public class PlotManager : MonoBehaviour
             if (!data.plant.isHarvested)
             {
                 data.plant.isHarvested = true;
-                plant.transform.Find("Plant Sprite").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+                plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // drop as loose item fruit
                 ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
                 if (ism == null)

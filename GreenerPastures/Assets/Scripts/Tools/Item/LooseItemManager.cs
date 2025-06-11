@@ -66,7 +66,7 @@ public class LooseItemManager : MonoBehaviour
         if (itemRenderer.material.shader.name == "Unlit/Three Layer Composite")
             itemRenderer.material.SetTextureScale("_AccentTex", flip);
 
-        // run sprite timer
+        // run frame timer
         if (frameTimer > 0f)
         {
             frameTimer -= Time.deltaTime;
@@ -83,7 +83,7 @@ public class LooseItemManager : MonoBehaviour
                     animOnce = false;
                     frameTimer = 0f;
                 }
-                // configure current sprite, based on sprite array
+                // configure current frame, based on frames array
                 itemRenderer.material.mainTexture = frames[ looseItem.artFrame ];
             }
         }
@@ -140,7 +140,7 @@ public class LooseItemManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Toggles this item sprite horizontal flip
+    /// Toggles this item image horizontal flip
     /// </summary>
     public void ToggleItemFlip()
     {
@@ -219,7 +219,8 @@ public class LooseItemManager : MonoBehaviour
         Color c = itemRenderer.material.GetColor("_Color");
         c.r = value;
         c.g = value;
-        c.b = 0f;
+        if (value < 1f)
+            c.b = 0f;
         c.a = (value/2f) + 0.5f;
         itemRenderer.material.SetColor("_Color", c);
     }

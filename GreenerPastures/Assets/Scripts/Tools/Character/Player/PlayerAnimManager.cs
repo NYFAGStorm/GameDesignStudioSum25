@@ -35,7 +35,7 @@ public class PlayerAnimManager : MonoBehaviour
 
     void Update()
     {
-        // handle sprite flip
+        // handle image flip
         Vector2 flipVec = new Vector2(1f,1f);
         if (imageFlipped)
             flipVec.x = -1f;

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1780530301567226462
+--- !u!1 &9070429627191650932
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,46 +8,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5328569549660597508}
-  - component: {fileID: 3876501267607127192}
-  - component: {fileID: 2103499803840195778}
+  - component: {fileID: 7808729630050702640}
+  - component: {fileID: 1925455849248748173}
+  - component: {fileID: 2925560709859633409}
+  - component: {fileID: 9105255155821836046}
   m_Layer: 0
-  m_Name: Plant Image
+  m_Name: Loose Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5328569549660597508
+--- !u!4 &7808729630050702640
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780530301567226462}
+  m_GameObject: {fileID: 9070429627191650932}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.0036035, y: 0.125, z: 0.49982303}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 404363616400919929}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3876501267607127192
+--- !u!33 &1925455849248748173
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780530301567226462}
+  m_GameObject: {fileID: 9070429627191650932}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &2103499803840195778
+--- !u!23 &2925560709859633409
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780530301567226462}
+  m_GameObject: {fileID: 9070429627191650932}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -64,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c9dff808a18a9f140a506d8c6c705a0d, type: 2}
+  - {fileID: 2100000, guid: 933e4e4221206cc4c87e1bcca0f5fb12, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -86,48 +87,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &2627265445584032241
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 404363616400919929}
-  - component: {fileID: 3322695105568415230}
-  m_Layer: 0
-  m_Name: Plant
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &404363616400919929
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627265445584032241}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 5328569549660597508}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3322695105568415230
+--- !u!114 &9105255155821836046
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627265445584032241}
+  m_GameObject: {fileID: 9070429627191650932}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1573eae2fe9fd1b4c9c1aa8f472fe845, type: 3}
+  m_Script: {fileID: 11500000, guid: 13ccbe12bf5b7894d8be076baf1c2c11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  looseItem:
+    inv:
+      maxSlots: 1
+      items:
+      - name: Fertilizer
+        type: 1
+        plantIndex: -1
+        size: 1
+        health: 1
+        quality: 1
+        effects: 
+    parentIsland: 0
+    posX: 0
+    posY: 0
+    posZ: 0
+    artFrame: 0
+    flipped: 0
+    deleteMe: 0
+  frameTime: 0
+  animOnce: 0
+  frames:
+  - {fileID: 2800000, guid: e24812a97bc33da49933647c14f8c5b7, type: 3}
