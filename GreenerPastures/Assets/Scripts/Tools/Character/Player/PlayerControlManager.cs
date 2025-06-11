@@ -53,7 +53,7 @@ public class PlayerControlManager : MonoBehaviour
 
     private CameraManager cam;
     private PlayerAnimManager pam;
-    private SpriteLibraryManager slm;
+    private ArtLibraryManager alm;
 
     const float PROXIMITYRANGE = 0.381f;
     const float INVENTORYSELECTIONTIME = 999f; // was 2f
@@ -79,10 +79,10 @@ public class PlayerControlManager : MonoBehaviour
             Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no player anim manager found in children. aborting.");
             enabled = false;
         }
-        slm = GameObject.FindFirstObjectByType<SpriteLibraryManager>();
-        if (slm == null)
+        alm = GameObject.FindFirstObjectByType<ArtLibraryManager>();
+        if (alm == null)
         {
-            Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no sprite library manager found. aborting.");
+            Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no art library manager found. aborting.");
             enabled = false;
         }
         // initialize
@@ -183,8 +183,8 @@ public class PlayerControlManager : MonoBehaviour
         float leftPad = 0f;
         float rightPad = 0f;
 
-        // check gamepad move input
-        if ( padMgr != null )
+        // check gamepad move input (override if gamepad active)
+        if ( padMgr != null && padMgr.gamepads[0].isActive )
         {
             float padX = padMgr.gamepads[0].XaxisL;
             float padY = padMgr.gamepads[0].YaxisL;
@@ -239,9 +239,9 @@ public class PlayerControlManager : MonoBehaviour
         pos += characterMove;
         // handle character sprite flip
         if (characterMove.x < 0f)
-            pam.spriteFlipped = true;
+            pam.imageFlipped = true;
         if (characterMove.x > 0f)
-            pam.spriteFlipped = false;
+            pam.imageFlipped = false;
         gameObject.transform.position = pos;
     }
 
@@ -288,7 +288,7 @@ public class PlayerControlManager : MonoBehaviour
         characterActions.actionC = Input.GetKey(actionCKey);
         characterActions.actionD = Input.GetKey(actionDKey);
 
-        if (padMgr != null)
+        if (padMgr != null && padMgr.gamepads[0].isActive)
         {
             // use standard 'hold' signals from gamepad for these buttons
             characterActions.actionA = padMgr.gamepads[0].aButton;
@@ -346,7 +346,7 @@ public class PlayerControlManager : MonoBehaviour
                     {
                         LooseItemData lid = InventorySystem.DropItem(playerInventory.items[currentInventorySelection], playerInventory, out playerInventory);
                         Vector3 pos = gameObject.transform.position;
-                        if (pam.spriteFlipped)
+                        if (pam.imageFlipped)
                             pos += Vector3.left * PROXIMITYRANGE;
                         else
                             pos += Vector3.right * PROXIMITYRANGE;
@@ -404,7 +404,7 @@ public class PlayerControlManager : MonoBehaviour
                     r.width -= (0.01f * w);
                     r.height -= (0.01f * w);
                     // draw inventory item
-                    t = (Texture2D)slm.itemSprites[slm.GetSpriteData(playerInventory.items[i].type).spriteIndexBase].texture;
+                    t = alm.itemImages[alm.GetArtData(playerInventory.items[i].type).artIndexBase];
                     GUI.DrawTexture(r, t);
                     // re-adjust larger again
                     r.x -= 0.005f * w;

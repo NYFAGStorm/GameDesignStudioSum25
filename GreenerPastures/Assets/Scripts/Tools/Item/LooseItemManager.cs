@@ -5,16 +5,15 @@ public class LooseItemManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles an item in the game world, as a loose item
 
-    // REVIEW: if using Sprites or Texture2Ds, and SpriteRenderer or MeshRenderer
-    // need Texture2Ds for shader work?
+    // NOTE: using Texture2D to emlpoy shaders and ease import process in art pipeline
 
     public LooseItemData looseItem;
-    public float spriteTime; // if animating, set positive seconds
+    public float frameTime; // if animating, set positive seconds
     public bool animOnce; // do not repeat loop, if animating (returns to frame 0)
-    public Sprite[] sprites = new Sprite[1];
+    public Texture2D[] frames = new Texture2D[1];
 
-    private float spriteTimer;
-    private SpriteRenderer spriteRenderer;
+    private float frameTimer;
+    private Renderer itemRenderer;
     private bool pulseActive;
     private float pulseTimer;
 
@@ -25,25 +24,30 @@ public class LooseItemManager : MonoBehaviour
     void Start()
     {
         // validate
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
+        itemRenderer = GetComponent<Renderer>();
+        if (itemRenderer == null)
         {
-            Debug.LogError("--- LooseItemManager [Start] : "+gameObject.name+" no sprite renderer component found. aborting.");
+            Debug.LogError("--- LooseItemManager [Start] : "+gameObject.name+" no renderer component found. aborting.");
+            enabled = false;
+        }
+        if ( frames == null || frames.Length == 0 )
+        {
+            Debug.LogError("--- LooseItemManager [Start] : " + gameObject.name + " no art frames configured. aborting.");
             enabled = false;
         }
         // initialize
         if (enabled)
         {
-
+            itemRenderer.material.mainTexture = frames[0];
         }
     }
 
     void Update()
     {
-        // validate sprite renderer
-        if (spriteRenderer == null)
+        // validate item renderer
+        if (itemRenderer == null)
         {
-            Debug.LogError("--- LooseItemManager [Start] : " + gameObject.name + " no sprite renderer component found. aborting.");
+            Debug.LogError("--- LooseItemManager [Start] : " + gameObject.name + " no renderer component found. aborting.");
             enabled = false;
             return;
         }
@@ -51,27 +55,36 @@ public class LooseItemManager : MonoBehaviour
         CheckItemPulse();
 
         // configure horizontal flip
-        spriteRenderer.flipX = looseItem.flipped;
+        Vector2 flip = new Vector2(1f, 1f);
+        if (looseItem.flipped)
+            flip.x = -1f;
+        itemRenderer.material.SetTextureScale("_MainTex", flip);
+        // TEST: if we have multi-layer composite shader, flip all layers
+        if (itemRenderer.material.shader.name == "Unlit/Two Layer Composite" ||
+            itemRenderer.material.shader.name == "Unlit/Three Layer Composite")
+            itemRenderer.material.SetTextureScale("_AltTex", flip);
+        if (itemRenderer.material.shader.name == "Unlit/Three Layer Composite")
+            itemRenderer.material.SetTextureScale("_AccentTex", flip);
 
         // run sprite timer
-        if (spriteTimer > 0f)
+        if (frameTimer > 0f)
         {
-            spriteTimer -= Time.deltaTime;
-            if (spriteTimer < 0f)
+            frameTimer -= Time.deltaTime;
+            if (frameTimer < 0f)
             {
-                spriteTimer = spriteTime;
+                frameTimer = frameTime;
                 // add slight timing variation
-                spriteTimer += (Random.Range(-MINIMUMFRAMETIME/2f,MINIMUMFRAMETIME/2f));
-                looseItem.spriteFrame++;
-                if (looseItem.spriteFrame > sprites.Length)
-                    looseItem.spriteFrame = 0;
+                frameTimer += (Random.Range(-MINIMUMFRAMETIME/2f,MINIMUMFRAMETIME/2f));
+                looseItem.artFrame++;
+                if (looseItem.artFrame > frames.Length)
+                    looseItem.artFrame = 0;
                 if (animOnce)
                 {
                     animOnce = false;
-                    spriteTimer = 0f;
+                    frameTimer = 0f;
                 }
                 // configure current sprite, based on sprite array
-                spriteRenderer.sprite = sprites[ looseItem.spriteFrame ];
+                itemRenderer.material.mainTexture = frames[ looseItem.artFrame ];
             }
         }
 
@@ -91,19 +104,19 @@ public class LooseItemManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Configures a new item object data and sprites, by item type
+    /// Configures a new item object data and art, by item type
     /// </summary>
     /// <param name="itemType">item type</param>
     public void ConfigureItem( ItemType itemType )
     {
         looseItem = InventorySystem.CreateItem(itemType);
-        // refer to sprite library to configure sprite list and anim properties
-        SpriteLibraryManager slm = GameObject.FindAnyObjectByType<SpriteLibraryManager>();
-        SpriteData spriteData = slm.GetSpriteData(itemType);
-        sprites = slm.GetSpriteList(spriteData);
-        spriteRenderer.sprite = sprites[0];
-        spriteTime = spriteData.animFrameTime;
-        animOnce = !spriteData.animLoop;
+        // refer to art library to configure image list and anim properties
+        ArtLibraryManager alm = GameObject.FindAnyObjectByType<ArtLibraryManager>();
+        ArtData artData = alm.GetArtData(itemType);
+        frames = alm.GetImageList(artData);
+        itemRenderer.material.mainTexture = frames[0];
+        frameTime = artData.animFrameTime;
+        animOnce = !artData.animLoop;
     }
 
     /// <summary>
@@ -118,7 +131,7 @@ public class LooseItemManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets the sprite on this item horizontal orientation
+    /// Sets the image on this item horizontal orientation
     /// </summary>
     /// <param name="flipped">flipped horizontally from default</param>
     public void SetItemFlip( bool flipped )
@@ -131,7 +144,7 @@ public class LooseItemManager : MonoBehaviour
     /// </summary>
     public void ToggleItemFlip()
     {
-        looseItem.flipped = !looseItem.flipped;
+        SetItemFlip(!looseItem.flipped);
     }
 
     /// <summary>
@@ -139,8 +152,8 @@ public class LooseItemManager : MonoBehaviour
     /// </summary>
     public void AnimateItem()
     {
-        looseItem.spriteFrame = 0;
-        spriteTimer = spriteTime; // begin animating immediately
+        looseItem.artFrame = 0;
+        frameTimer = frameTime; // begin animating immediately
     }
 
     /// <summary>
@@ -148,7 +161,7 @@ public class LooseItemManager : MonoBehaviour
     /// </summary>
     public void StopAnimation()
     {
-        spriteTimer = 0f;
+        frameTimer = 0f;
     }
 
     /// <summary>
@@ -200,14 +213,14 @@ public class LooseItemManager : MonoBehaviour
 
     void SetItemHighlight(float value)
     {
-        if (spriteRenderer == null)
+        if (itemRenderer == null)
             return;
-        // REVIEW: need another way to highlight, for any color sprite
-        Color c = spriteRenderer.material.color;
-        c.r = 1f;
+        // base fill color
+        Color c = itemRenderer.material.GetColor("_Color");
+        c.r = value;
         c.g = value;
-        c.b = 1f;
-        c.a = 1f;
-        spriteRenderer.material.color = c;
+        c.b = 0f;
+        c.a = (value/2f) + 0.5f;
+        itemRenderer.material.SetColor("_Color", c);
     }
 }

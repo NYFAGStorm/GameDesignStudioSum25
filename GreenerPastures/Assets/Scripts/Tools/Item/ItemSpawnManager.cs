@@ -6,6 +6,7 @@ public class ItemSpawnManager : MonoBehaviour
     // Handles loose item spawning for dropped items
     // -- also handles specific affects for dropped items when settled --
     // (fertilizer on uprooted plot for improving soil quality)
+    // (seed on tilled plot for planting)
 
     public AnimationCurve dropCurve;
 
@@ -136,19 +137,18 @@ public class ItemSpawnManager : MonoBehaviour
     /// <param name="location">position in world to put item</param>
     public void SpawnItem( LooseItemData item, Vector3 spawnLocation, Vector3 dropLocation )
     {
-        GameObject looseItem = new GameObject();
+        GameObject looseItem = GameObject.Instantiate((GameObject)Resources.Load("Loose Item"));
         looseItem.transform.position = spawnLocation + (Vector3.up * VERTICALORIGIN);
         looseItem.name = "Item "+item.inv.items[0].type.ToString();
-        LooseItemManager lim = looseItem.AddComponent<LooseItemManager>();
+        LooseItemManager lim = looseItem.GetComponent<LooseItemManager>();
+        if (lim == null)
+            Debug.LogWarning("--- ItemSpawnManager [SpawnItem] : loose item prefab does not contain loose item manager component. will ignore.");
         lim.looseItem = item;
-        lim.looseItem.flipped = (dropLocation.x < spawnLocation.x);
+        lim.looseItem.flipped = (dropLocation.x <= spawnLocation.x);
 
-        lim.sprites = new Sprite[1];
-        SpriteData d = GameObject.FindAnyObjectByType<SpriteLibraryManager>().GetSpriteData(item.inv.items[0].type);
-        lim.sprites[0] = GameObject.FindAnyObjectByType<SpriteLibraryManager>().itemSprites[d.spriteIndexBase];
-        SpriteRenderer sr = looseItem.AddComponent<SpriteRenderer>();
-        sr.sprite = lim.sprites[0];
-        sr.flipX = lim.looseItem.flipped;
+        lim.frames = new Texture2D[1];
+        ArtData d = GameObject.FindAnyObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type);
+        lim.frames[0] = GameObject.FindAnyObjectByType<ArtLibraryManager>().itemImages[d.artIndexBase];
 
         // handle drop animation
         AddDrop(looseItem.gameObject, spawnLocation, dropLocation);
@@ -166,6 +166,28 @@ public class ItemSpawnManager : MonoBehaviour
             {
                 // soil quality improved ~.5 (0-1, gaussian random distribution)
                 plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + RandomSystem.GaussianRandom01());
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    bool CheckSeedDrop( int index )
+    {
+        bool retBool = false;
+
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i = 0; i < plots.Length; i++)
+        {
+            float dist = Vector3.Distance(drops[index].dropTarget, plots[i].gameObject.transform.position);
+            if (dist < 0.25f && plots[i].data.condition == PlotCondition.Tilled)
+            {
+                // soil quality improved ~.5 (0-1, gaussian random distribution)
+                //plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + RandomSystem.GaussianRandom01());
+                // TODO: plant using the seed plant data
+                
                 retBool = true;
                 break;
             }

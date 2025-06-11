@@ -45,7 +45,7 @@ public class LooseItemData
     public float posX;
     public float posY;
     public float posZ;
-    public int spriteFrame; // index to sprite art (if static, remains type sprite)
+    public int artFrame; // index to art (if static, remains type item)
     public bool flipped; // facing opposite horizontal direction
     public bool deleteMe; // item has been stored, not here, destroy game object
 }

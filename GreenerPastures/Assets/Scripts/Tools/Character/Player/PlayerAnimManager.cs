@@ -5,7 +5,7 @@ public class PlayerAnimManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles the animation of a player character, as directed by player control
 
-    public bool spriteFlipped;
+    public bool imageFlipped;
 
     private PlayerControlManager pcm;
     private Renderer rend;
@@ -37,7 +37,7 @@ public class PlayerAnimManager : MonoBehaviour
     {
         // handle sprite flip
         Vector2 flipVec = new Vector2(1f,1f);
-        if (spriteFlipped)
+        if (imageFlipped)
             flipVec.x = -1f;
         rend.material.SetTextureScale("_MainTex",flipVec);
     }
