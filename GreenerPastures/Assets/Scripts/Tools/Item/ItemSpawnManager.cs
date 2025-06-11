@@ -20,7 +20,7 @@ public class ItemSpawnManager : MonoBehaviour
     private DroppedItem[] drops = new DroppedItem[0];
 
     const float DROPTIME = 1f;
-    const float VERTICALORIGIN = 0.125f;
+    const float VERTICALORIGIN = 0.25f;
 
 
     void Start()

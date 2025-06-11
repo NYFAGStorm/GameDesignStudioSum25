@@ -344,15 +344,19 @@ public class PlotManager : MonoBehaviour
                         {
                             // += Mathf.RoundToInt(((seedPotential - .5f) / .2f) + .5f)
                             numberOfSeeds += Mathf.RoundToInt(((data.plant.seedPotential - .5f) / .2f) + .5f);
-                            // REVIEW: gaussian random distribution from 1 to numberOfSeeds
+                            // gaussian random distribution from 1 to numberOfSeeds
                             numberOfSeeds = 1 + Mathf.RoundToInt((RandomSystem.GaussianRandom01() * (numberOfSeeds - 1)) + 0.5f);
-                            Debug.Log(" plant seed potential: "+data.plant.seedPotential+" , resulting number of seed items: "+numberOfSeeds);
                         }
+                        // spawn seeds as individual copies of original plant, in seed form
                         for (int i=0; i<numberOfSeeds; i++)
                         {
+                            LooseItemData looseSeed = InventorySystem.CreateItem(ItemType.Seed);
+                            looseSeed.inv.items[0] = InventorySystem.SetItemAsPlant(looseSeed.inv.items[0], data.plant);
+                            // seeds begin with a size and quality of zero (when planted, start growing)
+                            looseSeed.inv.items[0].size = 0f;
+                            looseSeed.inv.items[0].quality = 0f;
                             target.x += RandomSystem.GaussianRandom01() - .5f;
-                            loose.inv.items[0].type = ItemType.Seed; // the rest of this data is the same
-                            ism.SpawnItem(loose, gameObject.transform.position, target);
+                            ism.SpawnItem(looseSeed, gameObject.transform.position, target);
                         }
                     }
                 }

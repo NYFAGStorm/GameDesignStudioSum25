@@ -219,9 +219,12 @@ public class LooseItemManager : MonoBehaviour
         Color c = itemRenderer.material.GetColor("_Color");
         c.r = value;
         c.g = value;
+        // pulse yellow, reset white
         if (value < 1f)
             c.b = 0f;
-        c.a = (value/2f) + 0.5f;
+        else
+            c.b = 1f;
+        c.a = (value / 2f) + 0.5f;
         itemRenderer.material.SetColor("_Color", c);
     }
 }
