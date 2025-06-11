@@ -105,10 +105,10 @@ public class PlayerControlManager : MonoBehaviour
             playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.Fertilizer);
             playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.Seed);
             playerInventory.items[1].name += " (Carrot)";
-            playerInventory.items[1].plantIndex = 2;
+            playerInventory.items[1].plantIndex = (int)PlantType.Carrot;
             playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.Seed);
             playerInventory.items[2].name += " (Tomato)";
-            playerInventory.items[2].plantIndex = 1;
+            playerInventory.items[2].plantIndex = (int)PlantType.Tomato;
         }
     }
 
@@ -179,6 +179,27 @@ public class PlayerControlManager : MonoBehaviour
                 !characterActions.actionC && !characterActions.actionD)
                 activePlot.ActionClear();
         }
+    }
+    
+    /// <summary>
+    /// Gets item data for current selection of player inventory
+    /// </summary>
+    /// <returns>item data or null if inventory selection slot is empty</returns>
+    public ItemData GetPlayerCurrentItemSelection()
+    {
+        if ( currentInventorySelection >= playerInventory.items.Length )
+            return null;
+        return playerInventory.items[currentInventorySelection];
+    }
+
+    /// <summary>
+    /// Removes the current item selection from player inventory ( *poof* )
+    /// </summary>
+    public void DeleteCurrentItemSelection()
+    {
+        if (currentInventorySelection >= playerInventory.items.Length)
+            return;
+        playerInventory = InventorySystem.RemoveItemFromInventory(playerInventory, playerInventory.items[currentInventorySelection]);
     }
 
     void ReadMoveInput()

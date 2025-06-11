@@ -197,8 +197,15 @@ public class PlotManager : MonoBehaviour
         if (actionCompleteTimer > 0f && !actionClear)
             return;
 
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        ItemData iData = pcm.GetPlayerCurrentItemSelection();
+
         if (data.condition == PlotCondition.Tilled)
         {
+            if (action == CurrentAction.Planting && (iData == null || 
+                iData.type != ItemType.Seed))
+                return;
+
             if (action != CurrentAction.Planting && action != CurrentAction.None)
                 return;
             action = CurrentAction.Planting;
@@ -253,10 +260,14 @@ public class PlotManager : MonoBehaviour
                 data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
                 break;
             case PlotCondition.Tilled:
-                // plant seed
+                // plant seed with seed item selected in player inventory
                 plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 plant.transform.parent = transform;
                 plant.transform.position = transform.position;
+                // insert distinct plant data from player inventory current selection
+                data.plant = PlantSystem.InitializePlant((PlantType)iData.plantIndex);
+                // using data, remove from player inventory
+                pcm.DeleteCurrentItemSelection();
                 data.condition = PlotCondition.Growing;
                 break;
             case PlotCondition.Uprooted:

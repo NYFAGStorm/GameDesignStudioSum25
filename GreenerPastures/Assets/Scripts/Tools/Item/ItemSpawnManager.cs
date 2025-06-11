@@ -21,6 +21,7 @@ public class ItemSpawnManager : MonoBehaviour
 
     const float DROPTIME = 1f;
     const float VERTICALORIGIN = 0.25f;
+    const float TARGETDETECTRADIUS = 0.381f;
 
 
     void Start()
@@ -98,6 +99,12 @@ public class ItemSpawnManager : MonoBehaviour
                         if (CheckFertilizerDrop(i))
                             looseD.looseItem.deleteMe = true;
                     }
+                    // seed dropped in empty tilled plot
+                    if (looseD.looseItem.inv.items[0].type == ItemType.Seed)
+                    {
+                        if (CheckSeedDrop(i, (PlantType)looseD.looseItem.inv.items[0].plantIndex))
+                            looseD.looseItem.deleteMe = true;
+                    }
 
                     RemoveDrop(i);
                     continue;
@@ -162,7 +169,7 @@ public class ItemSpawnManager : MonoBehaviour
         for (int i=0; i<plots.Length; i++)
         {
             float dist = Vector3.Distance(drops[index].dropTarget, plots[i].gameObject.transform.position);
-            if (dist < 0.25f && plots[i].data.condition == PlotCondition.Uprooted)
+            if (dist < TARGETDETECTRADIUS && plots[i].data.condition == PlotCondition.Uprooted)
             {
                 // soil quality improved ~.5 (0-1, gaussian random distribution)
                 plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + RandomSystem.GaussianRandom01());
@@ -174,7 +181,10 @@ public class ItemSpawnManager : MonoBehaviour
         return retBool;
     }
 
-    bool CheckSeedDrop( int index )
+    // REVIEW: should we _not_ have a dedicated PLANTING player control, and
+    // instead just use this mechanism of dropping a seed loose item on a tilled plot?
+    // (if so, how do we probably need a visual/audio signal to the player it is planted)
+    bool CheckSeedDrop( int index, PlantType type )
     {
         bool retBool = false;
 
@@ -182,12 +192,17 @@ public class ItemSpawnManager : MonoBehaviour
         for (int i = 0; i < plots.Length; i++)
         {
             float dist = Vector3.Distance(drops[index].dropTarget, plots[i].gameObject.transform.position);
-            if (dist < 0.25f && plots[i].data.condition == PlotCondition.Tilled)
+            if (dist < TARGETDETECTRADIUS && plots[i].data.condition == PlotCondition.Tilled)
             {
-                // soil quality improved ~.5 (0-1, gaussian random distribution)
-                //plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + RandomSystem.GaussianRandom01());
-                // TODO: plant using the seed plant data
-                
+                // create plant using the seed plant data
+                // REVIEW: how to configure proper plant prefab and art
+                GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
+                plantObj.transform.parent = plots[i].gameObject.transform;
+                plantObj.transform.position = plots[i].gameObject.transform.position;
+                plots[i].plant = plantObj;
+                PlantData plant = PlantSystem.InitializePlant(type);
+                plots[i].data.plant = plant;
+                plots[i].data.condition = PlotCondition.Growing;
                 retBool = true;
                 break;
             }
