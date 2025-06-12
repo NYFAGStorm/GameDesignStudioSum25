@@ -10,7 +10,7 @@ public class CompostManager : MonoBehaviour
     private float compostTimer;
     private ItemSpawnManager ism;
 
-    const float ITEMCHECKRADIUS = 0.381f;
+    const float ITEMCHECKRADIUS = 0.618f;
     const float COMPOSTCHECKTIME = 1f;
     const float COMPOSTCOOKRATE = 0.1f;
 
@@ -49,7 +49,8 @@ public class CompostManager : MonoBehaviour
         }
 
         // cook compost
-        cookedAmount += Time.deltaTime * COMPOSTCOOKRATE;
+        if ( compostAmount > cookedAmount )
+            cookedAmount += Time.deltaTime * COMPOSTCOOKRATE;
     }
 
     void CheckDroppedPlants()
@@ -58,6 +59,10 @@ public class CompostManager : MonoBehaviour
         // take all plant items within range, add to compost amount, remove items
         for (int i=0; i<looseItems.Length; i++)
         {
+            if (looseItems[i] == null || looseItems[i].looseItem == null ||
+                looseItems[i].looseItem.inv == null || looseItems[i].looseItem.inv.items == null ||
+                looseItems[i].looseItem.inv.items.Length == 0)
+                continue;
             float amountAdd = 0f;
             // seed worth .1, fruit worth .381, stalk with .618, plant worth 1
             switch (looseItems[i].looseItem.inv.items[0].type)
