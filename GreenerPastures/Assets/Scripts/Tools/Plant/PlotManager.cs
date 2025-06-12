@@ -204,7 +204,10 @@ public class PlotManager : MonoBehaviour
         {
             if (action == CurrentAction.Planting && (iData == null || 
                 iData.type != ItemType.Seed))
+            {
+                actionLabel = "Need Seed Selected";
                 return;
+            }
 
             if (action != CurrentAction.Planting && action != CurrentAction.None)
                 return;

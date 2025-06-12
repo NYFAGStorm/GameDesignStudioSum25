@@ -52,6 +52,12 @@ MonoBehaviour:
   leftKey: 97
   rightKey: 100
   actionAKey: 101
+  actionBKey: 102
+  actionCKey: 99
+  actionDKey: 118
+  lBumpKey: 91
+  rBumpKey: 93
+  characterFrozen: 0
 --- !u!81 &1722252933839553243
 AudioListener:
   m_ObjectHideFlags: 0
@@ -73,7 +79,7 @@ GameObject:
   - component: {fileID: 6607996765990932929}
   - component: {fileID: 3493846875638259010}
   m_Layer: 0
-  m_Name: Proto Wizard Sprite
+  m_Name: Proto PC Art
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -159,4 +165,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85931b8183899594a9544231b04ed4b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteFlipped: 0
+  imageFlipped: 0

@@ -5,6 +5,8 @@ public class PlayerControlManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles the local player controls for their character
 
+    public PlayerData playerData;
+
     public float characterSpeed = 2.7f;
 
     public enum PlayerControlType
@@ -64,7 +66,6 @@ public class PlayerControlManager : MonoBehaviour
     private ArtLibraryManager alm;
 
     const float PROXIMITYRANGE = 0.381f;
-    const float INVENTORYSELECTIONTIME = 999f; // was 2f
 
 
     void Start()
@@ -109,11 +110,23 @@ public class PlayerControlManager : MonoBehaviour
             playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.Seed);
             playerInventory.items[2].name += " (Tomato)";
             playerInventory.items[2].plantIndex = (int)PlantType.Tomato;
+
+            // temp - player data (mainly for gold)
+            playerData = PlayerSystem.InitializePlayer("Player", "Player", "pass");
+            playerData.inventory = playerInventory;
         }
     }
 
     void Update()
     {
+        // check action input
+        ReadActionInput();
+
+        // detect inventory selection input
+        DetectInventorySelectionInput();
+        // check inventory selection drop
+        CheckInventorySelectionDrop();
+
         if (characterFrozen)
             return;
 
@@ -121,13 +134,6 @@ public class PlayerControlManager : MonoBehaviour
         ReadMoveInput();
         // move
         DoCharacterMove();
-        // check action input
-        ReadActionInput();
-
-        // detect inventory selection input
-        DetectInventorySelectionInput();
-        // run inventory selection timer
-        CheckInventorySelectionDrop();
 
         // clear active loose item if moving
         ClearActiveItem();
@@ -200,6 +206,15 @@ public class PlayerControlManager : MonoBehaviour
         if (currentInventorySelection >= playerInventory.items.Length)
             return;
         playerInventory = InventorySystem.RemoveItemFromInventory(playerInventory, playerInventory.items[currentInventorySelection]);
+    }
+
+    /// <summary>
+    /// Get current player character actions
+    /// </summary>
+    /// <returns>player actions struct data for this frame</returns>
+    public PlayerActions GetPlayerActions()
+    {
+        return characterActions;
     }
 
     void ReadMoveInput()
@@ -449,6 +464,28 @@ public class PlayerControlManager : MonoBehaviour
             GUI.color = Color.white;
         }
 
+        // gold display
+        r.x = 0.6375f * w;
+        r.y = 0.02f * h;
+        r.width = 0.1f * w;
+        r.height = 0.05f * h;
+        GUIStyle g = new GUIStyle(GUI.skin.label);
+        g.alignment = TextAnchor.MiddleLeft;
+        g.fontSize = Mathf.RoundToInt(20f * (w / 1204f));
+        g.fontStyle = FontStyle.Bold;
+        string s = "GOLD: ";
+        s += playerData.gold.ToString();
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
         if (currentInventorySelection >= playerInventory.items.Length)
             return;
 
@@ -468,11 +505,10 @@ public class PlayerControlManager : MonoBehaviour
         GUI.DrawTexture(r, t);
         GUI.color = Color.white;
 
-        GUIStyle g = new GUIStyle(GUI.skin.label);
         g.alignment = TextAnchor.MiddleCenter;
         g.fontSize = Mathf.RoundToInt( 22f * (w/1204f));
         g.fontStyle = FontStyle.Bold;
-        string s = playerInventory.items[currentInventorySelection].name;
+        s = playerInventory.items[currentInventorySelection].name;
 
         r.x += 0.0005f * w;
         r.y += 0.0008f * w;

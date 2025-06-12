@@ -24,7 +24,7 @@ public class CheatManager : MonoBehaviour
     private float codeTimer;
     private int validCode;
 
-    const int TOTALCHEATCODES = 6;
+    const int TOTALCHEATCODES = 8;
     const float CHEATCODEWINDOW = 1f;
 
 
@@ -153,6 +153,14 @@ public class CheatManager : MonoBehaviour
                 n = "playerlight";
                 d = "Toggles a light over the player";
                 break;
+            case 6:
+                n = "gimmiepoo";
+                d = "Drops fertilizer in front of the player";
+                break;
+            case 7:
+                n = "gimmieseed";
+                d = "Drops corn seed in front of the player";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -163,6 +171,8 @@ public class CheatManager : MonoBehaviour
     void PerformValidCode()
     {
         //Debug.Log("--- CheatManager [PerformValidCode] : performing cheat code "+validCode+" '"+codes[validCode].name+"'.");
+
+        ItemSpawnManager ism;
 
         // time bump codes
         switch (validCode)
@@ -198,6 +208,33 @@ public class CheatManager : MonoBehaviour
                 }
                 else
                     Destroy(GameObject.Find("player light").gameObject);
+                break;
+            case 6:
+                ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+                if (ism != null)
+                {
+                    PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                    float facing = pcm.gameObject.transform.GetChild(0).GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
+                    Vector3 pos = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject.transform.position;
+                    Vector3 targ = pos + (facing * Vector3.right);
+                    ism.SpawnNewItem(ItemType.Fertilizer, pos, targ);
+                }
+                break;
+            case 7:
+                ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+                if (ism != null)
+                {
+                    PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                    float facing = pcm.gameObject.transform.GetChild(0).GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
+                    Vector3 pos = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject.transform.position;
+                    Vector3 targ = pos + (facing*Vector3.right);
+                    LooseItemData seed = InventorySystem.CreateItem(ItemType.Seed);
+                    seed.inv.items[0].name = "Seed (Corn)";
+                    seed.inv.items[0].plantIndex = 0;
+                    seed.inv.items[0].size = 0f;
+                    seed.inv.items[0].quality = 0f;
+                    ism.SpawnItem(seed, pos, targ);
+                }
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");
