@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ItemSpawnManager : MonoBehaviour
@@ -7,6 +8,7 @@ public class ItemSpawnManager : MonoBehaviour
     // -- also handles specific affects for dropped items when settled --
     // (fertilizer on uprooted plot for improving soil quality)
     // (seed on tilled plot for planting)
+    // (stalk or plant on uprooted plot for trans-planting)
 
     public AnimationCurve dropCurve;
 
@@ -103,6 +105,13 @@ public class ItemSpawnManager : MonoBehaviour
                     if (looseD.looseItem.inv.items[0].type == ItemType.Seed)
                     {
                         if (CheckSeedDrop(i, (PlantType)looseD.looseItem.inv.items[0].plantIndex))
+                            looseD.looseItem.deleteMe = true;
+                    }
+                    // stalk or plant dropped in uprooted plot
+                    if (looseD.looseItem.inv.items[0].type == ItemType.Stalk ||
+                        looseD.looseItem.inv.items[0].type == ItemType.Plant)
+                    {
+                        if (CheckPlantDrop(i, looseD.looseItem.inv.items[0]))
                             looseD.looseItem.deleteMe = true;
                     }
 
@@ -205,6 +214,47 @@ public class ItemSpawnManager : MonoBehaviour
                 // configure plant from seed to size = 0f (growth) and quality = 0f
                 plots[i].data.plant.growth = 0f;
                 plots[i].data.plant.quality = 0f;
+                plots[i].data.condition = PlotCondition.Growing;
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    bool CheckPlantDrop( int index, ItemData iData )
+    {
+        bool retBool = false;
+
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i = 0; i < plots.Length; i++)
+        {
+            float dist = Vector3.Distance(drops[index].dropTarget, plots[i].gameObject.transform.position);
+            if (dist < TARGETDETECTRADIUS && plots[i].data.condition == PlotCondition.Uprooted)
+            {
+                // create plant using the seed plant data
+                GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
+                plantObj.transform.parent = plots[i].gameObject.transform;
+                plantObj.transform.position = plots[i].gameObject.transform.position;
+                // REVIEW: how to configure proper plant prefab and art
+                Texture2D t;
+                if (iData.type == ItemType.Stalk)
+                    t = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+                else
+                    t = (Texture2D)Resources.Load("ProtoPlant04");
+                plantObj.GetComponentInChildren<Renderer>().material.mainTexture = t;
+                plots[i].plant = plantObj;
+                PlantData plant = PlantSystem.InitializePlant((PlantType)iData.plantIndex);
+                plots[i].data.plant = plant;
+                // configure individual plant properties from item data
+                plots[i].data.plant.growth = iData.size;
+                plots[i].data.plant.health = iData.health;
+                plots[i].data.plant.quality = iData.quality;
+                plots[i].data.plant.isHarvested = (iData.type == ItemType.Stalk);
+                plots[i].gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>().material.mainTexture = 
+                    (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                // NOTE: we have skipped improving soil quality
                 plots[i].data.condition = PlotCondition.Growing;
                 retBool = true;
                 break;

@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlotManager : MonoBehaviour
 {
@@ -340,6 +342,7 @@ public class PlotManager : MonoBehaviour
                 plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // drop as loose item fruit
                 ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+                // REVIEW: consider attempt placing all in player inventory first, dropping if no empty slot                
                 if (ism == null)
                     Debug.LogWarning("--- PlotManager [HarvestPlant] : "+gameObject.name+" no item spawn manager found in scene. will ignore.");
                 else
@@ -410,7 +413,24 @@ public class PlotManager : MonoBehaviour
         else
             r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
         // player would collect stalk or full plant as inventory at this point
-        // drop as loose item
+        // REVIEW: _only_ collect if plant growth is 100%, otherwise it is lost (*poof*)
+        if (data.plant.growth == 1f)
+        {
+            ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+            // drop as loose item
+            Vector3 target = gameObject.transform.position;
+            target.x += RandomSystem.GaussianRandom01() - .5f;
+            target.z -= 0.01f; // in front of plant
+            LooseItemData loose = InventorySystem.CreateItem(ItemType.Plant);
+            // transfer properties of plant to item (revise item data)
+            loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
+            if (data.plant.isHarvested)
+            {
+                loose.inv.items[0].type = ItemType.Stalk;
+                loose.inv.items[0].name = "Stalk (" + data.plant.type.ToString() + ")";
+            }
+            ism.SpawnItem(loose, gameObject.transform.position, target);
+        }
         // remove plant
         Destroy(plant);
         data.plant = PlantSystem.InitializePlant(PlantType.Default);
