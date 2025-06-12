@@ -269,6 +269,9 @@ public class PlotManager : MonoBehaviour
                 plant.transform.position = transform.position;
                 // insert distinct plant data from player inventory current selection
                 data.plant = PlantSystem.InitializePlant((PlantType)iData.plantIndex);
+                // configure plant from seed to size = 0f (growth) and quality = 0f
+                data.plant.growth = 0f;
+                data.plant.quality = 0f;
                 // using data, remove from player inventory
                 pcm.DeleteCurrentItemSelection();
                 data.condition = PlotCondition.Growing;

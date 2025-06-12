@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class MarketManager : MonoBehaviour
 {
@@ -149,11 +147,6 @@ public class MarketManager : MonoBehaviour
                         else
                         {
                             iData.plantIndex = menuItems[menuItemSelection].plantIndex;
-                            if (menuItems[menuItemSelection].itemType == ItemType.Seed)
-                            {
-                                iData.size = 0f;
-                                iData.quality = 0f; // REVIEW: should this only be set on plot upon planting?
-                            }
                             if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                                 menuItems[menuItemSelection].itemType == ItemType.Fruit)
                             {
@@ -172,11 +165,6 @@ public class MarketManager : MonoBehaviour
                         ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
                         LooseItemData loose = InventorySystem.CreateItem(menuItems[menuItemSelection].itemType);
                         loose.inv.items[0].plantIndex = menuItems[menuItemSelection].plantIndex;
-                        if (menuItems[menuItemSelection].itemType == ItemType.Seed)
-                        {
-                            loose.inv.items[0].size = 0f;
-                            loose.inv.items[0].quality = 0f;
-                        }
                         if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                             menuItems[menuItemSelection].itemType == ItemType.Fruit)
                         {
@@ -353,7 +341,10 @@ public class MarketManager : MonoBehaviour
         g.alignment = TextAnchor.MiddleRight;
         for (int i = 0; i < menuItems.Length; i++)
         {
-            s = menuItems[i].itemValue.ToString();
+            if (customerMode == CustomerMode.Sell)
+                s = (menuItems[i].itemValue-1).ToString(); // (less 1 gold as profit margin)
+            else
+                s = menuItems[i].itemValue.ToString();
             c = Color.white;
             if (i == menuItemSelection)
             {

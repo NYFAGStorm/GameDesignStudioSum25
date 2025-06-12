@@ -202,6 +202,9 @@ public class ItemSpawnManager : MonoBehaviour
                 plots[i].plant = plantObj;
                 PlantData plant = PlantSystem.InitializePlant(type);
                 plots[i].data.plant = plant;
+                // configure plant from seed to size = 0f (growth) and quality = 0f
+                plots[i].data.plant.growth = 0f;
+                plots[i].data.plant.quality = 0f;
                 plots[i].data.condition = PlotCondition.Growing;
                 retBool = true;
                 break;
