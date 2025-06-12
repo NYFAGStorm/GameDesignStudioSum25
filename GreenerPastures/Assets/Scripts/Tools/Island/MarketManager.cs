@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class MarketManager : MonoBehaviour
 {
@@ -33,6 +35,7 @@ public class MarketManager : MonoBehaviour
     private float rejectFlashTimer;
     private Vector3 purchaseOffset = new Vector3(-1f,0f,0f);
     // TODO: apply a profit margin difference when player sells an item (less value)
+    // temp - for now, just minus one gold when selling items to market
 
     const float PLAYERCHECKTIME = 1f;
     const float MARKETPROXIMITYRANGE = .5f;
@@ -88,7 +91,6 @@ public class MarketManager : MonoBehaviour
                     currentCustomer = pcms[found];
                 else
                 {
-                    // REVIEW: frozen player after leaving market?
                     if (currentCustomer != null )
                         currentCustomer.characterFrozen = false;
                     currentCustomer = null;
@@ -102,14 +104,22 @@ public class MarketManager : MonoBehaviour
         PlayerControlManager.PlayerActions pa = currentCustomer.GetPlayerActions();
 
         // allow player to enter buy mode
-        if ( customerMode == CustomerMode.Default && pa.actionADown )
+        CheckBuyMode( pa );
+
+        // allow player to sell inventory item
+        CheckSellMode( pa );
+    }
+
+    void CheckBuyMode( PlayerControlManager.PlayerActions pa )
+    {
+        if (customerMode == CustomerMode.Default && pa.actionADown)
         {
             customerMode = CustomerMode.Buy;
             currentCustomer.characterFrozen = true;
             menuItemSelection = 0;
             marketInstructions = "MARKET [BUY MODE]\nE=BUY V=EXIT";
         }
-        if ( customerMode == CustomerMode.Buy )
+        if (customerMode == CustomerMode.Buy)
         {
             // allow player to select item on menu
             if (Input.GetKeyDown(currentCustomer.upKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL > 0f))
@@ -122,32 +132,59 @@ public class MarketManager : MonoBehaviour
                 menuItemSelection++;
                 rejectFlashTimer = 0f;
             }
-            menuItemSelection = Mathf.Clamp(menuItemSelection, 0, menuItems.Length-1);
+            menuItemSelection = Mathf.Clamp(menuItemSelection, 0, menuItems.Length - 1);
             // allow player to buy item
             if (Input.GetKeyDown(currentCustomer.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
             {
                 if (menuItems[menuItemSelection].itemValue <= currentCustomer.playerData.gold)
                 {
                     currentCustomer.playerData.gold -= menuItems[menuItemSelection].itemValue;
-                    Vector3 pos = gameObject.transform.position;
-                    pos += purchaseOffset;
-                    Vector3 targ = (currentCustomer.transform.position - gameObject.transform.position) * 4f;
-                    targ += pos;
-                    ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
-                    LooseItemData loose = InventorySystem.CreateItem(menuItems[menuItemSelection].itemType);
-                    loose.inv.items[0].plantIndex = menuItems[menuItemSelection].plantIndex;
-                    if (menuItems[menuItemSelection].itemType == ItemType.Seed)
+                    // try place in inventory, spawn to the side if fail
+                    bool playerInventorySlotAvailable = InventorySystem.InvHasSlot(currentCustomer.playerData.inventory);
+                    if (playerInventorySlotAvailable)
                     {
-                        loose.inv.items[0].size = 0f;
-                        loose.inv.items[0].quality = 0f;
+                        ItemData iData = InventorySystem.InitializeItem(menuItems[menuItemSelection].itemType);
+                        if (iData == null)
+                            Debug.LogWarning("--- MarketManager [CheckBuyMode] : unable to initialize item. will ignore.");
+                        else
+                        {
+                            iData.plantIndex = menuItems[menuItemSelection].plantIndex;
+                            if (menuItems[menuItemSelection].itemType == ItemType.Seed)
+                            {
+                                iData.size = 0f;
+                                iData.quality = 0f; // REVIEW: should this only be set on plot upon planting?
+                            }
+                            if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
+                                menuItems[menuItemSelection].itemType == ItemType.Fruit)
+                            {
+                                PlantType p = (PlantType)iData.plantIndex;
+                                iData.name += " (" + p.ToString() + ")";
+                            }
+                        }
+                        currentCustomer.playerData.inventory = InventorySystem.AddToInventory(currentCustomer.playerData.inventory, iData);
                     }
-                    if (menuItems[menuItemSelection].itemType == ItemType.Seed || 
-                        menuItems[menuItemSelection].itemType == ItemType.Fruit)
+                    else
                     {
-                        PlantType p = (PlantType)loose.inv.items[0].plantIndex;
-                        loose.inv.items[0].name += " (" + p.ToString() + ")";
+                        Vector3 pos = gameObject.transform.position;
+                        pos += purchaseOffset;
+                        Vector3 targ = (currentCustomer.transform.position - gameObject.transform.position) * 4f;
+                        targ += pos;
+                        ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+                        LooseItemData loose = InventorySystem.CreateItem(menuItems[menuItemSelection].itemType);
+                        loose.inv.items[0].plantIndex = menuItems[menuItemSelection].plantIndex;
+                        if (menuItems[menuItemSelection].itemType == ItemType.Seed)
+                        {
+                            loose.inv.items[0].size = 0f;
+                            loose.inv.items[0].quality = 0f;
+                        }
+                        if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
+                            menuItems[menuItemSelection].itemType == ItemType.Fruit)
+                        {
+                            PlantType p = (PlantType)loose.inv.items[0].plantIndex;
+                            loose.inv.items[0].name += " (" + p.ToString() + ")";
+                        }
+                        ism.SpawnItem(loose, pos, targ);
                     }
-                    ism.SpawnItem(loose, pos, targ);
                 }
                 else
                     rejectFlashTimer = REJECTFLASHTIME;
@@ -161,8 +198,10 @@ public class MarketManager : MonoBehaviour
                 marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
             }
         }
+    }
 
-        // allow player to sell inventory item
+    void CheckSellMode( PlayerControlManager.PlayerActions pa )
+    {
         if (customerMode == CustomerMode.Default && pa.actionBDown)
         {
             customerMode = CustomerMode.Sell;
@@ -176,16 +215,19 @@ public class MarketManager : MonoBehaviour
             if (Input.GetKeyDown(currentCustomer.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
             {
                 ItemData iData = currentCustomer.GetPlayerCurrentItemSelection();
-                if (iData != null)
+                // cannot sell fertilizer (or 'default' type item)
+                if (iData != null && (int)iData.type > 1)
                 {
                     bool found = false;
                     int value = 0;
-                    for (int i=0; i < menuItems.Length; i++)
+                    for (int i = 0; i < menuItems.Length; i++)
                     {
                         if (menuItems[i].itemType == iData.type)
                         {
                             value = menuItems[i].itemValue;
                             // TODO: apply profit margin difference (less value)
+                            // temp just minus one gold for now
+                            value--;
                             found = true;
                             break;
                         }
@@ -216,29 +258,35 @@ public class MarketManager : MonoBehaviour
         menuItems[0].itemType = ItemType.Fertilizer;
         menuItems[0].plantIndex = -1;
         menuItems[0].itemValue = 1;
+
         menuItems[1].itemName = "Seed (Corn)";
         menuItems[1].itemType = ItemType.Seed;
-        menuItems[1].plantIndex = 0;
+        menuItems[1].plantIndex = 1; // NOTE: plant index 0 = Default
         menuItems[1].itemValue = 3;
+
         menuItems[2].itemName = "Seed (Tomato)";
         menuItems[2].itemType = ItemType.Seed;
-        menuItems[2].plantIndex = 1;
+        menuItems[2].plantIndex = 2;
         menuItems[2].itemValue = 4;
+
         menuItems[3].itemName = "Seed (Carrot)";
         menuItems[3].itemType = ItemType.Seed;
-        menuItems[3].plantIndex = 2;
+        menuItems[3].plantIndex = 3;
         menuItems[3].itemValue = 5;
+
         menuItems[4].itemName = "Fruit (Corn)";
         menuItems[4].itemType = ItemType.Fruit;
-        menuItems[4].plantIndex = 0;
+        menuItems[4].plantIndex = 1;
         menuItems[4].itemValue = 7;
+
         menuItems[5].itemName = "Fruit (Tomato)";
         menuItems[5].itemType = ItemType.Fruit;
-        menuItems[5].plantIndex = 1;
+        menuItems[5].plantIndex = 2;
         menuItems[5].itemValue = 9;
+
         menuItems[6].itemName = "Fruit (Carrot)";
         menuItems[6].itemType = ItemType.Fruit;
-        menuItems[6].plantIndex = 2;
+        menuItems[6].plantIndex = 3;
         menuItems[6].itemValue = 11;
     }
 
