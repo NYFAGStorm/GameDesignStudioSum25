@@ -138,8 +138,7 @@ public class MarketManager : MonoBehaviour
                 {
                     currentCustomer.playerData.gold -= menuItems[menuItemSelection].itemValue;
                     // try place in inventory, spawn to the side if fail
-                    bool playerInventorySlotAvailable = InventorySystem.InvHasSlot(currentCustomer.playerData.inventory);
-                    if (playerInventorySlotAvailable)
+                    if (InventorySystem.InvHasSlot(currentCustomer.playerData.inventory))
                     {
                         ItemData iData = InventorySystem.InitializeItem(menuItems[menuItemSelection].itemType);
                         if (iData == null)

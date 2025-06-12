@@ -1,6 +1,5 @@
-using NUnit.Framework;
+using JetBrains.Annotations;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class PlotManager : MonoBehaviour
 {
@@ -22,6 +21,7 @@ public class PlotManager : MonoBehaviour
 
     private TimeManager tim;
 
+    private PlayerControlManager currentPlayer;
     private Renderer cursor;
     private bool cursorActive;
     private float cursorTimer;
@@ -135,6 +135,21 @@ public class PlotManager : MonoBehaviour
         SetCursorHighlight(pulse);
     }
 
+    /// <summary>
+    /// Sets this plot to associate a player for transferring inventory
+    /// </summary>
+    /// <param name="player">player control manager reference</param>
+    /// <returns>true if successful, false if a player already set as current</returns>
+    public void SetCurrentPlayer( PlayerControlManager player )
+    {
+        // REVIEW: does this get confused in multiplayer?
+        currentPlayer = player;
+    }
+
+    /// <summary>
+    /// Sets this plot cursor pulse state
+    /// </summary>
+    /// <param name="active">if true, cursor will pulse</param>
     public void SetCursorPulse( bool active )
     {
         cursorActive = active;
@@ -143,6 +158,8 @@ public class PlotManager : MonoBehaviour
         cursor.enabled = active;
         ActionClear();
         actionProgressDisplay = false;
+        if ( active && currentPlayer == null )
+            Debug.LogWarning("--- PlotManager [SetCursorPulse] : cursor active but no current player is defined. will ignore.");
     }
 
     void SetCursorHighlight( float value )
@@ -343,24 +360,44 @@ public class PlotManager : MonoBehaviour
                 // drop as loose item fruit
                 ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
                 // REVIEW: consider attempt placing all in player inventory first, dropping if no empty slot                
+                Vector3 target;
                 if (ism == null)
                     Debug.LogWarning("--- PlotManager [HarvestPlant] : "+gameObject.name+" no item spawn manager found in scene. will ignore.");
                 else
                 {
-                    Vector3 target = gameObject.transform.position;
-                    target.x += RandomSystem.GaussianRandom01() - .5f;
-                    target.z -= 0.01f; // in front of plant
-                    // harvesting drops fruit
-                    LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
-                    // transfer properties of fruit to item (revise item data)
-                    loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
-                    ism.SpawnItem(loose, gameObject.transform.position, target);
+                    // check if empty inventory slot availbale on player, drop loose if not
+                    if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
+                    {
+                        // harvesting gives fruit
+                        ItemData iData = InventorySystem.InitializeItem(ItemType.Fruit);
+                        if (iData == null)
+                            Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize fruit item. will ignore.");
+                        else
+                        {
+                            iData.plantIndex = (int)data.plant.type;
+                            iData.name += " (" + data.plant.plantName.ToString() + ")";
+                        }
+                        currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
+                    }
+                    else
+                    {
+                        target = gameObject.transform.position;
+                        target.x += RandomSystem.GaussianRandom01() - .5f;
+                        target.z -= 0.01f; // in front of plant
+                        // harvesting drops fruit
+                        LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
+                        // transfer properties of fruit to item (revise item data)
+                        loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
+                        loose.inv.items[0].size = data.plant.growth;
+                        loose.inv.items[0].quality = data.plant.quality;
+                        ism.SpawnItem(loose, gameObject.transform.position, target);
+                    }
                     // harvesting may drop seed
-                    if ( RandomSystem.FlatRandom01() < data.plant.seedPotential )
+                    if (RandomSystem.FlatRandom01() < data.plant.seedPotential)
                     {
                         // calculate number of seed items
                         int numberOfSeeds = 1;
-                        if ( data.plant.seedPotential > 0.5f )
+                        if (data.plant.seedPotential > 0.5f)
                         {
                             // += Mathf.RoundToInt(((seedPotential - .5f) / .2f) + .5f)
                             numberOfSeeds += Mathf.RoundToInt(((data.plant.seedPotential - .5f) / .2f) + .5f);
@@ -368,15 +405,35 @@ public class PlotManager : MonoBehaviour
                             numberOfSeeds = 1 + Mathf.RoundToInt((RandomSystem.GaussianRandom01() * (numberOfSeeds - 1)) + 0.5f);
                         }
                         // spawn seeds as individual copies of original plant, in seed form
-                        for (int i=0; i<numberOfSeeds; i++)
+                        for (int i = 0; i < numberOfSeeds; i++)
                         {
-                            LooseItemData looseSeed = InventorySystem.CreateItem(ItemType.Seed);
-                            looseSeed.inv.items[0] = InventorySystem.SetItemAsPlant(looseSeed.inv.items[0], data.plant);
-                            // seeds begin with a size and quality of zero (when planted, start growing)
-                            looseSeed.inv.items[0].size = 0f;
-                            looseSeed.inv.items[0].quality = 0f;
-                            target.x += RandomSystem.GaussianRandom01() - .5f;
-                            ism.SpawnItem(looseSeed, gameObject.transform.position, target);
+                            if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
+                            {
+                                // harvesting gives seed if empty inventory slot on player
+                                ItemData iData = InventorySystem.InitializeItem(ItemType.Seed);
+                                if (iData == null)
+                                    Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize seed item. will ignore.");
+                                else
+                                {
+                                    iData.plantIndex = (int)data.plant.type;
+                                    iData.name += " (" + data.plant.plantName.ToString() + ")";
+                                }
+                                currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
+                            }
+                            else
+                            {
+                                // drop seed
+                                target = gameObject.transform.position;
+                                target.x += RandomSystem.GaussianRandom01() - .5f;
+                                target.z -= 0.01f; // in front of plant
+                                LooseItemData looseSeed = InventorySystem.CreateItem(ItemType.Seed);
+                                looseSeed.inv.items[0] = InventorySystem.SetItemAsPlant(looseSeed.inv.items[0], data.plant);
+                                // seeds begin with a size and quality of zero (when planted, start growing)
+                                looseSeed.inv.items[0].size = 0f;
+                                looseSeed.inv.items[0].quality = 0f;
+                                target.x += RandomSystem.GaussianRandom01() - .5f;
+                                ism.SpawnItem(looseSeed, gameObject.transform.position, target);
+                            }
                         }
                     }
                 }
@@ -416,20 +473,41 @@ public class PlotManager : MonoBehaviour
         // REVIEW: _only_ collect if plant growth is 100%, otherwise it is lost (*poof*)
         if (data.plant.growth == 1f)
         {
-            ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
-            // drop as loose item
-            Vector3 target = gameObject.transform.position;
-            target.x += RandomSystem.GaussianRandom01() - .5f;
-            target.z -= 0.01f; // in front of plant
-            LooseItemData loose = InventorySystem.CreateItem(ItemType.Plant);
-            // transfer properties of plant to item (revise item data)
-            loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
-            if (data.plant.isHarvested)
+            // check if empty inventory slot availbale on player, drop loose if not
+            if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
             {
-                loose.inv.items[0].type = ItemType.Stalk;
-                loose.inv.items[0].name = "Stalk (" + data.plant.type.ToString() + ")";
+                // harvesting gives fruit
+                ItemData iData = InventorySystem.InitializeItem(ItemType.Plant);
+                if (iData == null)
+                    Debug.LogWarning("--- PlotManager [UprootPlot] : unable to initialize plant or stalk item. will ignore.");
+                else
+                {
+                    if (data.plant.isHarvested)
+                    {
+                        iData.type = ItemType.Stalk;
+                        iData.name = "Stalk";
+                    }
+                    iData = InventorySystem.SetItemAsPlant(iData, data.plant);
+                }
+                currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
             }
-            ism.SpawnItem(loose, gameObject.transform.position, target);
+            else
+            {
+                ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+                // drop as loose item
+                Vector3 target = gameObject.transform.position;
+                target.x += RandomSystem.GaussianRandom01() - .5f;
+                target.z -= 0.01f; // in front of plant
+                LooseItemData loose = InventorySystem.CreateItem(ItemType.Plant);
+                // transfer properties of plant to item (revise item data)
+                loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
+                if (data.plant.isHarvested)
+                {
+                    loose.inv.items[0].type = ItemType.Stalk;
+                    loose.inv.items[0].name = "Stalk (" + data.plant.type.ToString() + ")";
+                }
+                ism.SpawnItem(loose, gameObject.transform.position, target);
+            }
         }
         // remove plant
         Destroy(plant);

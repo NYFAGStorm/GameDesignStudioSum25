@@ -318,6 +318,7 @@ public class PlayerControlManager : MonoBehaviour
             if (Vector3.Distance(plots[i].gameObject.transform.position,gameObject.transform.position) < PROXIMITYRANGE)
             {
                 activePlot = plots[i];
+                activePlot.SetCurrentPlayer(this);
                 plots[i].SetCursorPulse(true);
                 break;
             }
@@ -412,6 +413,7 @@ public class PlayerControlManager : MonoBehaviour
     {
         if (characterMove != Vector3.zero && activePlot != null)
         {
+            activePlot.SetCurrentPlayer(null);
             activePlot.SetCursorPulse(false);
             activePlot = null;
         }
