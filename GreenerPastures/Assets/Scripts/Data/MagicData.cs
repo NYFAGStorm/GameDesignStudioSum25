@@ -45,7 +45,7 @@ public class GrimioreData
     public string name;
     public string description;
     public SpellType type;
-    public ItemData[] ingredients;
+    public ItemType[] ingredients; // REVIEW: only need one item of each ingredient?
 }
 
 // spell books hold the spell charges a player has crafted and are available to cast
