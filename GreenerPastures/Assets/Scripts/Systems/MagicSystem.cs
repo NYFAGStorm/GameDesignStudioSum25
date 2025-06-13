@@ -15,7 +15,6 @@ public static class MagicSystem
         retMagic.library = new SpellLibrary();
         retMagic.library.grimiore = new GrimioreData[0];
         retMagic.library.spellBook = new SpellBookData[0];
-        retMagic.casts = new CastData[0];
 
         return retMagic;
     }
@@ -24,13 +23,18 @@ public static class MagicSystem
     /// Creates a cast from the spell data in a player's spell book to the world
     /// </summary>
     /// <param name="spell">spell book data from a player's spell libray</param>
+    /// /// <param name="position">the game world position this cast is centered</param>
     /// <returns>initialized cast data</returns>
-    public static CastData InitializeCast(SpellBookData spell)
+    public static CastData InitializeCast(SpellBookData spell, UnityEngine.Vector3 position)
     {
         CastData retCast = new CastData();
 
         retCast.type = spell.type;
         retCast.lifetime = spell.castDuration;
+        retCast.posX = position.x;
+        retCast.posY = position.y;
+        retCast.posZ = position.z;
+        retCast.rangeAOE = spell.castAOE;
 
         return retCast;
     }
@@ -118,9 +122,10 @@ public static class MagicSystem
         retEntry.cooldownDuration = 0f;
         retEntry.cooldown = 0f;
         retEntry.castDuration = 0f;
+        retEntry.castAOE = 0f; // range (radius) of area of effect
 
         // TODO: configure by spell type
-        switch(spell)
+        switch (spell)
         {
             case SpellType.Default:
                 // should never be here
@@ -139,6 +144,28 @@ public static class MagicSystem
         }
 
         return retEntry;
+    }
+
+    /// <summary>
+    /// Gets spell book data for a spell entry, if it exists in the spell book
+    /// </summary>
+    /// <param name="spell">spell type</param>
+    /// <param name="library">player spell library data</param>
+    /// <returns>spell book data, or null if entry does not exist in spell book</returns>
+    public static SpellBookData GetSpellBookEntry(SpellType spell, SpellLibrary library)
+    {
+        SpellBookData retData = null;
+
+        for (int i = 0; i < library.spellBook.Length; i++)
+        {
+            if (library.spellBook[i].type == spell)
+            {
+                retData = library.spellBook[i];
+                break;
+            }
+        }
+
+        return retData;
     }
 
     /// <summary>

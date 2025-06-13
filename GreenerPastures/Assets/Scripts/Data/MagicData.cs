@@ -58,6 +58,7 @@ public class SpellBookData
     public float cooldownDuration;
     public float cooldown; // tracked cooldown max is cooldownDuration
     public float castDuration;
+    public float castAOE; // range (radius) of area of effect
 }
 
 // the spell library is both the grimiore and spell book for a single player
@@ -76,6 +77,10 @@ public class CastData
 {
     public SpellType type;
     public float lifetime; // tracked lifetime max is castDuration
+    public float posX;
+    public float posY;
+    public float posZ;
+    public float rangeAOE;
 }
 
 // magic is one player's current magic, including learned spells and casts in effect
@@ -84,5 +89,4 @@ public class MagicData
 {
     public MagicStats stats;
     public SpellLibrary library;
-    public CastData[] casts;
 }

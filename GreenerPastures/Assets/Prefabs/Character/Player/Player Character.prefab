@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3494834401035346939}
   - component: {fileID: 261740017079920572}
+  - component: {fileID: 3484861889041133304}
   - component: {fileID: 1722252933839553243}
   m_Layer: 0
   m_Name: Player Character
@@ -46,6 +47,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d722d560232d6f3418cc340b8468d5dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerData:
+    playerName: 
+    stats:
+      totalGameTime: 0
+      totalPlanted: 0
+      totalHarvested: 0
+      totalGoldEarned: 0
+      totalArcanaEarned: 0
+    profile:
+      loginName: 
+      loginPass: 
+      state: 0
+      options:
+        micAvailable: 0
+        micEnabled: 0
+        voiceChatMuted: 0
+    farm:
+      plots: []
+      farmEffects: 
+    gold: 0
+    arcana: 0
+    location: 0
+    action: 0
+    inventory:
+      maxSlots: 0
+      items: []
+    magic:
+      stats:
+        totalMagicTime: 0
+        totalRecipesLearned: 0
+        totalIngredientsUsed: 0
+        totalChargesCrafted: 0
+        totalChargesCast: 0
+      library:
+        grimiore: []
+        spellBook: []
+    effects: 
   characterSpeed: 2.7
   upKey: 119
   downKey: 115
@@ -58,6 +96,19 @@ MonoBehaviour:
   lBumpKey: 91
   rBumpKey: 93
   characterFrozen: 0
+--- !u!114 &3484861889041133304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3232420859449547436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 281cc859e3066e34aad21692f861af05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useMagicKey: 109
 --- !u!81 &1722252933839553243
 AudioListener:
   m_ObjectHideFlags: 0
