@@ -2,15 +2,15 @@
 
 public static class MagicSystem
 {
-    const float STARTINGMANA = 100.0f; // REVIEW: what is the starting mana?
-
     public static MagicData IntializeMagic()
     {
         MagicData retMagic = new MagicData();
 
         // initialize
         retMagic.stats = new MagicStats();
-        retMagic.mana = STARTINGMANA;
+        retMagic.library = new SpellLibrary();
+        retMagic.library.grimiore = new GrimioreData[0];
+        retMagic.library.spellBook = new SpellBookData[0];
         retMagic.casts = new CastData[0];
 
         return retMagic;
