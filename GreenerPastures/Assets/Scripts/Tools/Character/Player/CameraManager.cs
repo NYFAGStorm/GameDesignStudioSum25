@@ -10,6 +10,7 @@ public class CameraManager : MonoBehaviour
         Default,
         Follow,
         Hold,
+        PanFollow,
         CloseUp,
         Medium,
         Long,
@@ -37,6 +38,9 @@ public class CameraManager : MonoBehaviour
     const float CAMERAPAUSEDURATION = 0.381f;
     const float CAMERAMOVEDURATION = 1f;
     const float GLIDEMULTIPLIER = 0.0381f;
+    const float PANCRANETARGETVERTICALOFFSET = 0.618f;
+    const float MAXPANCRANEDIST = 10f;
+    const float MINPANCRANEHEIGHT = 0.5f;
 
 
     void Start()
@@ -50,6 +54,7 @@ public class CameraManager : MonoBehaviour
             // start paused
             cameraPauseTimer = 1f;
             mode = CameraMode.Hold;
+            SavePosAndRot();
         }
     }
 
@@ -61,6 +66,28 @@ public class CameraManager : MonoBehaviour
     {
         playerObject = player.gameObject;
         pcm = player;
+    }
+
+    /// <summary>
+    /// Sets the camera mode to travel with the player plus offset
+    /// </summary>
+    public void SetCameraFollowMode()
+    {
+        GetFollowTarget();
+        gameObject.transform.eulerAngles = savedRotation;
+        mode = CameraMode.Follow;
+    }
+
+    /// <summary>
+    /// Sets the camera mode to lock in a position and pan to follow player
+    /// </summary>
+    /// <param name="camPosition"></param>
+    public void SetCameraPanMode( Vector3 camPosition )
+    {
+        gameObject.transform.position = camPosition;
+        savedPostion = camPosition;
+        mode = CameraMode.PanFollow;
+        GetPanTarget();
     }
 
     void SavePosAndRot()
@@ -75,6 +102,23 @@ public class CameraManager : MonoBehaviour
         cameraTargetRotation = followRotOffset;
     }
 
+    void GetPanTarget()
+    {
+        Vector3 lateralCam = gameObject.transform.position;
+        Vector3 lateralPlayer = playerObject.transform.position;
+        float heightDist = (savedPostion.y - lateralPlayer.y);
+        lateralCam.y = 0f;
+        lateralPlayer.y = 0f;
+        float dist = Vector3.Distance(lateralCam,lateralPlayer);
+        dist = Mathf.Clamp(dist,0f,MAXPANCRANEDIST);
+        float craneMultiplier = 1f-(dist/MAXPANCRANEDIST);
+        float craneHeight = ( craneMultiplier * heightDist ) - MINPANCRANEHEIGHT;
+        cameraTargetPosition = savedPostion + (Vector3.down * craneHeight);
+        Transform camTrans = gameObject.transform;
+        camTrans.LookAt(playerObject.transform.position + (Vector3.up * PANCRANETARGETVERTICALOFFSET));
+        cameraTargetRotation = camTrans.eulerAngles;
+    }
+
     void SetTimers()
     {
         cameraPauseTimer = CAMERAPAUSEDURATION;
@@ -82,6 +126,18 @@ public class CameraManager : MonoBehaviour
     }
 
     void PerformMove( Vector3 posOffset, Vector3 rotOffset )
+    {
+        Vector3 pos = gameObject.transform.position;
+        Vector3 rot = gameObject.transform.eulerAngles;
+
+        pos += (cameraTargetPosition - pos) * GLIDEMULTIPLIER;
+        rot += (cameraTargetRotation - rot) * GLIDEMULTIPLIER;
+
+        gameObject.transform.position = pos;
+        gameObject.transform.eulerAngles = rot;
+    }
+
+    void PerformPan( Vector3 posOffset, Vector3 rotOffset )
     {
         Vector3 pos = gameObject.transform.position;
         Vector3 rot = gameObject.transform.eulerAngles;
@@ -124,6 +180,14 @@ public class CameraManager : MonoBehaviour
                 else
                     return;
             }
+        }
+
+        if ( mode == CameraMode.PanFollow )
+        {
+            GetPanTarget();
+            // pan camera
+            PerformPan(followMoveOffset, followRotOffset);
+            return;
         }
 
         // NOTE: for cinematic camera use (not default follow player mode)

@@ -8,6 +8,8 @@ public class TeleportManager : MonoBehaviour
 
     public string teleporterTag;
     public GameObject teleportSubject;
+    [Tooltip("if none defined, will ignore. otherwise reaching this node will trigger.")]
+    public CameraTrigger associatedCamTrigger;
 
     private bool teleportActive;
     private float teleportTimer;
@@ -143,6 +145,10 @@ public class TeleportManager : MonoBehaviour
         {
             r.enabled = true; // REVIEW: are there things that should not be visible?
         }
+
+        // if associated camera trigger, trigger
+        if (pairedPad.associatedCamTrigger != null)
+            pairedPad.associatedCamTrigger.TriggerCameraMode();
     }
 
     /// <summary>
