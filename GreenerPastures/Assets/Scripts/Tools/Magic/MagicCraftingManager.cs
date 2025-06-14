@@ -13,17 +13,36 @@ public class MagicCraftingManager : MonoBehaviour
         Deactivating,   // end crafting interface, detect player left to reset
     }
 
-    public LibraryState state;
-    private float stateTimer;
+    public enum CraftState
+    {
+        Default,
+        Grimoire,
+        Cauldron,
+        Exiting
+    }
+
+    public LibraryState libraryState;
+    public CraftState craftState;
+
+    public Texture2D grimoireBackground;
+    public Texture2D cauldronBackground;
+
+    private float libraryStateTimer;
+    private float craftStateTimer;
     private float checkTimer;
 
     private bool craftingDisplay;
 
+    private bool fadingOverlay;
+    private bool fadingFromBlack;
+    private Texture2D currentBackground;
+
     private PlayerControlManager pcm;
     private PlayerControlManager leaving; // used in deactivation
-    private MagicManager mm;
+    private MagicManager mm; // REVIEW: need this at all here?
 
-    const float STATETIMERMAX = 1f;
+    const float LIBRARYSTATETIMERMAX = 1f;
+    const float CRAFTSTATETIMERMAX = 1f;
     const float PLAYERCHECKTIME = 1f;
     const float PROXIMITYCHECKRADIUS = 0.381f;
 
@@ -31,6 +50,7 @@ public class MagicCraftingManager : MonoBehaviour
     void Start()
     {
         // validate
+        // TODO: validate for grimoire and cauldron background images
         // initialize
         if (enabled)
         {
@@ -44,11 +64,15 @@ public class MagicCraftingManager : MonoBehaviour
             return;
 
         HandleLibraryStates();
+
+        RunCraftStateTimer();
+
+        HandleCraftingStates();
     }
 
     bool DetectPlayer()
     {
-        if (state != LibraryState.Default && state != LibraryState.Deactivating)
+        if (libraryState != LibraryState.Default && libraryState != LibraryState.Deactivating)
             return true; // we must already have player engaged, skip
 
         // if no player, run player check timer 
@@ -81,13 +105,13 @@ public class MagicCraftingManager : MonoBehaviour
                     {
                         // engaged player has now left, reset
                         leaving = null;
-                        state = LibraryState.Default;
-                        stateTimer = 0f;
+                        libraryState = LibraryState.Default;
+                        libraryStateTimer = 0f;
                     }
                 }
                 else if (leaving != null && pcm == leaving)
                 {
-                    // remain in state until leaving player not detected
+                    // remain in libraryState until leaving player not detected
                     pcm = null;
                     mm = null;
                     checkTimer = PLAYERCHECKTIME;
@@ -97,8 +121,8 @@ public class MagicCraftingManager : MonoBehaviour
                     // engage with player, activate library
                     pcm.characterFrozen = true;
                     pcm.hidePlayerHUD = true;
-                    state = LibraryState.Activating;
-                    stateTimer = STATETIMERMAX;
+                    libraryState = LibraryState.Activating;
+                    libraryStateTimer = LIBRARYSTATETIMERMAX;
                 }
             }
         }
@@ -108,32 +132,34 @@ public class MagicCraftingManager : MonoBehaviour
 
     void HandleLibraryStates()
     {
-        if (stateTimer == 0f)
+        if (libraryStateTimer == 0f)
             return;
 
-        // run state timer
-        if (stateTimer > 0f)
+        // run libraryState timer
+        if (libraryStateTimer > 0f)
         {
-            stateTimer -= Time.deltaTime;
-            if (stateTimer < 0f)
+            libraryStateTimer -= Time.deltaTime;
+            if (libraryStateTimer < 0f)
             {
-                stateTimer = 0f;
-                switch (state)
+                libraryStateTimer = 0f;
+                switch (libraryState)
                 {
                     case LibraryState.Default:
                         // should never be here
                         break;
                     case LibraryState.Activating:
-                        // REVIEW: may do special stuff here, using state timer
-                        state = LibraryState.Active;
-                        craftingDisplay = true;
+                        // REVIEW: may do special stuff here, using libraryState timer
+                        libraryState = LibraryState.Active;
+                        craftingDisplay = true; // sets false in craft state handling
+                        craftState = CraftState.Grimoire;
+                        craftStateTimer = CRAFTSTATETIMERMAX;
+                        fadingOverlay = true;
                         break;
                     case LibraryState.Active:
                         pcm.characterFrozen = false;
                         pcm.hidePlayerHUD = false;
-                        state = LibraryState.Deactivating;
-                        stateTimer = STATETIMERMAX;
-                        craftingDisplay = false;
+                        libraryState = LibraryState.Deactivating;
+                        libraryStateTimer = LIBRARYSTATETIMERMAX;
                         break;
                     case LibraryState.Deactivating:
                         if (pcm != null)
@@ -142,15 +168,102 @@ public class MagicCraftingManager : MonoBehaviour
                             pcm = null;
                             mm = null;
                         }
-                        // remain in state until leaving player not detected
+                        // remain in libraryState until leaving player not detected
                         checkTimer = PLAYERCHECKTIME;
-                        stateTimer = STATETIMERMAX;
+                        libraryStateTimer = LIBRARYSTATETIMERMAX;
                         break;
                     default:
-                        Debug.LogWarning("--- MagicCraftingManager [HandleLibraryStates] : library state undefined. will ignore.");
+                        Debug.LogWarning("--- MagicCraftingManager [HandleLibraryStates] : library libraryState undefined. will ignore.");
                         break;
                 }
             }
+        }
+    }
+
+    void RunCraftStateTimer()
+    {
+        if (craftStateTimer > 0f)
+        {
+            craftStateTimer -= Time.deltaTime;
+            if (craftStateTimer < (CRAFTSTATETIMERMAX / 2f))
+            {
+                // configure craft background images between overlay fades
+                switch (craftState)
+                {
+                    case CraftState.Default:
+                        break;
+                    case CraftState.Grimoire:
+                        if (!fadingFromBlack)
+                        {
+                            if (currentBackground == null && grimoireBackground != null)
+                                currentBackground = grimoireBackground;
+                            if (currentBackground == null)
+                                currentBackground = Texture2D.grayTexture; // TEMP
+                        }
+                        break;
+                    case CraftState.Cauldron:
+                        if (!fadingFromBlack)
+                        {
+                            if (currentBackground == null && cauldronBackground != null)
+                                currentBackground = cauldronBackground;
+                            if (currentBackground == null)
+                                currentBackground = Texture2D.whiteTexture; // TEMP
+                        }
+                        break;
+                    case CraftState.Exiting:
+                        if (!fadingFromBlack)
+                            currentBackground = null;
+                        break;
+                }
+                fadingFromBlack = true;
+            }
+            if (craftStateTimer < 0f)
+            {
+                craftStateTimer = 0f;
+                fadingFromBlack = false;
+                // handle craft state changes
+                switch (craftState)
+                {
+                    case CraftState.Default:
+                        // we should never be here
+                        break;
+                    case CraftState.Grimoire:
+                        craftState = CraftState.Cauldron;
+                        fadingOverlay = false;
+                        break;
+                    case CraftState.Cauldron:
+                        craftState = CraftState.Exiting;
+                        fadingOverlay = false;
+                        break;
+                    case CraftState.Exiting:
+                        libraryStateTimer = (LIBRARYSTATETIMERMAX/2f); // exit faster
+                        craftState = CraftState.Default;
+                        craftingDisplay = false;
+                        fadingOverlay = false;
+                        break;
+                    default:
+                        Debug.LogWarning("--- MagicCraftingManager [RunCraftStateTimer] : craft state undefined. will ignore.");
+                        break;
+                }
+
+            }
+        }
+
+    }
+
+    void HandleCraftingStates()
+    {
+        switch (craftState)
+        {
+            case CraftState.Default:
+                // we should never be here
+                break;
+            case CraftState.Grimoire:
+                break;
+            case CraftState.Cauldron:
+                break;
+            case CraftState.Exiting:
+                break;
         }
     }
 
@@ -163,6 +276,39 @@ public class MagicCraftingManager : MonoBehaviour
         float w = Screen.width;
         float h = Screen.height;
 
+        Texture2D t = Texture2D.whiteTexture;
+        Color c = Color.white;
+
+        r.x = 0f;
+        r.y = 0f;
+        r.width = w;
+        r.height = h;
+
+        // crafting background image appears halfway through overlay fading
+        if (currentBackground != null)
+        {
+            t = currentBackground;
+            c = Color.white;
+            GUI.color = c;
+            GUI.DrawTexture(r, t);
+        }
+
+        // handle fading to and from black for craft state transitions
+        if (fadingOverlay)
+        {
+            c = Color.black;
+            if (fadingFromBlack)
+                c.a = ((craftStateTimer * 2f)/CRAFTSTATETIMERMAX);
+            else
+                c.a = 1f-(((craftStateTimer * 2f) / CRAFTSTATETIMERMAX)-1f);
+            GUI.color = c;
+            GUI.DrawTexture(r, t);
+            // if fading overlay, no other display
+            return;
+        }
+
+
+
         r.x = 0.1f * w;
         r.y = 0.1f * h;
         r.width = 0.2f * w;
@@ -171,34 +317,30 @@ public class MagicCraftingManager : MonoBehaviour
         GUIStyle g = new GUIStyle(GUI.skin.label);
         g.fontSize = Mathf.RoundToInt(20 * (w/1024f));
 
-        Color c = Color.white;
-
-        Texture2D t = Texture2D.whiteTexture;
-
         string s = "words";
 
+        c = Color.white;
         GUI.color = c;
 
         GUI.Label(r, s, g);
-
 
         // cancel / exit crafting button
         r.x = 0.4f * w;
         r.y = 0.9f * h;
         r.width = 0.2f * w;
         r.height = 0.05f * h;
-
         g = new GUIStyle(GUI.skin.button);
         g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
-
         s = "EXIT CRAFTING";
 
         if (GUI.Button(r, s, g))
         {
-            stateTimer = STATETIMERMAX;
+            craftState = CraftState.Exiting;
+            craftStateTimer = CRAFTSTATETIMERMAX;
+            fadingOverlay = true;
         }
     }
 }
