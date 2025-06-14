@@ -1955,7 +1955,7 @@ GameObject:
   - component: {fileID: 1793189161}
   - component: {fileID: 1793189162}
   m_Layer: 0
-  m_Name: Magic Library Trigger
+  m_Name: Magic Crafting Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1988,6 +1988,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1bc0429e41688f4382a2a9fef3ce077, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
 --- !u!1 &1854411119
 GameObject:
   m_ObjectHideFlags: 0
