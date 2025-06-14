@@ -115,6 +115,29 @@ public class PlayerControlManager : MonoBehaviour
             // temp - player data (mainly for gold)
             playerData = PlayerSystem.InitializePlayer("Player", "Player", "pass");
             playerData.inventory = playerInventory;
+
+            // temp - player magic
+            playerData.magic = MagicSystem.IntializeMagic();
+            /*
+            MagicSystem.AddSpellToGrimoire(SpellType.SpellA, playerData.magic.library);
+            MagicSystem.AddSpellToGrimoire(SpellType.SpellB, playerData.magic.library);
+            MagicSystem.AddSpellToGrimoire(SpellType.SpellC, playerData.magic.library);
+            playerData.magic.library.grimiore[0].name = "Fireball";
+            playerData.magic.library.grimiore[0].description = "Conjures a ball of fire to throw at enemies.";
+            playerData.magic.library.grimiore[0].ingredients = new ItemType[2];
+            playerData.magic.library.grimiore[0].ingredients[0] = ItemType.Rock;
+            playerData.magic.library.grimiore[0].ingredients[1] = ItemType.Fertilizer;
+            playerData.magic.library.grimiore[1].name = "Healing";
+            playerData.magic.library.grimiore[1].description = "Conjures a ball of fire to throw at enemies.";
+            playerData.magic.library.grimiore[1].ingredients = new ItemType[2];
+            playerData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
+            playerData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
+            playerData.magic.library.grimiore[2].name = "Freeze Ray";
+            playerData.magic.library.grimiore[2].description = "Conjures a ball of fire to throw at enemies.";
+            playerData.magic.library.grimiore[2].ingredients = new ItemType[2];
+            playerData.magic.library.grimiore[2].ingredients[0] = ItemType.Plant;
+            playerData.magic.library.grimiore[2].ingredients[1] = ItemType.Stalk;
+            */
         }
     }
 

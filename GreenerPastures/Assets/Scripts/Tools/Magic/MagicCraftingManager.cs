@@ -37,9 +37,13 @@ public class MagicCraftingManager : MonoBehaviour
     private bool fadingFromBlack;
     private Texture2D currentBackground;
 
+    private int currentGrimoireEntry;
+    private int selectedGrimoireRecipe;
+
     private PlayerControlManager pcm;
     private PlayerControlManager leaving; // used in deactivation
     private MagicManager mm; // REVIEW: need this at all here?
+    private MultiGamepad padMgr;
 
     const float LIBRARYSTATETIMERMAX = 1f;
     const float CRAFTSTATETIMERMAX = 1f;
@@ -51,10 +55,19 @@ public class MagicCraftingManager : MonoBehaviour
     {
         // validate
         // TODO: validate for grimoire and cauldron background images
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if ( padMgr == null )
+        {
+            Debug.LogWarning("--- MagicCraftingManager [Start] : no gamepad manager found. will ignore.");
+        }
         // initialize
         if (enabled)
         {
             checkTimer = PLAYERCHECKTIME;
+            currentGrimoireEntry = -1;
+            selectedGrimoireRecipe = -1;
+            if (selectedGrimoireRecipe == 0)
+                print("a silly use of a variable not implemented yet");
         }
     }
 
@@ -198,15 +211,15 @@ public class MagicCraftingManager : MonoBehaviour
                             if (currentBackground == null && grimoireBackground != null)
                                 currentBackground = grimoireBackground;
                             if (currentBackground == null)
-                                currentBackground = Texture2D.grayTexture; // TEMP
+                                currentBackground = Texture2D.whiteTexture; // TEMP
                         }
                         break;
                     case CraftState.Cauldron:
                         if (!fadingFromBlack)
                         {
-                            if (currentBackground == null && cauldronBackground != null)
+                            if (cauldronBackground != null)
                                 currentBackground = cauldronBackground;
-                            if (currentBackground == null)
+                            if (currentBackground != cauldronBackground)
                                 currentBackground = Texture2D.whiteTexture; // TEMP
                         }
                         break;
@@ -228,11 +241,11 @@ public class MagicCraftingManager : MonoBehaviour
                         // we should never be here
                         break;
                     case CraftState.Grimoire:
-                        craftState = CraftState.Cauldron;
+                        //craftState = CraftState.Cauldron;
                         fadingOverlay = false;
                         break;
                     case CraftState.Cauldron:
-                        craftState = CraftState.Exiting;
+                        //craftState = CraftState.Exiting;
                         fadingOverlay = false;
                         break;
                     case CraftState.Exiting:
@@ -259,6 +272,24 @@ public class MagicCraftingManager : MonoBehaviour
                 // we should never be here
                 break;
             case CraftState.Grimoire:
+                if ( pcm.playerData.magic.library.grimiore.Length > 0 )
+                {
+                    // allow player to change current recipe entry from grimoire listing
+                    if (Input.GetKeyDown(pcm.upKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL > 0f))
+                        currentGrimoireEntry--;
+                    if (Input.GetKeyDown(pcm.downKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL < 0f))
+                        currentGrimoireEntry++;
+                    currentGrimoireEntry = Mathf.Clamp(currentGrimoireEntry, 0, pcm.playerData.magic.library.grimiore.Length - 1);
+                }
+                if (currentGrimoireEntry != -1)
+                {
+                    // TODO: validate all ingredients in inventory
+                    // allow player to make selection of recipe to craft in cauldron state
+                    if (Input.GetKeyDown(pcm.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
+                    {
+                        selectedGrimoireRecipe = currentGrimoireEntry;
+                    }
+                }
                 break;
             case CraftState.Cauldron:
                 break;
@@ -277,6 +308,8 @@ public class MagicCraftingManager : MonoBehaviour
         float h = Screen.height;
 
         Texture2D t = Texture2D.whiteTexture;
+        GUIStyle g = new GUIStyle(GUI.skin.label);
+        string s = "words go here";
         Color c = Color.white;
 
         r.x = 0f;
@@ -307,28 +340,144 @@ public class MagicCraftingManager : MonoBehaviour
             return;
         }
 
+        if (craftStateTimer > 0f)
+            return;
 
+        if (craftState == CraftState.Grimoire)
+        {
+            // grimoire box overlay
+            r.x = 0.1f * w;
+            r.y = 0.05f * h;
+            r.width = 0.8f * w;
+            r.height = 0.8f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            s = "THE GRIMOIRE";
+            c = Color.white;
+            GUI.color = c;
 
-        r.x = 0.1f * w;
-        r.y = 0.1f * h;
-        r.width = 0.2f * w;
-        r.height = 0.1f * h;
+            GUI.Box(r, s, g);
 
-        GUIStyle g = new GUIStyle(GUI.skin.label);
-        g.fontSize = Mathf.RoundToInt(20 * (w/1024f));
+            // grimoire spell listing
+            r.x = 0.15f * w;
+            r.y = 0.1f * h;
+            r.width = 0.7f * w;
+            r.height = 0.7f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+            s = "No spell recipes have been acquired.\nLevel up to gain new recipes.";
+            c = Color.white;
+            GUI.color = c;
+            // default empty grimoire display
+            if ( pcm.playerData.magic.library.grimiore == null ||
+                pcm.playerData.magic.library.grimiore.Length == 0 )
+            {
+                g.fontStyle = FontStyle.BoldAndItalic;
+                GUI.Label(r, s, g);
+            }
+            else
+            {
+                r.x = 0.15f * w;
+                r.y = 0.1f * h;
+                r.width = 0.7f * w;
+                r.height = 0.075f * h;
+                g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+                for ( int i = 0; i < pcm.playerData.magic.library.grimiore.Length; i++ )
+                {
+                    c = Color.white;
+                    if (i == currentGrimoireEntry)
+                        c = Color.yellow;
+                    GUI.color = c;
+                    GrimioreData grim = pcm.playerData.magic.library.grimiore[i];
+                    // spell name
+                    g.alignment = TextAnchor.MiddleLeft;
+                    s = grim.name;
+                    GUI.Label(r, s, g);
+                    // spell description
+                    r.y += 0.05f * h;
+                    g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
+                    s = grim.description;
+                    GUI.Label(r, s, g);
+                    // spell ingredients
+                    r.y += 0.05f * h;
+                    g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+                    g.alignment = TextAnchor.MiddleRight;
+                    s = "";
+                    for (int n = 0; n < grim.ingredients.Length; n++)
+                    {
+                        s += grim.ingredients[n].ToString();
+                        if (n < grim.ingredients.Length - 1)
+                            s += ", ";
+                    }
+                    GUI.Label(r, s, g);
+                    r.y += 0.05f * h;
+                }
+            }
+        }
 
-        string s = "words";
+        if (craftState == CraftState.Cauldron)
+        {
+            // caulron box overlay
+            r.x = 0.1f * w;
+            r.y = 0.05f * h;
+            r.width = 0.8f * w;
+            r.height = 0.8f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            s = "THE CAULRON";
+            c = Color.white;
+            GUI.color = c;
+
+            GUI.Box(r, s, g);
+        }
 
         c = Color.white;
         GUI.color = c;
 
-        GUI.Label(r, s, g);
+        // cauldron or crafting button
+        r.x = 0.15f * w;
+        r.y = 0.9f * h;
+        r.width = 0.25f * w;
+        r.height = 0.075f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
+        g.active.textColor = Color.white;
+        if (craftState == CraftState.Grimoire)
+            s = "CRAFTING CAULDRON";
+        else
+            s = "CRAFT SPELL CHARGE";
+
+        // TODO: un-comment this and require recipe selection to craft
+        //if (craftState == CraftState.Grimoire && selectedGrimoireRecipe == -1)
+        //    GUI.enabled = false;
+
+        if (craftState != CraftState.Exiting && GUI.Button(r, s, g))
+        {
+            if (craftState == CraftState.Grimoire)
+            {
+                craftState = CraftState.Cauldron;
+                craftStateTimer = CRAFTSTATETIMERMAX;
+                fadingOverlay = true;
+            }
+            else
+            {
+                // add spell charge to spell book (stay in this state)
+                print("add charge to spell book for completed spell craft");
+            }
+        }
+
+        GUI.enabled = true;
 
         // cancel / exit crafting button
-        r.x = 0.4f * w;
+        r.x = 0.6f * w;
         r.y = 0.9f * h;
-        r.width = 0.2f * w;
-        r.height = 0.05f * h;
+        r.width = 0.25f * w;
+        r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
         g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
         g.normal.textColor = Color.white;

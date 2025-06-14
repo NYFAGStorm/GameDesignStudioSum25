@@ -293,10 +293,9 @@ public static class MagicSystem
         if (retLibrary.grimiore == null || retLibrary.grimiore.Length == 0)
         {
             // no spell data yet, create
-            // add listing to grimoire
+            // add first listing to grimoire
             retLibrary.grimiore = new GrimioreData[1];
             retLibrary.grimiore[0] = InitializeGrimoireEntry(spell);
-            found = true;
         }
         else
         {
