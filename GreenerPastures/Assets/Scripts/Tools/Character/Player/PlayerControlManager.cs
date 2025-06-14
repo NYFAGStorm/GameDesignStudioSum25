@@ -50,6 +50,7 @@ public class PlayerControlManager : MonoBehaviour
     public KeyCode rBumpKey = KeyCode.RightBracket;
 
     public bool characterFrozen;
+    public bool hidePlayerHUD;
 
     private Vector3 characterMove;
     private LooseItemManager activeItem;
@@ -421,6 +422,9 @@ public class PlayerControlManager : MonoBehaviour
 
     void OnGUI()
     {
+        if (hidePlayerHUD)
+            return;
+
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;

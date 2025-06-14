@@ -116,6 +116,7 @@ public class MarketManager : MonoBehaviour
             currentCustomer.characterFrozen = true;
             menuItemSelection = 0;
             marketInstructions = "MARKET [BUY MODE]\nE=BUY V=EXIT";
+            return; // consume input, do not allow purchase with current actionA signal
         }
         if (customerMode == CustomerMode.Buy)
         {
@@ -195,6 +196,7 @@ public class MarketManager : MonoBehaviour
             currentCustomer.characterFrozen = true;
             menuItemSelection = -1;
             marketInstructions = "MARKET [SELL MODE]\nE=SELL V=EXIT";
+            return; // consume input of actionB signal
         }
         if (customerMode == CustomerMode.Sell)
         {

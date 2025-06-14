@@ -9,6 +9,7 @@ public class PlayerStats
     public int totalHarvested;
     public int totalGoldEarned;
     public int totalArcanaEarned;
+    public int totalXPEarned;
 }
 
 // REVIEW:
@@ -56,6 +57,8 @@ public class PlayerData
     public FarmData farm;
     public int gold;
     public int arcana;
+    public int xp;
+    public int level;
     public PlayerLocation location;
     public PlayerAction action;
     public InventoryData inventory;

@@ -1788,6 +1788,7 @@ Transform:
   m_Children:
   - {fileID: 869074430}
   - {fileID: 451620815}
+  - {fileID: 1793189161}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1459058641
@@ -1943,6 +1944,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3707677030043376523, guid: 1fbb451aa960449458741614c45879e8, type: 3}
   m_PrefabInstance: {fileID: 1753893508}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1793189160
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1793189161}
+  - component: {fileID: 1793189162}
+  m_Layer: 0
+  m_Name: Magic Library Trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1793189161
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793189160}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.25, y: -3.618, z: -0.618}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1339543635}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1793189162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793189160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1bc0429e41688f4382a2a9fef3ce077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1854411119
 GameObject:
   m_ObjectHideFlags: 0

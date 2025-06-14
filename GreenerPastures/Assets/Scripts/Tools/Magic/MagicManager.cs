@@ -3,7 +3,7 @@ using UnityEngine;
 public class MagicManager : MonoBehaviour
 {
     // Author: Glenn Storm
-    // This handles a player's use of their spell book and grimoire
+    // This handles a player's use of their spell book
 
     private PlayerControlManager pcm;
     private CastManager castMgr;
