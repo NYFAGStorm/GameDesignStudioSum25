@@ -41,6 +41,7 @@ public class CameraManager : MonoBehaviour
     const float PANCRANETARGETVERTICALOFFSET = 0.618f;
     const float MAXPANCRANEDIST = 10f;
     const float MINPANCRANEHEIGHT = 0.5f;
+    const float LATERALPANMULTIPLIER = 0.618f;
 
 
     void Start()
@@ -107,13 +108,15 @@ public class CameraManager : MonoBehaviour
         Vector3 lateralCam = gameObject.transform.position;
         Vector3 lateralPlayer = playerObject.transform.position;
         float heightDist = (savedPostion.y - lateralPlayer.y);
+        float sideMove = (savedPostion.x - lateralPlayer.x);
+        sideMove *= LATERALPANMULTIPLIER;
         lateralCam.y = 0f;
         lateralPlayer.y = 0f;
         float dist = Vector3.Distance(lateralCam,lateralPlayer);
         dist = Mathf.Clamp(dist,0f,MAXPANCRANEDIST);
         float craneMultiplier = 1f-(dist/MAXPANCRANEDIST);
         float craneHeight = ( craneMultiplier * heightDist ) - MINPANCRANEHEIGHT;
-        cameraTargetPosition = savedPostion + (Vector3.down * craneHeight);
+        cameraTargetPosition = savedPostion + (Vector3.down * craneHeight) + (Vector3.left * sideMove);
         Transform camTrans = gameObject.transform;
         camTrans.LookAt(playerObject.transform.position + (Vector3.up * PANCRANETARGETVERTICALOFFSET));
         cameraTargetRotation = camTrans.eulerAngles;

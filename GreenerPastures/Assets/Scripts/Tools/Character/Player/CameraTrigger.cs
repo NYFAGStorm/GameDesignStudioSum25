@@ -27,10 +27,8 @@ public class CameraTrigger : MonoBehaviour
             Debug.LogError("--- CameraTrigger [Start] : "+gameObject.name+" no camera manager found in scene. aborting.");
             enabled = false;
         }
-        if (mode == CameraTriggerMode.PanMode && panModePositon != Vector3.zero)
-        {
+        if (mode == CameraTriggerMode.PanMode && panModePositon == Vector3.zero)
             Debug.LogWarning("--- CameraTrigger [Start] : " + gameObject.name + " pan mode configured and pan position defined as Vector3 zero. will ignore.");
-        }
         // initialize
         if ( enabled )
         {
