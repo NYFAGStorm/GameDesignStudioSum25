@@ -86,10 +86,15 @@ public class MagicCraftingManager : MonoBehaviour
             checkTimer = PLAYERCHECKTIME;
             currentGrimoireEntry = -1;
             selectedGrimoireRecipe = -1;
-            if (selectedGrimoireRecipe == 0)
-                print("a silly use of a variable not implemented yet");
 
             placedIngredients = new ItemPiece[0];
+
+            // TODO: cleanup
+            if (selectedGrimoireRecipe == 0)
+                print("a silly use of a variable not implemented yet");
+            if (craftingSolved)
+                print("a silly use of a variable not implemented yet");
+
             // TODO: set this based on player level
             sizeOfCauldronGrid = 4; // testing
             cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
@@ -303,7 +308,7 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 if (currentGrimoireEntry != -1)
                 {
-                    // TODO: validate at least one of all ingredients in inventory
+                    // TODO: validate at least one of each ingredients in inventory
                     // allow player to make selection of recipe to craft in cauldron state
                     if (Input.GetKeyDown(pcm.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
                     {
@@ -326,6 +331,13 @@ public class MagicCraftingManager : MonoBehaviour
     {
         ItemPiece[] tmp = new ItemPiece[placedIngredients.Length + 1];
 
+        // convert pos to snapped at center of grid position
+        int oRow = 0;
+        int oCol = 0;
+        ConvertViewportSpaceToGrid(pos, out oRow, out oCol);
+        pos = SnapToGrid(oRow, oCol);
+
+        // add to placed piece array
         for (int i = 0; i < placedIngredients.Length; i++)
         {
             tmp[i] = placedIngredients[i];
@@ -335,6 +347,21 @@ public class MagicCraftingManager : MonoBehaviour
         tmp[placedIngredients.Length].pos = pos;
 
         placedIngredients = tmp;
+    }
+
+    Vector3 SnapToGrid( int row, int col )
+    {
+        Vector3 retVec = Vector3.zero;
+
+        // based on sizeOfCauldronGrid and 0.075f * w per square grid space
+        // starting from center of grid at 0.7f * w, 0.45f * h
+        float ratioToX = (float)Screen.width / (float)Screen.height;
+        retVec.x = 0.7f - (sizeOfCauldronGrid * 0.075f * 0.5f);
+        retVec.y = 0.45f - (sizeOfCauldronGrid * 0.075f * ratioToX * 0.5f);
+        retVec.x += col * (0.075f);
+        retVec.y += row * (0.075f * ratioToX);
+
+        return retVec;
     }
 
     bool isAmongPlacedPieces( ItemType type )
@@ -353,6 +380,28 @@ public class MagicCraftingManager : MonoBehaviour
         return retBool;
     }
 
+    int ConvertViewportSpaceToInventory( Vector3 viewport )
+    {
+        // set invalid by default
+        int retInvSlot = -1;
+
+        int sizeOfInv = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients.Length;
+
+        float ratioToX = ((float)Screen.width / (float)Screen.height);
+        float leftX = 0.15f; // - ((sizeOfInv * 0.075f) / 2f);
+        float topY = 0.675f; // - ((sizeOfInv * 0.075f * ratioToX) / 2f);
+
+        float floatCol = Mathf.RoundToInt(((viewport.x - leftX) / 0.075f) - 0.5f);
+        // off inventory invalidation
+        if (floatCol >= 0f && floatCol <= sizeOfCauldronGrid - 1)
+            retInvSlot = (int)Mathf.Clamp(floatCol, 0f, sizeOfCauldronGrid - 1);
+        // invalidate if out of row
+        if (viewport.y < topY || viewport.y > (topY + (0.075f * ratioToX)))
+            retInvSlot = -1;
+
+        return retInvSlot;
+    }
+
     void ClearPlacedPieces()
     {
         placedIngredients = new ItemPiece[0];
@@ -360,12 +409,32 @@ public class MagicCraftingManager : MonoBehaviour
 
     void ConvertViewportSpaceToGrid( Vector3 viewport, out int row, out int col )
     {
-        int retRow = 0;
-        int retCol = 0;
+        // set invalid by default
+        int retRow = -1;
+        int retCol = -1;
 
         // based on sizeOfCauldronGrid and 0.075f * w per square grid space
         // starting from center of grid at 0.7f * w, 0.45f * h
-        // TODO: ...
+        float ratioToX = ((float)Screen.width/(float)Screen.height);
+        float leftX = 0.7f - ((sizeOfCauldronGrid * 0.075f) / 2f);
+        float topY = 0.45f - ((sizeOfCauldronGrid * 0.075f * ratioToX) / 2f);
+
+        float floatCol = Mathf.RoundToInt(( (viewport.x - leftX) / 0.075f ) - 0.5f);
+        // off grid invalidation
+        if (floatCol >= 0f && floatCol <= sizeOfCauldronGrid-1)
+            retCol = (int)Mathf.Clamp(floatCol, 0f, sizeOfCauldronGrid - 1);
+
+        float floatRow = Mathf.RoundToInt(( (viewport.y - topY) / (0.075f * ratioToX) ) - 0.5f);
+        // off grid invalidation
+        if (floatRow >= 0f && floatRow <= sizeOfCauldronGrid-1)
+            retRow = (int)Mathf.Clamp(floatRow, 0f, sizeOfCauldronGrid - 1);
+
+        if (retCol == -1 || retRow == -1)
+        {
+            // invalidate both axis if off grid
+            retRow = -1;
+            retCol = -1;
+        }
 
         row = retRow;
         col = retCol;
@@ -381,6 +450,11 @@ public class MagicCraftingManager : MonoBehaviour
 
     void SetGridSpaceFilled( int row, int col )
     {
+        if (row == -1 || col == -1)
+        {
+            Debug.LogWarning("--- MagicCraftingManager [SetGridSpaceFilled] : invalid row and column. will ignore.");
+            return;
+        }
         int resultIndex = row + (col * sizeOfCauldronGrid);
         cauldronGridFilled[resultIndex] = true;
     }
@@ -392,7 +466,8 @@ public class MagicCraftingManager : MonoBehaviour
         int outRow = 0;
         int outCol = 0;
         ConvertViewportSpaceToGrid(viewport, out outRow, out outCol);
-        IsGridSpaceOpen(outRow, outCol);
+        if ( outRow > -1 && outCol > -1 )
+            retBool = IsGridSpaceOpen(outRow, outCol);
         
         return retBool;
     }
@@ -401,8 +476,11 @@ public class MagicCraftingManager : MonoBehaviour
     {
         bool retBool = false;
 
+        if (row == -1 || col == -1)
+            return retBool; // invalid space off grid
+
         int gridIndex = row + (col * sizeOfCauldronGrid);
-        retBool = cauldronGridFilled[gridIndex];
+        retBool = !cauldronGridFilled[gridIndex];
 
         return retBool;
     }
@@ -590,7 +668,11 @@ public class MagicCraftingManager : MonoBehaviour
                 mouseClickPos.x /= w;
                 mouseClickPos.y /= h;
                 mouseClickPos.y = 1f - mouseClickPos.y; // invert y
-                print("mouse click position is "+mouseClickPos);
+
+                // grab items from inventory slot spaces
+                int itemIndex = ConvertViewportSpaceToInventory(mouseClickPos);
+                if (itemIndex > -1)
+                    heldIngredient = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[itemIndex];
             }
 
             // ingredient inventory display
@@ -630,7 +712,7 @@ public class MagicCraftingManager : MonoBehaviour
                 t = (Texture2D)Resources.Load("Plot_Cursor");
                 GUI.color = c;
                 GUI.DrawTexture(r, t);
-                r.x += r.width + (0.01f * w);
+                r.x += r.width;
             }
 
             // cauldron image (part of cauldron background)
@@ -644,8 +726,8 @@ public class MagicCraftingManager : MonoBehaviour
                 for (int i = 0; i < placedIngredients.Length; i++)
                 {
                     // NOTE: no need to use grid spacing, items have saved positions
-                    r.x = placedIngredients[i].pos.x;
-                    r.y = placedIngredients[i].pos.y;
+                    r.x = placedIngredients[i].pos.x * w;
+                    r.y = placedIngredients[i].pos.y * h;
                     c = Color.white;
                     // adjust smaller
                     r.x += 0.005f * w;
@@ -677,6 +759,7 @@ public class MagicCraftingManager : MonoBehaviour
             r.x -= ((sizeOfCauldronGrid * r.width) / 2f);
             r.y -= ((sizeOfCauldronGrid * r.width) / 2f);
             float savedXPos = r.x;
+            t = (Texture2D)Resources.Load("Plot_Cursor");
             for ( int i=0; i < sizeOfCauldronGrid; i++ )
             {
                 for ( int n=0; n < sizeOfCauldronGrid; n++ )
@@ -706,12 +789,17 @@ public class MagicCraftingManager : MonoBehaviour
                 heldPosition.y = Mathf.Clamp(heldPosition.y, 0.05f, 0.85f);
                 heldPosition.z = 0f; // need to use this data?
 
-                r.x = heldPosition.x - (0.075f * w * 0.5f);
-                r.y = heldPosition.y - (0.075f * w * 0.5f);
+                r.x = heldPosition.x - (0.075f * 0.5f);
+                r.y = heldPosition.y - (0.075f * 0.5f * (w / h));
+                r.x *= w;
+                r.y *= h;
                 r.width = 0.075f * w;
                 r.height = r.width;
+
+                t = alm.itemImages[alm.GetArtData(heldIngredient).artIndexBase];
                 c = Color.white;
                 GUI.color = c;
+
                 GUI.DrawTexture(r, t);
             }
         }
@@ -729,6 +817,12 @@ public class MagicCraftingManager : MonoBehaviour
                 heldIngredient = ItemType.Default;
                 heldPosition = Vector3.zero; // REVIEW: safe?
                 // TODO: check puzzle solved
+            }
+            else
+            {
+                // if not valid space on grid, reset to inventory
+                heldIngredient = ItemType.Default;
+                heldPosition = Vector3.zero;
             }
         }
 
@@ -794,6 +888,7 @@ public class MagicCraftingManager : MonoBehaviour
         {
             ClearPlacedPieces();
             ClearCauldronGrid();
+            craftingSolved = false;
         }
         GUI.enabled = true;
 
