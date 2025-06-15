@@ -21,6 +21,12 @@ public class MagicCraftingManager : MonoBehaviour
         Exiting         // leaving crafting
     }
 
+    public struct ItemPiece
+    {
+        public ItemType type;
+        public Vector3 pos;
+    }
+
     public LibraryState libraryState;
     public CraftState craftState;
 
@@ -41,7 +47,11 @@ public class MagicCraftingManager : MonoBehaviour
     private int selectedGrimoireRecipe;
 
     private int sizeOfCauldronGrid;
-    private InventoryData cauldronInventory; // holds ingredients for crafting
+    private InventoryData cauldronInventory; // TODO: hold ingredients for crafting
+    private ItemType heldIngredient; // ingredient item currently dragging
+    private Vector3 heldPosition; // viewport position of current ingredient
+    private ItemPiece[] placedIngredients; // to draw placed ingredient pieces on grid
+    private bool[] cauldronGridFilled; // 2 dimensional array (row, col) if spaces taken
     private bool craftingSolved; // has the player solved the crafting puzzle?
 
     private PlayerControlManager pcm;
@@ -79,8 +89,10 @@ public class MagicCraftingManager : MonoBehaviour
             if (selectedGrimoireRecipe == 0)
                 print("a silly use of a variable not implemented yet");
 
+            placedIngredients = new ItemPiece[0];
             // TODO: set this based on player level
             sizeOfCauldronGrid = 4; // testing
+            cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
         }
     }
 
@@ -310,6 +322,99 @@ public class MagicCraftingManager : MonoBehaviour
         }
     }
 
+    void AddPlacedPiece( ItemType type, Vector3 pos )
+    {
+        ItemPiece[] tmp = new ItemPiece[placedIngredients.Length + 1];
+
+        for (int i = 0; i < placedIngredients.Length; i++)
+        {
+            tmp[i] = placedIngredients[i];
+        }
+        tmp[placedIngredients.Length] = new ItemPiece();
+        tmp[placedIngredients.Length].type = type;
+        tmp[placedIngredients.Length].pos = pos;
+
+        placedIngredients = tmp;
+    }
+
+    bool isAmongPlacedPieces( ItemType type )
+    {
+        bool retBool = false;
+
+        for (int i = 0; i < placedIngredients.Length; i++)
+        {
+            if (placedIngredients[i].type == type)
+            {
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    void ClearPlacedPieces()
+    {
+        placedIngredients = new ItemPiece[0];
+    }
+
+    void ConvertViewportSpaceToGrid( Vector3 viewport, out int row, out int col )
+    {
+        int retRow = 0;
+        int retCol = 0;
+
+        // based on sizeOfCauldronGrid and 0.075f * w per square grid space
+        // starting from center of grid at 0.7f * w, 0.45f * h
+        // TODO: ...
+
+        row = retRow;
+        col = retCol;
+    }
+
+    void SetGridSpaceFilled( Vector3 viewport )
+    {
+        int outRow = 0;
+        int outCol = 0;
+        ConvertViewportSpaceToGrid(viewport, out outRow, out outCol);
+        SetGridSpaceFilled(outRow, outCol);
+    }
+
+    void SetGridSpaceFilled( int row, int col )
+    {
+        int resultIndex = row + (col * sizeOfCauldronGrid);
+        cauldronGridFilled[resultIndex] = true;
+    }
+
+    bool IsGridSpaceOpen( Vector3 viewport )
+    {
+        bool retBool = false;
+
+        int outRow = 0;
+        int outCol = 0;
+        ConvertViewportSpaceToGrid(viewport, out outRow, out outCol);
+        IsGridSpaceOpen(outRow, outCol);
+        
+        return retBool;
+    }
+
+    bool IsGridSpaceOpen( int row, int col )
+    {
+        bool retBool = false;
+
+        int gridIndex = row + (col * sizeOfCauldronGrid);
+        retBool = cauldronGridFilled[gridIndex];
+
+        return retBool;
+    }
+
+    void ClearCauldronGrid()
+    {
+        for (int i = 0; i < cauldronGridFilled.Length; i++)
+        {
+            cauldronGridFilled[i] = false;
+        }
+    }
+
     void OnGUI()
     {
         if (!craftingDisplay)
@@ -476,6 +581,18 @@ public class MagicCraftingManager : MonoBehaviour
             }
             GUI.Label(r, s, g);
 
+            Vector3 mouseClickPos = Vector3.zero; // REVIEW: safe?
+            // acquire held item from mouse position and click
+            if (heldIngredient == ItemType.Default && Input.GetMouseButtonDown(0))
+            {
+                mouseClickPos = Input.mousePosition;
+                // convert mouse position pixels to viewport space
+                mouseClickPos.x /= w;
+                mouseClickPos.y /= h;
+                mouseClickPos.y = 1f - mouseClickPos.y; // invert y
+                print("mouse click position is "+mouseClickPos);
+            }
+
             // ingredient inventory display
             r.y += 0.075f * h;
             r.width = 0.075f * w;
@@ -484,15 +601,26 @@ public class MagicCraftingManager : MonoBehaviour
             GUI.color = c;
             for (int i = 0; i < grim.ingredients.Length; i++)
             {
-                c = Color.white; // adjust to gray if missing or empty?
                 // item icon
+                c = Color.white; // adjust to gray if missing or empty?
                 // adjust smaller
                 r.x += 0.005f * w;
                 r.y += 0.005f * w;
                 r.width -= (0.01f * w);
                 r.height -= (0.01f * w);
+                // determine if this icon space contains a 'first press' mouse click
+                if (mouseClickPos != Vector3.zero)
+                {
+                    if (r.Contains(mouseClickPos))
+                        heldIngredient = grim.ingredients[i];
+                }
                 t = alm.itemImages[alm.GetArtData(grim.ingredients[i]).artIndexBase];
-                GUI.DrawTexture(r, t);
+                if (heldIngredient == grim.ingredients[i])
+                    c *= 0.5f; // gray out icon if held and dragging to cauldron
+                GUI.color = c;
+                if (!isAmongPlacedPieces(grim.ingredients[i]))
+                    GUI.DrawTexture(r, t); // skip if ingredient is place in grid
+                c = Color.white;
                 // re-adjust larger
                 r.x -= 0.005f * w;
                 r.y -= 0.005f * w;
@@ -507,6 +635,34 @@ public class MagicCraftingManager : MonoBehaviour
 
             // cauldron image (part of cauldron background)
             // NOTE: this sits middle right, to hold crafting puzzle
+
+            // placed pieces
+            // NOTE: currently (test) simply using the single icon as placed
+            // TODO: revise for shapes made from icon, up to 3x3 block shapes
+            if (placedIngredients != null && placedIngredients.Length > 0)
+            {
+                for (int i = 0; i < placedIngredients.Length; i++)
+                {
+                    // NOTE: no need to use grid spacing, items have saved positions
+                    r.x = placedIngredients[i].pos.x;
+                    r.y = placedIngredients[i].pos.y;
+                    c = Color.white;
+                    // adjust smaller
+                    r.x += 0.005f * w;
+                    r.y += 0.005f * w;
+                    r.width -= (0.01f * w);
+                    r.height -= (0.01f * w);
+                    t = alm.itemImages[alm.GetArtData(placedIngredients[i].type).artIndexBase];
+                    GUI.color = c;
+                    GUI.DrawTexture(r, t);
+                    c = Color.white;
+                    // re-adjust larger
+                    r.x -= 0.005f * w;
+                    r.y -= 0.005f * w;
+                    r.width += (0.01f * w);
+                    r.height += (0.01f * w);
+                }
+            }
 
             // cauldron crafting grid
             // centered at 0.7f * w, 0.45f * h
@@ -531,6 +687,49 @@ public class MagicCraftingManager : MonoBehaviour
                 r.x = savedXPos;
                 r.y += r.width;
             }
+
+            // NOTE: will need to refer to those grid space locations
+
+            // drag and drop item
+            if ( heldIngredient != ItemType.Default )
+            {
+                // get mouse position
+                // TODO: handle gamepad control
+                heldPosition = Input.mousePosition;
+                // convert mouse position pixels to viewport space
+                heldPosition.x /= w;
+                heldPosition.y /= h;
+                heldPosition.y = 1f - heldPosition.y; // invert y
+
+                // clamp held position to cauldron box
+                heldPosition.x = Mathf.Clamp(heldPosition.x, 0.1f, 0.9f);
+                heldPosition.y = Mathf.Clamp(heldPosition.y, 0.05f, 0.85f);
+                heldPosition.z = 0f; // need to use this data?
+
+                r.x = heldPosition.x - (0.075f * w * 0.5f);
+                r.y = heldPosition.y - (0.075f * w * 0.5f);
+                r.width = 0.075f * w;
+                r.height = r.width;
+                c = Color.white;
+                GUI.color = c;
+                GUI.DrawTexture(r, t);
+            }
+        }
+
+        // detect mouse release held item
+        if (heldIngredient != ItemType.Default && Input.GetMouseButtonUp(0))
+        {
+            // determine if placement is valid
+            if (IsGridSpaceOpen(heldPosition))
+            {
+                // add to placed ingredient pieces
+                AddPlacedPiece(heldIngredient, heldPosition);
+                SetGridSpaceFilled(heldPosition); // TODO: revise for arbitrary item shapes
+                // clear held item
+                heldIngredient = ItemType.Default;
+                heldPosition = Vector3.zero; // REVIEW: safe?
+                // TODO: check puzzle solved
+            }
         }
 
         c = Color.white;
@@ -539,10 +738,10 @@ public class MagicCraftingManager : MonoBehaviour
         // cauldron or crafting button
         r.x = 0.15f * w;
         r.y = 0.9f * h;
-        r.width = 0.25f * w;
+        r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
@@ -575,16 +774,36 @@ public class MagicCraftingManager : MonoBehaviour
                 // craftingSolved = false;
             }
         }
+        GUI.enabled = true;
 
+        // reset crafting puzzle button
+        r.x = 0.4f * w;
+        r.y = 0.9f * h;
+        r.width = 0.2f * w;
+        r.height = 0.075f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
+        g.active.textColor = Color.white;
+        s = "RESET PUZZLE";
+
+        if (placedIngredients.Length == 0)
+            GUI.enabled = false;
+        if (GUI.Button(r, s, g))
+        {
+            ClearPlacedPieces();
+            ClearCauldronGrid();
+        }
         GUI.enabled = true;
 
         // cancel / exit crafting button
-        r.x = 0.6f * w;
+        r.x = 0.65f * w;
         r.y = 0.9f * h;
-        r.width = 0.25f * w;
+        r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
+        g.fontSize = Mathf.RoundToInt(16 * (w/1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
