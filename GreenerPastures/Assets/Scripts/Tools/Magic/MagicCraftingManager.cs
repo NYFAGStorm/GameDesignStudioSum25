@@ -15,10 +15,10 @@ public class MagicCraftingManager : MonoBehaviour
 
     public enum CraftState
     {
-        Default,
-        Grimoire,
-        Cauldron,
-        Exiting
+        Default,        // ready to enter crafting
+        Grimoire,       // gazing at the list of recipes in the grimoire
+        Cauldron,       // fixing to mix up a selected spell (craft a charge)
+        Exiting         // leaving crafting
     }
 
     public LibraryState libraryState;
@@ -40,10 +40,14 @@ public class MagicCraftingManager : MonoBehaviour
     private int currentGrimoireEntry;
     private int selectedGrimoireRecipe;
 
+    private int sizeOfCauldronGrid;
+    private InventoryData cauldronInventory; // holds ingredients for crafting
+    private bool craftingSolved; // has the player solved the crafting puzzle?
+
     private PlayerControlManager pcm;
     private PlayerControlManager leaving; // used in deactivation
-    private MagicManager mm; // REVIEW: need this at all here?
     private MultiGamepad padMgr;
+    private ArtLibraryManager alm;
 
     const float LIBRARYSTATETIMERMAX = 1f;
     const float CRAFTSTATETIMERMAX = 1f;
@@ -58,7 +62,13 @@ public class MagicCraftingManager : MonoBehaviour
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if ( padMgr == null )
         {
-            Debug.LogWarning("--- MagicCraftingManager [Start] : no gamepad manager found. will ignore.");
+            Debug.LogWarning("--- MagicCraftingManager [Start] : no gamepad manager found in scene. will ignore.");
+        }
+        alm = GameObject.FindFirstObjectByType<ArtLibraryManager>();
+        if (alm == null)
+        {
+            Debug.LogError("--- MagicCraftingManager [Start] : no art library manager found in scene. aborting.");
+            enabled = false;
         }
         // initialize
         if (enabled)
@@ -68,6 +78,9 @@ public class MagicCraftingManager : MonoBehaviour
             selectedGrimoireRecipe = -1;
             if (selectedGrimoireRecipe == 0)
                 print("a silly use of a variable not implemented yet");
+
+            // TODO: set this based on player level
+            sizeOfCauldronGrid = 4; // testing
         }
     }
 
@@ -104,9 +117,6 @@ public class MagicCraftingManager : MonoBehaviour
                     if (dist < PROXIMITYCHECKRADIUS)
                     {
                         pcm = pcs[i];
-                        mm = pcs[i].gameObject.GetComponent<MagicManager>();
-                        if (mm == null)
-                            Debug.LogWarning("--- MagicCraftingManager [DetectPlayer] : acquired player has no magic manager component. will ignore, will cause errors.");
                         break;
                     }
                 }
@@ -126,7 +136,6 @@ public class MagicCraftingManager : MonoBehaviour
                 {
                     // remain in libraryState until leaving player not detected
                     pcm = null;
-                    mm = null;
                     checkTimer = PLAYERCHECKTIME;
                 }
                 else
@@ -179,7 +188,6 @@ public class MagicCraftingManager : MonoBehaviour
                         {
                             leaving = pcm;
                             pcm = null;
-                            mm = null;
                         }
                         // remain in libraryState until leaving player not detected
                         checkTimer = PLAYERCHECKTIME;
@@ -241,11 +249,9 @@ public class MagicCraftingManager : MonoBehaviour
                         // we should never be here
                         break;
                     case CraftState.Grimoire:
-                        //craftState = CraftState.Cauldron;
                         fadingOverlay = false;
                         break;
                     case CraftState.Cauldron:
-                        //craftState = CraftState.Exiting;
                         fadingOverlay = false;
                         break;
                     case CraftState.Exiting:
@@ -253,6 +259,8 @@ public class MagicCraftingManager : MonoBehaviour
                         craftState = CraftState.Default;
                         craftingDisplay = false;
                         fadingOverlay = false;
+                        currentGrimoireEntry = -1;
+                        selectedGrimoireRecipe = -1;
                         break;
                     default:
                         Debug.LogWarning("--- MagicCraftingManager [RunCraftStateTimer] : craft state undefined. will ignore.");
@@ -283,11 +291,15 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 if (currentGrimoireEntry != -1)
                 {
-                    // TODO: validate all ingredients in inventory
+                    // TODO: validate at least one of all ingredients in inventory
                     // allow player to make selection of recipe to craft in cauldron state
                     if (Input.GetKeyDown(pcm.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
                     {
                         selectedGrimoireRecipe = currentGrimoireEntry;
+                        // transfer all matching ingredients to cauldron inventory
+                        // if ( InventorySystem.StoreItem() )
+                        // ...
+                        // NOTE: if we exit, remaining cauldron inventory must transfer back to player
                     }
                 }
                 break;
@@ -427,11 +439,98 @@ public class MagicCraftingManager : MonoBehaviour
             g = new GUIStyle(GUI.skin.box);
             g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
-            s = "THE CAULRON";
+            s = "THE CAULDRON";
             c = Color.white;
             GUI.color = c;
 
             GUI.Box(r, s, g);
+
+            // spell book image (part of cauldron background)
+            // NOTE: this sits top-left, to receive spell charge
+
+            // grimoire recipe entry
+            GrimioreData grim = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe];
+            r.x = 0.15f * w;
+            r.y = 0.55f * h;
+            r.width = 0.3f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleLeft;
+            g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+            s = grim.name;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+
+            r.y += 0.05f * h;
+            g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+            g.alignment = TextAnchor.MiddleRight;
+            s = "";
+            for (int i = 0; i < grim.ingredients.Length; i++)
+            {
+                s += grim.ingredients[i].ToString();
+                if (i < grim.ingredients.Length - 1)
+                    s += ", ";
+                c = Color.white;
+                GUI.color = c;
+            }
+            GUI.Label(r, s, g);
+
+            // ingredient inventory display
+            r.y += 0.075f * h;
+            r.width = 0.075f * w;
+            r.height = r.width; // square
+            c = Color.white;
+            GUI.color = c;
+            for (int i = 0; i < grim.ingredients.Length; i++)
+            {
+                c = Color.white; // adjust to gray if missing or empty?
+                // item icon
+                // adjust smaller
+                r.x += 0.005f * w;
+                r.y += 0.005f * w;
+                r.width -= (0.01f * w);
+                r.height -= (0.01f * w);
+                t = alm.itemImages[alm.GetArtData(grim.ingredients[i]).artIndexBase];
+                GUI.DrawTexture(r, t);
+                // re-adjust larger
+                r.x -= 0.005f * w;
+                r.y -= 0.005f * w;
+                r.width += (0.01f * w);
+                r.height += (0.01f * w);
+                // inventory slot frame
+                t = (Texture2D)Resources.Load("Plot_Cursor");
+                GUI.color = c;
+                GUI.DrawTexture(r, t);
+                r.x += r.width + (0.01f * w);
+            }
+
+            // cauldron image (part of cauldron background)
+            // NOTE: this sits middle right, to hold crafting puzzle
+
+            // cauldron crafting grid
+            // centered at 0.7f * w, 0.45f * h
+            // each grid space is 0.075f * w squared
+            // no spacing between grid squares
+            // sizeOfCauldronGrid determines starting position
+            // sizeOfCauldronGrid is both vertical and horizontal size (square)
+            r.x = 0.7f * w;
+            r.y = 0.45f * h;
+            r.width = 0.075f * w;
+            r.height = r.width; // square
+            r.x -= ((sizeOfCauldronGrid * r.width) / 2f);
+            r.y -= ((sizeOfCauldronGrid * r.width) / 2f);
+            float savedXPos = r.x;
+            for ( int i=0; i < sizeOfCauldronGrid; i++ )
+            {
+                for ( int n=0; n < sizeOfCauldronGrid; n++ )
+                {
+                    GUI.DrawTexture(r,t);
+                    r.x += r.width;
+                }
+                r.x = savedXPos;
+                r.y += r.width;
+            }
         }
 
         c = Color.white;
@@ -448,12 +547,15 @@ public class MagicCraftingManager : MonoBehaviour
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         if (craftState == CraftState.Grimoire)
-            s = "CRAFTING CAULDRON";
+            s = "TO MAGIC CAULDRON";
         else
             s = "CRAFT SPELL CHARGE";
 
         // TODO: un-comment this and require recipe selection to craft
-        //if (craftState == CraftState.Grimoire && selectedGrimoireRecipe == -1)
+        if (craftState == CraftState.Grimoire && selectedGrimoireRecipe == -1)
+            GUI.enabled = false;
+        // TODO: un-comment this and require crafting is solved
+        //if (craftState == CraftState.Cauldron && !craftingSolved)
         //    GUI.enabled = false;
 
         if (craftState != CraftState.Exiting && GUI.Button(r, s, g))
@@ -467,7 +569,10 @@ public class MagicCraftingManager : MonoBehaviour
             else
             {
                 // add spell charge to spell book (stay in this state)
-                print("add charge to spell book for completed spell craft");
+                string spellName = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].name;
+                print("add '"+spellName+"' charge to spell book for completed spell craft");
+                // REVIEW: how to handle craftingSolved?
+                // craftingSolved = false;
             }
         }
 

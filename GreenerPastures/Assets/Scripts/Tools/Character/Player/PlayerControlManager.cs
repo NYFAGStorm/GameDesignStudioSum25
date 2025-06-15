@@ -118,26 +118,19 @@ public class PlayerControlManager : MonoBehaviour
 
             // temp - player magic
             playerData.magic = MagicSystem.IntializeMagic();
-            /*
-            MagicSystem.AddSpellToGrimoire(SpellType.SpellA, playerData.magic.library);
-            MagicSystem.AddSpellToGrimoire(SpellType.SpellB, playerData.magic.library);
-            MagicSystem.AddSpellToGrimoire(SpellType.SpellC, playerData.magic.library);
+            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SpellA, playerData.magic.library);
+            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SpellB, playerData.magic.library);
             playerData.magic.library.grimiore[0].name = "Fireball";
-            playerData.magic.library.grimiore[0].description = "Conjures a ball of fire to throw at enemies.";
+            playerData.magic.library.grimiore[0].type = SpellType.SpellA; // REVIEW: why this not already in?
+            playerData.magic.library.grimiore[0].description = "Conjures a ball of fire to throw around the world.";
             playerData.magic.library.grimiore[0].ingredients = new ItemType[2];
-            playerData.magic.library.grimiore[0].ingredients[0] = ItemType.Rock;
-            playerData.magic.library.grimiore[0].ingredients[1] = ItemType.Fertilizer;
+            playerData.magic.library.grimiore[0].ingredients[0] = ItemType.Fertilizer;
+            playerData.magic.library.grimiore[0].ingredients[1] = ItemType.Stalk;
             playerData.magic.library.grimiore[1].name = "Healing";
-            playerData.magic.library.grimiore[1].description = "Conjures a ball of fire to throw at enemies.";
+            playerData.magic.library.grimiore[1].description = "Heals friends and foes alike. You're just that nice.";
             playerData.magic.library.grimiore[1].ingredients = new ItemType[2];
             playerData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
             playerData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
-            playerData.magic.library.grimiore[2].name = "Freeze Ray";
-            playerData.magic.library.grimiore[2].description = "Conjures a ball of fire to throw at enemies.";
-            playerData.magic.library.grimiore[2].ingredients = new ItemType[2];
-            playerData.magic.library.grimiore[2].ingredients[0] = ItemType.Plant;
-            playerData.magic.library.grimiore[2].ingredients[1] = ItemType.Stalk;
-            */
         }
     }
 
