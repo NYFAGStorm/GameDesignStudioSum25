@@ -50,6 +50,7 @@ public class MagicCraftingManager : MonoBehaviour
     private InventoryData cauldronInventory; // TODO: hold ingredients for crafting
     private ItemType heldIngredient; // ingredient item currently dragging
     private Vector3 heldPosition; // viewport position of current ingredient
+    private bool[] heldItemShape; // 3x3 grid defining the shape of the held item
     private ItemPiece[] placedIngredients; // to draw placed ingredient pieces on grid
     private bool[] cauldronGridFilled; // 2 dimensional array (row, col) if spaces taken
     private bool craftingSolved; // has the player solved the crafting puzzle?
@@ -98,6 +99,15 @@ public class MagicCraftingManager : MonoBehaviour
             // TODO: set this based on player level
             sizeOfCauldronGrid = 4; // testing
             cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
+
+            heldItemShape = new bool[9]; // 3x3 grid makes a single shape
+            heldItemShape[4] = true; // origin, always on
+            // temp item shape (vertical line 1x3)
+            //heldItemShape[1] = true;
+            heldItemShape[7] = true;
+            // temp item shape (horizontal line 3x1)
+            //heldItemShape[3] = true;
+            heldItemShape[5] = true;
         }
     }
 
@@ -327,7 +337,7 @@ public class MagicCraftingManager : MonoBehaviour
         }
     }
 
-    void AddPlacedPiece( ItemType type, Vector3 pos )
+    void AddPlacedPiece( ItemType type, Vector3 pos, bool centerPiece )
     {
         ItemPiece[] tmp = new ItemPiece[placedIngredients.Length + 1];
 
@@ -337,16 +347,19 @@ public class MagicCraftingManager : MonoBehaviour
         ConvertViewportSpaceToGrid(pos, out oRow, out oCol);
         pos = SnapToGrid(oRow, oCol);
 
-        // add to placed piece array
-        for (int i = 0; i < placedIngredients.Length; i++)
+        if (centerPiece)
         {
-            tmp[i] = placedIngredients[i];
-        }
-        tmp[placedIngredients.Length] = new ItemPiece();
-        tmp[placedIngredients.Length].type = type;
-        tmp[placedIngredients.Length].pos = pos;
+            // add to placed piece array
+            for (int i = 0; i < placedIngredients.Length; i++)
+            {
+                tmp[i] = placedIngredients[i];
+            }
+            tmp[placedIngredients.Length] = new ItemPiece();
+            tmp[placedIngredients.Length].type = type;
+            tmp[placedIngredients.Length].pos = pos;
 
-        placedIngredients = tmp;
+            placedIngredients = tmp;
+        }
     }
 
     Vector3 SnapToGrid( int row, int col )
@@ -698,7 +711,7 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 t = alm.itemImages[alm.GetArtData(grim.ingredients[i]).artIndexBase];
                 if (heldIngredient == grim.ingredients[i])
-                    c *= 0.5f; // gray out icon if held and dragging to cauldron
+                    c *= 0.381f; // gray out icon if held and dragging to cauldron
                 GUI.color = c;
                 if (!isAmongPlacedPieces(grim.ingredients[i]))
                     GUI.DrawTexture(r, t); // skip if ingredient is place in grid
@@ -719,30 +732,47 @@ public class MagicCraftingManager : MonoBehaviour
             // NOTE: this sits middle right, to hold crafting puzzle
 
             // placed pieces
-            // NOTE: currently (test) simply using the single icon as placed
-            // TODO: revise for shapes made from icon, up to 3x3 block shapes
+            // handle arbitrary shapes made from icon, up to 3x3 block shapes
             if (placedIngredients != null && placedIngredients.Length > 0)
             {
                 for (int i = 0; i < placedIngredients.Length; i++)
                 {
-                    // NOTE: no need to use grid spacing, items have saved positions
-                    r.x = placedIngredients[i].pos.x * w;
-                    r.y = placedIngredients[i].pos.y * h;
-                    c = Color.white;
-                    // adjust smaller
-                    r.x += 0.005f * w;
-                    r.y += 0.005f * w;
-                    r.width -= (0.01f * w);
-                    r.height -= (0.01f * w);
-                    t = alm.itemImages[alm.GetArtData(placedIngredients[i].type).artIndexBase];
-                    GUI.color = c;
-                    GUI.DrawTexture(r, t);
-                    c = Color.white;
-                    // re-adjust larger
-                    r.x -= 0.005f * w;
-                    r.y -= 0.005f * w;
-                    r.width += (0.01f * w);
-                    r.height += (0.01f * w);
+                    int offsetX = -1;
+                    int offsetY = -1;
+                    for (int n=0; n<9; n++)
+                    {
+                        if (heldItemShape[n])
+                        {
+                            Vector3 shapePart = placedIngredients[i].pos;
+                            shapePart.x += offsetX * 0.075f;
+                            shapePart.y += offsetY * 0.075f * (w / h);
+
+                            // NOTE: no need to use grid spacing, items have saved positions
+                            r.x = shapePart.x * w;
+                            r.y = shapePart.y * h;
+                            c = Color.white;
+                            // adjust smaller
+                            r.x += 0.005f * w;
+                            r.y += 0.005f * w;
+                            r.width -= (0.01f * w);
+                            r.height -= (0.01f * w);
+                            t = alm.itemImages[alm.GetArtData(placedIngredients[i].type).artIndexBase];
+                            GUI.color = c;
+                            GUI.DrawTexture(r, t);
+                            c = Color.white;
+                            // re-adjust larger
+                            r.x -= 0.005f * w;
+                            r.y -= 0.005f * w;
+                            r.width += (0.01f * w);
+                            r.height += (0.01f * w);
+                        }
+                        offsetX++;
+                        if (offsetX > 1)
+                        {
+                            offsetX = -1;
+                            offsetY++;
+                        }
+                    }
                 }
             }
 
@@ -789,30 +819,117 @@ public class MagicCraftingManager : MonoBehaviour
                 heldPosition.y = Mathf.Clamp(heldPosition.y, 0.05f, 0.85f);
                 heldPosition.z = 0f; // need to use this data?
 
-                r.x = heldPosition.x - (0.075f * 0.5f);
-                r.y = heldPosition.y - (0.075f * 0.5f * (w / h));
-                r.x *= w;
-                r.y *= h;
-                r.width = 0.075f * w;
-                r.height = r.width;
+                // handle multiple squares for shapes (3x3)
+                int shapeX = -1;
+                int shapeY = -1;
+                for ( int i = 0; i < 9; i++ )
+                {
+                    float offsetX = shapeX * 0.075f;
+                    float offsetY = shapeY * 0.075f * (w / h);
+                    if (heldItemShape[i])
+                    {
+                        r.x = heldPosition.x - (0.075f * 0.5f);
+                        r.y = heldPosition.y - (0.075f * 0.5f * (w / h));
+                        r.x += offsetX;
+                        r.y += offsetY;
+                        r.x *= w;
+                        r.y *= h;
+                        r.width = 0.075f * w;
+                        r.height = r.width;
 
-                t = alm.itemImages[alm.GetArtData(heldIngredient).artIndexBase];
-                c = Color.white;
-                GUI.color = c;
+                        // shape background
+                        t = Texture2D.whiteTexture;
+                        c = Color.blue;
+                        c.a = 0.1f;
+                        GUI.color = c;
+                        GUI.DrawTexture(r, t);
 
-                GUI.DrawTexture(r, t);
+                        // item icon
+                        t = alm.itemImages[alm.GetArtData(heldIngredient).artIndexBase];
+                        c = Color.white;
+                        GUI.color = c;
+                        GUI.DrawTexture(r, t);
+                    }
+                    shapeX++;
+                    if (shapeX > 1)
+                    {
+                        shapeX = -1;
+                        shapeY++;
+                    }
+                }
             }
         }
 
         // detect mouse release held item
         if (heldIngredient != ItemType.Default && Input.GetMouseButtonUp(0))
         {
+            // determine if arbitrary item shape is valid on grid at this position
+            bool valid = true;
+            int offsetX = -1;
+            int offsetY = -1;
+            for ( int i = 0; i < 9; i++ )
+            {
+                if (heldItemShape[i])
+                {
+                    Vector3 shapeCheckPos = heldPosition;
+                    shapeCheckPos.x += offsetX * 0.075f;
+                    shapeCheckPos.y += offsetY * 0.075f * (w / h);
+                    if (!IsGridSpaceOpen(shapeCheckPos))
+                    {
+                        valid = false;
+                        break;
+                    }
+
+                }
+                offsetX++;
+                if (offsetX > 1)
+                {
+                    offsetX = -1;
+                    offsetY++;
+                }
+            }
+
+            if (valid)
+            {
+                // add all parts of shape to placed ingredient pieces
+                offsetX = -1;                
+                offsetY = -1;
+                for ( int i = 0; i < 9; i++ )
+                {
+                    if (heldItemShape[i])
+                    {
+                        Vector3 shapeCheckPos = heldPosition;
+                        shapeCheckPos.x += offsetX * 0.075f;
+                        shapeCheckPos.y += offsetY * 0.075f * (w/h);
+                        AddPlacedPiece(heldIngredient, shapeCheckPos, (i == 4));
+                        SetGridSpaceFilled(shapeCheckPos);
+                    }
+                    offsetX++;
+                    if (offsetX > 1)
+                    {
+                        offsetX = -1;
+                        offsetY++;
+                    }
+                }
+                // clear held item
+                heldIngredient = ItemType.Default;
+                heldPosition = Vector3.zero; // REVIEW: safe?
+                // TODO: check puzzle solved (simply, all ingredients used?)
+            }
+            else
+            {
+                // if not valid space on grid, reset to inventory
+                heldIngredient = ItemType.Default;
+                heldPosition = Vector3.zero;
+            }
+
+            /*
             // determine if placement is valid
             if (IsGridSpaceOpen(heldPosition))
             {
                 // add to placed ingredient pieces
                 AddPlacedPiece(heldIngredient, heldPosition);
-                SetGridSpaceFilled(heldPosition); // TODO: revise for arbitrary item shapes
+                SetGridSpaceFilled(heldPosition);
                 // clear held item
                 heldIngredient = ItemType.Default;
                 heldPosition = Vector3.zero; // REVIEW: safe?
@@ -824,6 +941,7 @@ public class MagicCraftingManager : MonoBehaviour
                 heldIngredient = ItemType.Default;
                 heldPosition = Vector3.zero;
             }
+            */
         }
 
         c = Color.white;
