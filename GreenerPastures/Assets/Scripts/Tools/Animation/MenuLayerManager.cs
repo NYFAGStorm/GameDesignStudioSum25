@@ -79,14 +79,14 @@ public class MenuLayerManager : MonoBehaviour
     void OnSceneLoaded(Scene s, LoadSceneMode mode)
     {
         // hide all layers if in game
-        if (s.name == "Proto_GreenerStuff" && previousSceneName == "Menu")
+        if (s.name == "GreenerGame" && previousSceneName == "Menu")
         {
             for (int i=0; i<layers.Length; i++)
             {
                 layers[i].layerObj.SetActive(false);
             }
         }
-        else if (previousSceneName == "Proto_GreenerStuff")
+        else if (previousSceneName == "GreenerGame")
         {
             for (int i = 0; i < layers.Length; i++)
             {
