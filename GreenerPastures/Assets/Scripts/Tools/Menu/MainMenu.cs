@@ -129,7 +129,7 @@ public class MainMenu : MonoBehaviour
             {
                 if (buttons[i].sceneName != "")
                 {
-                    if ((buttons[i].sceneName == "Proto_GreenerStuff"))
+                    if ((buttons[i].sceneName == "GreenerGame"))
                     {
                         // little cinematic menu fun
                         GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 2;

@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Working/Credits.unity
     guid: 8aad4a289a2c6ef49a3c35806cfb642b
   - enabled: 1
-    path: Assets/Scenes/Working/TempGame.unity
+    path: Assets/Scenes/Working/GreenerGame.unity
     guid: fb47e64478fe7d74ca0f50ab91c350d1
   - enabled: 1
     path: Assets/Scenes/Prototype/Glenn/Proto_GreenerStuff.unity
