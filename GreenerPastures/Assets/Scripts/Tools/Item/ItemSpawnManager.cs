@@ -127,7 +127,7 @@ public class ItemSpawnManager : MonoBehaviour
                 else
                 {
                     Vector3 pos = Vector3.Lerp(drops[i].spawnPoint, drops[i].dropTarget, 1f - (drops[i].dropTimer / DROPTIME));
-                    pos.y = dropCurve.Evaluate(1f - (drops[i].dropTimer / DROPTIME)) + VERTICALORIGIN;
+                    pos.y = drops[i].dropTarget.y + dropCurve.Evaluate(1f - (drops[i].dropTimer / DROPTIME)) + VERTICALORIGIN;
                     drops[i].dropItem.transform.position = pos;
                 }
             }
