@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class PlotManager : MonoBehaviour
@@ -469,12 +468,9 @@ public class PlotManager : MonoBehaviour
             Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
         else
             r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
-        // player would collect stalk or full plant as inventory at this point
-        // REVIEW: _only_ collect if plant growth is 100%, otherwise it is lost (*poof*)
-        // maybe 75%-100% you get a plant
-        // maybe 50%-75% you get a stalk
-        // less than 50% you get nothing (*poof*)
-        if (data.plant.growth == 1f)
+        // player would collect stalk or full plant as inventory at this point if growth >50%
+        // stalk if harvested, plant if not (data retains both isHarvested and growth)
+        if (data.plant.growth > 0.5f)
         {
             // check if empty inventory slot availbale on player, drop loose if not
             if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
