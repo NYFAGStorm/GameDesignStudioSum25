@@ -24,7 +24,7 @@ public class CheatManager : MonoBehaviour
     private float codeTimer;
     private int validCode;
 
-    const int TOTALCHEATCODES = 8;
+    const int TOTALCHEATCODES = 9;
     const float CHEATCODEWINDOW = 1f;
 
 
@@ -161,6 +161,10 @@ public class CheatManager : MonoBehaviour
                 n = "gimmieseed";
                 d = "Drops corn seed in front of the player";
                 break;
+            case 8:
+                n = "gimmiegold";
+                d = "Gives 10 gold to the player";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -233,6 +237,10 @@ public class CheatManager : MonoBehaviour
                     seed.inv.items[0].plantIndex = 1;
                     ism.SpawnItem(seed, pos, targ);
                 }
+                break;
+            case 8:
+                PlayerControlManager playerControlMgr = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                playerControlMgr.playerData.gold += 10;
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");
