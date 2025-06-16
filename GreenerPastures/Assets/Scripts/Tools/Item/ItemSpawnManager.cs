@@ -78,6 +78,7 @@ public class ItemSpawnManager : MonoBehaviour
         drops = tmp;
     }
 
+
     void CheckDrops()
     {
         for (int i=0; i<drops.Length; i++)
@@ -232,6 +233,8 @@ public class ItemSpawnManager : MonoBehaviour
             float dist = Vector3.Distance(drops[index].dropTarget, plots[i].gameObject.transform.position);
             if (dist < TARGETDETECTRADIUS && plots[i].data.condition == PlotCondition.Uprooted)
             {
+                if (!plots[i].CanAcceptPlantDrop())
+                    break; // pause timer still running from uprooting this plot
                 // create plant using the seed plant data
                 GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 plantObj.transform.parent = plots[i].gameObject.transform;

@@ -25,6 +25,7 @@ public class PlotManager : MonoBehaviour
     private bool cursorActive;
     private float cursorTimer;
     private float plotTimer;
+    private float uprootedTimer;
 
     private CurrentAction action;
     private bool actionDirty; // complete, not yet cleared
@@ -52,6 +53,7 @@ public class PlotManager : MonoBehaviour
     const float UPROOTWINDOW = 2.5f;
     const float ACTIONCOMPLETEDURATION = 0.5f;
     const float HARVESTDISPLAYDURATION = 1f;
+    const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
 
 
     void Start()
@@ -121,6 +123,23 @@ public class PlotManager : MonoBehaviour
             if ( harvestDisplayTimer < 0f )
                 harvestDisplayTimer = 0f;
         }
+
+        // run uprooted timer
+        if ( uprootedTimer > 0f )
+        {
+            uprootedTimer -= Time.deltaTime;
+            if ( uprootedTimer < 0f )
+                uprootedTimer = 0f;
+        }
+    }
+
+    /// <summary>
+    /// Can this plot accept a plant or stalk drop into the uprooted hole?
+    /// </summary>
+    /// <returns>true if plot can accept, false if pause timer still running</returns>
+    public bool CanAcceptPlantDrop()
+    {
+        return (uprootedTimer == 0f);
     }
 
     void CheckCursor()
@@ -512,6 +531,7 @@ public class PlotManager : MonoBehaviour
         Destroy(plant);
         data.plant = PlantSystem.InitializePlant(PlantType.Default);
         data.condition = PlotCondition.Uprooted;
+        uprootedTimer = UPROOTEDPLOTPAUSE; // disallow plant drop in hole for a short time
     }
 
     void OnGUI()
