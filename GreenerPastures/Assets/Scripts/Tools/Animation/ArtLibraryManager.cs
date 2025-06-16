@@ -5,7 +5,7 @@ public class ArtLibraryManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles multiple libraries of art image arrays, including animation sequences
 
-    // NOTE:
+    // NOTE: 
     // may have multiple data and art arrays per type
     // (bg,char,item,vfx and ui)
     // or by any other category division necessary to maintain images easily
