@@ -948,7 +948,7 @@ MonoBehaviour:
   titleFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
   titleFontSizeAt1024: 80
   startButtonText: START
-  destinationScene: Menu
+  destinationScene: Gustavo_Menu
   startButton:
     serializedVersion: 2
     x: 0.3

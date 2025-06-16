@@ -18,6 +18,7 @@ public class SplashScreen : MonoBehaviour
     public int titleFontSizeAt1024 = 60;
 
     public string startButtonText = "START";
+    public string destinationScene;
     public Rect startButton;
 
     public Font buttonFont;
@@ -45,7 +46,7 @@ public class SplashScreen : MonoBehaviour
     void Update()
     {
         if (splashLaunched)
-            SceneManager.LoadScene("Menu");
+            SceneManager.LoadScene(destinationScene);
 
         // determine ui selection from game pad input
         if (padMgr.gPadDown[0].YaxisL > 0f)
