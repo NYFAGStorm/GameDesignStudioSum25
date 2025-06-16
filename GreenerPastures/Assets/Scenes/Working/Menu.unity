@@ -388,7 +388,7 @@ MonoBehaviour:
       y: 0.3
       width: 0.4
       height: 0.09
-    sceneName: Proto_GreenerStuff
+    sceneName: GreenerGame
   - buttonText: Credits
     buttonPos:
       serializedVersion: 2
