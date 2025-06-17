@@ -1,8 +1,7 @@
 # GameDesignStudioSum25
 New York Film Academy - Burbank CA - 3D Game Design Studio - Summer 2025
 
-### NOTE: make public if ppl have problem cloning repo
-
+### NOTE for next semester: make public if ppl have problem cloning repo
 
 ## First Thing : Generate an Access Token for this Repository to last all semester
 
