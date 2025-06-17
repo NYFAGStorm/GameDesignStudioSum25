@@ -5,6 +5,8 @@ public class MagicManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles a player's use of their spell book
 
+    // TODO: integrate additional mode before casting to select spell charge from spell book
+
     // casting routine includes:
     // suspend movement and actions from player
     // enable display player controls for casting routine
