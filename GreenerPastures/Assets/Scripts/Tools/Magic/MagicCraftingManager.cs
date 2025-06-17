@@ -70,10 +70,10 @@ public class MagicCraftingManager : MonoBehaviour
 
     private MultiGamepad padMgr;
     // a button down to turn on padDragOn, with padDragOn true detect a button unpressed to turn off
-    //private int padItemSelection = -1;
-    //private bool padDragOn; // is the player currently dragging an ingredient item?
-    //private Vector3 padDragPos;
-    //private float padDragSpeed = 0.1f;
+    private int padItemSelection = -1;
+    private bool padDragOn; // is the player currently dragging an item with gamepad?
+    private Vector3 padDragPos; // viewport space of held item
+    private float padDragSpeed = 0.381f;
 
     const float LIBRARYSTATETIMERMAX = 1f;
     const float CRAFTSTATETIMERMAX = 1f;
@@ -227,6 +227,7 @@ public class MagicCraftingManager : MonoBehaviour
                 {
                     // engage with player, activate library
                     pcm.characterFrozen = true;
+                    pcm.freezeCharacterActions = true;
                     pcm.hidePlayerHUD = true;
                     libraryState = LibraryState.Activating;
                     libraryStateTimer = LIBRARYSTATETIMERMAX;
@@ -272,6 +273,7 @@ public class MagicCraftingManager : MonoBehaviour
                         break;
                     case LibraryState.Active:
                         pcm.characterFrozen = false;
+                        pcm.freezeCharacterActions = false;
                         pcm.hidePlayerHUD = false;
                         libraryState = LibraryState.Deactivating;
                         libraryStateTimer = LIBRARYSTATETIMERMAX;
@@ -402,12 +404,61 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 break;
             case CraftState.Cauldron:
-                if (padMgr != null)
+                if (padMgr != null && padMgr.gamepads[0].isActive)
                 {
+                    GrimioreData grim = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe];
                     // cauldron craft puzzle control via gamepad
-                    // NOTE: this cannot include button navigation control at bottom
-                    // use only for drag-and-drop of items (a button hold and release)
                     // shoulder buttons to select ingredient inventory
+                    if (padMgr.gPadDown[0].LBump)
+                    {
+                        padItemSelection--;
+                        if (padItemSelection < 0)
+                            padItemSelection = grim.ingredients.Length - 1;
+                    }
+                    if (padMgr.gPadDown[0].RBump)
+                    {
+                        padItemSelection++;
+                        if (padItemSelection > grim.ingredients.Length - 1)
+                            padItemSelection = 0;
+                    }
+                    padItemSelection = Mathf.Clamp(padItemSelection,0, grim.ingredients.Length - 1);
+                    // use only for drag-and-drop of items (a button hold and release)
+                    if (!padDragOn && 
+                        !isAmongPlacedPieces(grim.ingredients[padItemSelection]) &&
+                        padMgr.gPadDown[0].aButton)
+                    {
+                        padDragOn = true;
+                        heldIngredient = grim.ingredients[padItemSelection];
+                        heldItemShape = shapeLibrary[(int)heldIngredient].pieces;
+                        // set padDragPos to center of this inventory space
+                        padDragPos = Vector3.zero;
+                        padDragPos.x = 0.15f + (padItemSelection * 0.075f);
+                        padDragPos.y = 0.675f;
+                        padDragPos.x += (0.075f * 0.5f);
+                        padDragPos.y += 0.075f;
+                    }
+                    // handle dragging, clamp to bounds of cauldron box
+                    if (!padDragOn)
+                        break;
+                    if (padMgr.gamepads[0].YaxisL > 0f)
+                    {
+                        padDragPos.y -= Time.deltaTime * padDragSpeed;
+                    }
+                    else if (padMgr.gamepads[0].YaxisL < 0f)
+                    {
+                        padDragPos.y += Time.deltaTime * padDragSpeed;
+                    }
+                    padDragPos.y = Mathf.Clamp(padDragPos.y,0.05f,0.85f);
+                    if (padMgr.gamepads[0].XaxisL < 0f)
+                    {
+                        padDragPos.x -= Time.deltaTime * padDragSpeed;
+                    }
+                    else if (padMgr.gamepads[0].XaxisL > 0f)
+                    {
+                        padDragPos.x += Time.deltaTime * padDragSpeed;
+                    }
+                    padDragPos.x = Mathf.Clamp(padDragPos.x, 0.1f, 0.9f);
+                    // handle drop in OnGUI
                 }
                 break;
             case CraftState.Exiting:
@@ -514,8 +565,8 @@ public class MagicCraftingManager : MonoBehaviour
         int sizeOfInv = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients.Length;
 
         float ratioToX = ((float)Screen.width / (float)Screen.height);
-        float leftX = 0.15f; // - ((sizeOfInv * 0.075f) / 2f);
-        float topY = 0.675f; // - ((sizeOfInv * 0.075f * ratioToX) / 2f);
+        float leftX = 0.15f;
+        float topY = 0.675f;
 
         float floatCol = Mathf.RoundToInt(((viewport.x - leftX) / 0.075f) - 0.5f);
         // off inventory invalidation
@@ -862,10 +913,14 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 // inventory slot frame
                 t = (Texture2D)Resources.Load("Plot_Cursor");
+                if (padMgr != null && padMgr.gamepads[0].isActive 
+                    && padItemSelection == i)
+                    c = Color.yellow;
                 GUI.color = c;
                 GUI.DrawTexture(r, t);
                 r.x += r.width;
             }
+            GUI.color = Color.white;
 
             // cauldron image (part of cauldron background)
             // NOTE: this sits middle right, to hold crafting puzzle
@@ -941,23 +996,28 @@ public class MagicCraftingManager : MonoBehaviour
                 r.y += r.width;
             }
 
-            // NOTE: will need to refer to those grid space locations
-
             // drag and drop item
             if ( heldIngredient != ItemType.Default )
             {
-                // get mouse position
-                // TODO: handle gamepad control
-                heldPosition = Input.mousePosition;
-                // convert mouse position pixels to viewport space
-                heldPosition.x /= w;
-                heldPosition.y /= h;
-                heldPosition.y = 1f - heldPosition.y; // invert y
+                if ( padMgr == null || !padMgr.gamepads[0].isActive )
+                {
+                    // get mouse position
+                    heldPosition = Input.mousePosition;
+                    // convert mouse position pixels to viewport space
+                    heldPosition.x /= w;
+                    heldPosition.y /= h;
+                    heldPosition.y = 1f - heldPosition.y; // invert y
 
-                // clamp held position to cauldron box
-                heldPosition.x = Mathf.Clamp(heldPosition.x, 0.1f, 0.9f);
-                heldPosition.y = Mathf.Clamp(heldPosition.y, 0.05f, 0.85f);
-                heldPosition.z = 0f; // need to use this data?
+                    // clamp held position to cauldron box
+                    heldPosition.x = Mathf.Clamp(heldPosition.x, 0.1f, 0.9f);
+                    heldPosition.y = Mathf.Clamp(heldPosition.y, 0.05f, 0.85f);
+                    heldPosition.z = 0f; // need to use this data?
+                }
+                else
+                {
+                    // handle gamepad drag control
+                    heldPosition = padDragPos;
+                }
 
                 // handle multiple squares for shapes (3x3)
                 int shapeX = -1;
@@ -1000,8 +1060,10 @@ public class MagicCraftingManager : MonoBehaviour
             }
         }
 
-        // detect mouse release held item
-        if (heldIngredient != ItemType.Default && Input.GetMouseButtonUp(0))
+        // detect mouse release held item or gamepad a button release
+        if (heldIngredient != ItemType.Default && (
+            ( (padMgr == null || !padMgr.gamepads[0].isActive) && Input.GetMouseButtonUp(0) ) || 
+            ( padMgr != null && padMgr.gamepads[0].isActive && !padMgr.gamepads[0].aButton ) ) )
         {
             // determine if arbitrary item shape is valid on grid at this position
             bool valid = true;
@@ -1019,7 +1081,6 @@ public class MagicCraftingManager : MonoBehaviour
                         valid = false;
                         break;
                     }
-
                 }
                 offsetX++;
                 if (offsetX > 1)
@@ -1055,6 +1116,9 @@ public class MagicCraftingManager : MonoBehaviour
                 heldIngredient = ItemType.Default;
                 heldPosition = Vector3.zero;
                 heldItemShape = new bool[9];
+                // handle gamepad control
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    padDragOn = false;
 
                 // check puzzle solved
                 craftingSolved = CheckPuzzleSolved();
@@ -1065,6 +1129,9 @@ public class MagicCraftingManager : MonoBehaviour
                 heldIngredient = ItemType.Default;
                 heldPosition = Vector3.zero;
                 heldItemShape = new bool[9];
+                // handle gamepad control
+                if ( padMgr != null && padMgr.gamepads[0].isActive )
+                    padDragOn = false;
             }
         }
 
@@ -1077,8 +1144,8 @@ public class MagicCraftingManager : MonoBehaviour
         r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        if ( padMgr != null )
-            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        if ( padMgr != null && padMgr.gamepads[0].isActive )
+            g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
         else
             g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
@@ -1088,7 +1155,7 @@ public class MagicCraftingManager : MonoBehaviour
             s = "TO MAGIC CAULDRON";
         else
             s = "CRAFT SPELL CHARGE";
-        if (padMgr != null)
+        if (padMgr != null && padMgr.gamepads[0].isActive)
             s += "\n[START BUTTON]";
 
         // require recipe selection to craft
@@ -1099,7 +1166,9 @@ public class MagicCraftingManager : MonoBehaviour
             GUI.enabled = false;
 
         if (craftState != CraftState.Exiting && 
-            (GUI.Button(r, s, g) || (GUI.enabled && padMgr != null && padMgr.gPadDown[0].startButton)))
+            (GUI.Button(r, s, g) || 
+            (GUI.enabled && padMgr != null && padMgr.gamepads[0].isActive && 
+                padMgr.gPadDown[0].startButton)))
         {
             if (craftState == CraftState.Grimoire)
             {
@@ -1140,21 +1209,23 @@ public class MagicCraftingManager : MonoBehaviour
         r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        if ( padMgr != null )
-            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        if ( padMgr != null && padMgr.gamepads[0].isActive )
+            g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
         else
             g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         s = "RESET PUZZLE";
-        if ( padMgr != null )
+        if ( padMgr != null && padMgr.gamepads[0].isActive )
             s += "\n[X BUTTON]";
 
         if (placedIngredients.Length == 0)
             GUI.enabled = false;
         if (craftState == CraftState.Cauldron && 
-            (GUI.Button(r, s, g) || (GUI.enabled && padMgr != null && padMgr.gPadDown[0].xButton)))
+            (GUI.Button(r, s, g) || 
+            (GUI.enabled && padMgr != null && padMgr.gamepads[0].isActive && 
+                padMgr.gPadDown[0].xButton)))
         {
             heldIngredient = ItemType.Default;
             heldPosition = Vector3.zero;
@@ -1171,18 +1242,20 @@ public class MagicCraftingManager : MonoBehaviour
         r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        if ( padMgr != null )
-            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        if ( padMgr != null && padMgr.gamepads[0].isActive )
+            g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
         else
             g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         s = "EXIT CRAFTING";
-        if ( padMgr != null )
+        if ( padMgr != null && padMgr.gamepads[0].isActive )
             s += "\n[BACK BUTTON]";
 
-        if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gPadDown[0].backButton))
+        if (GUI.Button(r, s, g) || 
+            (padMgr != null && padMgr.gamepads[0].isActive && 
+                padMgr.gPadDown[0].backButton))
         {
             craftState = CraftState.Exiting;
             craftStateTimer = CRAFTSTATETIMERMAX;

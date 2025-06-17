@@ -49,8 +49,9 @@ public class PlayerControlManager : MonoBehaviour
     public KeyCode lBumpKey = KeyCode.LeftBracket;
     public KeyCode rBumpKey = KeyCode.RightBracket;
 
-    public bool characterFrozen;
-    public bool hidePlayerHUD;
+    public bool characterFrozen; // prevent movement controls
+    public bool freezeCharacterActions; // prevent use of action controls
+    public bool hidePlayerHUD; // prevent normal player HUD display
 
     private Vector3 characterMove;
     private LooseItemManager activeItem;
@@ -136,13 +137,16 @@ public class PlayerControlManager : MonoBehaviour
 
     void Update()
     {
-        // check action input
-        ReadActionInput();
+        if (!freezeCharacterActions)
+        {
+            // check action input
+            ReadActionInput();
 
-        // detect inventory selection input
-        DetectInventorySelectionInput();
-        // check inventory selection drop
-        CheckInventorySelectionDrop();
+            // detect inventory selection input
+            DetectInventorySelectionInput();
+            // check inventory selection drop
+            CheckInventorySelectionDrop();
+        }
 
         if (characterFrozen)
             return;
