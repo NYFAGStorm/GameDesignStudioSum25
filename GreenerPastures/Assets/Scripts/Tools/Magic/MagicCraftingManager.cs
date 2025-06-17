@@ -1,3 +1,4 @@
+using System.Buffers.Text;
 using UnityEngine;
 
 public class MagicCraftingManager : MonoBehaviour
@@ -52,7 +53,7 @@ public class MagicCraftingManager : MonoBehaviour
     private bool currentEntryValid; // player has all ingredients in inventory
     private int selectedGrimoireRecipe;
 
-    private int sizeOfCauldronGrid;
+    private int sizeOfCauldronGrid; // set this based on player level (max 5)
     private ItemType heldIngredient; // ingredient item currently dragging
     private Vector3 heldPosition; // viewport position of current ingredient
     private bool[] heldItemShape; // 3x3 grid defining the shape of the held item
@@ -99,16 +100,6 @@ public class MagicCraftingManager : MonoBehaviour
             selectedGrimoireRecipe = -1;
 
             placedIngredients = new ItemPiece[0];
-
-            // TODO: cleanup
-            if (selectedGrimoireRecipe == 0)
-                print("a silly use of a variable not implemented yet");
-            if (craftingSolved)
-                print("a silly use of a variable not implemented yet");
-
-            // TODO: set this based on player level
-            sizeOfCauldronGrid = 3; // testing
-            cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
 
             // to be set based on item shape data
             heldItemShape = new bool[9]; // 3x3 grid makes a single shape
@@ -227,6 +218,11 @@ public class MagicCraftingManager : MonoBehaviour
                     pcm.hidePlayerHUD = true;
                     libraryState = LibraryState.Activating;
                     libraryStateTimer = LIBRARYSTATETIMERMAX;
+                    // configure cauldron grid size
+                    // REVIEW: based on player level (start 2x2, goes up one per 10 levels?)
+                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((float)pcm.playerData.level / 10f);
+                    sizeOfCauldronGrid = Mathf.Clamp(sizeOfCauldronGrid, 2, 5);
+                    cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
                 }
             }
         }

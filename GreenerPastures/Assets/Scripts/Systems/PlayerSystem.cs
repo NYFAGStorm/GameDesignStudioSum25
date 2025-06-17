@@ -18,6 +18,7 @@ public static class PlayerSystem
         retPlayer.stats = new PlayerStats();
         retPlayer.profile = ProfileSystem.InitializeProfile(user, pass);
         retPlayer.farm = FarmSystem.InitializeFarm();
+        retPlayer.gold = 50; // starting gold is 50
         retPlayer.inventory = new InventoryData();
         retPlayer.magic = MagicSystem.IntializeMagic();
         retPlayer.effects = new PlayerEffects[0];
