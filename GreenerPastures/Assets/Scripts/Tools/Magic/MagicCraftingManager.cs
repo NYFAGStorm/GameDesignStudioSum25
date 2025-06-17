@@ -1,4 +1,3 @@
-using System.Buffers.Text;
 using UnityEngine;
 
 public class MagicCraftingManager : MonoBehaviour
@@ -66,8 +65,15 @@ public class MagicCraftingManager : MonoBehaviour
 
     private PlayerControlManager pcm;
     private PlayerControlManager leaving; // used in deactivation
-    private MultiGamepad padMgr;
     private ArtLibraryManager alm;
+    private QuitOnEscape qoe; // disable to suspend use of start button during crafting
+
+    private MultiGamepad padMgr;
+    // a button down to turn on padDragOn, with padDragOn true detect a button unpressed to turn off
+    //private int padItemSelection = -1;
+    //private bool padDragOn; // is the player currently dragging an ingredient item?
+    //private Vector3 padDragPos;
+    //private float padDragSpeed = 0.1f;
 
     const float LIBRARYSTATETIMERMAX = 1f;
     const float CRAFTSTATETIMERMAX = 1f;
@@ -90,6 +96,12 @@ public class MagicCraftingManager : MonoBehaviour
         if (alm == null)
         {
             Debug.LogError("--- MagicCraftingManager [Start] : no art library manager found in scene. aborting.");
+            enabled = false;
+        }
+        qoe = GameObject.FindAnyObjectByType<QuitOnEscape>();
+        if ( qoe == null )
+        {
+            Debug.LogError("--- MagicCraftingManager [Start] : no quit on escape found in scene. aborting.");
             enabled = false;
         }
         // initialize
@@ -220,8 +232,10 @@ public class MagicCraftingManager : MonoBehaviour
                     libraryStateTimer = LIBRARYSTATETIMERMAX;
                     // configure cauldron grid size
                     // REVIEW: based on player level (start 2x2, goes up one per 10 levels?)
-                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((float)pcm.playerData.level / 10f);
+                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((pcm.playerData.level / 10f) - .5f);
                     sizeOfCauldronGrid = Mathf.Clamp(sizeOfCauldronGrid, 2, 5);
+                    // TODO: remove this temp testing
+                    sizeOfCauldronGrid = 3;
                     cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
                 }
             }
@@ -254,6 +268,7 @@ public class MagicCraftingManager : MonoBehaviour
                         craftState = CraftState.Grimoire;
                         craftStateTimer = CRAFTSTATETIMERMAX;
                         fadingOverlay = true;
+                        qoe.enabled = false;
                         break;
                     case LibraryState.Active:
                         pcm.characterFrozen = false;
@@ -270,6 +285,7 @@ public class MagicCraftingManager : MonoBehaviour
                         // remain in libraryState until leaving player not detected
                         checkTimer = PLAYERCHECKTIME;
                         libraryStateTimer = LIBRARYSTATETIMERMAX;
+                        qoe.enabled = true;
                         break;
                     default:
                         Debug.LogWarning("--- MagicCraftingManager [HandleLibraryStates] : library libraryState undefined. will ignore.");
@@ -358,7 +374,8 @@ public class MagicCraftingManager : MonoBehaviour
                 // we should never be here
                 break;
             case CraftState.Grimoire:
-                if ( pcm.playerData.magic.library.grimiore.Length > 0 )
+                if ( pcm.playerData.magic.library.grimiore.Length > 0 && 
+                    selectedGrimoireRecipe == -1)
                 {
                     // allow player to change current recipe entry from grimoire listing
                     if (Input.GetKeyDown(pcm.upKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL > 0f))
@@ -377,8 +394,21 @@ public class MagicCraftingManager : MonoBehaviour
                     if (Input.GetKeyDown(pcm.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
                         selectedGrimoireRecipe = currentGrimoireEntry;
                 }
+                if (selectedGrimoireRecipe != -1)
+                {
+                    // allow player to cancel selection of recipe
+                    if (Input.GetKeyDown(pcm.actionBKey) || (padMgr != null && padMgr.gPadDown[0].bButton))
+                        selectedGrimoireRecipe = -1;
+                }
                 break;
             case CraftState.Cauldron:
+                if (padMgr != null)
+                {
+                    // cauldron craft puzzle control via gamepad
+                    // NOTE: this cannot include button navigation control at bottom
+                    // use only for drag-and-drop of items (a button hold and release)
+                    // shoulder buttons to select ingredient inventory
+                }
                 break;
             case CraftState.Exiting:
                 break;
@@ -687,11 +717,18 @@ public class MagicCraftingManager : MonoBehaviour
                 g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
                 for ( int i = 0; i < pcm.playerData.magic.library.grimiore.Length; i++ )
                 {
-                    c = Color.white;
+                    c = Color.gray;
                     if (i == currentGrimoireEntry)
-                        c = Color.yellow;
+                        c = Color.white;
                     if (i == currentGrimoireEntry && !currentEntryValid)
                         c = Color.black; // invalid due to lack of ingredients in inventory
+                    if (i == selectedGrimoireRecipe)
+                    {
+                        // recipe selected, may toggle un-select with a button press
+                        c = Color.blue;
+                        c.r = 0.2f;
+                        c.g = 0.2f;
+                    }
                     GUI.color = c;
                     GrimioreData grim = pcm.playerData.magic.library.grimiore[i];
                     // spell name
@@ -798,8 +835,8 @@ public class MagicCraftingManager : MonoBehaviour
                 if (currentEntryValid)
                 {
                     // item icon
-                    c = Color.white; // adjust to gray if missing or empty?
-                                     // adjust smaller
+                    c = Color.white;
+                    // adjust smaller
                     r.x += 0.005f * w;
                     r.y += 0.005f * w;
                     r.width -= (0.01f * w);
@@ -1040,7 +1077,10 @@ public class MagicCraftingManager : MonoBehaviour
         r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        if ( padMgr != null )
+            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        else
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
@@ -1048,6 +1088,8 @@ public class MagicCraftingManager : MonoBehaviour
             s = "TO MAGIC CAULDRON";
         else
             s = "CRAFT SPELL CHARGE";
+        if (padMgr != null)
+            s += "\n[START BUTTON]";
 
         // require recipe selection to craft
         if (craftState == CraftState.Grimoire && selectedGrimoireRecipe == -1)
@@ -1056,7 +1098,8 @@ public class MagicCraftingManager : MonoBehaviour
         if (craftState == CraftState.Cauldron && !craftingSolved)
             GUI.enabled = false;
 
-        if (craftState != CraftState.Exiting && GUI.Button(r, s, g))
+        if (craftState != CraftState.Exiting && 
+            (GUI.Button(r, s, g) || (GUI.enabled && padMgr != null && padMgr.gPadDown[0].startButton)))
         {
             if (craftState == CraftState.Grimoire)
             {
@@ -1088,6 +1131,9 @@ public class MagicCraftingManager : MonoBehaviour
                     craftingSolved = false; // disallow another spell charge
                 }
             }
+            // ask quit on escape to consume START BUTTON input and skip quit popup
+            QuitOnEscape qOE = GameObject.FindAnyObjectByType<QuitOnEscape>();
+            qOE.AbandonQuit();
         }
         GUI.enabled = true;
 
@@ -1097,15 +1143,21 @@ public class MagicCraftingManager : MonoBehaviour
         r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        if ( padMgr != null )
+            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        else
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         s = "RESET PUZZLE";
+        if ( padMgr != null )
+            s += "\n[X BUTTON]";
 
         if (placedIngredients.Length == 0)
             GUI.enabled = false;
-        if (GUI.Button(r, s, g))
+        if (craftState == CraftState.Cauldron && 
+            (GUI.Button(r, s, g) || (GUI.enabled && padMgr != null && padMgr.gPadDown[0].xButton)))
         {
             heldIngredient = ItemType.Default;
             heldPosition = Vector3.zero;
@@ -1122,13 +1174,18 @@ public class MagicCraftingManager : MonoBehaviour
         r.width = 0.2f * w;
         r.height = 0.075f * h;
         g = new GUIStyle(GUI.skin.button);
-        g.fontSize = Mathf.RoundToInt(16 * (w/1024f));
+        if ( padMgr != null )
+            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        else
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         s = "EXIT CRAFTING";
+        if ( padMgr != null )
+            s += "\n[BACK BUTTON]";
 
-        if (GUI.Button(r, s, g))
+        if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gPadDown[0].backButton))
         {
             craftState = CraftState.Exiting;
             craftStateTimer = CRAFTSTATETIMERMAX;
