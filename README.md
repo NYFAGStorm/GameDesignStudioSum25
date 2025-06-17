@@ -26,4 +26,4 @@ Start again with step 1 if you've come back to work after a length of time, to e
 
 You Got This!
 
-# NOTE for next semester: make public if ppl have problem cloning repo
+#### NOTE for next semester: make public if ppl have problem cloning repo
