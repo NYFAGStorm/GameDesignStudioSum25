@@ -1131,9 +1131,6 @@ public class MagicCraftingManager : MonoBehaviour
                     craftingSolved = false; // disallow another spell charge
                 }
             }
-            // ask quit on escape to consume START BUTTON input and skip quit popup
-            QuitOnEscape qOE = GameObject.FindAnyObjectByType<QuitOnEscape>();
-            qOE.AbandonQuit();
         }
         GUI.enabled = true;
 
