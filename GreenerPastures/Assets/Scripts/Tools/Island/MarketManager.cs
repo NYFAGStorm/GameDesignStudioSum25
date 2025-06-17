@@ -32,7 +32,7 @@ public class MarketManager : MonoBehaviour
     private CustomerMode customerMode;
     private float rejectFlashTimer;
     private Vector3 purchaseOffset = new Vector3(-1f,0f,0f);
-    // TODO: apply a profit margin difference when player sells an item (less value)
+    // REVIEW: apply a profit margin difference when player sells an item (less value)
     // temp - for now, just minus one gold when selling items to market
 
     const float PLAYERCHECKTIME = 1f;
@@ -52,6 +52,8 @@ public class MarketManager : MonoBehaviour
             InitializeMenu();
             playerCheckTimer = PLAYERCHECKTIME;
             marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
         }
     }
 
@@ -116,24 +118,32 @@ public class MarketManager : MonoBehaviour
             currentCustomer.characterFrozen = true;
             menuItemSelection = 0;
             marketInstructions = "MARKET [BUY MODE]\nE=BUY V=EXIT";
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                marketInstructions = "MARKET [BUY MODE]\nA=BUY Y=EXIT";
             return; // consume input, do not allow purchase with current actionA signal
         }
         if (customerMode == CustomerMode.Buy)
         {
             // allow player to select item on menu
-            if (Input.GetKeyDown(currentCustomer.upKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL > 0f))
+            if (Input.GetKeyDown(currentCustomer.upKey) || 
+                (padMgr != null && padMgr.gamepads[0].isActive &&
+                    padMgr.gPadDown[0].YaxisL > 0f))
             {
                 menuItemSelection--;
                 rejectFlashTimer = 0f;
             }
-            if (Input.GetKeyDown(currentCustomer.downKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL < 0f))
+            if (Input.GetKeyDown(currentCustomer.downKey) || 
+                (padMgr != null && padMgr.gamepads[0].isActive && 
+                    padMgr.gPadDown[0].YaxisL < 0f))
             {
                 menuItemSelection++;
                 rejectFlashTimer = 0f;
             }
             menuItemSelection = Mathf.Clamp(menuItemSelection, 0, menuItems.Length - 1);
             // allow player to buy item
-            if (Input.GetKeyDown(currentCustomer.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
+            if (Input.GetKeyDown(currentCustomer.actionAKey) || 
+                (padMgr != null && padMgr.gamepads[0].isActive && 
+                    padMgr.gPadDown[0].aButton))
             {
                 if (menuItems[menuItemSelection].itemValue <= currentCustomer.playerData.gold)
                 {
@@ -178,12 +188,16 @@ public class MarketManager : MonoBehaviour
                     rejectFlashTimer = REJECTFLASHTIME;
             }
             // allow customer to exit buy mode
-            if (Input.GetKeyDown(currentCustomer.actionDKey) || (padMgr != null && padMgr.gPadDown[0].yButton))
+            if (Input.GetKeyDown(currentCustomer.actionDKey) || 
+                (padMgr != null && padMgr.gamepads[0].isActive && 
+                    padMgr.gPadDown[0].yButton))
             {
                 customerMode = CustomerMode.Default;
                 currentCustomer.characterFrozen = false;
                 menuItemSelection = -1;
                 marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
             }
         }
     }
@@ -196,12 +210,16 @@ public class MarketManager : MonoBehaviour
             currentCustomer.characterFrozen = true;
             menuItemSelection = -1;
             marketInstructions = "MARKET [SELL MODE]\nE=SELL V=EXIT";
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                marketInstructions = "MARKET [SELL MODE]\nA=SELL Y=EXIT";
             return; // consume input of actionB signal
         }
         if (customerMode == CustomerMode.Sell)
         {
             // allow customer to sell selected item
-            if (Input.GetKeyDown(currentCustomer.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
+            if (Input.GetKeyDown(currentCustomer.actionAKey) || 
+                (padMgr != null && padMgr.gamepads[0].isActive && 
+                    padMgr.gPadDown[0].aButton))
             {
                 ItemData iData = currentCustomer.GetPlayerCurrentItemSelection();
                 // cannot sell fertilizer (or 'default' type item)
@@ -229,12 +247,16 @@ public class MarketManager : MonoBehaviour
                 }
             }
             // allow customer to exit sell mode
-            if (Input.GetKeyDown(currentCustomer.actionDKey) || (padMgr != null && padMgr.gPadDown[0].yButton))
+            if (Input.GetKeyDown(currentCustomer.actionDKey) || 
+                (padMgr != null && padMgr.gamepads[0].isActive && 
+                    padMgr.gPadDown[0].yButton))
             {
                 customerMode = CustomerMode.Default;
                 currentCustomer.characterFrozen = false;
                 menuItemSelection = -1;
                 marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
             }
         }
     }
