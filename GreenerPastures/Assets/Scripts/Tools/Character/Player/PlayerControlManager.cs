@@ -36,6 +36,7 @@ public class PlayerControlManager : MonoBehaviour
         public bool lBumpDown;
         public bool rBump;
         public bool rBumpDown;
+        public bool castMagic; // REVIEW: what gamepad control?
     }
 
     public KeyCode upKey = KeyCode.W;
@@ -48,6 +49,7 @@ public class PlayerControlManager : MonoBehaviour
     public KeyCode actionDKey = KeyCode.V;
     public KeyCode lBumpKey = KeyCode.LeftBracket;
     public KeyCode rBumpKey = KeyCode.RightBracket;
+    public KeyCode castKey = KeyCode.Q;
 
     public bool characterFrozen; // prevent movement controls
     public bool freezeCharacterActions; // prevent use of action controls
@@ -65,6 +67,7 @@ public class PlayerControlManager : MonoBehaviour
 
     private CameraManager cam;
     private PlayerAnimManager pam;
+    private MagicManager mm;
     private ArtLibraryManager alm;
     private TimeManager tim;
 
@@ -92,16 +95,22 @@ public class PlayerControlManager : MonoBehaviour
             Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no player anim manager found in children. aborting.");
             enabled = false;
         }
+        mm = gameObject.GetComponent<MagicManager>();
+        if ( mm == null )
+        {
+            Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no magic manager found on player object. aborting.");
+            enabled = false;
+        }
         alm = GameObject.FindFirstObjectByType<ArtLibraryManager>();
         if (alm == null)
         {
-            Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no art library manager found. aborting.");
+            Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no art library manager found in scene. aborting.");
             enabled = false;
         }
         tim = GameObject.FindAnyObjectByType<TimeManager>();
         if (tim == null)
         {
-            Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no time manager found. aborting.");
+            Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no time manager found in scene. aborting.");
             enabled = false;
         }
         // initialize
@@ -213,6 +222,13 @@ public class PlayerControlManager : MonoBehaviour
             if (!characterActions.actionA && !characterActions.actionB &&
                 !characterActions.actionC && !characterActions.actionD)
                 activePlot.ActionClear();
+        }
+
+        // REVIEW: cast magic is last considered?
+        if (characterActions.castMagic)
+        {
+            if (!mm.EnterSpellCastMode())
+                Debug.LogWarning("--- PlayerControlManager [Update] : unable to enter spell cast mode without spell charges. will ignore.");
         }
     }
     
@@ -395,6 +411,8 @@ public class PlayerControlManager : MonoBehaviour
         characterActions.lBumpDown = Input.GetKeyDown(lBumpKey);
         characterActions.rBump = Input.GetKey(rBumpKey);
         characterActions.rBumpDown = Input.GetKeyDown(rBumpKey);
+        // REVIEW: no need for hold control of cast magic
+        characterActions.castMagic = Input.GetKeyDown(castKey);
 
         if (padMgr != null && padMgr.gamepads[0].isActive)
         {
@@ -411,6 +429,7 @@ public class PlayerControlManager : MonoBehaviour
             characterActions.lBumpDown = padMgr.gPadDown[0].LBump;
             characterActions.rBump = padMgr.gamepads[0].RBump;
             characterActions.rBumpDown = padMgr.gPadDown[0].RBump;
+            // REVIEW: need cast magic control on gamepad
         }
     }
 

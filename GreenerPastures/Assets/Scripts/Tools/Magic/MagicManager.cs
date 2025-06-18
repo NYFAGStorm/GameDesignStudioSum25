@@ -133,10 +133,10 @@ public class MagicManager : MonoBehaviour
             }
         }
 
-        HandleCancelCast();
 
         if (mode == SpellCastMode.Selecting)
         {
+            HandleCancelCast();
             UpdateSelection();
             return;
         }
@@ -145,7 +145,9 @@ public class MagicManager : MonoBehaviour
             return;
 
         UpdateCastCursor();
-            
+
+        HandleCancelCast();
+
         HandleCastAction();
     }
 
@@ -186,6 +188,8 @@ public class MagicManager : MonoBehaviour
         bool retBool = false;
 
         // validate has at least one spell charge in spell book
+        if ( pcm.playerData.magic.library.spellBook == null || pcm.playerData.magic.library.spellBook.Length == 0 )
+            return retBool;
         for ( int i = 0; i < pcm.playerData.magic.library.spellBook.Length; i++ )
         {
             if (pcm.playerData.magic.library.spellBook[i].chargesAvailable > 0)
@@ -216,7 +220,10 @@ public class MagicManager : MonoBehaviour
         pcm.characterFrozen = !allowed;
         pcm.freezeCharacterActions = !allowed;
         pcm.hidePlayerHUD = !allowed;
-        qoe.enabled = allowed;
+        if (qoe == null)
+            print("no qoe");
+        else
+            qoe.enabled = allowed;
     }
 
     void CancelCasting()
@@ -260,8 +267,9 @@ public class MagicManager : MonoBehaviour
         castingCursor.GetComponent<Renderer>().material.color = Color.blue;
         // AOE circle scale (child object)
         Vector3 lScale = Vector3.one;
-        lScale.x = Mathf.Max(1f, cData.rangeAOE * 2f);
-        lScale.y = Mathf.Max(1f, cData.rangeAOE * 2f);
+        float aoe = pcm.playerData.magic.library.spellBook[selectedSpellCharge].castAOE;
+        lScale.x = Mathf.Max(1f, aoe * 2f);
+        lScale.y = Mathf.Max(1f, aoe * 2f);
         castingCursor.transform.GetChild(0).transform.localScale = lScale;
     }
 
@@ -366,6 +374,7 @@ public class MagicManager : MonoBehaviour
         modeChangeTimer = CASTMODECHANGETIME;
         if (castingCursor != null)
             Destroy(castingCursor);
+        cData = MagicSystem.InitializeCast(pcm.playerData.magic.library.spellBook[selectedSpellCharge], castingCursor.transform.position);
         CastSpell(cData.type, castingCursor.transform.position);
         castInstructionsDisplay = false;
     }
@@ -446,7 +455,7 @@ public class MagicManager : MonoBehaviour
             s = "Up - Down = Select, A Button to Target";
 
             GUI.Label(r, s, g);
-            r.y += 0.05f;
+            r.y += 0.05f * h;
 
             for ( int i = 0; i < pcm.playerData.magic.library.spellBook.Length; i++ )
             {
@@ -460,7 +469,7 @@ public class MagicManager : MonoBehaviour
                 s = "[" + pcm.playerData.magic.library.spellBook[i].chargesAvailable + "] " + pcm.playerData.magic.library.spellBook[i].name;
                 
                 GUI.Label(r, s, g);
-                r.y += 0.05f;
+                r.y += 0.05f * h;
             }
         }
 
