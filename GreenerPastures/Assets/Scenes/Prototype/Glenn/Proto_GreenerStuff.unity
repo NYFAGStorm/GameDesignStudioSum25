@@ -2853,6 +2853,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 960954471}
     m_Modifications:
+    - target: {fileID: 1191804461078306348, guid: fa00e438f5fc03147b5e5b5e2ff155b4, type: 3}
+      propertyPath: NoiseModule.strength.scalar
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4226894393747504459, guid: fa00e438f5fc03147b5e5b5e2ff155b4, type: 3}
       propertyPath: m_Name
       value: Test Tower Interior
