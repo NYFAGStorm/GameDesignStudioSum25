@@ -6,13 +6,14 @@ public class MagicManager : MonoBehaviour
     // This handles a player's use of their spell book
 
     // casting routine includes:
-    // suspend movement and actions from player
+    // suspend movement and actions from player, disable quit on escape
     // enable display player controls for selection / casting routine
     // allow player to cancel casting (D button down)
     //      (return movement and action control,
     //      disable display of player controls for casting routine,
     //      remove cast cursor if exists,
-    //      present exiting cast mode)
+    //      present exiting cast mode,
+    //      re-enable quit on escape)
     // present animation and effects of entering select mode
     // display spell book charge list, highlight current selection
     // allow player to change current selection among list
@@ -28,7 +29,7 @@ public class MagicManager : MonoBehaviour
     // send cast data to cast manager via CastSpell()
     // disable display of player controls for selection / casting routine
     // present animation and effects of exiting cast mode
-    //      (return movement and action control)
+    //      (return movement and action control, re-enable quit on escape)
 
     public enum SpellCastMode
     {
@@ -53,6 +54,7 @@ public class MagicManager : MonoBehaviour
     private PlayerControlManager pcm;
     private MultiGamepad padMgr;
     private CastManager castMgr;
+    private QuitOnEscape qoe;
 
     const float CASTMODECHANGETIME = 1f;
 
@@ -76,6 +78,12 @@ public class MagicManager : MonoBehaviour
         if (castMgr == null)
         {
             Debug.LogError("--- MagicManager [Start] : no cast manager found in scene. aborting.");
+            enabled = false;
+        }
+        qoe = GameObject.FindFirstObjectByType<QuitOnEscape>();
+        if (qoe == null)
+        {
+            Debug.LogError("--- MagicManager [Start] : no quit on escape found in scene. aborting.");
             enabled = false;
         }
         // initialize
@@ -208,6 +216,7 @@ public class MagicManager : MonoBehaviour
         pcm.characterFrozen = !allowed;
         pcm.freezeCharacterActions = !allowed;
         pcm.hidePlayerHUD = !allowed;
+        qoe.enabled = allowed;
     }
 
     void CancelCasting()
