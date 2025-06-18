@@ -43,7 +43,7 @@ public class PlotManager : MonoBehaviour
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
     const float WATERDRAINWITHPLANTRATE = 0.1f;
-    const float SOILDEGRADERATE = 2f;
+    const float SOILDEGRADERATE = 0.381f;
     const float PLOTCHECKINTERVAL = 1f;
     // action hold time windows to complete
     const float WORKLANDWINDOW = 2f;

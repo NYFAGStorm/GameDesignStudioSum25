@@ -6,6 +6,7 @@ public class TimeManager : MonoBehaviour
     // This handles the world time cycles and related world properties
 
     public GameObject skyLightObject;
+    public GameObject seasonalTiltGimble;
     public Light sunLight;
     public Light moonLight;
 
@@ -18,6 +19,8 @@ public class TimeManager : MonoBehaviour
     public WorldSeason season;
 
     public float temperatureAdjust;
+
+    private Vector3 skyLightEulerSaved;
 
     // TODO: link to game for world data, run time based on game seed
     // TODO: revise UpdateGlobalTimeProgress() to include total game time
@@ -43,6 +46,10 @@ public class TimeManager : MonoBehaviour
     // weather effects temp as well (as temperatureAdjust)
     const float TEMPADJUSTSETTLERATE = 0.01f;
 
+    const float SEASONALSINEOFFSET = 0.71166667f;
+    const float WINTERSOLSTICEMINANGLE = 38.1f;
+    const float SUMMERSOLSTICEANGLEDELTA = 47f;
+
 
     void Start()
     {
@@ -55,11 +62,12 @@ public class TimeManager : MonoBehaviour
         }
         else
         {
+            seasonalTiltGimble = skyLightObject.transform.parent.gameObject;
             sunLight = skyLightObject.transform.Find("Sun Light").GetComponent<Light>();
             moonLight = skyLightObject.transform.Find("Moon Light").GetComponent<Light>();
-            if ( sunLight == null || moonLight == null )
+            if ( seasonalTiltGimble == null | sunLight == null || moonLight == null )
             {
-                Debug.LogError("--- TimeManager [Start] : sun and moon lights misconfigured. aborting.");
+                Debug.LogError("--- TimeManager [Start] : gimble or sun or moon lights misconfigured. aborting.");
                 enabled = false;
             }
         }
@@ -70,6 +78,8 @@ public class TimeManager : MonoBehaviour
             dayOfMonth = 1;
             monthOfYear = WorldMonth.Mar;
             season = WorldSeason.Spring;
+
+            skyLightEulerSaved = skyLightObject.transform.localEulerAngles;
         }
     }
 
@@ -98,10 +108,20 @@ public class TimeManager : MonoBehaviour
             }
         }
         // rotate sky lights object once per game day
-        float sunRotX = Time.deltaTime * (WORLDTIMEMULTIPLIER * cheatTimeScale) * (360f / (24f * 60f * 60f));
-        skyLightObject.transform.Rotate(sunRotX, 0f, 0f);
+        // set sun angle to seasonal sine wave
+        float seasonProgress = ((1 / 30) + (((dayProgress + dayOfMonth) / 30) + (int)monthOfYear)) / 12;
+        // TODO: seasonal sine wave longer-shorter days, sky light tilt
+        // TODO: slow sun daytime during summer, speed up at night
+        // TODO: speed up sun daytime during winter, slow down at night
+        float seasonalSin = Mathf.Sin((seasonProgress + SEASONALSINEOFFSET) * 2f * Mathf.PI); // season progress 0-1
+        float skyLightTilt = 90f - (WINTERSOLSTICEMINANGLE + (SUMMERSOLSTICEANGLEDELTA / 2f) + ((SUMMERSOLSTICEANGLEDELTA / 2f) * seasonalSin));
+        // seasonal tilt must be applied on parent object to skylight object (a gimble of z rotation)
+        seasonalTiltGimble.transform.localEulerAngles = new Vector3(0f, 0f, -skyLightTilt);
+        // set sun rot based on day progress value
+        skyLightObject.transform.localEulerAngles = new Vector3((dayProgress * 360f), 12.36f, 0f);
+
         // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
-        
+
         if (dayProgress > .3f && dayProgress < .7f)
         {
             sunLight.intensity = SUNLIGHTINTENSITY;
@@ -129,7 +149,7 @@ public class TimeManager : MonoBehaviour
 
         // REVIEW: base temperature based on season cycle
         // FIXME: the bottom seems 'to bounce' and not like a sine wave
-        float seasonProgress = ((1 / 30) + (((dayProgress + dayOfMonth) / 30) + (int)monthOfYear)) / 12;
+
         baseTemperature = BASETEMPERATURE + (((Mathf.Sin(Mathf.PI * seasonProgress) * 2f) - 1f) * TEMPERATUREVARIANCE);
         baseTemperature += temperatureAdjust;
         baseTemperature = Mathf.RoundToInt(baseTemperature * 10f) / 10f;
