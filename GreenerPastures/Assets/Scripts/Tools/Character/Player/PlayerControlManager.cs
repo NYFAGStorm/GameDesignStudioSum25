@@ -66,6 +66,7 @@ public class PlayerControlManager : MonoBehaviour
     private CameraManager cam;
     private PlayerAnimManager pam;
     private ArtLibraryManager alm;
+    private TimeManager tim;
 
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
@@ -95,6 +96,12 @@ public class PlayerControlManager : MonoBehaviour
         if (alm == null)
         {
             Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no art library manager found. aborting.");
+            enabled = false;
+        }
+        tim = GameObject.FindAnyObjectByType<TimeManager>();
+        if (tim == null)
+        {
+            Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no time manager found. aborting.");
             enabled = false;
         }
         // initialize
@@ -466,6 +473,29 @@ public class PlayerControlManager : MonoBehaviour
         }
     }
 
+    string FormatTimeOfDay( float currentTime )
+    {
+        string retString = "";
+
+        float minutes = (currentTime * 24f * 60f);
+        int hour = Mathf.RoundToInt((minutes / 60f)-0.5f);
+        minutes -= (hour * 60f);
+        if (hour > 12)
+            hour -= 12;
+        if (hour == 0)
+            hour = 12;
+        int min = Mathf.RoundToInt(minutes-0.5f);
+
+        retString = hour.ToString() + ":" + min.ToString("00");
+
+        if (currentTime > 0.5f)
+            retString += " PM";
+        else
+            retString += " AM";
+
+        return retString;
+    }
+
     void OnGUI()
     {
         if (hidePlayerHUD)
@@ -516,17 +546,110 @@ public class PlayerControlManager : MonoBehaviour
             GUI.color = Color.white;
         }
 
-        // gold display
+        // player stats display
+        // arcana, gold, level, xp
         r.x = 0.6375f * w;
-        r.y = 0.02f * h;
-        r.width = 0.1f * w;
+        r.y = 0.015f * h;
+        r.width = 0.125f * w;
         r.height = 0.05f * h;
         GUIStyle g = new GUIStyle(GUI.skin.label);
         g.alignment = TextAnchor.MiddleLeft;
         g.fontSize = Mathf.RoundToInt(20f * (w / 1204f));
         g.fontStyle = FontStyle.Bold;
-        string s = "GOLD: ";
+        string s = "ARCANA: ";
+        s += playerData.arcana.ToString();
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+        r.y += 0.04f * h;
+        s = "GOLD: ";
         s += playerData.gold.ToString();
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+        r.x += 0.125f * w;
+        r.y = 0.015f * h;
+
+        s = "LEVEL: ";
+        s += playerData.level.ToString();
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+        r.y += 0.04f * h;
+        s = "XP: ";
+        s += playerData.xp.ToString();
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+        // world stats display
+        // time, day, month, season, temperature
+        r.x = 0.175f * w;
+        r.y = 0.015f * h;
+        r.width = 0.2f * w;
+        r.height = 0.05f * h;
+
+        s = "DAY: ";
+        s += tim.monthOfYear.ToString() + " " + tim.dayOfMonth.ToString() + " " + tim.season.ToString();
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+        r.y += 0.04f * h;
+        s = "TIME: ";
+        s += FormatTimeOfDay(tim.dayProgress);
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+        r.y += 0.04f * h;
+        s = "TEMP: ";
+        s += tim.currentTempC.ToString("00.0")+ " C ("+ tim.currentTempF.ToString("00.0") +" F)";
 
         r.x += 0.0006f * w;
         r.y += 0.001f * h;
