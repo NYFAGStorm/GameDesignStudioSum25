@@ -68,6 +68,7 @@ public class PlayerControlManager : MonoBehaviour
     private ArtLibraryManager alm;
 
     const float PROXIMITYRANGE = 0.381f;
+    const float ISLANDTETHERSTRENGTH = 1f;
 
 
     void Start()
@@ -238,8 +239,33 @@ public class PlayerControlManager : MonoBehaviour
         return characterActions;
     }
 
+    void HandleIslandTether()
+    {
+        if (playerData.freeFly)
+            return;
+
+        Vector3 center = Vector3.zero;
+        center.x = playerData.islandCenterX;
+        center.y = playerData.islandCenterY;
+        center.z = playerData.islandCenterZ;
+        float radius = playerData.islandRange;
+        float dist = Vector3.Distance(gameObject.transform.position, center);
+        if (dist > radius )
+        {
+            Vector3 pushBack = (center - gameObject.transform.position);
+            pushBack *= ISLANDTETHERSTRENGTH * Time.deltaTime;
+
+            Vector3 pos = gameObject.transform.position;
+            pos += pushBack;
+            gameObject.transform.position = pos;
+        }
+    }
+
     void ReadMoveInput()
     {
+        // player held (tethered) to center of current island
+        HandleIslandTether();
+
         // reset character move
         characterMove = Vector3.zero;
 

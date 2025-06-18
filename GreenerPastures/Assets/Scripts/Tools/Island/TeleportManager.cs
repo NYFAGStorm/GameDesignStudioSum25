@@ -10,6 +10,8 @@ public class TeleportManager : MonoBehaviour
     public GameObject teleportSubject;
     [Tooltip("if none defined, will ignore. otherwise reaching this node will trigger.")]
     public CameraTrigger associatedCamTrigger;
+    public GameObject islandObj; // hold player to this center
+    public float islandRadius = 7f;
 
     private bool teleportActive;
     private float teleportTimer;
@@ -51,6 +53,11 @@ public class TeleportManager : MonoBehaviour
                 Debug.LogError("--- TeleportManager [Start] : " + gameObject.name + " more than one teleport pad found with same tag '" + teleporterTag + "'. aborting.");
                 enabled = false;
             }
+        }
+        if ( islandObj == null )
+        {
+            Debug.LogError("--- TeleportManager [Start] : " + gameObject.name + " no island object defined. aborting.");
+            enabled = false;
         }
         if (enabled && pairedPad == null)
         {
@@ -139,7 +146,8 @@ public class TeleportManager : MonoBehaviour
         pairedPad.LaunchTeleportEffects();
         teleportSubject.transform.position = pairedPad.transform.position;
         // materialize teleport subject
-        teleportSubject.GetComponent<PlayerControlManager>().characterFrozen = false;
+        PlayerControlManager pcm = teleportSubject.GetComponent<PlayerControlManager>();
+        pcm.characterFrozen = false;
         Renderer[] rends = teleportSubject.GetComponentsInChildren<Renderer>();
         foreach (Renderer r in rends)
         {
@@ -149,6 +157,12 @@ public class TeleportManager : MonoBehaviour
         // if associated camera trigger, trigger
         if (pairedPad.associatedCamTrigger != null)
             pairedPad.associatedCamTrigger.TriggerCameraMode();
+
+        // hold player to new location
+        pcm.playerData.islandRange = pairedPad.islandRadius;
+        pcm.playerData.islandCenterX = pairedPad.islandObj.transform.position.x;
+        pcm.playerData.islandCenterY = pairedPad.islandObj.transform.position.y;
+        pcm.playerData.islandCenterZ = pairedPad.islandObj.transform.position.z;
     }
 
     /// <summary>

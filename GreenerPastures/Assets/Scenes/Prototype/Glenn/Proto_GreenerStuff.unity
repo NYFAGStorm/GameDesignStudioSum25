@@ -597,6 +597,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 960954471}
     m_Modifications:
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: islandObj
+      value: 
+      objectReference: {fileID: 5353403415971511523}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: tower
       objectReference: {fileID: 0}
@@ -710,6 +714,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 960954471}
     m_Modifications:
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: islandObj
+      value: 
+      objectReference: {fileID: 5353403415971511523}
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: tower
@@ -1461,6 +1469,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1153260590}
     m_Modifications:
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: islandObj
+      value: 
+      objectReference: {fileID: 1153260591}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: testTPort
       objectReference: {fileID: 0}
@@ -1582,6 +1594,11 @@ PrefabInstance:
 --- !u!4 &1153260590 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8041112620955945839, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
+  m_PrefabInstance: {fileID: 1153260589}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1153260591 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
   m_PrefabInstance: {fileID: 1153260589}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1211474063
@@ -2407,6 +2424,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 727019979}
     m_Modifications:
+    - target: {fileID: 261740017079920572, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
+      propertyPath: playerData.heldIsland
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 261740017079920572, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
+      propertyPath: playerData.islandRange
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 2783380199156033629, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
       propertyPath: SortKey
       value: 3166325409
@@ -2592,6 +2617,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 960954471}
     m_Modifications:
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: islandObj
+      value: 
+      objectReference: {fileID: 5353403415971511523}
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: testTPort
@@ -2978,6 +3007,11 @@ PrefabInstance:
       addedObject: {fileID: 311349289}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
+--- !u!1 &5353403415971511523 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
+  m_PrefabInstance: {fileID: 5353403415971511522}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5693001885766750571
 PrefabInstance:
   m_ObjectHideFlags: 0

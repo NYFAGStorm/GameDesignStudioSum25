@@ -12,31 +12,6 @@ public class PlayerStats
     public int totalXPEarned;
 }
 
-// REVIEW:
-public enum PlayerLocation
-{
-    Default,
-    Home,
-    Farm,
-    Shop,
-    Lab,
-    Visiting
-}
-
-// REVIEW:
-public enum PlayerAction
-{
-    Default,
-    Idle,
-    Walking,
-    Tilling,
-    Planting,
-    Watering,
-    Harvesting,
-    Casting,
-    Teleporting
-}
-
 // if there are discrete effects that can be applied to a player character
 // each effect can then apply separate rules in a modular way
 public enum PlayerEffects
@@ -59,8 +34,11 @@ public class PlayerData
     public int arcana;
     public int xp;
     public int level;
-    public PlayerLocation location;
-    public PlayerAction action;
+    public bool freeFly; // can walk off island edges
+    public float islandCenterX;
+    public float islandCenterY;
+    public float islandCenterZ;
+    public float islandRange;
     public InventoryData inventory;
     public MagicData magic;
     public PlayerEffects[] effects;
