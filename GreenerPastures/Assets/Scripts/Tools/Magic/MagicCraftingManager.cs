@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class MagicCraftingManager : MonoBehaviour
@@ -60,7 +61,7 @@ public class MagicCraftingManager : MonoBehaviour
     private bool[] cauldronGridFilled; // 2 dimensional array (row, col) if spaces taken
     private bool craftingSolved; // has the player solved the crafting puzzle?
 
-    private ItemTypeShape[] shapeLibrary; // all item types described as 3x3 shapes
+    private ShapeLibraryManager.ItemTypeShape[] shapeLibrary; // all item types described as 3x3 shapes
     // NOTE: the index for this array is the enum reference number of the item type
 
     private PlayerControlManager pcm;
@@ -122,7 +123,17 @@ public class MagicCraftingManager : MonoBehaviour
 
     void InitializeItemShapeLibrary()
     {
-        shapeLibrary = new ItemTypeShape[TOTALITEMSHAPETYPES];
+        ShapeLibraryManager slm = GameObject.FindFirstObjectByType<ShapeLibraryManager>();
+        if (slm != null && slm.itemShapes != null && 
+            slm.itemShapes.Length > 0)
+        {
+            shapeLibrary = slm.GetShapeLibrary();
+            return;
+        }
+
+        Debug.LogWarning("--- MagicCraftingManager [InitializeItemShapeLibrary] : no shape library manager found in scene or shape invalid data. will use temple shape library.");
+
+        shapeLibrary = new ShapeLibraryManager.ItemTypeShape[TOTALITEMSHAPETYPES];
 
         for ( int i = 0; i < shapeLibrary.Length; i++ )
         {
