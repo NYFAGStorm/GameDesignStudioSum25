@@ -5,6 +5,16 @@ public class TimeManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles the world time cycles and related world properties
 
+    // NOTE: our global time progress is the master clock, driven by season progress
+    // in data, our game begins from a point in real time, used as a starting point
+    // global time progress uses that starting point and game time progress
+    // .
+    // various elements in our game have timers and durations (cooldowns, etc)
+    // to represent valid time markers with our global time progress, we save timestamps
+    // data holds 'long' type timestamps of gloabl time progress + scheduled durations
+    // when we load data, we will then un-pack these various element timers
+    // we will compare the timestamp difference and assign timer and duration values
+
     public GameObject skyLightObject;
     public GameObject seasonalTiltGimble;
     public Light sunLight;
@@ -20,8 +30,6 @@ public class TimeManager : MonoBehaviour
 
     public float temperatureAdjust;
 
-    private Vector3 skyLightEulerSaved;
-
     // TODO: link to game for world data, run time based on game seed
     // TODO: revise UpdateGlobalTimeProgress() to include total game time
     // TODO: migrate temperature to weather manager
@@ -29,6 +37,8 @@ public class TimeManager : MonoBehaviour
     private long globalTimeProgress;
 
     private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
+
+    const float ABSOLUTEMINIMUMFLOAT = -999999999999999f; // used for timestamp difference
 
     const float SUNLIGHTINTENSITY = 1f;
     const float MOONLIGHTINTENSITY = 0.1f;
@@ -78,8 +88,6 @@ public class TimeManager : MonoBehaviour
             dayOfMonth = 1;
             monthOfYear = WorldMonth.Mar;
             season = WorldSeason.Spring;
-
-            skyLightEulerSaved = skyLightObject.transform.localEulerAngles;
         }
     }
 
@@ -163,7 +171,7 @@ public class TimeManager : MonoBehaviour
 
         // settle temperature adjustment from weather manager
         if (temperatureAdjust > 0f)
-            temperatureAdjust -= (TEMPADJUSTSETTLERATE * Time.deltaTime) / (WORLDTIMEMULTIPLIER * cheatTimeScale);
+            temperatureAdjust -= ( TEMPADJUSTSETTLERATE * Time.deltaTime ) / (WORLDTIMEMULTIPLIER * cheatTimeScale);
         if (temperatureAdjust < 0f)
             temperatureAdjust += ( TEMPADJUSTSETTLERATE * Time.deltaTime ) / (WORLDTIMEMULTIPLIER * cheatTimeScale);
         if (Mathf.Abs(temperatureAdjust) < 0.001f)
@@ -185,6 +193,29 @@ public class TimeManager : MonoBehaviour
     public long GetGlobalTimeProgress()
     {
         return globalTimeProgress;
+    }
+
+    /// <summary>
+    /// Gets a gloabl time progress value with additional schedule delay
+    /// </summary>
+    /// <param name="schedule">amount of delay to schedule</param>
+    /// <returns>global time progress at scheduled timestamp</returns>
+    public long GetGlobalTimestamp( float schedule )
+    {
+        return globalTimeProgress + (long)schedule;
+    }
+
+    /// <summary>
+    /// Get a float of remaining duration from a scheduled delay timestamp
+    /// </summary>
+    /// <param name="timestamp">schedule timestamp of global time progress</param>
+    /// <returns>amount of time remaining (positive value if any time remaining)</returns>
+    public float GetTimestampDifference( long timestamp )
+    {
+        if ( (timestamp - globalTimeProgress) < ABSOLUTEMINIMUMFLOAT )
+            return ABSOLUTEMINIMUMFLOAT;
+        else
+            return timestamp - globalTimeProgress;
     }
 
     /// <summary>

@@ -17,7 +17,7 @@ public class MagicManager : MonoBehaviour
     // present animation and effects of entering select mode
     // display spell book charge list, highlight current selection
     // allow player to change current selection among list
-    // allow player to select the spell charge to cast, sends to casting mode
+    // allow player to select the spell charge to cast, if has charge and not on cooldown
     // spawn cast cursor with AOE circle, based on spell data
     // allow player to navigate cursor (Up-Down-Left-Right)
     // present cursor as invalid if invalid location
@@ -26,7 +26,8 @@ public class MagicManager : MonoBehaviour
     // disallow player to cancel casting
     // present animation and effects of casting action
     // remove cast cursor
-    // send cast data to cast manager via CastSpell()
+    // send cast data to cast manager via CastSpell(), removes spell charge
+    // begin spell cooldown
     // disable display of player controls for selection / casting routine
     // present animation and effects of exiting cast mode
     //      (return movement and action control, re-enable quit on escape)
@@ -43,6 +44,8 @@ public class MagicManager : MonoBehaviour
     public SpellCastMode mode;
 
     private float modeChangeTimer;
+    private int invalidSelection = -1;
+    private float selectionInvalidTimer;
     private bool selectionDisplay;
     private bool castInstructionsDisplay;
     private bool playerCanCancel;
@@ -57,6 +60,7 @@ public class MagicManager : MonoBehaviour
     private QuitOnEscape qoe;
 
     const float CASTMODECHANGETIME = 1f;
+    const float SELECTIONINVALIDTIME = 1.5f;
 
 
     void Start()
@@ -95,6 +99,33 @@ public class MagicManager : MonoBehaviour
 
     void Update()
     {
+        // run selection invalid timer
+        if ( selectionInvalidTimer > 0f )
+        {
+            selectionInvalidTimer -= Time.deltaTime;
+            if (selectionInvalidTimer < 0f)
+                selectionInvalidTimer = 0;
+        }
+
+        // run spell book cooldowns
+        if ( pcm.playerData.magic.library.spellBook != null && 
+            pcm.playerData.magic.library.spellBook.Length > 0 )
+        {
+            for (int i = 0; i < pcm.playerData.magic.library.spellBook.Length; i++)
+            {
+                SpellBookData sBookData = pcm.playerData.magic.library.spellBook[i];
+                if (sBookData.cooldown > 0f)
+                {
+                    sBookData.cooldown -= Time.deltaTime;
+                    if (sBookData.cooldown < 0f)
+                    {
+                        sBookData.cooldown = 0f;
+                        sBookData.cooldownTimestamp = 0; // clear timestamp
+                    }
+                }
+            }
+        }
+        
         // run cast mode change timer
         if ( modeChangeTimer > 0f )
         {
@@ -133,7 +164,6 @@ public class MagicManager : MonoBehaviour
             }
         }
 
-
         if (mode == SpellCastMode.Selecting)
         {
             HandleCancelCast();
@@ -168,7 +198,18 @@ public class MagicManager : MonoBehaviour
                 SpellBookData spellData = MagicSystem.GetSpellBookEntry(spell, pcm.playerData.magic.library);
                 if (spellData != null)
                 {
-                    castMgr.AcquireNewCast(MagicSystem.InitializeCast(spellData, pos));
+                    // configure cast lifeTimestamp and spell book cooldown timestamp
+                    CastData cData = MagicSystem.InitializeCast(spellData, pos);
+                    spellData.cooldown = spellData.cooldownDuration;
+                    TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
+                    if (tim == null)
+                        Debug.LogWarning("--- MagicManager [CastSpell] : no time manager found in scene. will ignore setting timestamps.");
+                    else
+                    {
+                        spellData.cooldownTimestamp = tim.GetGlobalTimestamp(spellData.cooldownDuration);
+                        cData.lifeTimestamp = tim.GetGlobalTimestamp(spellData.castDuration);
+                    }
+                    castMgr.AcquireNewCast(cData);
                     retBool = true;
                 }
                 else
@@ -233,8 +274,12 @@ public class MagicManager : MonoBehaviour
         modeChangeTimer = CASTMODECHANGETIME;
         if (castingCursor != null)
             Destroy(castingCursor);
+        selectionDisplay = false;
         castInstructionsDisplay = false;
         ExitCastingPresentation();
+        selectedSpellCharge = 0;
+        invalidSelection = -1;
+        selectionInvalidTimer = 0f;
     }
 
     void EnterCastingPresentation()
@@ -261,7 +306,7 @@ public class MagicManager : MonoBehaviour
             return;
         }
         castingCursor.transform.position = gameObject.transform.position;
-        castingCursor.transform.position += (0.001f * Vector3.up);
+        castingCursor.transform.position += (0.004f * Vector3.up);
         castingCursor.transform.parent = null;
         castingCursor.name = "Casting Cursor";
         castingCursor.GetComponent<Renderer>().material.color = Color.blue;
@@ -301,15 +346,23 @@ public class MagicManager : MonoBehaviour
         }
         selectedSpellCharge = Mathf.Clamp(selectedSpellCharge, min, max);
 
-        // selection control
-        if ( pcm.playerData.magic.library.spellBook[selectedSpellCharge].chargesAvailable > 0 )
+        // selection control, if has charge and not on cooldown
+        if (Input.GetKeyDown(pcm.actionAKey) || (padMgr != null &&
+            padMgr.gamepads[0].isActive && padMgr.gPadDown[0].aButton))
         {
-            if (Input.GetKeyDown(pcm.actionAKey) || (padMgr != null &&
-                padMgr.gamepads[0].isActive && padMgr.gPadDown[0].aButton))
+            if (pcm.playerData.magic.library.spellBook[selectedSpellCharge].chargesAvailable > 0 &&
+                pcm.playerData.magic.library.spellBook[selectedSpellCharge].cooldown == 0f)
             {
+                invalidSelection = -1;
+                selectionInvalidTimer = 0f;
                 // transition to casting mode
                 selectionDisplay = false;
                 modeChangeTimer = CASTMODECHANGETIME / 2f; // faster transition to cast
+            }
+            else
+            {
+                invalidSelection = selectedSpellCharge;
+                selectionInvalidTimer = SELECTIONINVALIDTIME;
             }
         }
     }
@@ -354,7 +407,10 @@ public class MagicManager : MonoBehaviour
     {
         if (!playerCanCancel)
             return;
-        CancelCasting();
+        // detect player control signal to cancel
+        if ( Input.GetKeyDown(pcm.castKey) || (padMgr != null && 
+            padMgr.gamepads[0].isActive && padMgr.gPadDown[0].DpadPress) )
+            CancelCasting();
     }
 
     void HandleCastAction()
@@ -375,8 +431,12 @@ public class MagicManager : MonoBehaviour
         if (castingCursor != null)
             Destroy(castingCursor);
         cData = MagicSystem.InitializeCast(pcm.playerData.magic.library.spellBook[selectedSpellCharge], castingCursor.transform.position);
-        CastSpell(cData.type, castingCursor.transform.position);
+        if ( !CastSpell(cData.type, castingCursor.transform.position) )
+            Debug.LogWarning("--- MagicManager [PerformCast] : unable to cast spell (invalid or no charges). will ignore.");
         castInstructionsDisplay = false;
+        selectedSpellCharge = 0;
+        invalidSelection = -1;
+        selectionInvalidTimer = 0f;
     }
 
     void OnGUI()
@@ -401,10 +461,6 @@ public class MagicManager : MonoBehaviour
         r.y = 0.1f * h;
         r.width = 0.5f * w;
         r.height = 0.3f * h;
-
-        c.r *= 0.5f;
-        c.g *= 0.5f;
-        c.a *= 0.381f;
 
         GUI.color = c;
         GUI.Box(r, s, g);
@@ -446,7 +502,7 @@ public class MagicManager : MonoBehaviour
         {
             // individual spell charges
             r.x = 0.3f * w;
-            r.y = 0.125f * h;
+            r.y = 0.15f * h;
             r.width = 0.4f * w;
             r.height = 0.05f * h;
 
@@ -455,21 +511,37 @@ public class MagicManager : MonoBehaviour
             s = "Up - Down = Select, A Button to Target";
 
             GUI.Label(r, s, g);
-            r.y += 0.05f * h;
+            r.y += 0.0375f * h;
 
             for ( int i = 0; i < pcm.playerData.magic.library.spellBook.Length; i++ )
             {
                 c = Color.white;
-                if (pcm.playerData.magic.library.spellBook[i].chargesAvailable == 0)
+                if (i != selectedSpellCharge &&
+                    pcm.playerData.magic.library.spellBook[i].chargesAvailable == 0)
                     c = Color.black;
-                else if (i == selectedSpellCharge)
-                    c = Color.yellow;
+                else if (i == selectedSpellCharge &&
+                    pcm.playerData.magic.library.spellBook[i].chargesAvailable > 0)
+                {
+                    if (pcm.playerData.magic.library.spellBook[i].cooldown == 0f)
+                        c = Color.yellow;
+                    else
+                        c = Color.gray;
+                }   
+                if (invalidSelection == i && selectionInvalidTimer > 0f)
+                {
+                    c = Color.red;
+                    c.g = (selectionInvalidTimer * 5f) % 1f;
+                    c.b = (selectionInvalidTimer * 5f) % 1f;
+                }
                 GUI.color = c;
 
                 s = "[" + pcm.playerData.magic.library.spellBook[i].chargesAvailable + "] " + pcm.playerData.magic.library.spellBook[i].name;
-                
+
+                if (pcm.playerData.magic.library.spellBook[i].cooldown > 0f)
+                    s += " (COOLDOWN)";
+
                 GUI.Label(r, s, g);
-                r.y += 0.05f * h;
+                r.y += 0.0375f * h;
             }
         }
 

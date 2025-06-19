@@ -56,7 +56,8 @@ public class SpellBookData
     public SpellType type;
     public int chargesAvailable;
     public float cooldownDuration;
-    public float cooldown; // tracked cooldown max is cooldownDuration
+    public long cooldownTimestamp; // tracked cooldown max is a timestamp (future game time)
+    public float cooldown; // tracked cooldown max is cooldown duration
     public float castDuration;
     public float castAOE; // range (radius) of area of effect
 }
@@ -76,7 +77,8 @@ public class SpellLibrary
 public class CastData
 {
     public SpellType type;
-    public float lifetime; // tracked lifetime max is castDuration
+    public long lifeTimestamp; // saved lifetime max is a timestamp (future game time)
+    public float lifetime; // tracked lifetime max is cast duration
     public float posX;
     public float posY;
     public float posZ;
