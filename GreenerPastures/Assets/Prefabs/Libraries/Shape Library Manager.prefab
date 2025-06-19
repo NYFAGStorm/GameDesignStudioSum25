@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5437802415114976911}
-  - component: {fileID: 5030975577627564629}
+  - component: {fileID: 6493065540776624956}
   m_Layer: 0
   m_Name: Shape Library Manager
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5030975577627564629
+--- !u!114 &6493065540776624956
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,3 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d73074dd793132546a2603a985354547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemShapes:
+  - item: Default
+    pieces: 000000000000000000
+  - item: Fertilizer
+    pieces: 000000000100010101
+  - item: Seed
+    pieces: 000000000100000000
+  - item: Plant
+    pieces: 010101000100000100
+  - item: Stalk
+    pieces: 000000000100000100
+  - item: Fruit
+    pieces: 000100010101000100
+  - item: Rock
+    pieces: 000000000101000101

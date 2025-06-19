@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ShapeLibraryManager : MonoBehaviour
@@ -5,11 +6,13 @@ public class ShapeLibraryManager : MonoBehaviour
     // Author: Glenn Storm
     // This holds data for item shapes, each as an array of booleans
 
+    [System.Serializable]
     public struct ItemTypeShape
     {
+        public string item;
         public bool[] pieces;
     }
-
+    [Tooltip("Each entry represents the shape of one item. The nine booleans represent a 3x3 grid; 0-2 on top row, 3-5 middle row, 6-8 bottom row. True means this shape includes this square.")]
     public ItemTypeShape[] itemShapes;
 
 
@@ -19,7 +22,18 @@ public class ShapeLibraryManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-
+            if ( itemShapes == null || itemShapes.Length == 0 )
+            {
+                // temp - create a shape library entry for every item type
+                int numOfTypes = Enum.GetNames(typeof(ItemType)).Length;
+                itemShapes = new ItemTypeShape[numOfTypes];
+                for (int i = 0; i < numOfTypes; i++)
+                {
+                    itemShapes[i].item = ((ItemType)i).ToString();
+                    itemShapes[i].pieces = new bool[9];
+                    itemShapes[i].pieces[4] = true; // center square on
+                }
+            }
         }
     }
 
