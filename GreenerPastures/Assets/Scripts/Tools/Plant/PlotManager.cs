@@ -99,10 +99,19 @@ public class PlotManager : MonoBehaviour
                 if (plant != null)
                     data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * Time.deltaTime * PLOTCHECKINTERVAL));
                 // soil degrade, if plant exists
-                if ( plant != null )
+                if (plant != null)
                     data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * Time.deltaTime * PLOTCHECKINTERVAL));
+                // PLOT EFFECTS:
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.SummonWaterI))
+                    data.water = 1f;
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.EclipseI))
+                    data.sun = Mathf.Clamp( (data.sun * 0.5f), 0f, 0.5f );
             }
         }
+
+        // update plot hazards
+        // REVIEW: what hazards?
+        UpdatePlotHazards();
 
         // run action complete timer
         if ( actionCompleteTimer > 0f )
@@ -151,6 +160,15 @@ public class PlotManager : MonoBehaviour
         cursorTimer += Time.deltaTime;
         float pulse = 1f - ((cursorTimer % CURSORPULSEDURATION) * 0.9f);
         SetCursorHighlight(pulse);
+    }
+
+    void UpdatePlotHazards()
+    {
+        // PLOT EFFECTS:
+        if (FarmSystem.PlotHasEffect(data, PlotEffect.BlessI))
+            return;
+        
+        // TODO: implement hazards update
     }
 
     /// <summary>
@@ -312,6 +330,11 @@ public class PlotManager : MonoBehaviour
                 // using data, remove from player inventory
                 pcm.DeleteCurrentItemSelection();
                 data.condition = PlotCondition.Growing;
+                // PLOT EFFECTS:
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.FastGrowI))
+                    data.plant.growthRate += 0.05f;
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.MalnutritionI))
+                    data.plant.growthRate -= 0.1f;
                 break;
             case PlotCondition.Uprooted:
                 // change ground texture
@@ -377,38 +400,52 @@ public class PlotManager : MonoBehaviour
                 plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // drop as loose item fruit
                 ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
-                // REVIEW: consider attempt placing all in player inventory first, dropping if no empty slot                
+                // attempt place all in player inventory first, drop as loose if no empty slot                
                 Vector3 target;
                 if (ism == null)
-                    Debug.LogWarning("--- PlotManager [HarvestPlant] : "+gameObject.name+" no item spawn manager found in scene. will ignore.");
+                    Debug.LogWarning("--- PlotManager [HarvestPlant] : " + gameObject.name + " no item spawn manager found in scene. will ignore.");
                 else
                 {
-                    // check if empty inventory slot availbale on player, drop loose if not
-                    if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
+                    int harvestNumber = data.plant.harvestAmount;
+                    // PLOT EFFECTS:
+                    if (FarmSystem.PlotHasEffect(data, PlotEffect.ProsperousI) && 
+                        RandomSystem.FlatRandom01() < .1f)
+                        harvestNumber *= 2;
+                    // iterate to harvest multiple
+                    for ( int i = 0; i < harvestNumber; i++ )
                     {
-                        // harvesting gives fruit
-                        ItemData iData = InventorySystem.InitializeItem(ItemType.Fruit);
-                        if (iData == null)
-                            Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize fruit item. will ignore.");
+                        // PLOT EFFECTS:
+                        if (FarmSystem.PlotHasEffect(data, PlotEffect.LesionI))
+                            data.plant.quality -= 0.05f;
+                        if (FarmSystem.PlotHasEffect(data, PlotEffect.GoldenThumbI))
+                            data.plant.quality += 0.1f;
+                        // check if empty inventory slot availbale on player, drop loose if not
+                        if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
+                        {
+                            // harvesting gives fruit
+                            ItemData iData = InventorySystem.InitializeItem(ItemType.Fruit);
+                            if (iData == null)
+                                Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize fruit item. will ignore.");
+                            else
+                            {
+                                iData.plantIndex = (int)data.plant.type;
+                                iData.name += " (" + data.plant.plantName.ToString() + ")";
+                            }
+                            currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
+                        }
                         else
                         {
-                            iData.plantIndex = (int)data.plant.type;
-                            iData.name += " (" + data.plant.plantName.ToString() + ")";
+                            target = gameObject.transform.position;
+                            target.x += RandomSystem.GaussianRandom01() - .5f;
+                            target.z -= 0.01f; // in front of plant
+                            // harvesting drops fruit
+                            LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
+                            // transfer properties of fruit to item (revise item data)
+                            loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
+                            loose.inv.items[0].size = data.plant.growth;
+                            loose.inv.items[0].quality = data.plant.quality;
+                            ism.SpawnItem(loose, gameObject.transform.position, target);
                         }
-                        currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
-                    }
-                    else
-                    {
-                        target = gameObject.transform.position;
-                        target.x += RandomSystem.GaussianRandom01() - .5f;
-                        target.z -= 0.01f; // in front of plant
-                        // harvesting drops fruit
-                        LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
-                        // transfer properties of fruit to item (revise item data)
-                        loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
-                        loose.inv.items[0].size = data.plant.growth;
-                        loose.inv.items[0].quality = data.plant.quality;
-                        ism.SpawnItem(loose, gameObject.transform.position, target);
                     }
                     // harvesting may drop seed
                     if (RandomSystem.FlatRandom01() < data.plant.seedPotential)

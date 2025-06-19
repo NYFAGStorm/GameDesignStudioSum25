@@ -15,10 +15,14 @@ public enum PlotCondition
 public enum PlotEffect
 {
     Default,
-    EffectA,
-    EffectB,
-    EffectC,
-    EffectD
+    FastGrowI,
+    SummonWaterI,
+    BlessI,
+    MalnutritionI,
+    ProsperousI,
+    LesionI,
+    EclipseI,
+    GoldenThumbI
 }
 
 [System.Serializable]
@@ -42,12 +46,6 @@ public enum FarmEffects
     EffectC,
     EffectD
 }
-
-// REVIEW:
-// we may avoid complexity by asserting all farms have a 2D grid of plots
-// rows and columns of plots to make up a rectangular farm field
-// this allows us to define plots as a 2D array, columns first
-// example: a 5x5 array of plot can be described as an array of 25
 
 [System.Serializable]
 public class FarmData

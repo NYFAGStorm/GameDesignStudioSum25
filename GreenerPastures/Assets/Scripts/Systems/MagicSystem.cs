@@ -319,48 +319,77 @@ public static class MagicSystem
         // configure by spell type
         switch (entry.type)
         {
+            // REVIEW: all ingredient lists
+            
             case SpellType.Default:
                 // should never be here
                 break;
             case SpellType.FastGrowI:
                 retSpell.name = "Fast Grow I";
                 retSpell.description = "Plants grow faster for one day. (5%)";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[2];
+                retSpell.ingredients[0] = ItemType.Fertilizer;
+                retSpell.ingredients[1] = ItemType.Stalk;
                 break;
             case SpellType.SummonWaterI:
                 retSpell.name = "Summon Water I";
                 retSpell.description = "Waters a 2x2 area that stays hydrated for one day.";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[2];
+                retSpell.ingredients[0] = ItemType.Seed;
+                retSpell.ingredients[1] = ItemType.Fruit;
                 break;
             case SpellType.BlessI:
                 retSpell.name = "Bless I";
                 retSpell.description = "Make plants immune to all hazards for one day.";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[3];
+                retSpell.ingredients[0] = ItemType.Fertilizer;
+                retSpell.ingredients[1] = ItemType.Stalk;
+                retSpell.ingredients[2] = ItemType.Seed;
                 break;
             case SpellType.MalnutritionI:
                 retSpell.name = "Malnutrition I";
                 retSpell.description = "Plants grow speed decreases for 1 day. (10%)";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[3];
+                retSpell.ingredients[0] = ItemType.Stalk;
+                retSpell.ingredients[1] = ItemType.Rock;
+                retSpell.ingredients[2] = ItemType.Seed;
                 break;
             case SpellType.ProsperousI:
                 retSpell.name = "Prosperous I";
                 retSpell.description = "Have a chance of harvesting x2 from each plant. (10%)";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[4];
+                retSpell.ingredients[0] = ItemType.Fruit;
+                retSpell.ingredients[1] = ItemType.Seed;
+                retSpell.ingredients[2] = ItemType.Seed;
+                retSpell.ingredients[3] = ItemType.Seed;
                 break;
             case SpellType.LesionI:
                 retSpell.name = "Lesion I";
                 retSpell.description = "Curse plots and decrease harvest quality. (-5%)";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[4];
+                retSpell.ingredients[0] = ItemType.Fertilizer;
+                retSpell.ingredients[1] = ItemType.Stalk;
+                retSpell.ingredients[2] = ItemType.Stalk;
+                retSpell.ingredients[3] = ItemType.Seed;
                 break;
             case SpellType.EclipseI:
                 retSpell.name = "Eclipse I";
                 retSpell.description = "Obscure sunlight from plots for 1 day.";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[4];
+                retSpell.ingredients[0] = ItemType.Rock;
+                retSpell.ingredients[1] = ItemType.Stalk;
+                retSpell.ingredients[2] = ItemType.Seed;
+                retSpell.ingredients[3] = ItemType.Seed;
                 break;
             case SpellType.GoldenThumbI:
                 retSpell.name = "Golden Thumb I";
                 retSpell.description = "Bless plots and increase harvest quality. (10%)";
-                retSpell.ingredients = new ItemType[0];
+                retSpell.ingredients = new ItemType[5];
+                retSpell.ingredients[0] = ItemType.Fertilizer;
+                retSpell.ingredients[1] = ItemType.Seed;
+                retSpell.ingredients[2] = ItemType.Seed;
+                retSpell.ingredients[3] = ItemType.Seed;
+                retSpell.ingredients[4] = ItemType.Seed;
                 break;
             default:
                 UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureGrimoireEntry] : spell type undefined. will ignore.");

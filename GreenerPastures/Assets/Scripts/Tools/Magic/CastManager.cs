@@ -7,7 +7,8 @@ public class CastManager : MonoBehaviour
 
     public CastData[] casts = new CastData[0];
 
-    private int singleCastToRemove; // will remove one per frame
+    private int birthNewCast; // apply effect for one cast at birth
+    private int singleCastToRemove; // remove effect and cast upon expiration
 
 
     void Start()
@@ -16,6 +17,7 @@ public class CastManager : MonoBehaviour
         // initialize
         if (enabled)
         {
+            birthNewCast = -1;
             singleCastToRemove = -1;
         }
     }
@@ -39,14 +41,25 @@ public class CastManager : MonoBehaviour
             }
         }
 
+        // birth new cast
+        if (birthNewCast > -1)
+        {
+            HandleCastBirth(birthNewCast);
+            birthNewCast = -1;
+        }
+
         // remove expired cast
         if (singleCastToRemove > -1)
+        {
+            HandleCastExpiration(singleCastToRemove);
             RemoveCast(singleCastToRemove);
+            singleCastToRemove = -1;
+        }
 
-        // handle cast effects in the game world
+        // update all cast effects in the game world per frame
         for (int i = 0; i < casts.Length; i++)
         {
-            HandleCastEffect(i);
+            UpdateCastEffect(i);
         }
     }
 
@@ -77,39 +90,143 @@ public class CastManager : MonoBehaviour
             tmp[i] = casts[i];
         }
         tmp[casts.Length] = newCast;
+        birthNewCast = casts.Length; // will catch to intialize cast effects
         casts = tmp;
     }
 
-    void HandleCastEffect( int index )
+    // TODO: implement effects on plots and plants for the current master list of spells
+
+    // add cast effects to plots (and plants, items, players?)
+    void HandleCastBirth( int index )
     {
         SpellType spellType = casts[index].type;
         Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
         float areaOfEffect = casts[index].rangeAOE;
 
-        switch (spellType)
+        // REVIEW: the assumption is that most spells alter plots
+        // REVIEW: if that assumption is false,
+        //  we need to form lists of affected elements to operate on within switch
+        float dist;
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i = 0; i < plots.Length; i++)
         {
-            case SpellType.Default:
-                // should never be here
-                break;
-            case SpellType.FastGrowI:
-                break;
-            case SpellType.SummonWaterI:
-                break;
-            case SpellType.BlessI:
-                break;
-            case SpellType.MalnutritionI:
-                break;
-            case SpellType.ProsperousI:
-                break;
-            case SpellType.LesionI:
-                break;
-            case SpellType.EclipseI:
-                break;
-            case SpellType.GoldenThumbI:
-                break;
-            default:
-                Debug.LogWarning("--- CastManager [HandleCastEffect] : spell type effect not found for cast index "+index+". will ignore.");
-                break;
+            dist = Vector3.Distance(plots[i].gameObject.transform.position, positionEffect);
+            if (dist > areaOfEffect)
+                continue;
+
+            switch (spellType)
+            {
+                case SpellType.Default:
+                    // should never be here
+                    break;
+                case SpellType.FastGrowI:
+                    // Plants grow faster for one day. (5%)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.FastGrowI);
+                    if (plots[i].plant != null)
+                        plots[i].data.plant.growthRate += 0.05f;
+                    break;
+                case SpellType.SummonWaterI:
+                    // Waters a 2x2 area that stays hydrated for one day.
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.SummonWaterI);
+                    break;
+                case SpellType.BlessI:
+                    // Make plants immune to all hazards for one day.
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.BlessI);
+                    break;
+                case SpellType.MalnutritionI:
+                    // Plants grow speed decreases for 1 day. (10%)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.MalnutritionI);
+                    break;
+                case SpellType.ProsperousI:
+                    // Have a chance of harvesting x2 from each plant. (10%)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.ProsperousI);
+                    break;
+                case SpellType.LesionI:
+                    // Curse plots and decrease harvest quality. (-5%)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.LesionI);
+                    break;
+                case SpellType.EclipseI:
+                    // Obscure sunlight from plots for 1 day.
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.EclipseI);
+                    break;
+                case SpellType.GoldenThumbI:
+                    // Bless plots and increase harvest quality. (10%)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.GoldenThumbI);
+                    break;
+                default:
+                    Debug.LogWarning("--- CastManager [HandleCastBirth] : spell type effect not found for cast index " + index + ". will ignore.");
+                    break;
+            }
+        }
+    }
+
+    // REVIEW: handle cast effects per frame?
+    void UpdateCastEffect( int index )
+    {
+
+    }
+
+    // remove cast effects from plots (and plants, items, players?)
+    void HandleCastExpiration( int index )
+    {
+        SpellType spellType = casts[index].type;
+        Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
+        float areaOfEffect = casts[index].rangeAOE;
+
+        // REVIEW: the assumption is that most spells alter plots
+        // REVIEW: if that assumption is false,
+        //  we need to form lists of affected elements to operate on within switch
+        float dist;
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i = 0; i < plots.Length; i++)
+        {
+            dist = Vector3.Distance(plots[i].gameObject.transform.position, positionEffect);
+            if (dist > areaOfEffect)
+                continue;
+
+            switch (spellType)
+            {
+                case SpellType.Default:
+                    // should never be here
+                    break;
+                case SpellType.FastGrowI:
+                    // Plants grow faster for one day. (5%)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.FastGrowI);
+                    if (plots[i].plant != null)
+                        plots[i].data.plant.growthRate -= 0.05f;
+                    break;
+                case SpellType.SummonWaterI:
+                    // Waters a 2x2 area that stays hydrated for one day.
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.SummonWaterI);
+                    break;
+                case SpellType.BlessI:
+                    // Make plants immune to all hazards for one day.
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.BlessI);
+                    break;
+                case SpellType.MalnutritionI:
+                    // Plants grow speed decreases for 1 day. (10%)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.MalnutritionI);
+                    break;
+                case SpellType.ProsperousI:
+                    // Have a chance of harvesting x2 from each plant. (10%)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.ProsperousI);
+                    break;
+                case SpellType.LesionI:
+                    // Curse plots and decrease harvest quality. (-5%)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.LesionI);
+                    break;
+                case SpellType.EclipseI:
+                    // Obscure sunlight from plots for 1 day.
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.EclipseI);
+                    break;
+                case SpellType.GoldenThumbI:
+                    // Bless plots and increase harvest quality. (10%)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.GoldenThumbI);
+                    break;
+                default:
+                    Debug.LogWarning("--- CastManager [HandleCastExpiration] : spell type effect not found for cast index " + index + ". will ignore.");
+                    break;
+            }
         }
     }
 }
