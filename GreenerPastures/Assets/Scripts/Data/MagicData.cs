@@ -32,10 +32,14 @@ public class MagicStats
 public enum SpellType
 {
     Default,
-    SpellA,
-    SpellB,
-    SpellC,
-    SpellD
+    FastGrowI,
+    SummonWaterI,
+    BlessI,
+    MalnutritionI,
+    ProsperousI,
+    LesionI,
+    EclipseI,
+    GoldenThumbI
 }
 
 // a grimiore holds a player's list of learned spells available to make charges

@@ -136,16 +136,16 @@ public class PlayerControlManager : MonoBehaviour
 
             // temp - player magic
             playerData.magic = MagicSystem.IntializeMagic();
-            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SpellA, playerData.magic.library);
-            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SpellB, playerData.magic.library);
-            playerData.magic.library.grimiore[0].name = "Fireball";
-            playerData.magic.library.grimiore[0].type = SpellType.SpellA; // REVIEW: why this not already in?
-            playerData.magic.library.grimiore[0].description = "Conjures a ball of fire to throw around the world.";
+            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, playerData.magic.library);
+            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, playerData.magic.library);
+            playerData.magic.library.grimiore[0].name = "Fast Grow I";
+            playerData.magic.library.grimiore[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
+            playerData.magic.library.grimiore[0].description = "Plants grow faster for one day. (5%)";
             playerData.magic.library.grimiore[0].ingredients = new ItemType[2];
             playerData.magic.library.grimiore[0].ingredients[0] = ItemType.Fertilizer;
             playerData.magic.library.grimiore[0].ingredients[1] = ItemType.Stalk;
-            playerData.magic.library.grimiore[1].name = "Healing";
-            playerData.magic.library.grimiore[1].description = "Heals friends and foes alike. You're just that nice.";
+            playerData.magic.library.grimiore[1].name = "Summon Water I";
+            playerData.magic.library.grimiore[1].description = "Waters a 2x2 area that stays hydrated for one day.";
             playerData.magic.library.grimiore[1].ingredients = new ItemType[2];
             playerData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
             playerData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;

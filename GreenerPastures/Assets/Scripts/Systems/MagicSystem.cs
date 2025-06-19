@@ -1,5 +1,7 @@
 // REVIEW: necessary namespaces
 
+using UnityEditor.Experimental.GraphView;
+
 public static class MagicSystem
 {
     /// <summary>
@@ -116,7 +118,7 @@ public static class MagicSystem
     {
         SpellBookData retEntry = new SpellBookData();
 
-        retEntry.name = spell.ToString(); // TODO: configure
+        retEntry.name = spell.ToString(); // to be configured
         retEntry.type = spell;
         retEntry.chargesAvailable = 0;
         retEntry.cooldownDuration = 0f;
@@ -124,26 +126,75 @@ public static class MagicSystem
         retEntry.castDuration = 0f;
         retEntry.castAOE = 0f; // range (radius) of area of effect
 
-        // TODO: configure by spell type
-        switch (spell)
+        retEntry = ConfigureSpellBookEntry(retEntry);
+
+        return retEntry;
+    }
+
+    static SpellBookData ConfigureSpellBookEntry( SpellBookData entry )
+    {
+        SpellBookData retSpell = entry;
+
+        // configure by spell type
+        switch (entry.type)
         {
             case SpellType.Default:
                 // should never be here
                 break;
-            case SpellType.SpellA:
+            case SpellType.FastGrowI:
+                retSpell.name = "Fast Grow I";
+                retSpell.cooldownDuration = 1440f; // one day
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 3f; // 4x4 plot range
                 break;
-            case SpellType.SpellB:
+            case SpellType.SummonWaterI:
+                retSpell.name = "Summon Water I";
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
-            case SpellType.SpellC:
+            case SpellType.BlessI:
+                retSpell.name = "Bless I";
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 3f; // 4x4 plot range
                 break;
-            case SpellType.SpellD:
+            case SpellType.MalnutritionI:
+                retSpell.name = "Malnutrition I";
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 3f; // 4x4 plot range
+                break;
+            case SpellType.ProsperousI:
+                retSpell.name = "Prosperous I";
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = 720f; // half day
+                retSpell.castAOE = 3f; // 4x4 plot range
+                break;
+            case SpellType.LesionI:
+                retSpell.name = "Lesion I";
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = 720f; // half day
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.EclipseI:
+                retSpell.name = "Eclipse I";
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 3f; // 4x4 plot range
+                break;
+            case SpellType.GoldenThumbI:
+                retSpell.name = "Golden Thumb I";
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = 720f; // half day
+                retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             default:
-                UnityEngine.Debug.LogWarning("--- MagicSystem [InitializeSpellBookEntry] : spell type undefined. will ignore.");
+                UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureSpellBookEntry] : spell type undefined. will ignore.");
                 break;
         }
 
-        return retEntry;
+        return retSpell;
     }
 
     /// <summary>
@@ -251,31 +302,72 @@ public static class MagicSystem
     {
         GrimioreData retEntry = new GrimioreData();
 
-        retEntry.name = spell.ToString(); // TODO: configure
+        retEntry.name = spell.ToString(); // to be configured
         retEntry.description = "";
         retEntry.type = spell;
         retEntry.ingredients = new ItemType[0];
 
-        // TODO: configure by spell type
-        switch (spell)
+        retEntry = ConfigureGrimoireEntry(retEntry);
+
+        return retEntry;
+    }
+
+    static GrimioreData ConfigureGrimoireEntry( GrimioreData entry )
+    {
+        GrimioreData retSpell = entry;
+
+        // configure by spell type
+        switch (entry.type)
         {
             case SpellType.Default:
                 // should never be here
                 break;
-            case SpellType.SpellA:
+            case SpellType.FastGrowI:
+                retSpell.name = "Fast Grow I";
+                retSpell.description = "Plants grow faster for one day. (5%)";
+                retSpell.ingredients = new ItemType[0];
                 break;
-            case SpellType.SpellB:
+            case SpellType.SummonWaterI:
+                retSpell.name = "Summon Water I";
+                retSpell.description = "Waters a 2x2 area that stays hydrated for one day.";
+                retSpell.ingredients = new ItemType[0];
                 break;
-            case SpellType.SpellC:
+            case SpellType.BlessI:
+                retSpell.name = "Bless I";
+                retSpell.description = "Make plants immune to all hazards for one day.";
+                retSpell.ingredients = new ItemType[0];
                 break;
-            case SpellType.SpellD:
+            case SpellType.MalnutritionI:
+                retSpell.name = "Malnutrition I";
+                retSpell.description = "Plants grow speed decreases for 1 day. (10%)";
+                retSpell.ingredients = new ItemType[0];
+                break;
+            case SpellType.ProsperousI:
+                retSpell.name = "Prosperous I";
+                retSpell.description = "Have a chance of harvesting x2 from each plant. (10%)";
+                retSpell.ingredients = new ItemType[0];
+                break;
+            case SpellType.LesionI:
+                retSpell.name = "Lesion I";
+                retSpell.description = "Curse plots and decrease harvest quality. (-5%)";
+                retSpell.ingredients = new ItemType[0];
+                break;
+            case SpellType.EclipseI:
+                retSpell.name = "Eclipse I";
+                retSpell.description = "Obscure sunlight from plots for 1 day.";
+                retSpell.ingredients = new ItemType[0];
+                break;
+            case SpellType.GoldenThumbI:
+                retSpell.name = "Golden Thumb I";
+                retSpell.description = "Bless plots and increase harvest quality. (10%)";
+                retSpell.ingredients = new ItemType[0];
                 break;
             default:
-                UnityEngine.Debug.LogWarning("--- MagicSystem [InitializeGrimoireEntry] : spell type undefined. will ignore.");
+                UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureGrimoireEntry] : spell type undefined. will ignore.");
                 break;
         }
 
-        return retEntry;
+        return retSpell;
     }
 
     /// <summary>

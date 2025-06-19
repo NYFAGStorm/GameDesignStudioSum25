@@ -91,13 +91,21 @@ public class CastManager : MonoBehaviour
             case SpellType.Default:
                 // should never be here
                 break;
-            case SpellType.SpellA:
+            case SpellType.FastGrowI:
                 break;
-            case SpellType.SpellB:
+            case SpellType.SummonWaterI:
                 break;
-            case SpellType.SpellC:
+            case SpellType.BlessI:
                 break;
-            case SpellType.SpellD:
+            case SpellType.MalnutritionI:
+                break;
+            case SpellType.ProsperousI:
+                break;
+            case SpellType.LesionI:
+                break;
+            case SpellType.EclipseI:
+                break;
+            case SpellType.GoldenThumbI:
                 break;
             default:
                 Debug.LogWarning("--- CastManager [HandleCastEffect] : spell type effect not found for cast index "+index+". will ignore.");
