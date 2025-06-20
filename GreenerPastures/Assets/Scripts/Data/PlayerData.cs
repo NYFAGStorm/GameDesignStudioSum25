@@ -28,7 +28,7 @@ public class PlayerData
 {
     public string playerName;
     public PlayerStats stats;
-    public ProfileData profile;
+    public string profileID;
     public FarmData farm;
     public int gold;
     public int arcana;

@@ -131,7 +131,8 @@ public class PlayerControlManager : MonoBehaviour
             playerInventory.items[2].plantIndex = (int)PlantType.Tomato;
 
             // temp - player data (mainly for gold)
-            playerData = PlayerSystem.InitializePlayer("Player", "Player", "pass");
+            ProfileData tempProfile = ProfileSystem.InitializeProfile("user", "pass");
+            playerData = PlayerSystem.InitializePlayer("Player", tempProfile.profileID);
             playerData.inventory = playerInventory;
 
             // temp - player magic

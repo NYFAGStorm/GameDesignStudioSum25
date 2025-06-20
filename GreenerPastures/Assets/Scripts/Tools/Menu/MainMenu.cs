@@ -51,7 +51,7 @@ public class MainMenu : MonoBehaviour
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
-    private int padMaxButton = 2;
+    private int padMaxButton = 5;
 
     private bool profilePopup; // is displaying popup
     private bool popupEnabled; // is popping up or down
@@ -119,8 +119,6 @@ public class MainMenu : MonoBehaviour
             popupProgress = Mathf.Clamp01(popupProgress);
         }
 
-        // TODO: handle gamepad button navigation when popup active
-
         // run switch timer
         if ( sceneSwitchTimer > 0f )
         {
@@ -129,18 +127,28 @@ public class MainMenu : MonoBehaviour
                 SceneManager.LoadScene(sceneSwitchName);
         }
 
-        // determine ui selection from game pad input
-        if (padMgr.gPadDown[0].YaxisL > 0f)
+        // TODO: handle gamepad button navigation when popup active
+
+        if ( profilePopup )
         {
-            padButtonSelection--;
-            if (padButtonSelection < 0)
-                padButtonSelection = padMaxButton;
+            padMaxButton = 1;
         }
-        else if (padMgr.gPadDown[0].YaxisL < 0f)
+        else
         {
-            padButtonSelection++;
-            if (padButtonSelection > padMaxButton)
-                padButtonSelection = 0;
+            padMaxButton = 5;
+            // determine ui selection from game pad input
+            if (padMgr.gPadDown[0].YaxisL > 0f)
+            {
+                padButtonSelection--;
+                if (padButtonSelection < 0)
+                    padButtonSelection = padMaxButton;
+            }
+            else if (padMgr.gPadDown[0].YaxisL < 0f)
+            {
+                padButtonSelection++;
+                if (padButtonSelection > padMaxButton)
+                    padButtonSelection = 0;
+            }
         }
     }
 
@@ -234,7 +242,7 @@ public class MainMenu : MonoBehaviour
             if (padButtonSelection == 0) // TODO:
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
-            s = "NEW"; //"LOGIN";
+            s = "CREATE"; //"LOGIN";
             if (GUI.Button(r, s, g))
             {
                 // temp
@@ -244,6 +252,11 @@ public class MainMenu : MonoBehaviour
                 // TODO:
                 profileActive = true;
                 popupTimer = POPUPTIME;
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                {
+                    padButtonSelection = -1;
+                    padMaxButton = 5;
+                }
             }
 
             // Cancel
@@ -256,6 +269,11 @@ public class MainMenu : MonoBehaviour
             {
                 // temp
                 popupTimer = POPUPTIME;
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                {
+                    padButtonSelection = -1;
+                    padMaxButton = 5;
+                }
             }
 
             return;
@@ -287,8 +305,8 @@ public class MainMenu : MonoBehaviour
 
             GUI.enabled = (buttons[i].buttonEnabled);
 
-            if (buttons[i].buttonVisible && GUI.Button(r,s,g) ||
-            padButtonSelection == i && padMgr.gPadDown[0].aButton)
+            if (buttons[i].buttonVisible && ( GUI.Button(r,s,g) ||
+            GUI.enabled && padButtonSelection == i && padMgr.gPadDown[0].aButton) )
             {
                 if (buttons[i].sceneName != "" && buttons[i].buttonAction == ButtonAction.SceneSwitch)
                 {
@@ -313,6 +331,11 @@ public class MainMenu : MonoBehaviour
                     }
                     profilePopup = true;
                     popupTimer = POPUPTIME;
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                    {
+                        padButtonSelection = -1;
+                        padMaxButton = 1;
+                    }
                 }
                 else if (buttons[i].buttonAction == ButtonAction.Quit)
                     Application.Quit();

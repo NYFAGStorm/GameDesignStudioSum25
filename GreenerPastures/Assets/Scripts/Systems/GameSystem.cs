@@ -3,14 +3,16 @@
 public static class GameSystem
 {
     /// <summary>
-    /// Creates a new game
+    /// Creates a new game with a given name
     /// </summary>
     /// <returns>initialized game data</returns>
-    public static GameData InitializeGame()
+    public static GameData InitializeGame( string name )
     {
         GameData retGame = new GameData();
 
         // initialize
+        retGame.gameName = name;
+        retGame.gameKey = "[" + System.DateTime.Now.Millisecond + "]" + name;
         retGame.stats = new GameStats();
         retGame.stats.gameInitTime = System.DateTime.Now.ToFileTimeUtc();
         retGame.state = GameState.Initializing;

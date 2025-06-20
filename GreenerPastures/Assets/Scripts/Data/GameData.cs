@@ -19,6 +19,8 @@ public enum GameState
 [System.Serializable]
 public class GameData
 {
+    public string gameName;
+    public string gameKey; // game ID, a unique key used on data file name
     public GameStats stats;
     public GameState state;
     public PlayerData[] players;

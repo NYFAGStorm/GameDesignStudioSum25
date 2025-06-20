@@ -54,14 +54,28 @@ public class SplashScreen : MonoBehaviour
 
     private bool splashLaunched;
 
+    private SaveLoadManager saveMgr;
+
 
     void Start()
     {
+        // validate
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
         {
             Debug.LogError("--- SplashScreen [Start] : no pad manager found in scene. aborting.");
             enabled = false;
+        }
+        saveMgr = GameObject.FindFirstObjectByType<SaveLoadManager>();
+        if (saveMgr == null)
+        {
+            Debug.LogError("--- SplashScreen [Start] : no save load manager found in scene. aborting.");
+            enabled = false;
+        }
+        // initialize
+        if (enabled)
+        {
+
         }
     }
 
@@ -90,7 +104,7 @@ public class SplashScreen : MonoBehaviour
         string retText = "";
 
         retText = "version ";
-        retText += "06.20.01.a"; // TODO: save data used
+        retText += saveMgr.GetVersionNumber();
 
         return retText;
     }
