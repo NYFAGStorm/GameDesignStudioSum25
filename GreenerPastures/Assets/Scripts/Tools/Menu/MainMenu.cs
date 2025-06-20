@@ -7,6 +7,14 @@ public class MainMenu : MonoBehaviour
     // Author: Glenn Storm
     // This handles the main menu
 
+    public enum ButtonAction
+    {
+        Default,
+        SceneSwitch,
+        Quit,
+        PopupLaunch,
+    }
+
     public string titleText;
     [Tooltip("These values represent a proportion of screen space, as percentages of screen space. Like, less than 1")]
     public Rect title;
@@ -22,7 +30,10 @@ public class MainMenu : MonoBehaviour
     {
         public string buttonText;
         public Rect buttonPos;
+        public ButtonAction buttonAction;
         public string sceneName;
+        public bool buttonEnabled;
+        public bool buttonVisible;
     }
     public ButtonDef[] buttons;
 
@@ -35,6 +46,8 @@ public class MainMenu : MonoBehaviour
     private float sceneSwitchTimer;
     private string sceneSwitchName;
 
+    private SaveLoadManager saveMgr;
+
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 2;
@@ -42,11 +55,23 @@ public class MainMenu : MonoBehaviour
 
     void Start()
     {
+        // validate
+        saveMgr = GameObject.FindFirstObjectByType<SaveLoadManager>();
+        if (saveMgr == null)
+        {
+            Debug.LogError("--- MainMenu [Start] : no save load manager found in scene. aborting.");
+            enabled = false;
+        }
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
         {
             Debug.LogError("--- MainMenu [Start] : no pad manager found in scene. aborting.");
             enabled = false;
+        }
+        // initialize
+        if (enabled)
+        {
+            // TODO: use game data
         }
     }
 
@@ -83,12 +108,13 @@ public class MainMenu : MonoBehaviour
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;
-        GUIStyle g = new GUIStyle();
+        GUIStyle g = new GUIStyle(GUI.skin.label);
         g.font = titleFont;
         g.fontStyle = titleFontStyle;
         g.fontSize = Mathf.RoundToInt(titleFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = titleFontColor;
+        g.hover.textColor = titleFontColor;
         g.active.textColor = titleFontColor;
         string s = titleText;
 
@@ -124,7 +150,9 @@ public class MainMenu : MonoBehaviour
 
             s = buttons[i].buttonText;
 
-            if (GUI.Button(r,s,g) ||
+            GUI.enabled = (buttons[i].buttonEnabled);
+
+            if (buttons[i].buttonVisible && GUI.Button(r,s,g) ||
             padButtonSelection == i && padMgr.gPadDown[0].aButton)
             {
                 if (buttons[i].sceneName != "")
@@ -143,5 +171,7 @@ public class MainMenu : MonoBehaviour
                     Application.Quit();
             }
         }
+
+        GUI.enabled = true;
     }
 }

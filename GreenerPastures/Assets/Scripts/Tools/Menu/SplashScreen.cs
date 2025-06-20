@@ -17,6 +17,21 @@ public class SplashScreen : MonoBehaviour
     [Tooltip("Font will scale appropriately based on active screen width, using this 1024 size")]
     public int titleFontSizeAt1024 = 60;
 
+    public string taglineText;
+    public Rect tagline;
+
+    public Font taglineFont;
+    public FontStyle taglineFontStyle;
+    public Color taglineFontColor = Color.white;
+    public int taglineFontSizeAt1024 = 24;
+
+    public Rect version;
+
+    public Font versionFont;
+    public FontStyle versionFontStyle;
+    public Color versionFontColor = Color.gray;
+    public int versionFontSizeAt1024 = 12;
+
     public string startButtonText = "START";
     public string destinationScene;
     public Rect startButton;
@@ -25,6 +40,13 @@ public class SplashScreen : MonoBehaviour
     public FontStyle buttonFontStyle;
     public Color buttonFontColor = Color.white;
     public int buttonFontSizeAt1024 = 48;
+
+    public string legaleseText = "New York Film Academy | Burbank | 3D Game Design Studio | Summer 2025";
+    public Rect legalese;
+    public Font legaleseFont;
+    public FontStyle legaleseFontStyle = FontStyle.Normal;
+    public Color legaleseFontColor = Color.white;
+    public int legaleseFontSizeAt1024 = 14;
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
@@ -63,17 +85,28 @@ public class SplashScreen : MonoBehaviour
         }
     }
 
+    string GetVersionText()
+    {
+        string retText = "";
+
+        retText = "version ";
+        retText += "06.20.01.a"; // TODO: save data used
+
+        return retText;
+    }
+
     void OnGUI()
     {
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;
-        GUIStyle g = new GUIStyle();
+        GUIStyle g = new GUIStyle(GUI.skin.label);
         g.font = titleFont;
         g.fontStyle = titleFontStyle;
         g.fontSize = Mathf.RoundToInt(titleFontSizeAt1024 * (w/1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = titleFontColor;
+        g.hover.textColor = titleFontColor;
         g.active.textColor = titleFontColor;
         string s = titleText;
 
@@ -83,6 +116,38 @@ public class SplashScreen : MonoBehaviour
         r.width *= w;
         r.height *= h;
 
+        GUI.Label(r, s, g);
+
+        r = tagline;
+        r.x *= w;
+        r.y *= h;
+        r.width *= w;
+        r.height *= h;
+        g.font = taglineFont;
+        g.fontStyle = taglineFontStyle;
+        g.fontSize = Mathf.RoundToInt(taglineFontSizeAt1024 * (w / 1024f));
+        g.normal.textColor = taglineFontColor;
+        g.hover.textColor = taglineFontColor;
+        g.active.textColor = taglineFontColor;
+        s = taglineText;
+
+        GUI.color = Color.white;
+        GUI.Label(r, s, g);
+
+        r = version;
+        r.x *= w;
+        r.y *= h;
+        r.width *= w;
+        r.height *= h;
+        g.font = versionFont;
+        g.fontStyle = versionFontStyle;
+        g.fontSize = Mathf.RoundToInt(versionFontSizeAt1024 * (w / 1024f));
+        g.normal.textColor = versionFontColor;
+        g.hover.textColor = versionFontColor;
+        g.active.textColor = versionFontColor;
+        s = GetVersionText();
+
+        GUI.color = Color.white;
         GUI.Label(r, s, g);
 
         r = startButton;
@@ -107,5 +172,23 @@ public class SplashScreen : MonoBehaviour
             GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 1;
             splashLaunched = true;
         }
+
+        r = legalese;
+        r.x *= w;
+        r.y *= h;
+        r.width *= w;
+        r.height *= h;
+        g = new GUIStyle(GUI.skin.label);
+        g.font = legaleseFont;
+        g.fontStyle = legaleseFontStyle;
+        g.fontSize = Mathf.RoundToInt(legaleseFontSizeAt1024 * (w / 1024f));
+        g.alignment = TextAnchor.MiddleCenter;
+        g.normal.textColor = legaleseFontColor;
+        g.hover.textColor = legaleseFontColor;
+        g.active.textColor = legaleseFontColor;
+        s = legaleseText;
+
+        GUI.color = Color.white;
+        GUI.Label(r, s, g);
     }
 }

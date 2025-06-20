@@ -219,7 +219,7 @@ MonoBehaviour:
   titleFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
   titleFontSizeAt1024: 50
   credits:
-  - creditText: Ellington
+  - creditText: Ellington Walters
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -227,7 +227,7 @@ MonoBehaviour:
       width: 0.4
       height: 0.09
     alignRight: 0
-  - creditText: Esther
+  - creditText: Esther Li (YT)
     creditPos:
       serializedVersion: 2
       x: 0.5
@@ -235,7 +235,7 @@ MonoBehaviour:
       width: 0.4
       height: 0.09
     alignRight: 1
-  - creditText: 'Grayson '
+  - creditText: Grayson Borchardt
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -243,7 +243,7 @@ MonoBehaviour:
       width: 0.4
       height: 0.09
     alignRight: 0
-  - creditText: Gustavo
+  - creditText: Gustavo Rojas Flores
     creditPos:
       serializedVersion: 2
       x: 0.5
@@ -251,7 +251,7 @@ MonoBehaviour:
       width: 0.4
       height: 0.09
     alignRight: 1
-  - creditText: Huch
+  - creditText: Huch Platt
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -259,7 +259,7 @@ MonoBehaviour:
       width: 0.4
       height: 0.09
     alignRight: 0
-  - creditText: Li-Ai
+  - creditText: LiAi Yang
     creditPos:
       serializedVersion: 2
       x: 0.5
@@ -267,7 +267,7 @@ MonoBehaviour:
       width: 0.4
       height: 0.09
     alignRight: 1
-  - creditText: Tia
+  - creditText: Alithia Hadiwibowo (Tia)
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -275,18 +275,10 @@ MonoBehaviour:
       width: 0.4
       height: 0.09
     alignRight: 0
-  - creditText: New York Film Academy - Burbank - Summer 2025
-    creditPos:
-      serializedVersion: 2
-      x: 0.05
-      y: 0.65
-      width: 0.9
-      height: 0.09
-    alignRight: 1
   creditFont: {fileID: 0}
   creditsFontStyle: 0
   creditFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
-  creditFontSizeAt1024: 40
+  creditFontSizeAt1024: 36
   backButtonText: BACK
   backButton:
     serializedVersion: 2

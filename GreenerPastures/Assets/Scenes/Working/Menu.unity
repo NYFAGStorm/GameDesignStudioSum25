@@ -372,14 +372,14 @@ MonoBehaviour:
   titleText: GREENER PASTURES
   title:
     serializedVersion: 2
-    x: 0.1
+    x: 0.05
     y: 0.1
-    width: 0.8
+    width: 0.9
     height: 0.2
   titleFont: {fileID: 0}
   titleFontStyle: 1
   titleFontColor: {r: 0.23584317, g: 0.62, b: 0.286902, a: 1}
-  titleFontSizeAt1024: 80
+  titleFontSizeAt1024: 79
   buttons:
   - buttonText: Play
     buttonPos:
@@ -388,23 +388,65 @@ MonoBehaviour:
       y: 0.3
       width: 0.4
       height: 0.09
+    buttonAction: 1
     sceneName: GreenerGame
-  - buttonText: Credits
+    buttonEnabled: 1
+    buttonVisible: 1
+  - buttonText: Player Profile
+    buttonPos:
+      serializedVersion: 2
+      x: 0.3
+      y: 0.4
+      width: 0.4
+      height: 0.09
+    buttonAction: 3
+    sceneName: 
+    buttonEnabled: 0
+    buttonVisible: 1
+  - buttonText: Game Selection
     buttonPos:
       serializedVersion: 2
       x: 0.3
       y: 0.5
       width: 0.4
       height: 0.09
-    sceneName: Credits
-  - buttonText: Quit
+    buttonAction: 1
+    sceneName: 
+    buttonEnabled: 0
+    buttonVisible: 1
+  - buttonText: Profile Options
     buttonPos:
       serializedVersion: 2
       x: 0.3
       y: 0.6
       width: 0.4
       height: 0.09
+    buttonAction: 1
     sceneName: 
+    buttonEnabled: 0
+    buttonVisible: 1
+  - buttonText: Credits
+    buttonPos:
+      serializedVersion: 2
+      x: 0.3
+      y: 0.7
+      width: 0.4
+      height: 0.09
+    buttonAction: 1
+    sceneName: Credits
+    buttonEnabled: 1
+    buttonVisible: 1
+  - buttonText: Quit
+    buttonPos:
+      serializedVersion: 2
+      x: 0.3
+      y: 0.85
+      width: 0.4
+      height: 0.09
+    buttonAction: 2
+    sceneName: 
+    buttonEnabled: 1
+    buttonVisible: 1
   buttonFont: {fileID: 0}
   buttonFontStyle: 1
   buttonFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
