@@ -10,7 +10,6 @@ public class DiscoverableElement : MonoBehaviour
     public enum RevealTransition
     {
         Default,
-        PopOff,
         SildeOff,
         FadeOut,
         ScaleDown,
@@ -43,7 +42,9 @@ public class DiscoverableElement : MonoBehaviour
     private bool elementDiscovered;
     private float revealTimer;
     private float revealProgress;
-    private PlayerData playerData;  // REVIEW: how to set as client player?
+    // TODO: set as client player once logged in
+    // REVIEW: hold onto rewards and deliver to next logged in player?
+    private PlayerData playerData = new PlayerData();
 
 
     void Start()
@@ -110,6 +111,8 @@ public class DiscoverableElement : MonoBehaviour
                 revealTimer = 0f;
             revealProgress = Mathf.Clamp01(1f - (revealTimer/revealTime));
 
+            revealProgress = revealAnimation.Evaluate(revealProgress);
+
             if (revealProgress == 1f)
                 ProvideReward();
         }
@@ -157,11 +160,6 @@ public class DiscoverableElement : MonoBehaviour
         float w = Screen.width;
         float h = Screen.height;
 
-        r.x *= w;
-        r.y *= h;
-        r.width *= w;
-        r.height *= h;
-
         GUIStyle g = new GUIStyle();
         g.normal.background = null;
         g.hover.background = null;
@@ -171,6 +169,11 @@ public class DiscoverableElement : MonoBehaviour
 
         if (!elementDiscovered)
         {
+            r.x *= w;
+            r.y *= h;
+            r.width *= w;
+            r.height *= h;
+
             GUI.DrawTexture(r, t);
             // REVIEW: clickable area smaller than image space?
             if (GUI.Button(r, "", g))
@@ -178,14 +181,10 @@ public class DiscoverableElement : MonoBehaviour
             return;
         }
 
-        Vector2 startPos = Vector2.zero;
-        startPos.x = elementSpace.x;
-        startPos.y = elementSpace.y;
-        float animCurveProgress = revealAnimation.Evaluate(revealProgress);
-        Vector2 pos = Vector2.Lerp(startPos, elementTarget, animCurveProgress);
-        Rect revealPosition = new Rect();
-        revealPosition.x = pos.x;
-        revealPosition.y = pos.y;
+        // adjust for lerp to target
+        r.x = Mathf.Lerp(elementSpace.x, elementTarget.x, revealProgress);
+        r.y = Mathf.Lerp(elementSpace.y, elementTarget.y, revealProgress);
+
         // REVIEW: consider calculating aspect ratio
         Vector2 elementCenter = Vector2.zero;
         elementCenter.x = elementSpace.x + (elementSpace.width * 0.5f);
@@ -196,28 +195,22 @@ public class DiscoverableElement : MonoBehaviour
             case RevealTransition.Default:
                 // we should never be here
                 break;
-            case RevealTransition.PopOff:
-                c = Color.white;
-                if (revealProgress == 1f)
-                    c.a = 0f;
-                break;
             case RevealTransition.SildeOff:
                 break;
             case RevealTransition.FadeOut:
-                c = Color.white;
                 c.a = 1f - revealProgress;
                 break;
             case RevealTransition.ScaleDown:
-                r.x = elementCenter.x - ((1f - revealProgress) * (elementCenter.x - elementSpace.x));
-                r.y = elementCenter.y - ((1f - revealProgress) * (elementCenter.y - elementSpace.y));
-                r.width += ((1f - revealProgress) * elementSpace.width);
-                r.height += ((1f - revealProgress) * elementSpace.height);
+                r.x += (elementCenter.x - elementSpace.x) * revealProgress;
+                r.y += (elementCenter.y - elementSpace.y) * revealProgress;
+                r.width -= revealProgress * elementSpace.width;
+                r.height -= revealProgress * elementSpace.height;
                 break;
             case RevealTransition.ScaleUpFade:
-                r.x -= revealProgress * 0.1f * elementSpace.width;
-                r.y -= revealProgress * 0.1f * elementSpace.height;
-                r.width += revealProgress * 0.2f * elementSpace.width;
-                r.height += revealProgress * 0.2f * elementSpace.height;
+                r.x -= (elementCenter.x - elementSpace.x) * .381f * revealProgress;
+                r.y -= (elementCenter.y - elementSpace.y) * .381f * revealProgress;
+                r.width += revealProgress * 0.381f * elementSpace.width;
+                r.height += revealProgress * 0.381f * elementSpace.height;
                 c.a = 1f - revealProgress;
                 break;
             default:
@@ -225,6 +218,12 @@ public class DiscoverableElement : MonoBehaviour
         }
 
         GUI.color = c;
+
+        r.x *= w;
+        r.y *= h;
+        r.width *= w;
+        r.height *= h;
+
         GUI.DrawTexture(r, t);
     }
 }
