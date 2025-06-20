@@ -47,10 +47,21 @@ public class MainMenu : MonoBehaviour
     private string sceneSwitchName;
 
     private SaveLoadManager saveMgr;
+    private bool profileActive; // from data, is profile logged in
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 2;
+
+    private bool profilePopup; // is displaying popup
+    private bool popupEnabled; // is popping up or down
+    private float popupTimer;
+    private float popupProgress;
+    private AnimationCurve popupCurve;
+    private string popupName;
+    private string popupPass;
+
+    const float POPUPTIME = 1f;
 
 
     void Start()
@@ -71,12 +82,45 @@ public class MainMenu : MonoBehaviour
         // initialize
         if (enabled)
         {
-            // TODO: use game data
+            // TODO: set profile active based on data
+            buttons[0].buttonEnabled = profileActive;
+            buttons[2].buttonEnabled = profileActive;
+            buttons[3].buttonEnabled = profileActive;
+            popupCurve = AnimationCurve.EaseInOut(0f,0f,1f,1f);
         }
     }
 
     void Update()
     {
+        // run popup timer
+        if ( popupTimer > 0f )
+        {
+            popupTimer -= Time.deltaTime;
+            if (popupTimer < 0f)
+            {
+                popupTimer = 0f;
+                popupEnabled = !popupEnabled;
+                if (!popupEnabled)
+                {
+                    profilePopup = false;
+                    for (int i = 0; i < buttons.Length; i++)
+                    {
+                        buttons[i].buttonVisible = true;
+                    }
+                }
+            }
+            else
+            {
+                if (popupEnabled)
+                    popupProgress = 1f - popupCurve.Evaluate(popupTimer / POPUPTIME);
+                else
+                    popupProgress = popupCurve.Evaluate(popupTimer / POPUPTIME);
+            }
+            popupProgress = Mathf.Clamp01(popupProgress);
+        }
+
+        // TODO: handle gamepad button navigation when popup active
+
         // run switch timer
         if ( sceneSwitchTimer > 0f )
         {
@@ -126,6 +170,97 @@ public class MainMenu : MonoBehaviour
 
         GUI.Label(r, s, g);
 
+        // PLAYER PROFILE CREATION / LOGIN
+        if (profilePopup)
+        {
+            r = new Rect();
+            r.x = 0.2f * w;
+            r.y = (0.3f * h) + (popupProgress * 0.85f * h);
+            r.width = 0.6f * w;
+            r.height = 0.4f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.normal.textColor = buttonFontColor;
+            g.hover.textColor = buttonFontColor;
+            g.active.textColor = buttonFontColor;
+            g.fontStyle = FontStyle.Bold;
+            g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
+            g.padding = new RectOffset(0, 0, 20, 0);
+            s = "Player Profile";
+            GUI.color = Color.white;
+            GUI.Box(r, s, g);
+
+            // Popup Entry Labels
+            r.x += 0.05f * w;
+            r.y += 0.1f * h;
+            r.width = 0.25f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.normal.textColor = buttonFontColor;
+            g.hover.textColor = buttonFontColor;
+            g.active.textColor = buttonFontColor;
+            g.alignment = TextAnchor.MiddleRight;
+            g.padding = new RectOffset(0, 20, 0, 0);
+            g.fontSize = Mathf.RoundToInt(20 * (w/1024f));
+            g.fontStyle = FontStyle.Normal;
+            s = "Player Profile Name";
+            GUI.Label(r, s, g);
+            r.y += 0.05f * h;
+            s = "Profile Password";
+            GUI.Label(r, s, g);
+
+            // Popup Text Entry
+            r.x += 0.25f * w;
+            r.y -= 0.05f * h;
+            g = new GUIStyle(GUI.skin.textField);
+            g.normal.textColor = buttonFontColor;
+            g.hover.textColor = buttonFontColor;
+            g.active.textColor = buttonFontColor;
+            g.alignment = TextAnchor.MiddleLeft;
+            g.padding = new RectOffset(20, 0, 0, 0);
+            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+            popupName = GUI.TextField(r, popupName, g);
+            r.y += 0.05f * h;
+            popupPass = GUI.PasswordField(r, popupPass, char.Parse("*"), g);
+
+            // Popup Buttons
+            r.x = 0.25f * w;
+            r.y += 0.1f * h;
+            r.width = 0.2f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.normal.textColor = buttonFontColor;
+            g.active.textColor = buttonFontColor;
+            // Create / Login
+            if (padButtonSelection == 0) // TODO:
+                g.normal.textColor = Color.white;
+            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+            s = "NEW"; //"LOGIN";
+            if (GUI.Button(r, s, g))
+            {
+                // temp
+                buttons[0].buttonEnabled = true;
+                buttons[2].buttonEnabled = true;
+                buttons[3].buttonEnabled = true;
+                // TODO:
+                profileActive = true;
+                popupTimer = POPUPTIME;
+            }
+
+            // Cancel
+            r.x += 0.3f * w;
+            if (padButtonSelection == 1) // TODO:
+                g.normal.textColor = Color.white;
+            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+            s = "CANCEL";
+            if (GUI.Button(r, s, g))
+            {
+                // temp
+                popupTimer = POPUPTIME;
+            }
+
+            return;
+        }
+
         if (buttons == null || buttons.Length == 0)
             return;
 
@@ -155,7 +290,7 @@ public class MainMenu : MonoBehaviour
             if (buttons[i].buttonVisible && GUI.Button(r,s,g) ||
             padButtonSelection == i && padMgr.gPadDown[0].aButton)
             {
-                if (buttons[i].sceneName != "")
+                if (buttons[i].sceneName != "" && buttons[i].buttonAction == ButtonAction.SceneSwitch)
                 {
                     if ((buttons[i].sceneName == "GreenerGame"))
                     {
@@ -167,7 +302,19 @@ public class MainMenu : MonoBehaviour
                     else
                         SceneManager.LoadScene(buttons[i].sceneName);
                 }
-                else
+                else if (buttons[i].buttonAction == ButtonAction.PopupLaunch)
+                {
+                    // profile popup
+                    popupName = "";
+                    popupPass = "";
+                    for (int n = 0; n < buttons.Length; n++)
+                    {
+                        buttons[n].buttonVisible = false;
+                    }
+                    profilePopup = true;
+                    popupTimer = POPUPTIME;
+                }
+                else if (buttons[i].buttonAction == ButtonAction.Quit)
                     Application.Quit();
             }
         }

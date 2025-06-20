@@ -390,7 +390,7 @@ MonoBehaviour:
       height: 0.09
     buttonAction: 1
     sceneName: GreenerGame
-    buttonEnabled: 1
+    buttonEnabled: 0
     buttonVisible: 1
   - buttonText: Player Profile
     buttonPos:
@@ -401,7 +401,7 @@ MonoBehaviour:
       height: 0.09
     buttonAction: 3
     sceneName: 
-    buttonEnabled: 0
+    buttonEnabled: 1
     buttonVisible: 1
   - buttonText: Game Selection
     buttonPos:
