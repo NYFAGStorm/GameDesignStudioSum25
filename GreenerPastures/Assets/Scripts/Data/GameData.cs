@@ -5,7 +5,7 @@
 public class GameStats
 {
     public long gameInitTime; // seed date/time when game created
-    public float totalGameTime; // increment while any player online
+    public float totalGameTime; // increment while any profile player is in game
 }
 
 public enum GameState
