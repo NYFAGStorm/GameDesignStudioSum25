@@ -205,6 +205,11 @@ public class SaveLoadManager : MonoBehaviour
         profile.state = ProfileState.Connecting;
     }
 
+    public bool IsProfileLoggedIn()
+    {
+        return (profile != null);
+    }
+
     public ProfileData GetCurrentProfile()
     {
         if (profile == null)

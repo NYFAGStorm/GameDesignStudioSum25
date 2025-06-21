@@ -86,7 +86,7 @@ public class MainMenu : MonoBehaviour
         if (enabled)
         {
             // set profile active based on data
-            profileActive = (saveMgr.GetCurrentProfile() == null);
+            profileActive = saveMgr.IsProfileLoggedIn();
             buttons[0].buttonEnabled = profileActive;
             buttons[2].buttonEnabled = profileActive;
             buttons[3].buttonEnabled = profileActive;
