@@ -11,13 +11,26 @@ public class CastManager : MonoBehaviour
     private int singleCastToRemove; // remove effect and cast upon expiration
 
     private SaveLoadManager saveMgr;
+    private bool performCastListBirths;
 
 
     void Awake()
     {
         saveMgr = GameObject.FindAnyObjectByType<SaveLoadManager>();
-        if (saveMgr != null && saveMgr.GetCurrentGameData().casts != null )
+        if (saveMgr != null && saveMgr.GetCurrentGameData().casts != null)
             casts = saveMgr.GetCurrentGameData().casts;
+        // TIME PASSAGE MECHANICS
+        // apply effect of these casts
+        // 1. Cast Manager gets cast list (flag set if casts)
+        performCastListBirths = (casts.Length > 0);
+        // 2. Start() check flag and birth casts
+        // TODO: check in with time manager re: time passage
+        // TODO: fast forward time wrt cast lifetime
+        // TODO: remove casts for those that expired
+        // REVIEW: in case casts were removed in time passage,
+        //  ... find a way to allow a portion of effects to apply?
+        // NOTE: for each system, time passage should be defined
+        //  ... how does a unit of game time affect system?
     }
 
     void OnDestroy()
@@ -34,6 +47,14 @@ public class CastManager : MonoBehaviour
         {
             birthNewCast = -1;
             singleCastToRemove = -1;
+
+            if (performCastListBirths)
+            {
+                for (int i = 0; i < casts.Length; i++)
+                {
+                    HandleCastBirth(i);
+                }
+            }
         }
     }
 
