@@ -67,7 +67,8 @@ public class SaveLoadManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-
+            profile = null;
+            game = null;
         }
     }
 
@@ -91,14 +92,9 @@ public class SaveLoadManager : MonoBehaviour
         return GAMESPATH + GAMEFILEPREFIX + key + GAMEFILESUFFIX;
     }
 
-    // TODO: auto-load on enable
-    // . load roster.dat
-    // . (upon login , set profile to current)
-    // . (upon selectin of game...)
+    // TODO: 
+    // . (upon selection of game...)
     // . load game data .dat
-    // TODO: auto-save on destroy
-    // . save roster.dat
-    // . save current game data .dat
 
     // TODO: handle mismatch version data
 
@@ -163,6 +159,11 @@ public class SaveLoadManager : MonoBehaviour
         return retBool;
     }
 
+    public RosterData GetRosterData()
+    {
+        return roster;
+    }
+
     void HandleFirstRunRoster()
     {
         roster = ProfileSystem.InitializeUserRoster(VERSIONNUMBERSTRING);
@@ -178,17 +179,30 @@ public class SaveLoadManager : MonoBehaviour
         // TODO:
     }
 
+    public void CreateNewRosterEntry( ProfileData profile )
+    {
+        roster = ProfileSystem.AddProfile(roster, profile);
+    }
+
     public void LoginProfile( ProfileData pData )
     {
-        if (pData != null && pData != profile)
+        if (pData == null)
         {
-            Debug.LogError("--- SaveLoadManager [LogoutProfile] :another profile is currently logged in. aborting.");
+            Debug.LogError("--- SaveLoadManager [LoginProfile] : invalid profile data. aborting.");
             return;
         }
-        else if (pData == profile)
-            Debug.LogWarning("--- SaveLoadManager [LogoutProfile] : current profile already logged in. will ignore.");
-        profile.state = ProfileState.Connecting;
+        else if (profile != null && pData != profile)
+        {
+            Debug.LogError("--- SaveLoadManager [LoginProfile] : another profile is currently logged in. aborting.");
+            return;
+        }
+        else if (profile != null && pData == profile)
+        {
+            Debug.LogError("--- SaveLoadManager [LoginProfile] : profile data is currently logged in. aborting.");
+            return;
+        }
         profile = pData;
+        profile.state = ProfileState.Connecting;
     }
 
     public ProfileData GetCurrentProfile()
@@ -199,28 +213,23 @@ public class SaveLoadManager : MonoBehaviour
         return profile;
     }
 
-    public void SetCurrentProfile( ProfileData pData )
-    {
-        if (pData == null)
-        {
-            Debug.LogError("--- SaveLoadManager [SetCurrentProfile] : empty profile data. aborting.");
-            return;
-        }
-        if (profile != null)
-            Debug.LogWarning("--- SaveLoadManager [SetCurrentProfile] : current profile exists. will overwrite.");
-
-        profile = pData;
-    }
-
     public void LogoutProfile( ProfileData pData )
     {
-        if (pData != profile)
+        if (profile == null)
+        {
+            Debug.LogError("--- SaveLoadManager [LogoutProfile] : no current profile logged in. aborting.");
+            return;
+        }
+        else if (pData != profile)
         {
             Debug.LogError("--- SaveLoadManager [LogoutProfile] : given profile does not match current. aborting.");
             return;
         }
         else if (pData == null)
-            Debug.LogWarning("--- SaveLoadManager [LogoutProfile] : no current profile. will ignore.");
+        {
+            Debug.LogError("--- SaveLoadManager [LogoutProfile] : given profile data invalid. aborting.");
+            return;
+        }
         profile.state = ProfileState.Offline;
         profile = null;
     }

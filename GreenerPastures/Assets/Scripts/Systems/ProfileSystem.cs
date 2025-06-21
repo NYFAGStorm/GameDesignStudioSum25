@@ -18,6 +18,76 @@ public static class ProfileSystem
     }
 
     /// <summary>
+    /// Returns true if given username exists as a profile in the given roster
+    /// </summary>
+    /// <param name="roster">roster data</param>
+    /// <param name="username">profile login name</param>
+    /// <returns>true if exists in roster, false if does not</returns>
+    public static bool ProfileExistsInRoster( RosterData roster, string username )
+    {
+        bool retBool = false;
+
+        for ( int i = 0; i < roster.profiles.Length; i++ )
+        {
+            if (roster.profiles[i].loginName == username)
+            {
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    /// <summary>
+    /// Returns true if given roster holds a profile with matching name and password
+    /// </summary>
+    /// <param name="roster">roster data</param>
+    /// <param name="username">profile login name</param>
+    /// <param name="password">profile login password</param>
+    /// <returns>true if password matches profile, false if not or if does not exist</returns>
+    public static bool PasswordMatchToProfile( RosterData roster, string username, string password )
+    {
+        bool retBool = false;
+
+        for (int i = 0; i < roster.profiles.Length; i++)
+        {
+            if (roster.profiles[i].loginName == username &&
+                roster.profiles[i].loginPass == password)
+            {
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    /// <summary>
+    /// Returns the profile data from given profile login name and password
+    /// </summary>
+    /// <param name="roster">roster data</param>
+    /// <param name="username">profile login name</param>
+    /// <param name="password">profile login password</param>
+    /// <returns>profile data login name and login password, or blank if does not exist</returns>
+    public static ProfileData GetProfile( RosterData roster, string username, string password )
+    {
+        ProfileData retProfile = new ProfileData();
+
+        for (int i = 0; i < roster.profiles.Length; i++)
+        {
+            if (roster.profiles[i].loginName == username &&
+                roster.profiles[i].loginPass == password)
+            {
+                retProfile = roster.profiles[i];
+                break;
+            }
+        }
+
+        return retProfile;
+    }
+
+    /// <summary>
     /// Adds the given profile to the given roster, if not already in
     /// </summary>
     /// <param name="roster">roster data</param>

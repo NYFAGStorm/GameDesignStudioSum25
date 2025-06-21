@@ -60,6 +60,9 @@ public class MainMenu : MonoBehaviour
     private AnimationCurve popupCurve;
     private string popupName;
     private string popupPass;
+    private bool popupConfirm;
+    private string confirmPass;
+    private string popupFeedback;
 
     const float POPUPTIME = 1f;
 
@@ -82,7 +85,8 @@ public class MainMenu : MonoBehaviour
         // initialize
         if (enabled)
         {
-            // TODO: set profile active based on data
+            // set profile active based on data
+            profileActive = (saveMgr.GetCurrentProfile() == null);
             buttons[0].buttonEnabled = profileActive;
             buttons[2].buttonEnabled = profileActive;
             buttons[3].buttonEnabled = profileActive;
@@ -127,11 +131,22 @@ public class MainMenu : MonoBehaviour
                 SceneManager.LoadScene(sceneSwitchName);
         }
 
-        // TODO: handle gamepad button navigation when popup active
-
         if ( profilePopup )
         {
             padMaxButton = 1;
+            // determine ui selection from game pad input
+            if (padMgr.gPadDown[0].XaxisL < 0f)
+            {
+                padButtonSelection--;
+                if (padButtonSelection < 0)
+                    padButtonSelection = padMaxButton;
+            }
+            else if (padMgr.gPadDown[0].XaxisL > 0f)
+            {
+                padButtonSelection++;
+                if (padButtonSelection > padMaxButton)
+                    padButtonSelection = 0;
+            }
         }
         else
         {
@@ -185,7 +200,7 @@ public class MainMenu : MonoBehaviour
             r.x = 0.2f * w;
             r.y = (0.3f * h) + (popupProgress * 0.85f * h);
             r.width = 0.6f * w;
-            r.height = 0.4f * h;
+            r.height = 0.5f * h;
             g = new GUIStyle(GUI.skin.box);
             g.normal.textColor = buttonFontColor;
             g.hover.textColor = buttonFontColor;
@@ -212,13 +227,21 @@ public class MainMenu : MonoBehaviour
             g.fontStyle = FontStyle.Normal;
             s = "Player Profile Name";
             GUI.Label(r, s, g);
-            r.y += 0.05f * h;
+            r.y += 0.075f * h;
             s = "Profile Password";
             GUI.Label(r, s, g);
+            if (popupConfirm)
+            {
+                r.y += 0.075f * h;
+                s = "Confirm Password";
+                GUI.Label(r, s, g);
+            }
 
             // Popup Text Entry
             r.x += 0.25f * w;
-            r.y -= 0.05f * h;
+            r.y -= 0.075f * h;
+            if (popupConfirm)
+                r.y -= 0.075f * h;
             g = new GUIStyle(GUI.skin.textField);
             g.normal.textColor = buttonFontColor;
             g.hover.textColor = buttonFontColor;
@@ -227,47 +250,132 @@ public class MainMenu : MonoBehaviour
             g.padding = new RectOffset(20, 0, 0, 0);
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             popupName = GUI.TextField(r, popupName, g);
-            r.y += 0.05f * h;
+            r.y += 0.075f * h;
             popupPass = GUI.PasswordField(r, popupPass, char.Parse("*"), g);
+            if (popupConfirm)
+            {
+                r.y += 0.075f * h;
+                confirmPass = GUI.PasswordField(r, confirmPass, char.Parse("*"), g);
+            }
+
+            // Popup Feedback
+            r.x = 0.25f * w;
+            r.y += 0.135f * h;
+            if (popupConfirm)
+                r.y -= 0.075f * h;
+            r.width = 0.5f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            Color c = Color.gray;
+            g.normal.textColor = c;
+            g.hover.textColor = c;
+            g.active.textColor = c;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.padding = new RectOffset(0, 20, 0, 0);
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+            g.fontStyle = FontStyle.BoldAndItalic;
+            s = popupFeedback;
+            GUI.Label(r, s, g);
 
             // Popup Buttons
             r.x = 0.25f * w;
-            r.y += 0.1f * h;
+            r.y += 0.0625f * h;
             r.width = 0.2f * w;
             r.height = 0.1f * h;
             g = new GUIStyle(GUI.skin.button);
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
             // Create / Login
-            if (padButtonSelection == 0) // TODO:
+            if (padButtonSelection == 0)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
-            s = "CREATE"; //"LOGIN";
-            if (GUI.Button(r, s, g))
+            s = "LOGIN";
+            if (popupConfirm && popupPass == confirmPass)
+                s = "CREATE";
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 0 &&
+                padMgr.gPadDown[0].aButton))
             {
-                // temp
-                buttons[0].buttonEnabled = true;
-                buttons[2].buttonEnabled = true;
-                buttons[3].buttonEnabled = true;
-                // TODO:
-                profileActive = true;
-                popupTimer = POPUPTIME;
-                if (padMgr != null && padMgr.gamepads[0].isActive)
+                if (popupConfirm)
                 {
-                    padButtonSelection = -1;
-                    padMaxButton = 5;
+                    // confirming password
+                    if (popupPass != confirmPass)
+                    {
+                        // mismatch confirm
+                        popupFeedback = "password and confirmation do not match";
+                    }
+                    else if (ProfileSystem.ProfileExistsInRoster(saveMgr.GetRosterData(), popupName))
+                    {
+                        // existing user name
+                        popupFeedback = "this user name already exists";
+                    }
+                    else
+                    {
+                        // create new
+                        ProfileData newProfile = ProfileSystem.InitializeProfile(popupName, popupPass);
+                        saveMgr.CreateNewRosterEntry(newProfile);
+                        saveMgr.LoginProfile(newProfile);
+                        buttons[0].buttonEnabled = true;
+                        buttons[2].buttonEnabled = true;
+                        buttons[3].buttonEnabled = true;
+                        profileActive = true;
+                        popupTimer = POPUPTIME;
+                        if (padMgr != null && padMgr.gamepads[0].isActive)
+                        {
+                            padButtonSelection = -1;
+                            padMaxButton = 5;
+                        }
+                        popupFeedback = "new profile created and logged in";
+                    }
+                }
+                else
+                {
+                    if (ProfileSystem.ProfileExistsInRoster(saveMgr.GetRosterData(), popupName))
+                    {
+                        // profile name exists in roster
+                        if (ProfileSystem.PasswordMatchToProfile(saveMgr.GetRosterData(), popupName, popupPass))
+                        {
+                            // login profile
+                            saveMgr.LoginProfile(ProfileSystem.GetProfile(saveMgr.GetRosterData(), popupName, popupPass));
+                            buttons[0].buttonEnabled = true;
+                            buttons[2].buttonEnabled = true;
+                            buttons[3].buttonEnabled = true;
+                            profileActive = true;
+                            popupTimer = POPUPTIME;
+                            if (padMgr != null && padMgr.gamepads[0].isActive)
+                            {
+                                padButtonSelection = -1;
+                                padMaxButton = 5;
+                            }
+                            popupFeedback = "profile logged in";
+                        }
+                        else
+                        {
+                            // password mismatch
+                            popupFeedback = "password invalid";
+                        }
+                    }
+                    else
+                    {
+                        // no user by that name in roster
+                        popupConfirm = true;
+                        popupFeedback = "new user confirm or [CANCEL]";
+                    }
                 }
             }
 
             // Cancel
             r.x += 0.3f * w;
-            if (padButtonSelection == 1) // TODO:
+            if (padButtonSelection == 1)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "CANCEL";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null && 
+                padMgr.gamepads[0].isActive && padButtonSelection == 1 &&
+                padMgr.gPadDown[0].aButton))
             {
-                // temp
+                popupConfirm = false;
+                popupFeedback = "";
                 popupTimer = POPUPTIME;
                 if (padMgr != null && padMgr.gamepads[0].isActive)
                 {
@@ -325,6 +433,7 @@ public class MainMenu : MonoBehaviour
                     // profile popup
                     popupName = "";
                     popupPass = "";
+                    confirmPass = "";
                     for (int n = 0; n < buttons.Length; n++)
                     {
                         buttons[n].buttonVisible = false;
