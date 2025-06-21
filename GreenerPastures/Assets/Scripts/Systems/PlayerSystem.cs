@@ -6,16 +6,16 @@ public static class PlayerSystem
     /// Creates a new player and profile
     /// </summary>
     /// <param name="name">in-game player name</param>
-    /// <param name="profile">profile id</param>
+    /// <param name="profID">profile id</param>
     /// <returns>initialized player data</returns>
-    public static PlayerData InitializePlayer( string name, string profile )
+    public static PlayerData InitializePlayer( string name, string profID )
     {
         PlayerData retPlayer = new PlayerData();
 
         // initialize
         retPlayer.playerName = name;
         retPlayer.stats = new PlayerStats();
-        retPlayer.profileID = profile;
+        retPlayer.profileID = profID;
         retPlayer.farm = FarmSystem.InitializeFarm();
         retPlayer.gold = 50; // starting gold is 50
         retPlayer.islandRange = 7f;

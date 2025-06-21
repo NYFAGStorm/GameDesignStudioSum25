@@ -115,6 +115,7 @@ public class ProfileOptions : MonoBehaviour
         g.normal.textColor = buttonFontColor;
         g.active.textColor = buttonFontColor;
         string s = titleText;
+        Color c = Color.white;
 
         // title
         r = title;

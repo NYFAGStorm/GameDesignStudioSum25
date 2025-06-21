@@ -12,14 +12,26 @@ public static class GameSystem
 
         // initialize
         retGame.gameName = name;
-        retGame.gameKey = "[" + System.DateTime.Now.Millisecond + "]" + name;
+        retGame.gameKey = "[" + System.DateTime.Now.Millisecond + "]-" + name;
         retGame.stats = new GameStats();
         retGame.stats.gameInitTime = System.DateTime.Now.ToFileTimeUtc();
         retGame.state = GameState.Initializing;
         retGame.players = new PlayerData[0];
-        retGame.options = new GameOptionsData();
+        retGame.options = InitializeGameOptions();
 
         return retGame;
+    }
+
+    public static GameOptionsData InitializeGameOptions()
+    {
+        GameOptionsData retOptions = new GameOptionsData();
+
+        retOptions.maxPlayers = 8;
+        retOptions.allowCheats = false;
+        retOptions.allowHazards = false;
+        retOptions.allowCurses = true;
+
+        return retOptions;
     }
 
     /// <summary>
@@ -92,5 +104,34 @@ public static class GameSystem
         retGame.players = tmp;
 
         return retGame;
+    }
+
+    /// <summary>
+    /// Returns the player data in the given game matching the given profile
+    /// </summary>
+    /// <param name="game">game data</param>
+    /// <param name="profile">profile data</param>
+    /// <returns>player data with matching profile ID, or empty player data if not found</returns>
+    public static PlayerData GetProfilePlayer( GameData game, ProfileData profile )
+    {
+        PlayerData retPlayer = new PlayerData();
+
+        // validate
+        if (game == null || game.players == null || game.players.Length == 0)
+        {
+            UnityEngine.Debug.LogError("--- GameSystem [GetProfilePlayer] : invalid game or player data. will return empty player data.");
+            return retPlayer;
+        }
+
+        for ( int i = 0; i < game.players.Length; i++ )
+        {
+            if (game.players[i].profileID == profile.profileID)
+            {
+                retPlayer = game.players[i];
+                break;
+            }
+        }
+
+        return retPlayer;
     }
 }

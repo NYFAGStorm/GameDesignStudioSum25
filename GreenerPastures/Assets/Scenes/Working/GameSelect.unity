@@ -580,6 +580,11 @@ MonoBehaviour:
   titleFontStyle: 1
   titleFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
   titleFontSizeAt1024: 50
+  labelFont: {fileID: 0}
+  labelFontStyle: 0
+  labelFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
+  labelFontSizeAt1024: 20
+  buttonFontSizeAt1024: 30
   backButtonText: BACK
   backButton:
     serializedVersion: 2

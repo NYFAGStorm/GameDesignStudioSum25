@@ -3,5 +3,8 @@
 [System.Serializable]
 public class GameOptionsData
 {
-    public float gameTimeRatio = 72.0f;
+    public int maxPlayers;
+    public bool allowCheats;
+    public bool allowHazards;
+    public bool allowCurses;
 }

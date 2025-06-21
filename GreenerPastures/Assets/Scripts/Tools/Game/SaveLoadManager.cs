@@ -19,8 +19,8 @@ public class SaveLoadManager : MonoBehaviour
 
     private string persistentPath;
 
-    const string COMPANYNAME = "NYFA Game Design";
-    const string PRODUCTNAME = "Greener Pastures";
+    const string COMPANYNAME = "NYFA Game Design"; // already in persistent
+    const string PRODUCTNAME = "Greener Pastures"; // already in persistent
     const string ROSTERFILE = "/GreenerRoster.dat";
     const string GAMESPATH = "/Games/";
     const string GAMEFILEPREFIX = "GreenerGame-";
@@ -273,6 +273,14 @@ public class SaveLoadManager : MonoBehaviour
         // save game data file
         string p = GetGameDataPath() + GetGameFileName(gameKey);
 
+        // ensure games folder has been established
+        string gameDir = GetGameDataPath() + GAMESPATH;
+        if (!Directory.Exists(gameDir))
+        {
+            DirectoryInfo di = new DirectoryInfo(gameDir);
+            di.Create();
+        }
+
         if (!File.Exists(p))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -294,12 +302,22 @@ public class SaveLoadManager : MonoBehaviour
         return retBool;
     }
 
+    public bool IsGameCurrentlyLoaded()
+    {
+        return (game != null);
+    }
+
     public GameData GetCurrentGameData()
     {
         if (game == null)
             Debug.LogWarning("--- SaveLoadManager [GetCurrentGameData] : no game loaded. will return null.");
 
         return game;
+    }
+
+    public void ClearCurrentGameData()
+    {
+        game = null;
     }
 
     public void SetCurrentGameData( GameData gData )
