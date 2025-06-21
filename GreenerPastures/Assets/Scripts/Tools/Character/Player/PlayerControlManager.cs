@@ -60,7 +60,7 @@ public class PlayerControlManager : MonoBehaviour
     private PlotManager activePlot;
     private PlayerActions characterActions;
 
-    private InventoryData playerInventory;
+    private InventoryData playerInventory; // reference to player data inventory
     private int currentInventorySelection;
 
     private MultiGamepad padMgr;
@@ -70,9 +70,11 @@ public class PlayerControlManager : MonoBehaviour
     private MagicManager mm;
     private ArtLibraryManager alm;
     private TimeManager tim;
+    private SaveLoadManager saveMgr;
 
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
+    const bool ALLOWPLAYERDATALOAD = true; // for testing
 
 
     void Start()
@@ -113,43 +115,62 @@ public class PlayerControlManager : MonoBehaviour
             Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no time manager found in scene. aborting.");
             enabled = false;
         }
+        saveMgr = GameObject.FindAnyObjectByType<SaveLoadManager>();
+        if ( saveMgr == null )
+        {
+            Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no time manager found in scene. aborting.");
+            //enabled = false;
+        }
         // initialize
         if (enabled)
         {
             cam.SetPlayer(this);
-            playerInventory = InventorySystem.InitializeInventory(5);
-            currentInventorySelection = 2;
 
-            // temp - fill player inventory for testing
-            playerInventory.items = new ItemData[3];
-            playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.Fertilizer);
-            playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.Seed);
-            playerInventory.items[1].name += " (Carrot)";
-            playerInventory.items[1].plantIndex = (int)PlantType.Carrot;
-            playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.Seed);
-            playerInventory.items[2].name += " (Tomato)";
-            playerInventory.items[2].plantIndex = (int)PlantType.Tomato;
+            if (saveMgr == null || !ALLOWPLAYERDATALOAD)
+            {
+                // temp - fill player inventory for testing
+                playerInventory = InventorySystem.InitializeInventory(5);
+                currentInventorySelection = 2;
 
-            // temp - player data (mainly for gold)
-            ProfileData tempProfile = ProfileSystem.InitializeProfile("user", "pass");
-            playerData = PlayerSystem.InitializePlayer("Player", tempProfile.profileID);
-            playerData.inventory = playerInventory;
+                playerInventory.items = new ItemData[3];
+                playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.Fertilizer);
+                playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.Seed);
+                playerInventory.items[1].name += " (Carrot)";
+                playerInventory.items[1].plantIndex = (int)PlantType.Carrot;
+                playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.Seed);
+                playerInventory.items[2].name += " (Tomato)";
+                playerInventory.items[2].plantIndex = (int)PlantType.Tomato;
 
-            // temp - player magic
-            playerData.magic = MagicSystem.IntializeMagic();
-            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, playerData.magic.library);
-            playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, playerData.magic.library);
-            playerData.magic.library.grimiore[0].name = "Fast Grow I";
-            playerData.magic.library.grimiore[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
-            playerData.magic.library.grimiore[0].description = "Plants grow faster for one day. (5%)";
-            playerData.magic.library.grimiore[0].ingredients = new ItemType[2];
-            playerData.magic.library.grimiore[0].ingredients[0] = ItemType.Fertilizer;
-            playerData.magic.library.grimiore[0].ingredients[1] = ItemType.Stalk;
-            playerData.magic.library.grimiore[1].name = "Summon Water I";
-            playerData.magic.library.grimiore[1].description = "Waters a 2x2 area that stays hydrated for one day.";
-            playerData.magic.library.grimiore[1].ingredients = new ItemType[2];
-            playerData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
-            playerData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
+                // temp - player data (mainly for gold)
+                ProfileData tempProfile = ProfileSystem.InitializeProfile("user", "pass");
+                playerData = PlayerSystem.InitializePlayer("Player", tempProfile.profileID);
+                playerData.inventory = playerInventory;
+
+                // temp - player magic
+                playerData.magic = MagicSystem.IntializeMagic();
+                playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, playerData.magic.library);
+                playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, playerData.magic.library);
+                playerData.magic.library.grimiore[0].name = "Fast Grow I";
+                playerData.magic.library.grimiore[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
+                playerData.magic.library.grimiore[0].description = "Plants grow faster for one day. (5%)";
+                playerData.magic.library.grimiore[0].ingredients = new ItemType[2];
+                playerData.magic.library.grimiore[0].ingredients[0] = ItemType.Fertilizer;
+                playerData.magic.library.grimiore[0].ingredients[1] = ItemType.Stalk;
+                playerData.magic.library.grimiore[1].name = "Summon Water I";
+                playerData.magic.library.grimiore[1].description = "Waters a 2x2 area that stays hydrated for one day.";
+                playerData.magic.library.grimiore[1].ingredients = new ItemType[2];
+                playerData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
+                playerData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
+            }
+            else
+            {
+                // initialize player character
+                ProfileData profData = saveMgr.GetCurrentProfile();
+                GameData gameData = saveMgr.GetCurrentGameData();
+                playerData = GameSystem.GetProfilePlayer(gameData, profData);
+                print(" - player character initialized as '"+playerData.playerName+"' in '"+gameData.gameName+"' -");
+                playerInventory = playerData.inventory;
+            }
         }
     }
 

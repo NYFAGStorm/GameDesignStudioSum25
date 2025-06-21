@@ -57,14 +57,7 @@ MonoBehaviour:
       totalGoldEarned: 0
       totalArcanaEarned: 0
       totalXPEarned: 0
-    profile:
-      loginName: 
-      loginPass: 
-      state: 0
-      options:
-        micAvailable: 0
-        micEnabled: 0
-        voiceChatMuted: 0
+    profileID: 
     farm:
       plots: []
       farmEffects: 
@@ -72,8 +65,11 @@ MonoBehaviour:
     arcana: 0
     xp: 0
     level: 0
-    location: 0
-    action: 0
+    freeFly: 0
+    islandCenterX: 0
+    islandCenterY: 0
+    islandCenterZ: 0
+    islandRange: 0
     inventory:
       maxSlots: 0
       items: []
@@ -99,7 +95,9 @@ MonoBehaviour:
   actionDKey: 118
   lBumpKey: 91
   rBumpKey: 93
+  castKey: 113
   characterFrozen: 0
+  freezeCharacterActions: 0
   hidePlayerHUD: 0
 --- !u!114 &3484861889041133304
 MonoBehaviour:
@@ -113,6 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 281cc859e3066e34aad21692f861af05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mode: 0
 --- !u!81 &1722252933839553243
 AudioListener:
   m_ObjectHideFlags: 0
