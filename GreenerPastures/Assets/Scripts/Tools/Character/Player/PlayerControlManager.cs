@@ -74,7 +74,7 @@ public class PlayerControlManager : MonoBehaviour
 
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
-    const bool ALLOWPLAYERDATALOAD = true; // for testing
+    const bool ALLOWPLAYERDATALOAD = false; // for testing
 
 
     void Start()
@@ -169,6 +169,7 @@ public class PlayerControlManager : MonoBehaviour
                 GameData gameData = saveMgr.GetCurrentGameData();
                 playerData = GameSystem.GetProfilePlayer(gameData, profData);
                 print(" - player character initialized as '"+playerData.playerName+"' in '"+gameData.gameName+"' -");
+                // THIS is significant
                 playerInventory = playerData.inventory;
             }
         }

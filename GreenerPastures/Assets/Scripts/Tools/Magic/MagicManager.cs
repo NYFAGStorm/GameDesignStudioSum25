@@ -52,7 +52,7 @@ public class MagicManager : MonoBehaviour
     private int selectedSpellCharge;
     private GameObject castingCursor;
     private float castCursorSpeed = 3.81f;
-    private CastData cData;
+    private CastData castData;
 
     private PlayerControlManager pcm;
     private MultiGamepad padMgr;
@@ -93,7 +93,7 @@ public class MagicManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-            
+
         }
     }
 
@@ -428,11 +428,11 @@ public class MagicManager : MonoBehaviour
         playerCanCancel = false;
         CastingPresentation();
         modeChangeTimer = CASTMODECHANGETIME;
+        castData = MagicSystem.InitializeCast(pcm.playerData.magic.library.spellBook[selectedSpellCharge], castingCursor.transform.position);
+        if (!CastSpell(castData.type, castingCursor.transform.position))
+            Debug.LogWarning("--- MagicManager [PerformCast] : unable to cast spell (invalid or no charges). will ignore.");
         if (castingCursor != null)
             Destroy(castingCursor);
-        cData = MagicSystem.InitializeCast(pcm.playerData.magic.library.spellBook[selectedSpellCharge], castingCursor.transform.position);
-        if ( !CastSpell(cData.type, castingCursor.transform.position) )
-            Debug.LogWarning("--- MagicManager [PerformCast] : unable to cast spell (invalid or no charges). will ignore.");
         castInstructionsDisplay = false;
         selectedSpellCharge = 0;
         invalidSelection = -1;

@@ -18,6 +18,7 @@ public static class GameSystem
         retGame.state = GameState.Initializing;
         retGame.players = new PlayerData[0];
         retGame.options = InitializeGameOptions();
+        retGame.casts = new CastData[0];
 
         return retGame;
     }

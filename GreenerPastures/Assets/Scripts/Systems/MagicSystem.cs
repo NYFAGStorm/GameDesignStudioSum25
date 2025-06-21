@@ -1,7 +1,5 @@
 // REVIEW: necessary namespaces
 
-using UnityEditor.Experimental.GraphView;
-
 public static class MagicSystem
 {
     /// <summary>

@@ -10,6 +10,21 @@ public class CastManager : MonoBehaviour
     private int birthNewCast; // apply effect for one cast at birth
     private int singleCastToRemove; // remove effect and cast upon expiration
 
+    private SaveLoadManager saveMgr;
+
+
+    void Awake()
+    {
+        saveMgr = GameObject.FindAnyObjectByType<SaveLoadManager>();
+        if (saveMgr != null && saveMgr.GetCurrentGameData().casts != null )
+            casts = saveMgr.GetCurrentGameData().casts;
+    }
+
+    void OnDestroy()
+    {
+        if (saveMgr != null)
+            saveMgr.GetCurrentGameData().casts = casts;
+    }
 
     void Start()
     {
