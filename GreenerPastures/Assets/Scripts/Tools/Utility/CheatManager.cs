@@ -234,7 +234,7 @@ public class CheatManager : MonoBehaviour
                     Vector3 targ = pos + (facing*Vector3.right);
                     LooseItemData seed = InventorySystem.CreateItem(ItemType.Seed);
                     seed.inv.items[0].name = "Seed (Corn)";
-                    seed.inv.items[0].plantIndex = 1;
+                    seed.inv.items[0].plant = PlantType.Corn;
                     ism.SpawnItem(seed, pos, targ);
                 }
                 break;

@@ -104,7 +104,7 @@ public class ItemSpawnManager : MonoBehaviour
                     // seed dropped in empty tilled plot
                     if (looseD.looseItem.inv.items[0].type == ItemType.Seed)
                     {
-                        if (CheckSeedDrop(i, (PlantType)looseD.looseItem.inv.items[0].plantIndex))
+                        if (CheckSeedDrop(i, looseD.looseItem.inv.items[0].plant))
                             looseD.looseItem.deleteMe = true;
                     }
                     // stalk or plant dropped in uprooted plot
@@ -163,7 +163,12 @@ public class ItemSpawnManager : MonoBehaviour
         lim.looseItem.flipped = (dropLocation.x <= spawnLocation.x);
 
         lim.frames = new Texture2D[1];
-        ArtData d = GameObject.FindAnyObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type);
+        // if plant, attempt find specific plant type first (get default type item if failed)
+        ArtData d = new ArtData();
+        if (item.inv.items[0].plant != PlantType.Default)
+            d = GameObject.FindAnyObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type, item.inv.items[0].plant);
+        if ( d.type == ItemType.Default )
+            d = GameObject.FindAnyObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type);
         lim.frames[0] = GameObject.FindAnyObjectByType<ArtLibraryManager>().itemImages[d.artIndexBase];
 
         // handle drop animation
@@ -247,7 +252,7 @@ public class ItemSpawnManager : MonoBehaviour
                     t = (Texture2D)Resources.Load("ProtoPlant04");
                 plantObj.GetComponentInChildren<Renderer>().material.mainTexture = t;
                 plots[i].plant = plantObj;
-                PlantData plant = PlantSystem.InitializePlant((PlantType)iData.plantIndex);
+                PlantData plant = PlantSystem.InitializePlant(iData.plant);
                 plots[i].data.plant = plant;
                 // configure individual plant properties from item data
                 plots[i].data.plant.growth = iData.size;

@@ -1,6 +1,8 @@
 // REVIEW: necessary namespaces
 
 // if there are classes of plants that follow separate rules
+using Unity.VisualScripting;
+
 public enum PlantType
 {
     Default,
@@ -13,7 +15,38 @@ public enum PlantType
     Moonflower,
     Apple,
     Orange,
-    Lemon
+    Lemon,
+    Lotus,
+    Marigold,
+    Magnolia,
+    Myosotis,
+    Chrystalia,
+    Pumpkin,
+    Underbloom,
+    WaterLily,
+    Snowgrace,
+    Popcorn,
+    EclipseFlower,
+    GoldenApple,
+    Hollowbloom,
+    Mandrake,
+    FrostLily,
+    Banana,
+    Coconut,
+    Mysteria,
+    Nightshade,
+    CrystalRose,
+    Yarrow,
+    Dragonroot,
+    WinterRose,
+    FleurDeLis,
+    Tropicus,
+    MourningNyx,
+    BlastApple,
+    PixiePlumeria,
+    FaeFoxglove,
+    DruidsLotus,
+    SplatBerry
 }
 
 public enum PlantRarity
@@ -48,6 +81,7 @@ public class PlantData
     public bool isDarkPlant;
     public bool canReFruit; // when stalk only, does growth reduce to 90% for re-fruiting?
     public bool isHarvested; // stalk only, can be grafted with plant fruit item
+    public float adjustedGrowthRate; // from effects, modify plant type growth rate
     public float growth;
     public float vitality;
     public float health;

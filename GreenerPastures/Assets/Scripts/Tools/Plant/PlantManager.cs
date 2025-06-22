@@ -59,7 +59,9 @@ public class PlantManager : MonoBehaviour
                 healthDelta *= -0.001f;
                 plot.data.plant.health = Mathf.Clamp01(plot.data.plant.health+healthDelta);
                 // calculate growth
-                float growthDelta = resources * 0.2f * progress * plot.data.plant.vitality * plot.data.plant.growthRate;
+                float growthDelta = resources * 0.2f * progress * 
+                    plot.data.plant.vitality * plot.data.plant.growthRate * 
+                    plot.data.plant.adjustedGrowthRate;
                 if (plot.data.plant.growth < 1f)
                 {
                     plot.data.plant.growth = Mathf.Clamp01(plot.data.plant.growth + growthDelta);

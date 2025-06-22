@@ -323,7 +323,7 @@ public class PlotManager : MonoBehaviour
                 plant.transform.parent = transform;
                 plant.transform.position = transform.position;
                 // insert distinct plant data from player inventory current selection
-                data.plant = PlantSystem.InitializePlant((PlantType)iData.plantIndex);
+                data.plant = PlantSystem.InitializePlant(iData.plant);
                 // configure plant from seed to size = 0f (growth) and quality = 0f
                 data.plant.growth = 0f;
                 data.plant.quality = 0f;
@@ -332,9 +332,9 @@ public class PlotManager : MonoBehaviour
                 data.condition = PlotCondition.Growing;
                 // PLOT EFFECTS:
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.FastGrowI))
-                    data.plant.growthRate += 0.05f;
+                    data.plant.adjustedGrowthRate += 0.05f;
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.MalnutritionI))
-                    data.plant.growthRate -= 0.1f;
+                    data.plant.adjustedGrowthRate -= 0.1f;
                 break;
             case PlotCondition.Uprooted:
                 // change ground texture
@@ -428,7 +428,7 @@ public class PlotManager : MonoBehaviour
                                 Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize fruit item. will ignore.");
                             else
                             {
-                                iData.plantIndex = (int)data.plant.type;
+                                iData.plant = data.plant.type;
                                 iData.name += " (" + data.plant.plantName.ToString() + ")";
                             }
                             currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
@@ -470,7 +470,7 @@ public class PlotManager : MonoBehaviour
                                     Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize seed item. will ignore.");
                                 else
                                 {
-                                    iData.plantIndex = (int)data.plant.type;
+                                    iData.plant = data.plant.type;
                                     iData.name += " (" + data.plant.plantName.ToString() + ")";
                                 }
                                 currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);

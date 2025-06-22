@@ -159,11 +159,11 @@ public class MarketManager : MonoBehaviour
                             Debug.LogWarning("--- MarketManager [CheckBuyMode] : unable to initialize item. will ignore.");
                         else
                         {
-                            iData.plantIndex = menuItems[menuItemSelection].plantIndex;
+                            iData.plant = (PlantType)menuItems[menuItemSelection].plantIndex;
                             if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                                 menuItems[menuItemSelection].itemType == ItemType.Fruit)
                             {
-                                PlantType p = (PlantType)iData.plantIndex;
+                                PlantType p = iData.plant;
                                 iData.name += " (" + p.ToString() + ")";
                             }
                         }
@@ -177,11 +177,11 @@ public class MarketManager : MonoBehaviour
                         targ += pos;
                         ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
                         LooseItemData loose = InventorySystem.CreateItem(menuItems[menuItemSelection].itemType);
-                        loose.inv.items[0].plantIndex = menuItems[menuItemSelection].plantIndex;
+                        loose.inv.items[0].plant = (PlantType)menuItems[menuItemSelection].plantIndex;
                         if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                             menuItems[menuItemSelection].itemType == ItemType.Fruit)
                         {
-                            PlantType p = (PlantType)loose.inv.items[0].plantIndex;
+                            PlantType p = loose.inv.items[0].plant;
                             loose.inv.items[0].name += " (" + p.ToString() + ")";
                         }
                         ism.SpawnItem(loose, pos, targ);

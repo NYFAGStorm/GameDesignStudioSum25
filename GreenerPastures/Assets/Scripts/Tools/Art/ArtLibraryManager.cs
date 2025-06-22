@@ -77,6 +77,41 @@ public class ArtLibraryManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Gets art and animation data by item type (uses item type as name) and plant type
+    /// </summary>
+    /// <param name="itemType">item type</param>
+    /// <param name="plantType">plant type</param>
+    /// <returns>art data (empty data if failed)</returns>
+    public ArtData GetArtData(ItemType itemType, PlantType plantType)
+    {
+        ArtData retData = new ArtData();
+
+        // validate
+        bool found = false;
+        int index = -1;
+        for (int i = 0; i < itemArtData.images.Length; i++)
+        {
+            if (itemArtData.images[i].type == itemType &&
+                itemArtData.images[i].plant == plantType)
+            {
+                found = true;
+                index = i;
+                break;
+            }
+        }
+        if (!found)
+        {
+            // REVIEW: suppress this warning until we have art for plant types?
+            Debug.LogWarning("--- ArtLibraryManager [GetArtData] : no data found for item type " + itemType.ToString() + " and plant type " + plantType.ToString() + ". will return null data.");
+            return retData;
+        }
+
+        retData = itemArtData.images[index];
+
+        return retData;
+    }
+
+    /// <summary>
     /// Gets array of images referenced by art data, base and anim sequence
     /// </summary>
     /// <param name="data">art data</param>

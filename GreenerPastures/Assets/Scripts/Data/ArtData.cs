@@ -8,6 +8,7 @@ public class ArtData
 {
     public string name;
     public ItemType type;
+    public PlantType plant; // if plant, otherwise 'default' type
     public int artIndexBase;
     public int artAnimLength;
     public float animFrameTime;

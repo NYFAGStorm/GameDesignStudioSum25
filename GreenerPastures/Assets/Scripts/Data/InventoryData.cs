@@ -29,7 +29,7 @@ public class ItemData
     // REVIEW: this is messy with just necessary plant data, need another way?
     public string name; // REVIEW: necessary?
     public ItemType type;
-    public int plantIndex; // if plant or seed is plant type, else is ?
+    public PlantType plant; // if plant, stalk, fruit or seed, else is default
     public float size; // if plant is growth, else is item size? item amount? (default 1f)
     public float health; // if plant is health, else is item durability (default 1f)
     public float quality; // if plant is quality, else is item quality? (default 1f)

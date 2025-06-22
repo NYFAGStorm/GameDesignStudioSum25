@@ -159,7 +159,7 @@ public class CastManager : MonoBehaviour
                     // Plants grow faster for one day. (5%)
                     plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.FastGrowI);
                     if (plots[i].plant != null)
-                        plots[i].data.plant.growthRate += 0.05f;
+                        plots[i].data.plant.adjustedGrowthRate += 0.05f;
                     break;
                 case SpellType.SummonWaterI:
                     // Waters a 2x2 area that stays hydrated for one day.
@@ -229,7 +229,7 @@ public class CastManager : MonoBehaviour
                     // Plants grow faster for one day. (5%)
                     plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.FastGrowI);
                     if (plots[i].plant != null)
-                        plots[i].data.plant.growthRate -= 0.05f;
+                        plots[i].data.plant.adjustedGrowthRate -= 0.05f;
                     break;
                 case SpellType.SummonWaterI:
                     // Waters a 2x2 area that stays hydrated for one day.

@@ -138,10 +138,10 @@ public class PlayerControlManager : MonoBehaviour
                 playerInventory.items[0] = InventorySystem.InitializeItem(ItemType.Fertilizer);
                 playerInventory.items[1] = InventorySystem.InitializeItem(ItemType.Seed);
                 playerInventory.items[1].name += " (Carrot)";
-                playerInventory.items[1].plantIndex = (int)PlantType.Carrot;
+                playerInventory.items[1].plant = PlantType.Carrot;
                 playerInventory.items[2] = InventorySystem.InitializeItem(ItemType.Seed);
                 playerInventory.items[2].name += " (Tomato)";
-                playerInventory.items[2].plantIndex = (int)PlantType.Tomato;
+                playerInventory.items[2].plant = PlantType.Tomato;
 
                 // temp - player data (mainly for gold)
                 ProfileData tempProfile = ProfileSystem.InitializeProfile("user", "pass");
