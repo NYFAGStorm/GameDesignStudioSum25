@@ -6,7 +6,6 @@ public class PlayerControlManager : MonoBehaviour
     // This handles the local player controls for their character
 
     public PlayerData playerData;
-
     public float characterSpeed = 2.7f;
 
     public enum PlayerControlType
@@ -55,6 +54,9 @@ public class PlayerControlManager : MonoBehaviour
     public bool freezeCharacterActions; // prevent use of action controls
     public bool hidePlayerHUD; // prevent normal player HUD display
 
+    public bool hidePlayerNameTag; // prevent player name HUD display
+    private string playerName;
+
     private Vector3 characterMove;
     private LooseItemManager activeItem;
     private PlotManager activePlot;
@@ -74,7 +76,7 @@ public class PlayerControlManager : MonoBehaviour
 
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
-    const bool ALLOWPLAYERDATALOAD = false; // for testing
+    const bool ALLOWPLAYERDATALOAD = true; // for testing
 
 
     void Start()
@@ -161,6 +163,8 @@ public class PlayerControlManager : MonoBehaviour
                 playerData.magic.library.grimiore[1].ingredients = new ItemType[2];
                 playerData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
                 playerData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
+
+                playerName = "Test Player";
             }
             else
             {
@@ -169,8 +173,9 @@ public class PlayerControlManager : MonoBehaviour
                 GameData gameData = saveMgr.GetCurrentGameData();
                 playerData = GameSystem.GetProfilePlayer(gameData, profData);
                 print(" - player character initialized as '"+playerData.playerName+"' in '"+gameData.gameName+"' -");
-                // THIS is significant
+                // connecting property to data _as a reference_
                 playerInventory = playerData.inventory;
+                playerName = playerData.playerName;
             }
         }
     }
@@ -228,6 +233,9 @@ public class PlayerControlManager : MonoBehaviour
         ClearActivePlot();
         // check near plot
         CheckNearPlot();
+
+        // handle player tag display
+        hidePlayerNameTag = activePlot != null;
 
         // temp (a = work land, b = water plot , c = harvest plant, d = uproot plot)
         // temp (hold-type control detection)
@@ -703,6 +711,44 @@ public class PlayerControlManager : MonoBehaviour
         GUI.color = Color.yellow;
         GUI.Label(r, s, g);
         GUI.color = Color.white;
+
+        // player name tag
+        if (!hidePlayerNameTag && playerName != "")
+        {
+            float distToCam = Vector3.Distance(Camera.main.transform.position, gameObject.transform.position);
+            float fadeName = Mathf.Clamp01( (distToCam - 2f) );
+
+            Vector3 tagPos = Camera.main.WorldToViewportPoint(gameObject.transform.position + Vector3.up + (Vector3.up * 0.381f * fadeName));
+            r.x = tagPos.x;
+            r.y = 1f - tagPos.y;
+
+            r.x -= 0.05f;
+
+            r.x *= w;
+            r.y *= h;
+            r.width = 0.1f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(14f * (w / 1204f));
+            g.fontStyle = FontStyle.Bold;
+            s = playerName;
+            
+            r.x += 0.0006f * w;
+            r.y += 0.001f * h;
+            c = Color.black;
+            if (fadeName < 1f)
+                c.a = fadeName * 0.381f;
+            GUI.color = c; 
+            GUI.Label(r, s, g);
+            r.x -= 0.0012f * w;
+            r.y -= 0.002f * h;
+            c = Color.white;
+            if (fadeName < 1f)
+                c.a = fadeName;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+        }
 
         if (currentInventorySelection >= playerInventory.items.Length)
             return;

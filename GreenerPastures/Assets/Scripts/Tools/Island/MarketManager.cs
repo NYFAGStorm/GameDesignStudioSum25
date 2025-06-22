@@ -92,7 +92,10 @@ public class MarketManager : MonoBehaviour
                 else
                 {
                     if (currentCustomer != null )
+                    {
                         currentCustomer.characterFrozen = false;
+                        currentCustomer.hidePlayerNameTag = false;
+                    }
                     currentCustomer = null;
                 }
             }
@@ -305,6 +308,9 @@ public class MarketManager : MonoBehaviour
     {
         if (currentCustomer == null)
             return;
+
+        // handle player tag display
+        currentCustomer.hidePlayerNameTag = true;
 
         Rect r = new Rect();
         float w = Screen.width;
