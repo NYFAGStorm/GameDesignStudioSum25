@@ -174,9 +174,11 @@ public class SaveLoadManager : MonoBehaviour
         if (roster.versionNumber == VERSIONNUMBERSTRING)
             return;
 
-        Debug.LogWarning("--- SaveLoadManager [HandleVersionMismatch] : version mismatch. game data unrealiable.");
+        Debug.LogWarning("--- SaveLoadManager [HandleVersionMismatch] : version mismatch. game data may be unrealiable. will overwrite.");
 
-        // TODO:
+        // REVIEW: check numbers are incrementing? how to handle?
+
+        roster.versionNumber = VERSIONNUMBERSTRING; // temp, just reset
     }
 
     public void CreateNewRosterEntry( ProfileData profile )

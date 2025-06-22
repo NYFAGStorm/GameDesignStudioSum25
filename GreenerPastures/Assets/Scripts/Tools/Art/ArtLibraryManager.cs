@@ -101,8 +101,8 @@ public class ArtLibraryManager : MonoBehaviour
         }
         if (!found)
         {
-            // REVIEW: suppress this warning until we have art for plant types?
-            Debug.LogWarning("--- ArtLibraryManager [GetArtData] : no data found for item type " + itemType.ToString() + " and plant type " + plantType.ToString() + ". will return null data.");
+            // TEMP: suppressed this warning until we have art for plant types?
+            //Debug.LogWarning("--- ArtLibraryManager [GetArtData] : no data found for item type " + itemType.ToString() + " and plant type " + plantType.ToString() + ". will return null data.");
             return retData;
         }
 

@@ -24,7 +24,7 @@ public class CheatManager : MonoBehaviour
     private float codeTimer;
     private int validCode;
 
-    const int TOTALCHEATCODES = 9;
+    const int TOTALCHEATCODES = 10;
     const float CHEATCODEWINDOW = 1f;
 
 
@@ -165,6 +165,10 @@ public class CheatManager : MonoBehaviour
                 n = "gimmiegold";
                 d = "Gives 10 gold to the player";
                 break;
+            case 9:
+                n = "gimmiespells";
+                d = "Enters two spells in the player's grimoire";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -241,6 +245,23 @@ public class CheatManager : MonoBehaviour
             case 8:
                 PlayerControlManager playerControlMgr = GameObject.FindFirstObjectByType<PlayerControlManager>();
                 playerControlMgr.playerData.gold += 10;
+                break;
+            case 9:
+                PlayerControlManager plcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                PlayerData pData = plcm.playerData;
+                pData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, pData.magic.library);
+                pData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, pData.magic.library);
+                pData.magic.library.grimiore[0].name = "Fast Grow I";
+                pData.magic.library.grimiore[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
+                pData.magic.library.grimiore[0].description = "Plants grow faster for one day. (5%)";
+                pData.magic.library.grimiore[0].ingredients = new ItemType[2];
+                pData.magic.library.grimiore[0].ingredients[0] = ItemType.Fertilizer;
+                pData.magic.library.grimiore[0].ingredients[1] = ItemType.Stalk;
+                pData.magic.library.grimiore[1].name = "Summon Water I";
+                pData.magic.library.grimiore[1].description = "Waters a 2x2 area that stays hydrated for one day.";
+                pData.magic.library.grimiore[1].ingredients = new ItemType[2];
+                pData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
+                pData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");

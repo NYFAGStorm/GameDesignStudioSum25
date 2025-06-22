@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class ShapeLibraryManager : MonoBehaviour
@@ -24,12 +23,18 @@ public class ShapeLibraryManager : MonoBehaviour
         {
             if ( itemShapes == null || itemShapes.Length == 0 )
             {
-                // temp - create a shape library entry for every item type
-                int numOfTypes = Enum.GetNames(typeof(ItemType)).Length;
+                // temp - create a shape library entry for every
+                // default item type and every plant type
+                int numOfTypes = System.Enum.GetNames(typeof(ItemType)).Length +
+                    System.Enum.GetNames(typeof(PlantType)).Length;
                 itemShapes = new ItemTypeShape[numOfTypes];
                 for (int i = 0; i < numOfTypes; i++)
                 {
-                    itemShapes[i].item = ((ItemType)i).ToString();
+                    int itemCount = System.Enum.GetNames(typeof(ItemType)).Length;
+                    if (i < itemCount)
+                        itemShapes[i].item = ((ItemType)i).ToString();
+                    else
+                        itemShapes[i].item = ((PlantType)i-itemCount).ToString();
                     itemShapes[i].pieces = new bool[9];
                     itemShapes[i].pieces[4] = true; // center square on
                 }
