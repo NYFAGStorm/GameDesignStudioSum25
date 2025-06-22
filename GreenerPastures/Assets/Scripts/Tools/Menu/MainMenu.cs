@@ -48,6 +48,9 @@ public class MainMenu : MonoBehaviour
 
     private SaveLoadManager saveMgr;
     private bool profileActive; // from data, is profile logged in
+    private string profileName;
+    private bool gameLoaded; // from data, is game data loaded
+    private string gameName;
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
@@ -65,6 +68,8 @@ public class MainMenu : MonoBehaviour
     private string popupFeedback;
 
     const float POPUPTIME = 1f;
+    const int PLAYERPROFILEBUTTON = 1;
+    const int GAMESELECTIONBUTTON = 2;
 
 
     void Start()
@@ -86,10 +91,7 @@ public class MainMenu : MonoBehaviour
         if (enabled)
         {
             // set profile active based on data
-            profileActive = saveMgr.IsProfileLoggedIn();
-            buttons[0].buttonEnabled = profileActive;
-            buttons[2].buttonEnabled = profileActive;
-            buttons[3].buttonEnabled = profileActive;
+            ConfigureMenuButtonsEnabled();
             popupCurve = AnimationCurve.EaseInOut(0f,0f,1f,1f);
         }
     }
@@ -167,6 +169,19 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    void ConfigureMenuButtonsEnabled()
+    {
+        profileActive = saveMgr.IsProfileLoggedIn();
+        if (profileActive)
+            profileName = saveMgr.GetCurrentProfile().loginName;
+        gameLoaded = saveMgr.IsGameCurrentlyLoaded();
+        if (gameLoaded)
+            gameName = saveMgr.GetCurrentGameData().gameName;
+        buttons[0].buttonEnabled = (profileActive && gameLoaded);
+        buttons[2].buttonEnabled = profileActive;
+        buttons[3].buttonEnabled = profileActive;
+    }
+
     void OnGUI()
     {
         if (sceneSwitchTimer > 0f)
@@ -230,7 +245,7 @@ public class MainMenu : MonoBehaviour
             r.y += 0.075f * h;
             s = "Profile Password";
             GUI.Label(r, s, g);
-            if (popupConfirm)
+            if (!profileActive && popupConfirm)
             {
                 r.y += 0.075f * h;
                 s = "Confirm Password";
@@ -249,10 +264,16 @@ public class MainMenu : MonoBehaviour
             g.alignment = TextAnchor.MiddleLeft;
             g.padding = new RectOffset(20, 0, 0, 0);
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
-            popupName = GUI.TextField(r, popupName, g);
+            if (profileActive)
+                GUI.Label(r, popupName, g);
+            else
+                popupName = GUI.TextField(r, popupName, g);
             r.y += 0.075f * h;
+            if (profileActive)
+                GUI.enabled = false;
             popupPass = GUI.PasswordField(r, popupPass, char.Parse("*"), g);
-            if (popupConfirm)
+            GUI.enabled = true;
+            if (!profileActive && popupConfirm)
             {
                 r.y += 0.075f * h;
                 confirmPass = GUI.PasswordField(r, confirmPass, char.Parse("*"), g);
@@ -261,7 +282,7 @@ public class MainMenu : MonoBehaviour
             // Popup Feedback
             r.x = 0.25f * w;
             r.y += 0.135f * h;
-            if (popupConfirm)
+            if (!profileActive && popupConfirm)
                 r.y -= 0.075f * h;
             r.width = 0.5f * w;
             r.height = 0.05f * h;
@@ -285,12 +306,14 @@ public class MainMenu : MonoBehaviour
             g = new GUIStyle(GUI.skin.button);
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
-            // Create / Login
+            // Create / Login / Logout
             if (padButtonSelection == 0)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "LOGIN";
-            if (popupConfirm && popupPass == confirmPass)
+            if (profileActive)
+                s = "LOGOUT";
+            else if (popupConfirm && popupPass == confirmPass)
                 s = "CREATE";
             if (GUI.Button(r, s, g) || (padMgr != null &&
                 padMgr.gamepads[0].isActive && padButtonSelection == 0 &&
@@ -315,10 +338,7 @@ public class MainMenu : MonoBehaviour
                         ProfileData newProfile = ProfileSystem.InitializeProfile(popupName, popupPass);
                         saveMgr.CreateNewRosterEntry(newProfile);
                         saveMgr.LoginProfile(newProfile);
-                        buttons[0].buttonEnabled = true;
-                        buttons[2].buttonEnabled = true;
-                        buttons[3].buttonEnabled = true;
-                        profileActive = true;
+                        ConfigureMenuButtonsEnabled();
                         popupTimer = POPUPTIME;
                         if (padMgr != null && padMgr.gamepads[0].isActive)
                         {
@@ -330,24 +350,33 @@ public class MainMenu : MonoBehaviour
                 }
                 else
                 {
-                    if (ProfileSystem.ProfileExistsInRoster(saveMgr.GetRosterData(), popupName))
+                    if (profileActive)
+                    {
+                        // logout active profile
+                        saveMgr.LogoutProfile(saveMgr.GetCurrentProfile());
+                        ConfigureMenuButtonsEnabled();
+                        // NOTE: remain here, clear fields for login
+                        popupName = "";
+                        popupPass = "";
+                        confirmPass = "";
+                        popupConfirm = false;
+                        popupFeedback = "profile logged OUT";
+                    }
+                    else if (ProfileSystem.ProfileExistsInRoster(saveMgr.GetRosterData(), popupName))
                     {
                         // profile name exists in roster
                         if (ProfileSystem.PasswordMatchToProfile(saveMgr.GetRosterData(), popupName, popupPass))
                         {
                             // login profile
                             saveMgr.LoginProfile(ProfileSystem.GetProfile(saveMgr.GetRosterData(), popupName, popupPass));
-                            buttons[0].buttonEnabled = true;
-                            buttons[2].buttonEnabled = true;
-                            buttons[3].buttonEnabled = true;
-                            profileActive = true;
+                            ConfigureMenuButtonsEnabled();
                             popupTimer = POPUPTIME;
                             if (padMgr != null && padMgr.gamepads[0].isActive)
                             {
                                 padButtonSelection = -1;
                                 padMaxButton = 5;
                             }
-                            popupFeedback = "profile logged in";
+                            popupFeedback = "profile logged IN";
                         }
                         else
                         {
@@ -394,7 +423,6 @@ public class MainMenu : MonoBehaviour
         g = new GUIStyle(GUI.skin.button);
         g.font = buttonFont;
         g.fontStyle = buttonFontStyle;
-        g.fontSize = Mathf.RoundToInt(buttonFontSizeAt1024 * (w / 1024f));
 
         for ( int i=0; i<buttons.Length; i++)
         {
@@ -408,8 +436,19 @@ public class MainMenu : MonoBehaviour
             if (padButtonSelection == i)
                 g.normal.textColor = Color.white;
             g.active.textColor = buttonFontColor;
+            g.fontSize = Mathf.RoundToInt(buttonFontSizeAt1024 * (w / 1024f));
 
             s = buttons[i].buttonText;
+            if (i == PLAYERPROFILEBUTTON && profileActive)
+            {
+                s = "Profile : " + profileName;
+                g.fontSize = Mathf.RoundToInt((buttonFontSizeAt1024 - 8f) * (w / 1024f));
+            }
+            if (i == GAMESELECTIONBUTTON && profileActive && gameLoaded)
+            {
+                s = "Game : " + gameName;
+                g.fontSize = Mathf.RoundToInt((buttonFontSizeAt1024 - 8f) * (w / 1024f));
+            }
 
             GUI.enabled = (buttons[i].buttonEnabled);
 
@@ -434,6 +473,8 @@ public class MainMenu : MonoBehaviour
                     popupName = "";
                     popupPass = "";
                     confirmPass = "";
+                    if (i == PLAYERPROFILEBUTTON && profileActive)
+                        popupName = profileName;
                     for (int n = 0; n < buttons.Length; n++)
                     {
                         buttons[n].buttonVisible = false;

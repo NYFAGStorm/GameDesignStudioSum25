@@ -74,9 +74,7 @@ public class GameSelection : MonoBehaviour
         if (enabled)
         {
             popupCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-            gameLoaded = saveMgr.IsGameCurrentlyLoaded();
-            if (gameLoaded)
-                gamePlayerName = GameSystem.GetProfilePlayer(saveMgr.GetCurrentGameData(), saveMgr.GetCurrentProfile()).playerName;
+            ConfigureCurrentGameEnabled();
         }
     }
 
@@ -129,6 +127,13 @@ public class GameSelection : MonoBehaviour
             if (padButtonSelection > padMaxButton)
                 padButtonSelection = 0;
         }
+    }
+
+    void ConfigureCurrentGameEnabled()
+    {
+        gameLoaded = saveMgr.IsGameCurrentlyLoaded();
+        if (gameLoaded)
+            gamePlayerName = GameSystem.GetProfilePlayer(saveMgr.GetCurrentGameData(), saveMgr.GetCurrentProfile()).playerName;
     }
 
     void OnGUI()
@@ -254,7 +259,7 @@ public class GameSelection : MonoBehaviour
             // . toggle hazards
             // . toggle curses
             // . (textfield) joining player name
-            // . Create new game ('OK' if not new)
+            // . Create new game ('Unload' if not new)
             // . Cancel ('Close' if not new)
             r.x += 0.025f * w;
             r.y += 0.075f * h;
@@ -340,11 +345,11 @@ public class GameSelection : MonoBehaviour
             g = new GUIStyle(GUI.skin.button);
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
-            // OK / CREATE
+            // UNLOAD / CREATE
             if (padButtonSelection == 0)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
-            s = "OK";
+            s = "UNLOAD";
             if (newGame)
                 s = "CREATE";
             // validate new game info (game name and player name)
@@ -372,9 +377,18 @@ public class GameSelection : MonoBehaviour
                     saveMgr.SetCurrentGameData(newGameData);
                     saveMgr.SaveGameData(newGameData.gameKey);
                     gamePlayerName = popPlayerName;
-                    selectionFeedback = "- new game created -";
+                    selectionFeedback = "new game created";
                     feedbackTimer = FEEDBACKTIME;
-                }                
+                }
+                else
+                {
+                    // save current and clear current
+                    saveMgr.SaveGameData(saveMgr.GetCurrentGameData().gameKey);
+                    saveMgr.ClearCurrentGameData();
+                    ConfigureCurrentGameEnabled();
+                    selectionFeedback = "game unloaded";
+                    feedbackTimer = FEEDBACKTIME;
+                }
                 popupTimer = POPUPTIME;
                 if (padMgr != null && padMgr.gamepads[0].isActive)
                 {
@@ -430,7 +444,7 @@ public class GameSelection : MonoBehaviour
         }
         else
         {
-            s += "- no game currently loaded -";
+            s += "no game currently loaded";
             g.fontStyle = FontStyle.Italic;
         }
         GUI.color = c;
@@ -516,7 +530,7 @@ public class GameSelection : MonoBehaviour
             g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
             g.fontStyle = FontStyle.Italic;
             g.alignment = TextAnchor.MiddleCenter;
-            s = "- no games available -";
+            s = "no games available";
 
             GUI.Label(r, s, g);
         }
@@ -558,9 +572,9 @@ public class GameSelection : MonoBehaviour
                     // load game data
                     if (saveMgr.LoadGameData(list[i]))
                     {
-                        gameLoaded = saveMgr.IsGameCurrentlyLoaded();
+                        ConfigureCurrentGameEnabled();
                         if (gameLoaded)
-                            selectionFeedback = "- game loaded -";
+                            selectionFeedback = "game loaded";
                         else
                             selectionFeedback = "* ERROR loading game data *";
                         feedbackTimer = FEEDBACKTIME;
@@ -570,7 +584,7 @@ public class GameSelection : MonoBehaviour
                         // game file not found, remove this game key from profile
                         ProfileData profData = saveMgr.GetCurrentProfile();
                         profData = ProfileSystem.RemoveGameKey(profData, list[i]);
-                        selectionFeedback = "- game file missing, removing selection -";
+                        selectionFeedback = "game file missing, removing selection";
                         feedbackTimer = FEEDBACKTIME;
                     }
                 }
