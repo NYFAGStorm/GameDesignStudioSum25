@@ -50,7 +50,11 @@ public class PlantManager : MonoBehaviour
 
                 // find resources amount as an average of sun, water and soil quality
                 // if even a little (25%) sun is available, this counts as 100% sun resource
-                float resources = (Mathf.Clamp01(plot.data.sun*4f) + plot.data.water + plot.data.soil) / 3f;
+                float sunResource = Mathf.Clamp01(plot.data.sun * 4f);
+                // PLANT EFFECTS:
+                if (PlantSystem.PlantHasEffect(plot.data.plant, PlantEffect.DayNightPlant))
+                    sunResource = 1f;
+                float resources = (sunResource + plot.data.water + plot.data.soil) / 3f;
                 // calculate vitality
                 float vitalityDelta = (0.667f - resources) * -0.1f;
                 plot.data.plant.vitality = Mathf.Clamp01(plot.data.plant.vitality + vitalityDelta);

@@ -406,7 +406,9 @@ public class PlotManager : MonoBehaviour
                     Debug.LogWarning("--- PlotManager [HarvestPlant] : " + gameObject.name + " no item spawn manager found in scene. will ignore.");
                 else
                 {
-                    int harvestNumber = data.plant.harvestAmount;
+                    int harvestNumber = data.plant.harvestAmount; // if this is >1, flat random to this number
+                    if (harvestNumber > 1)
+                        harvestNumber = Random.Range(0, harvestNumber) + 1;
                     // PLOT EFFECTS:
                     if (FarmSystem.PlotHasEffect(data, PlotEffect.ProsperousI) && 
                         RandomSystem.FlatRandom01() < .1f)

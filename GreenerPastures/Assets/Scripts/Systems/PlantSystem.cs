@@ -30,6 +30,28 @@ public static class PlantSystem
         return retPlant;
     }
 
+    /// <summary>
+    /// Returns true if given plant data includes given effect
+    /// </summary>
+    /// <param name="plant">plant data</param>
+    /// <param name="effect">plant effect</param>
+    /// <returns>true if plant effect exists, false if not</returns>
+    public static bool PlantHasEffect( PlantData plant, PlantEffect effect )
+    {
+        bool retBool = false;
+
+        for (int i = 0; i < plant.plantEffects.Length; i++)
+        {
+            if (plant.plantEffects[i] == effect)
+            {
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
     static PlantData ConfigurePlantByType( PlantData data, PlantType type )
     {
         PlantData retData = data;
@@ -199,10 +221,12 @@ public static class PlantSystem
                 retData.plantName = "Eclipse Flower";
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = .75f;
-                retData.isDarkPlant = false; // grows during night as well
+                retData.isDarkPlant = false;
                 retData.canReFruit = true;
                 retData.springVitality = .5f;
                 retData.fallVitality = .5f;
+                retData.plantEffects = new PlantEffect[1];
+                retData.plantEffects[0] = PlantEffect.DayNightPlant;
                 break;
             // RARE PLANTS
             case PlantType.GoldenApple:
@@ -257,12 +281,14 @@ public static class PlantSystem
             case PlantType.Mysteria:
                 retData.rarity = PlantRarity.Rare;
                 retData.growthRate = .75f;
-                retData.isDarkPlant = false; // day/night
+                retData.isDarkPlant = false;
                 retData.canReFruit = true;
                 retData.springVitality = .75f;
                 retData.summerVitality = .75f;
                 retData.fallVitality = .75f;
                 retData.winterVitality = .75f;
+                retData.plantEffects = new PlantEffect[1];
+                retData.plantEffects[0] = PlantEffect.DayNightPlant;
                 break;
             case PlantType.Nightshade:
                 retData.rarity = PlantRarity.Rare;

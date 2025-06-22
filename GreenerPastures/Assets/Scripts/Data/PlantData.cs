@@ -1,8 +1,6 @@
 // REVIEW: necessary namespaces
 
 // if there are classes of plants that follow separate rules
-using Unity.VisualScripting;
-
 public enum PlantType
 {
     Default,
@@ -64,7 +62,7 @@ public enum PlantRarity
 public enum PlantEffect
 {
     Default,
-    EffectA,
+    DayNightPlant, // a variety of plant that is always 100% sun
     EffectB,
     EffectC,
     EffectD
