@@ -60,6 +60,8 @@ public class TimeManager : MonoBehaviour
     const float WINTERSOLSTICEMINANGLE = 38.1f;
     const float SUMMERSOLSTICEANGLEDELTA = 47f;
 
+    const float ANGLETOSUN = -12.36f; // not facing exactly west (cheat pretty sunset)
+
 
     void Start()
     {
@@ -124,9 +126,9 @@ public class TimeManager : MonoBehaviour
         float seasonalSin = Mathf.Sin((seasonProgress + SEASONALSINEOFFSET) * 2f * Mathf.PI); // season progress 0-1
         float skyLightTilt = 90f - (WINTERSOLSTICEMINANGLE + (SUMMERSOLSTICEANGLEDELTA / 2f) + ((SUMMERSOLSTICEANGLEDELTA / 2f) * seasonalSin));
         // seasonal tilt must be applied on parent object to skylight object (a gimble of z rotation)
-        seasonalTiltGimble.transform.localEulerAngles = new Vector3(0f, 0f, -skyLightTilt);
+        seasonalTiltGimble.transform.localEulerAngles = new Vector3(0f, 0f, skyLightTilt);
         // set sun rot based on day progress value
-        skyLightObject.transform.localEulerAngles = new Vector3((dayProgress * 360f), 12.36f, 0f);
+        skyLightObject.transform.localEulerAngles = new Vector3((dayProgress * 360f), ANGLETOSUN, 0f);
 
         // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
 
