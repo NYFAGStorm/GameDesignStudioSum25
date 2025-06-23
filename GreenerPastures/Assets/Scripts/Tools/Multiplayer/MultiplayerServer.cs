@@ -27,6 +27,7 @@ public class MultiplayerServer : NetworkBehaviour
         newPlayer.AssignInputAuthority(plr);
     }
 
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RemovePlayer(PlayerRef plr)
     {
         int plrSlot = GetPlayerNumber(plr);

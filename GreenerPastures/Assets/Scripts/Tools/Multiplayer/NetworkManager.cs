@@ -7,7 +7,6 @@ using Fusion;
 using Fusion.Sockets;
 using TMPro;
 using UnityEngine.InputSystem;
-using Random = UnityEngine.Random;
 using UnityEngine.UI;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
@@ -15,22 +14,49 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     // Author: Gustavo Rojas Flores
     // Manages Network creation, room joining and hosting
 
+    [SerializeField] private Accounts accountInfo;
     [SerializeField] private TMP_Text roomCode;
+    [SerializeField] private TMP_Text user;
+    [SerializeField] private TMP_Text pass;
     [SerializeField] private TMP_Text networkStatus;
+    [SerializeField] private TMP_Text userDisplay;
+    [SerializeField] private int gameScene;
+    [SerializeField] private GameObject loginMenu;
+    [SerializeField] private GameObject multiplayerMenu;
+    [SerializeField] private GameObject statusPanel;
 
     private PlayerRef[] players = new PlayerRef[4];
     private NetworkRunner Runner;
     private int plrCount = 0;
     private Camera cam;
     private bool inGame;
-    public bool lookEnabled = true;
+
+    private void OpenMenu(int menu)
+    {
+        loginMenu.SetActive(menu == 0);
+        multiplayerMenu.SetActive(menu == 1);
+        statusPanel.SetActive(menu == 2);
+    }
 
     private void Start()
     {
-        
+        OpenMenu(0);
     }
 
-    public void Host() 
+    public void Login()
+    {
+        foreach (Account acc in accountInfo.accounts)
+        {
+            if (user.text.ToLower().Contains(acc.username.ToLower()) && pass.text.Contains(acc.password))
+            {
+                userDisplay.text = acc.username;
+                OpenMenu(1);
+                break;
+            }
+        }
+    }
+
+    public void Host()
     {
         StartGame(GameMode.Host);
     }
@@ -40,19 +66,15 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         StartGame(GameMode.Client);
     }
 
-    public void BeginGame()
-    {
-        
-    }
-
     async void StartGame(GameMode mode)
     {
+        OpenMenu(2);
         networkStatus.text = (mode == GameMode.Host ? "Hosting" : "Joining") + " room \"" + roomCode.text + "\"";
 
         Runner = gameObject.AddComponent<NetworkRunner>();
         Runner.ProvideInput = true;
         
-        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
+        var scene = SceneRef.FromIndex(gameScene);
         var sceneInfo = new NetworkSceneInfo();
         if (scene.IsValid) sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
 
@@ -74,7 +96,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             plrCount++;
         }
     }
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) 
+    
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         if (Runner.IsServer)
         {
@@ -91,7 +114,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     
     public void OnSceneLoadDone(NetworkRunner runner) 
     {
-
+        OpenMenu(-1);
     }
     
     public void OnSceneLoadStart(NetworkRunner runner) {}

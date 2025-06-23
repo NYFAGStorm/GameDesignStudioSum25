@@ -20,6 +20,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Prototype/Glenn/Proto_GreenerStuff.unity
     guid: fca87c942d3f5fe4893b7ccbec95c873
+  - enabled: 1
+    path: Assets/Scenes/Prototype/Gustavo/Gustavo_Splash.unity
+    guid: 72763d0cb85e5934fbc25f5485fb4f2d
+  - enabled: 1
+    path: Assets/Scenes/Prototype/Gustavo/Gustavo_Menu.unity
+    guid: 9ce52e763c904e2449979293ee354931
+  - enabled: 1
+    path: Assets/Scenes/Prototype/Gustavo/Gustavo_Login.unity
+    guid: 63cd38b5479ef944d9d1e400b5794baf
+  - enabled: 1
+    path: Assets/Scenes/Prototype/Gustavo/Gustavo_Game.unity
+    guid: a56ccf19fc0375d47ab6d523d9bdffe8
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 3e9e0e0232a2e2b4a9749d414320f896, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: a6ef7389f1cc65f49900df5b5a2e3f2f, type: 3}
