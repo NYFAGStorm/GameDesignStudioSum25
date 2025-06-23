@@ -44,18 +44,24 @@ public class CameraManager : MonoBehaviour
     const float LATERALPANMULTIPLIER = 0.618f;
 
 
+    void Awake()
+    {
+        // NOTE: do this here so recovered position and settings from player data can work
+        // ensure unparented
+        gameObject.transform.parent = null;
+        // start paused
+        cameraPauseTimer = 1f;
+        mode = CameraMode.Hold;
+        SavePosAndRot();
+    }
+
     void Start()
     {
         // validate
         // initialize
         if (enabled)
         {
-            // ensure unparented
-            gameObject.transform.parent = null;
-            // start paused
-            cameraPauseTimer = 1f;
-            mode = CameraMode.Hold;
-            SavePosAndRot();
+
         }
     }
 
@@ -95,6 +101,11 @@ public class CameraManager : MonoBehaviour
     {
         savedPostion = transform.position;
         savedRotation = transform.eulerAngles;
+    }
+
+    public Vector3 GetSavedPosition()
+    {
+        return savedPostion;
     }
 
     void GetFollowTarget()

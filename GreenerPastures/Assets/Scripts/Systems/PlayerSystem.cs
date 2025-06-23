@@ -18,7 +18,7 @@ public static class PlayerSystem
         retPlayer.profileID = profID;
         retPlayer.farm = FarmSystem.InitializeFarm();
         retPlayer.gold = 50; // starting gold is 50
-        retPlayer.islandRange = 7f;
+        retPlayer.island.w = 7f;
         retPlayer.inventory = InventorySystem.InitializeInventory(5); // players have 5
         retPlayer.magic = MagicSystem.IntializeMagic();
         retPlayer.effects = new PlayerEffects[0];

@@ -176,12 +176,49 @@ public class PlayerControlManager : MonoBehaviour
                 // connecting property to data _as a reference_
                 playerInventory = playerData.inventory;
                 playerName = playerData.playerName;
+                // place player character in location
+                pam.imageFlipped = playerData.location.w < 0f;
+                Vector3 pos = new Vector3(playerData.location.x, playerData.location.y, playerData.location.z);
+                gameObject.transform.position = pos;
+                // restore cam location and mode
+                pos.x = playerData.camera.x;
+                pos.y = playerData.camera.y;
+                pos.z = playerData.camera.z;
+                cam.gameObject.transform.position = pos;
+                cam.mode = playerData.camMode;
+                pos.x = playerData.camSaved.x;
+                pos.y = playerData.camSaved.y;
+                pos.z = playerData.camSaved.z;
+                if (cam.mode == CameraManager.CameraMode.PanFollow)
+                    cam.SetCameraPanMode(pos);
             }
         }
     }
 
     void Update()
     {
+        // REVIEW: optimization please
+        // update player location data
+        if (pam.imageFlipped)
+            playerData.location.w = -1f;
+        else
+            playerData.location.w = 1f;
+        playerData.location.x = gameObject.transform.position.x;
+        playerData.location.y = gameObject.transform.position.y;
+        playerData.location.z = gameObject.transform.position.z;
+        // update cam data
+        playerData.camera.x = cam.transform.position.x;
+        playerData.camera.y = cam.transform.position.y;
+        playerData.camera.z = cam.transform.position.z;
+        playerData.camMode = cam.mode;
+        if (cam.mode == CameraManager.CameraMode.PanFollow)
+        {
+            Vector3 cSaved = cam.GetSavedPosition();
+            playerData.camSaved.x = cSaved.x;
+            playerData.camSaved.y = cSaved.y;
+            playerData.camSaved.z = cSaved.z;
+        }
+
         if (!freezeCharacterActions)
         {
             // check action input
@@ -299,10 +336,10 @@ public class PlayerControlManager : MonoBehaviour
             return;
 
         Vector3 center = Vector3.zero;
-        center.x = playerData.islandCenterX;
-        center.y = playerData.islandCenterY;
-        center.z = playerData.islandCenterZ;
-        float radius = playerData.islandRange;
+        center.x = playerData.island.x;
+        center.y = playerData.island.y;
+        center.z = playerData.island.z;
+        float radius = playerData.island.w;
         float dist = Vector3.Distance(gameObject.transform.position, center);
         if (dist > radius )
         {

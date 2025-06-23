@@ -159,10 +159,10 @@ public class TeleportManager : MonoBehaviour
             pairedPad.associatedCamTrigger.TriggerCameraMode();
 
         // hold player to new location
-        pcm.playerData.islandRange = pairedPad.islandRadius;
-        pcm.playerData.islandCenterX = pairedPad.islandObj.transform.position.x;
-        pcm.playerData.islandCenterY = pairedPad.islandObj.transform.position.y;
-        pcm.playerData.islandCenterZ = pairedPad.islandObj.transform.position.z;
+        pcm.playerData.island.w = pairedPad.islandRadius;
+        pcm.playerData.island.x = pairedPad.islandObj.transform.position.x;
+        pcm.playerData.island.y = pairedPad.islandObj.transform.position.y;
+        pcm.playerData.island.z = pairedPad.islandObj.transform.position.z;
     }
 
     /// <summary>

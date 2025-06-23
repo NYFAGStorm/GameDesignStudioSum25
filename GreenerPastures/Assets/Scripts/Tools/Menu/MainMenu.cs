@@ -284,6 +284,7 @@ public class MainMenu : MonoBehaviour
             r.y += 0.135f * h;
             if (!profileActive && popupConfirm)
                 r.y -= 0.075f * h;
+
             r.width = 0.5f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);
@@ -301,6 +302,8 @@ public class MainMenu : MonoBehaviour
             // Popup Buttons
             r.x = 0.25f * w;
             r.y += 0.0625f * h;
+            // FIXME: minor formatting issue upon creation button click
+            // REVIEW: use popup timer anim?
             r.width = 0.2f * w;
             r.height = 0.1f * h;
             g = new GUIStyle(GUI.skin.button);

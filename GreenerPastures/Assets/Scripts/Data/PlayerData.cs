@@ -24,6 +24,15 @@ public enum PlayerEffects
 }
 
 [System.Serializable]
+public struct PositionData
+{
+    public float w; // additional data (orientation or range)
+    public float x;
+    public float y;
+    public float z;
+}
+
+[System.Serializable]
 public class PlayerData
 {
     public string playerName;
@@ -35,10 +44,11 @@ public class PlayerData
     public int xp;
     public int level;
     public bool freeFly; // can walk off island edges
-    public float islandCenterX;
-    public float islandCenterY;
-    public float islandCenterZ;
-    public float islandRange;
+    public PositionData location;
+    public PositionData island;
+    public PositionData camera;
+    public PositionData camSaved;
+    public CameraManager.CameraMode camMode;
     public InventoryData inventory;
     public MagicData magic;
     public PlayerEffects[] effects;
