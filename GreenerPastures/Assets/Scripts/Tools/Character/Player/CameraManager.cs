@@ -61,7 +61,15 @@ public class CameraManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-
+            if (savedPostion == Vector3.zero)
+            {
+                // ensure unparented
+                gameObject.transform.parent = null;
+                // start paused
+                cameraPauseTimer = 1f;
+                mode = CameraMode.Hold;
+                SavePosAndRot();
+            }
         }
     }
 

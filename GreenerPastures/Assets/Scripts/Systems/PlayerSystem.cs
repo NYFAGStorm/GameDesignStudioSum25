@@ -19,6 +19,11 @@ public static class PlayerSystem
         retPlayer.farm = FarmSystem.InitializeFarm();
         retPlayer.gold = 50; // starting gold is 50
         retPlayer.island.w = 7f;
+        retPlayer.camera.x = 0f;
+        retPlayer.camera.y = 2.5f;
+        retPlayer.camera.z = -5f;
+        retPlayer.camSaved = retPlayer.camera;
+        retPlayer.camMode = CameraManager.CameraMode.Follow;
         retPlayer.inventory = InventorySystem.InitializeInventory(5); // players have 5
         retPlayer.magic = MagicSystem.IntializeMagic();
         retPlayer.effects = new PlayerEffects[0];
