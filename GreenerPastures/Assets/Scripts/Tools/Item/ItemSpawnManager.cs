@@ -17,9 +17,6 @@ public class ItemSpawnManager : MonoBehaviour
         public Vector3 spawnPoint;
         public Vector3 dropTarget;
         public float dropTimer;
-        // temp - keep drops on islands (bounce back from edge)
-        public Vector3 islandCenter;
-        public float islandRadius;
     }
     private DroppedItem[] drops = new DroppedItem[0];
 
@@ -52,7 +49,7 @@ public class ItemSpawnManager : MonoBehaviour
     {
         DroppedItem[] tmp = new DroppedItem[drops.Length + 1];
 
-        // temp - use closest teleport node for now
+        // detect the closest island center and range (use tport nodes)
         Vector3 iCenter = Vector3.zero;
         float iRadius = 0f;
         TeleportManager[] tports = GameObject.FindObjectsByType<TeleportManager>(FindObjectsSortMode.None);
@@ -76,9 +73,13 @@ public class ItemSpawnManager : MonoBehaviour
             }
         }
 
-        // TODO: detect the closest island center and range
-        // store as data on the drop
-        // use to 'bounce' item back from edge
+        // 'bounce' by resetting landing point
+        if (Vector3.Distance(end, iCenter) >= iRadius)
+        {
+            Vector3 startGround = start;
+            startGround.y = end.y;
+            end -= (end - startGround);
+        }
 
         for (int i=0;i<drops.Length;i++)
         {
@@ -88,9 +89,6 @@ public class ItemSpawnManager : MonoBehaviour
         tmp[drops.Length].spawnPoint = start;
         tmp[drops.Length].dropTarget = end;
         tmp[drops.Length].dropTimer = DROPTIME;
-        // temp - bounce drops back to island from edge
-        tmp[drops.Length].islandCenter = iCenter;
-        tmp[drops.Length].islandRadius = iRadius;
 
         drops = tmp;
     }
@@ -163,15 +161,6 @@ public class ItemSpawnManager : MonoBehaviour
                     Vector3 pos = Vector3.Lerp(drops[i].spawnPoint, drops[i].dropTarget, 1f - (drops[i].dropTimer / DROPTIME));
                     pos.y = drops[i].dropTarget.y + dropCurve.Evaluate(1f - (drops[i].dropTimer / DROPTIME)) + VERTICALORIGIN;
                     drops[i].dropItem.transform.position = pos;
-                    // 'bounce' by resetting landing point
-                    // REFACTOR: do this upon AddDrop()
-                    if ( Vector3.Distance(pos, drops[i].islandCenter) > drops[i].islandRadius )
-                    {
-                        Vector3 startGround = drops[i].spawnPoint;
-                        startGround.y = drops[i].dropTarget.y;
-                        pos.y = drops[i].dropTarget.y;
-                        drops[i].dropTarget -= (pos - startGround);
-                    }
                 }
             }
         }
