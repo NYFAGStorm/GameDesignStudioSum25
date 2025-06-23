@@ -375,7 +375,6 @@ public class PlayerControlManager : MonoBehaviour
             downPad = Mathf.Clamp01(-padY);
             leftPad = Mathf.Clamp01(-padX);
             rightPad = Mathf.Clamp01(padX);
-            // NOTE: we use all or nothing gamepad move control
         }
 
         // in each direction, test physics collision first, apply move if clear      

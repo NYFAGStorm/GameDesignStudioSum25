@@ -1193,7 +1193,6 @@ GameObject:
   - component: {fileID: 6579766368292363670}
   - component: {fileID: 8783274777338502682}
   - component: {fileID: 1177292143480485638}
-  - component: {fileID: 5986376219623877890}
   m_Layer: 0
   m_Name: Tower Left Wall Upper
   m_TagString: Untagged
@@ -1269,27 +1268,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &5986376219623877890
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4605837943622927075}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5527749718198433621
 GameObject:
   m_ObjectHideFlags: 0
@@ -1713,7 +1691,6 @@ GameObject:
   - component: {fileID: 7505539337667897945}
   - component: {fileID: 3450220444929560124}
   - component: {fileID: 5808064055654802324}
-  - component: {fileID: 6083853437180994600}
   m_Layer: 0
   m_Name: Tower Right Wall Upper
   m_TagString: Untagged
@@ -1789,27 +1766,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6083853437180994600
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7086150965847845159}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7258654856278296989
 GameObject:
   m_ObjectHideFlags: 0
@@ -1907,7 +1863,6 @@ GameObject:
   - component: {fileID: 2478836098814216547}
   - component: {fileID: 6403863681473761488}
   - component: {fileID: 4825209992204478528}
-  - component: {fileID: 6970683809495538025}
   m_Layer: 0
   m_Name: Tower Back Wall Upper
   m_TagString: Untagged
@@ -1983,27 +1938,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6970683809495538025
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7519552266470661129}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7526841592328001370
 GameObject:
   m_ObjectHideFlags: 0
