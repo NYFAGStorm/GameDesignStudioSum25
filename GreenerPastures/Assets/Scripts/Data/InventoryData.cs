@@ -26,8 +26,7 @@ public enum ItemEffects
 [System.Serializable]
 public class ItemData
 {
-    // REVIEW: this is messy with just necessary plant data, need another way?
-    public string name; // REVIEW: necessary?
+    public string name;
     public ItemType type;
     public PlantType plant; // if plant, stalk, fruit or seed, else is default
     public float size; // if plant is growth, else is item size? item amount? (default 1f)
@@ -40,11 +39,7 @@ public class ItemData
 public class LooseItemData
 {
     public InventoryData inv; // an inventory of size 1, the item
-    // REVIEW: conform location data, etc to game world properties
-    public int parentIsland;
-    public float posX;
-    public float posY;
-    public float posZ;
+    public PositionData location;
     public int artFrame; // index to art (if static, remains type item)
     public bool flipped; // facing opposite horizontal direction
     public bool deleteMe; // item has been stored, not here, destroy game object

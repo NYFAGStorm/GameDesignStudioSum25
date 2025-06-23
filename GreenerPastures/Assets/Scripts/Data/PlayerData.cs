@@ -24,28 +24,20 @@ public enum PlayerEffects
 }
 
 [System.Serializable]
-public struct PositionData
-{
-    public float w; // additional data (orientation or range)
-    public float x;
-    public float y;
-    public float z;
-}
-
-[System.Serializable]
 public class PlayerData
 {
     public string playerName;
     public PlayerStats stats;
     public string profileID;
     public FarmData farm;
+    public int playerIsland; // index on game data
     public int gold;
     public int arcana;
     public int xp;
     public int level;
     public bool freeFly; // can walk off island edges
     public PositionData location;
-    public PositionData island;
+    public PositionData island; // island tether data
     public PositionData camera;
     public PositionData camSaved;
     public CameraManager.CameraMode camMode;

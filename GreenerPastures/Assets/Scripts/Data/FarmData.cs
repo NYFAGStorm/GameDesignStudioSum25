@@ -51,7 +51,5 @@ public enum FarmEffects
 public class FarmData
 {
     public PlotData[] plots;
-    // REVIEW: island data (where should this live?)
-    // island (position, type?, teleport node)
     public FarmEffects[] farmEffects;
 }
