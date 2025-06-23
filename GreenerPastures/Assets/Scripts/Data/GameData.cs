@@ -28,4 +28,6 @@ public class GameData
     public GameOptionsData options;
     public WorldData world;
     public CastData[] casts;
+    // loose items
+    // REVIEW: market hub island defined here?
 }
