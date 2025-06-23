@@ -73,9 +73,19 @@ public class ItemSpawnManager : MonoBehaviour
             }
         }
 
-        // 'bounce' by resetting landing point
+        bool doBounce = false;
+
+        // check not off island
         if (Vector3.Distance(end, iCenter) >= iRadius)
+            doBounce = true;
+
+        // probe end point for collision with check box
+        if (Physics.CheckBox(end + (Vector3.up * 0.15f), (Vector3.one * 0.12f), Quaternion.identity, 1, QueryTriggerInteraction.Ignore))
+            doBounce = true;
+
+        if (doBounce)
         {
+            // 'bounce' by resetting landing point
             Vector3 startGround = start;
             startGround.y = end.y;
             end -= (end - startGround);
