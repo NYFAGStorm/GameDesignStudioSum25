@@ -35,7 +35,7 @@ public class PlayerControlManager : MonoBehaviour
         public bool lBumpDown;
         public bool rBump;
         public bool rBumpDown;
-        public bool castMagic; // REVIEW: what gamepad control?
+        public bool castMagic;
     }
 
     public KeyCode upKey = KeyCode.W;
@@ -375,42 +375,35 @@ public class PlayerControlManager : MonoBehaviour
             downPad = Mathf.Clamp01(-padY);
             leftPad = Mathf.Clamp01(-padX);
             rightPad = Mathf.Clamp01(padX);
+            // NOTE: we use all or nothing gamepad move control
         }
 
-        // in each direction, test physics collision first, apply move if clear
+        // in each direction, test physics collision first, apply move if clear      
         if (Input.GetKey(upKey) || upPad > 0f)
         {
-            if (upPad == 0f)
-                upPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.forward * upPad * characterSpeed * Time.deltaTime;
+            check += Vector3.forward * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.forward * characterSpeed * Time.deltaTime;
         }
         if (Input.GetKey(downKey) || downPad > 0f)
         {
-            if (downPad == 0f)
-                downPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.back * downPad * characterSpeed * Time.deltaTime;
+            check += Vector3.back * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.back * characterSpeed * Time.deltaTime;
         }
         if (Input.GetKey(leftKey) || leftPad > 0f)
         {
-            if (leftPad == 0f)
-                leftPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.left * leftPad * characterSpeed * Time.deltaTime;
+            check += Vector3.left * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.left * characterSpeed * Time.deltaTime;
         }
         if (Input.GetKey(rightKey) || rightPad > 0f)
         {
-            if (rightPad == 0f)
-                rightPad = 1f;
             Vector3 check = gameObject.transform.position + (Vector3.up * 0.25f);
-            check += Vector3.right * rightPad * characterSpeed * Time.deltaTime;
+            check += Vector3.right * characterSpeed * Time.deltaTime;
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.right * characterSpeed * Time.deltaTime;
         }

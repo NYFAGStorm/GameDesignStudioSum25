@@ -242,7 +242,6 @@ GameObject:
   - component: {fileID: 5274906373860126232}
   - component: {fileID: 6409863933394161909}
   - component: {fileID: 3462141702677284670}
-  - component: {fileID: 8494028119614907491}
   m_Layer: 0
   m_Name: Tower Back Wall Right
   m_TagString: Untagged
@@ -318,27 +317,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8494028119614907491
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1007981187985660472}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1055715947962647905
 GameObject:
   m_ObjectHideFlags: 0
@@ -934,7 +912,6 @@ GameObject:
   - component: {fileID: 6572237572573888298}
   - component: {fileID: 5196910459828961353}
   - component: {fileID: 3341745402630094324}
-  - component: {fileID: 3762103107904237151}
   m_Layer: 0
   m_Name: Tower Right Wall Back
   m_TagString: Untagged
@@ -1010,27 +987,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3762103107904237151
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3401470345851256176}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4023890580333383738
 GameObject:
   m_ObjectHideFlags: 0
@@ -1042,7 +998,6 @@ GameObject:
   - component: {fileID: 6234660254401498734}
   - component: {fileID: 8421146840898125006}
   - component: {fileID: 4390389870933118942}
-  - component: {fileID: 1284709431115787859}
   m_Layer: 0
   m_Name: Tower Right Wall Front
   m_TagString: Untagged
@@ -1118,27 +1073,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1284709431115787859
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4023890580333383738}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4097446983407330159
 GameObject:
   m_ObjectHideFlags: 0
@@ -1367,7 +1301,6 @@ GameObject:
   - component: {fileID: 5471541198332074306}
   - component: {fileID: 335812817756996901}
   - component: {fileID: 4374041643540974830}
-  - component: {fileID: 8087521889613189504}
   m_Layer: 0
   m_Name: Tower Left Wall Front
   m_TagString: Untagged
@@ -1443,27 +1376,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8087521889613189504
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5527749718198433621}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5727845847431951746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1909,7 +1821,6 @@ GameObject:
   - component: {fileID: 4153702799212002300}
   - component: {fileID: 8282845464402740978}
   - component: {fileID: 6755897850692487506}
-  - component: {fileID: 8029230381930990772}
   m_Layer: 0
   m_Name: Tower Back Wall Left
   m_TagString: Untagged
@@ -1985,27 +1896,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8029230381930990772
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7258654856278296989}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7519552266470661129
 GameObject:
   m_ObjectHideFlags: 0
@@ -2268,7 +2158,6 @@ GameObject:
   - component: {fileID: 2786826811654003474}
   - component: {fileID: 3189580485870722399}
   - component: {fileID: 4781217731296422947}
-  - component: {fileID: 7106155864609613682}
   m_Layer: 0
   m_Name: Tower Left Wall Back
   m_TagString: Untagged
@@ -2344,27 +2233,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &7106155864609613682
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8850482604348577874}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8876178886162740116
 GameObject:
   m_ObjectHideFlags: 0
