@@ -195,6 +195,7 @@ public class ItemSpawnManager : MonoBehaviour
 
         lim.frames = new Texture2D[1];
         // if plant, attempt find specific plant type first (get default type item if failed)
+        // TODO: clean this up
         ArtData d = new ArtData();
         if (item.inv.items[0].plant != PlantType.Default)
             d = GameObject.FindAnyObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type, item.inv.items[0].plant);

@@ -1940,6 +1940,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3205820212800136232}
   - {fileID: 869074430}
   - {fileID: 451620815}
   - {fileID: 1793189161}
@@ -2996,6 +2997,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1da295cbe68afd74e993f7d0dbf0f0b5, type: 3}
+--- !u!1001 &3205820212800136231
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1339543635}
+    m_Modifications:
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8784938652443388452, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+      propertyPath: m_Name
+      value: Greener Game Manager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+--- !u!4 &3205820212800136232 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3324938488900029711, guid: 2a1930855a9da974885a5ddaacb7231d, type: 3}
+  m_PrefabInstance: {fileID: 3205820212800136231}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4642188744227577263
 PrefabInstance:
   m_ObjectHideFlags: 0
