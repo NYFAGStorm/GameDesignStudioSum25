@@ -33,6 +33,7 @@ public class TimeManager : MonoBehaviour
 
     // TODO: link to game for world data, run time based on game seed
     // TODO: revise UpdateGlobalTimeProgress() to include total game time
+    // REVIEW: is that necessary if we use seed time? (doesn't this calculate from there?)
     // TODO: migrate temperature to weather manager
     private long gameSeedTime;
     private long globalTimeProgress;
@@ -280,5 +281,14 @@ public class TimeManager : MonoBehaviour
         retWData.duskTime = .75f; // temp
 
         return retWData;
+    }
+
+    /// <summary>
+    /// Sets the game seed time value for use in calculating global time progress. WARNING: use only with game data load
+    /// </summary>
+    /// <param name="seedTime">game seed time</param>
+    public void SetGameSeedTime( long seedTime )
+    {
+        gameSeedTime = seedTime;
     }
 }

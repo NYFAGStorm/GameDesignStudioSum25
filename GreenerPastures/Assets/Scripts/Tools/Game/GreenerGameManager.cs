@@ -6,12 +6,14 @@ public class GreenerGameManager : MonoBehaviour
     // This handles the highest level of game data during game scenes
 
     public GameData game;
+    public bool noisyLogging = true;
     // TODO: indicate who is the server (owner of game data)
+    // TODO: integrate player character collection and distribution
 
     private SaveLoadManager saveMgr;
     private ArtLibraryManager alm;
 
-    private bool looseItemsDistributed;
+    private bool gameDataDistributed;
     private bool shutdownDataCollected;
 
 
@@ -53,11 +55,44 @@ public class GreenerGameManager : MonoBehaviour
 
     void Update()
     {
-        if (!looseItemsDistributed && alm != null)
-        {
-            DistributeLooseItems();
-            looseItemsDistributed = true;
-        }
+        if (!gameDataDistributed)
+            gameDataDistributed = DoGameDataDistribution();
+    }
+
+    bool DoGameDataDistribution()
+    {
+        bool retBool = true;
+
+        // player
+        // TODO: integrate
+        // world
+        if (!DistributeWorldData())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : world data distributed.");
+        // islands
+        if (!DistributeIslandData())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : island data distributed.");
+        // loose items
+        if (!DistributeLooseItems())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : loose items distributed.");
+        // casts
+        if (!DistributeCastData())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : cast data distributed.");
+
+        // validation notice
+        if (retBool)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : game data distribution routine succeeded.");
+        else
+            Debug.LogWarning("--- GreenerGameManager [DoGameDataDistribution] : game data distribution routine failed. will ignore.");
+
+        return retBool;
     }
 
     public void DoShutDownGameDataCollection()
@@ -65,42 +100,72 @@ public class GreenerGameManager : MonoBehaviour
         if (shutdownDataCollected)
             return;
 
+        bool validShutdown = true;
+
+        // player
+        // TODO: integrate
         // world
-        CollectWorldData();
+        if (!CollectWorldData())
+            validShutdown = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : world data collected.");
         // islands
-        CollectIslandData();
+        if (!CollectIslandData())
+            validShutdown = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : island data collected.");
         // loose items
-        CollectLooseItemData();
+        if (!CollectLooseItemData())
+            validShutdown = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : " + game.looseItems.Length + " loose items collected.");
         // casts
-        CollectCastData();
+        if (!CollectCastData())
+            validShutdown = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : " + game.casts.Length + " casts collected.");
+
+        // validation notice
+        if (validShutdown)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : game data collection routine complete. shut down success.");
+        else
+            Debug.LogWarning("--- GreenerGameManager [DoShutDownGameDataCollection] : game data collection routine invalid. will ignore.");
 
         shutdownDataCollected = true;
     }
 
-    void CollectWorldData()
+    bool CollectWorldData()
     {
+        bool retBool = false;
+
         TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
         if (tim != null)
+        {
             game.world = tim.GetWorldData();
+            retBool = true;
+        }
+
+        return retBool;
     }
 
-    void CollectIslandData()
+    bool CollectIslandData()
     {
+        bool retBool = false;
+
         // REVIEW:
+        // temp
+        retBool = true;
+
+        return retBool;
     }
 
-    void CollectCastData()
+    bool CollectLooseItemData()
     {
-        CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
-        if (cm != null)
-            game.casts = cm.casts;
-    }
-
-    void CollectLooseItemData()
-    {
+        bool retBool = false;
+        
         LooseItemManager[] lItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
         if (lItems.Length == 0)
-            return;
+            return true; // no loose items, yet still valid
 
         game.looseItems = new LooseItemData[lItems.Length];
         for (int i = 0; i < lItems.Length; i++)
@@ -110,14 +175,66 @@ public class GreenerGameManager : MonoBehaviour
             lItems[i].looseItem.location.z = lItems[i].transform.position.z;
             game.looseItems[i] = lItems[i].looseItem;
         }
-        Debug.Log("--- GreenerGameManager [CollectLooseItems] : " + game.looseItems.Length + " loose items collected.");
+        retBool = true;
+
+        return retBool;
     }
 
-    void DistributeLooseItems()
+    bool CollectCastData()
     {
-        if (game == null || game.looseItems == null ||
-            game.looseItems.Length == 0)
-            return;
+        bool retBool = false;
+
+        CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
+        if (cm != null)
+        {
+            game.casts = cm.casts;
+            retBool = true;
+        }
+        
+        return retBool;
+    }
+
+    bool DistributeWorldData()
+    {
+        bool retBool = false;
+
+        TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
+        if (tim != null)
+        {
+            // REVIEW: confirm this is all time manager needs to set gloabl time progress
+            tim.SetGameSeedTime(game.stats.gameInitTime);
+            retBool = true;
+        }
+
+        return retBool;
+    }
+
+    bool DistributeIslandData()
+    {
+        bool retBool = false;
+
+        // REVIEW:
+        // temp
+        retBool = true;
+
+        return retBool;
+    }
+
+    bool DistributeLooseItems()
+    {
+        bool retBool = false;
+
+        if (alm == null)
+        {
+            Debug.LogError("GreenerGameManager [DistributeLooseItems] : no art library manager found in scene. aborting.");
+            return retBool;
+        }
+
+        if (game == null || game.looseItems == null)
+        {
+            Debug.LogError("GreenerGameManager [DistributeLooseItems] : no game data or no loose item array found in data. aborting.");
+            return retBool;
+        }
 
         for (int i = 0; i < game.looseItems.Length; i++)
         {
@@ -143,8 +260,25 @@ public class GreenerGameManager : MonoBehaviour
                 lim.frames[0] = alm.itemImages[aData.artIndexBase];
             }
         }
-
-        Debug.Log("--- GreenerGameManager [DistributeLooseItems] : " + game.looseItems.Length + " loose items distributed.");
+        if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DistributeLooseItems] : " + game.looseItems.Length + " loose items distributed.");
         game.looseItems = null;
+        retBool = true;
+
+        return retBool;
+    }
+
+    bool DistributeCastData()
+    {
+        bool retBool = false;
+
+        CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
+        if (cm != null)
+        {
+            cm.casts = game.casts;
+            retBool = true;
+        }
+
+        return retBool;
     }
 }
