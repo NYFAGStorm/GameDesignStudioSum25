@@ -27,6 +27,7 @@ public class TimeManager : MonoBehaviour
     public int dayOfMonth;
     public WorldMonth monthOfYear;
     public WorldSeason season;
+    public float annualProgress;
 
     public float temperatureAdjust;
 
@@ -77,7 +78,7 @@ public class TimeManager : MonoBehaviour
             seasonalTiltGimble = skyLightObject.transform.parent.gameObject;
             sunLight = skyLightObject.transform.Find("Sun Light").GetComponent<Light>();
             moonLight = skyLightObject.transform.Find("Moon Light").GetComponent<Light>();
-            if ( seasonalTiltGimble == null | sunLight == null || moonLight == null )
+            if ( seasonalTiltGimble == null || sunLight == null || moonLight == null )
             {
                 Debug.LogError("--- TimeManager [Start] : gimble or sun or moon lights misconfigured. aborting.");
                 enabled = false;
@@ -123,6 +124,7 @@ public class TimeManager : MonoBehaviour
         // TODO: seasonal sine wave longer-shorter days, sky light tilt
         // TODO: slow sun daytime during summer, speed up at night
         // TODO: speed up sun daytime during winter, slow down at night
+        // ... update GetWorldData() below once this is in place
         float seasonalSin = Mathf.Sin((seasonProgress + SEASONALSINEOFFSET) * 2f * Mathf.PI); // season progress 0-1
         float skyLightTilt = 90f - (WINTERSOLSTICEMINANGLE + (SUMMERSOLSTICEANGLEDELTA / 2f) + ((SUMMERSOLSTICEANGLEDELTA / 2f) * seasonalSin));
         // seasonal tilt must be applied on parent object to skylight object (a gimble of z rotation)
@@ -180,6 +182,7 @@ public class TimeManager : MonoBehaviour
             temperatureAdjust = 0f;
 
         UpdateGlobalTimeProgres(seasonProgress);
+        annualProgress = seasonProgress;
     }
 
     void UpdateGlobalTimeProgres( float seasonProgress )
@@ -257,5 +260,25 @@ public class TimeManager : MonoBehaviour
     public void SetTemperatureAdjust( float adjust )
     {
         temperatureAdjust = adjust;
+    }
+
+    /// <summary>
+    /// Get world data for storage in game data
+    /// </summary>
+    /// <returns>world data</returns>
+    public WorldData GetWorldData()
+    {
+        WorldData retWData = new WorldData();
+
+        retWData.worldTimeOfDay = dayProgress; // 24 hours in each day cycle
+        retWData.worldDayOfMonth = dayOfMonth; // 30 days in each month cycle
+        retWData.worldMonth = monthOfYear;
+        retWData.worldSeason = season;
+        retWData.annualProgress = annualProgress; // percentage of year cycle (0-1)
+        retWData.baseTemperature = baseTemperature;
+        retWData.dawnTime = .25f; // temp
+        retWData.duskTime = .75f; // temp
+
+        return retWData;
     }
 }

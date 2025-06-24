@@ -10,7 +10,9 @@ public class GreenerGameManager : MonoBehaviour
 
     private SaveLoadManager saveMgr;
     private ArtLibraryManager alm;
+
     private bool looseItemsDistributed;
+    private bool shutdownDataCollected;
 
 
     void Awake()
@@ -23,11 +25,9 @@ public class GreenerGameManager : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    void OnApplicationQuit()
     {
-        CollectLooseItemData();
-        if (saveMgr != null)
-            saveMgr.SetCurrentGameData(game);
+        DoShutDownGameDataCollection();
     }
 
     void Start()
@@ -60,6 +60,42 @@ public class GreenerGameManager : MonoBehaviour
         }
     }
 
+    public void DoShutDownGameDataCollection()
+    {
+        if (shutdownDataCollected)
+            return;
+
+        // world
+        CollectWorldData();
+        // islands
+        CollectIslandData();
+        // loose items
+        CollectLooseItemData();
+        // casts
+        CollectCastData();
+
+        shutdownDataCollected = true;
+    }
+
+    void CollectWorldData()
+    {
+        TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
+        if (tim != null)
+            game.world = tim.GetWorldData();
+    }
+
+    void CollectIslandData()
+    {
+        // REVIEW:
+    }
+
+    void CollectCastData()
+    {
+        CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
+        if (cm != null)
+            game.casts = cm.casts;
+    }
+
     void CollectLooseItemData()
     {
         LooseItemManager[] lItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
@@ -82,6 +118,7 @@ public class GreenerGameManager : MonoBehaviour
         if (game == null || game.looseItems == null ||
             game.looseItems.Length == 0)
             return;
+
         for (int i = 0; i < game.looseItems.Length; i++)
         {
             GameObject lItem = GameObject.Instantiate((GameObject)Resources.Load("Loose Item"));
@@ -106,6 +143,7 @@ public class GreenerGameManager : MonoBehaviour
                 lim.frames[0] = alm.itemImages[aData.artIndexBase];
             }
         }
+
         Debug.Log("--- GreenerGameManager [DistributeLooseItems] : " + game.looseItems.Length + " loose items distributed.");
         game.looseItems = null;
     }
