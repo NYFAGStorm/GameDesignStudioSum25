@@ -7,7 +7,7 @@ public enum StructureType
     MarketShop
 }
 
-public enum StructureEffects
+public enum StructureEffect
 {
     Default,
     EffectA,
@@ -22,12 +22,12 @@ public class StructureData
     public string name;
     public StructureType type;
     public PositionData location; // local space to island parent
-    public StructureEffects[] effects;
+    public StructureEffect[] effects;
 }
 
 // if there are discrete effects that can be applied to an island
 // each effect can then apply separate rules in a modular way
-public enum IslandEffects
+public enum IslandEffect
 {
     Default,
     EffectA,
@@ -39,10 +39,10 @@ public enum IslandEffects
 [System.Serializable]
 public class IslandData
 {
-    public string islandName;
+    public string name;
     public PositionData location;
     public PositionData[] tportNodes; // local space to island parent
     public string[] tportTags;
     public StructureData[] structures;
-    public IslandEffects[] effects;
+    public IslandEffect[] effects;
 }
