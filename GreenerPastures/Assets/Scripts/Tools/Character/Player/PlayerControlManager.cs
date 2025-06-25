@@ -126,6 +126,7 @@ public class PlayerControlManager : MonoBehaviour
         // initialize
         if (enabled)
         {
+            // TODO: fix in prep for multiplayer
             cam.SetPlayer(this);
 
             if (saveMgr == null || !ALLOWPLAYERDATALOAD)
@@ -166,59 +167,11 @@ public class PlayerControlManager : MonoBehaviour
 
                 playerName = "Test Player";
             }
-            else
-            {
-                // initialize player character
-                ProfileData profData = saveMgr.GetCurrentProfile();
-                GameData gameData = saveMgr.GetCurrentGameData();
-                playerData = GameSystem.GetProfilePlayer(gameData, profData);
-                print(" - player character initialized as '"+playerData.playerName+"' in '"+gameData.gameName+"' -");
-                // connecting property to data _as a reference_
-                playerInventory = playerData.inventory;
-                playerName = playerData.playerName;
-                // place player character in location
-                pam.imageFlipped = playerData.location.w < 0f;
-                Vector3 pos = new Vector3(playerData.location.x, playerData.location.y, playerData.location.z);
-                gameObject.transform.position = pos;
-                // restore cam location and mode
-                pos.x = playerData.camera.x;
-                pos.y = playerData.camera.y;
-                pos.z = playerData.camera.z;
-                cam.gameObject.transform.position = pos;
-                cam.mode = playerData.camMode;
-                pos.x = playerData.camSaved.x;
-                pos.y = playerData.camSaved.y;
-                pos.z = playerData.camSaved.z;
-                if (cam.mode == CameraManager.CameraMode.PanFollow)
-                    cam.SetCameraPanMode(pos);
-            }
         }
     }
 
     void Update()
     {
-        // REVIEW: optimization please
-        // update player location data
-        if (pam.imageFlipped)
-            playerData.location.w = -1f;
-        else
-            playerData.location.w = 1f;
-        playerData.location.x = gameObject.transform.position.x;
-        playerData.location.y = gameObject.transform.position.y;
-        playerData.location.z = gameObject.transform.position.z;
-        // update cam data
-        playerData.camera.x = cam.transform.position.x;
-        playerData.camera.y = cam.transform.position.y;
-        playerData.camera.z = cam.transform.position.z;
-        playerData.camMode = cam.mode;
-        if (cam.mode == CameraManager.CameraMode.PanFollow)
-        {
-            Vector3 cSaved = cam.GetSavedPosition();
-            playerData.camSaved.x = cSaved.x;
-            playerData.camSaved.y = cSaved.y;
-            playerData.camSaved.z = cSaved.z;
-        }
-
         if (!freezeCharacterActions)
         {
             // check action input
@@ -300,6 +253,65 @@ public class PlayerControlManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Gets the player data and camera data for the 'game-owning player character'
+    /// </summary>
+    /// <returns>player data</returns>
+    public PlayerData GetPlayerData()
+    {
+        // update player location data
+        if (pam.imageFlipped)
+            playerData.location.w = -1f;
+        else
+            playerData.location.w = 1f;
+        playerData.location.x = gameObject.transform.position.x;
+        playerData.location.y = gameObject.transform.position.y;
+        playerData.location.z = gameObject.transform.position.z;
+        // handle camera data collection
+        playerData.camera.x = cam.transform.position.x;
+        playerData.camera.y = cam.transform.position.y;
+        playerData.camera.z = cam.transform.position.z;
+        playerData.camMode = cam.mode;
+        if (cam.mode == CameraManager.CameraMode.PanFollow)
+        {
+            Vector3 cSaved = cam.GetSavedPosition();
+            playerData.camSaved.x = cSaved.x;
+            playerData.camSaved.y = cSaved.y;
+            playerData.camSaved.z = cSaved.z;
+        }
+        return playerData;
+    }
+
+    /// <summary>
+    /// Sets player data and camera data on this player character
+    /// </summary>
+    public void SetPlayerData()
+    {
+        // initialize player character
+        ProfileData profData = saveMgr.GetCurrentProfile();
+        GameData gameData = saveMgr.GetCurrentGameData();
+        playerData = GameSystem.GetProfilePlayer(gameData, profData);
+        print(" - player character initialized as '" + playerData.playerName + "' in '" + gameData.gameName + "' -");
+        // connecting property to data _as a reference_
+        playerInventory = playerData.inventory;
+        playerName = playerData.playerName;
+        // place player character in location
+        pam.imageFlipped = playerData.location.w < 0f;
+        Vector3 pos = new Vector3(playerData.location.x, playerData.location.y, playerData.location.z);
+        gameObject.transform.position = pos;
+        // restore cam location and mode
+        pos.x = playerData.camera.x;
+        pos.y = playerData.camera.y;
+        pos.z = playerData.camera.z;
+        cam.gameObject.transform.position = pos;
+        cam.mode = playerData.camMode;
+        pos.x = playerData.camSaved.x;
+        pos.y = playerData.camSaved.y;
+        pos.z = playerData.camSaved.z;
+        if (cam.mode == CameraManager.CameraMode.PanFollow)
+            cam.SetCameraPanMode(pos);
+    }
+
     /// <summary>
     /// Gets item data for current selection of player inventory
     /// </summary>

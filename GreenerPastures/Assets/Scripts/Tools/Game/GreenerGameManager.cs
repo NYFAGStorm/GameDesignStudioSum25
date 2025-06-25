@@ -7,7 +7,9 @@ public class GreenerGameManager : MonoBehaviour
 
     public GameData game;
     public bool noisyLogging = true;
-    // TODO: indicate who is the server (owner of game data)
+
+    // TODO: indicate who is the server (owner of game data) [match profile ID]
+    // TODO: indicate the local player (client player, has main camera control)
     // TODO: integrate player character collection and distribution
 
     private SaveLoadManager saveMgr;
@@ -64,7 +66,10 @@ public class GreenerGameManager : MonoBehaviour
         bool retBool = true;
 
         // player
-        // TODO: integrate
+        if (!DistributePlayerData())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : player data distributed.");
         // world
         if (!DistributeWorldData())
             retBool = false;
@@ -103,7 +108,10 @@ public class GreenerGameManager : MonoBehaviour
         bool validShutdown = true;
 
         // player
-        // TODO: integrate
+        if (!CollectPlayerData())
+            validShutdown = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : player data collected.");
         // world
         if (!CollectWorldData())
             validShutdown = false;
@@ -132,6 +140,52 @@ public class GreenerGameManager : MonoBehaviour
             Debug.LogWarning("--- GreenerGameManager [DoShutDownGameDataCollection] : game data collection routine invalid. will ignore.");
 
         shutdownDataCollected = true;
+    }
+
+    bool CollectPlayerData()
+    {
+        bool retBool = false;
+
+        // REVIEW: hold off on collecting remote player character data until multiplayer
+
+        // REVIEW: have not filled in player data for this profile?
+        /*
+        string clientProfile = saveMgr.GetCurrentProfile().profileID;
+        PlayerData clientPlayerData = null;
+        PlayerControlManager[] pcms = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+        for (int i=0; i < pcms.Length; i++)
+        {
+            if (pcms[i].playerData.profileID == clientProfile)
+            {
+                clientPlayerData = pcms[i].playerData;
+                break;
+            }
+        }
+
+        if (clientPlayerData == null)
+            return retBool;
+
+        for (int i = 0; i < game.players.Length; i++)
+        {
+            if (game.players[i].profileID == clientProfile)
+            {
+                game.players[i] = clientPlayerData;
+                retBool = true;
+                break;
+            }
+        }
+        */
+        
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm != null)
+        {
+            // temp
+            game.players[0] = pcm.GetPlayerData(); // REVIEW: [0] always data-owning player?
+            retBool = true;
+        }
+        
+
+        return retBool;
     }
 
     bool CollectWorldData()
@@ -197,6 +251,21 @@ public class GreenerGameManager : MonoBehaviour
         return retBool;
     }
 
+    bool DistributePlayerData()
+    {
+        bool retBool = false;
+
+        // REVIEW: we need to use a 'RemotePlayerManager' class for all non-client players?
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm != null)
+        {
+            pcm.SetPlayerData();
+            retBool = true;
+        }
+
+        return retBool;
+    }
+
     bool DistributeWorldData()
     {
         bool retBool = false;
@@ -254,6 +323,12 @@ public class GreenerGameManager : MonoBehaviour
                 pos.y = lim.looseItem.location.y;
                 pos.z = lim.looseItem.location.z;
                 lim.transform.position = pos;
+                // parent within Environment/Items
+                GameObject itemsObjFolder = GameObject.Find("Items");
+                if (itemsObjFolder != null)
+                    lim.transform.parent = itemsObjFolder.transform;
+                // name appropriately
+                lim.gameObject.name = "Loose Item " + lim.looseItem.inv.items[0].name;
                 // get art (first try from plant type)
                 ArtData aData = new ArtData();
                 lim.frames = new Texture2D[1];

@@ -5,7 +5,7 @@ public class IslandManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles all floating islands and the structures on them
 
-    IslandData[] islands;
+    public IslandData[] islands;
 
 
     void Start()
