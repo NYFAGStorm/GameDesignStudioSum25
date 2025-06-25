@@ -1254,6 +1254,68 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7091691130716672438, guid: 875a80e959f662540a8e87ee3b06aec7, type: 3}
   m_PrefabInstance: {fileID: 1011164591}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1024407569
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1339543635}
+    m_Modifications:
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8568857453720588710, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+      propertyPath: m_Name
+      value: Island Manager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+--- !u!4 &1024407570 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 947293236215908562, guid: 13f3b6b7b8b2b614e83da75a5f97e733, type: 3}
+  m_PrefabInstance: {fileID: 1024407569}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1029678537
 GameObject:
   m_ObjectHideFlags: 0
@@ -1976,6 +2038,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1381547778}
+  - {fileID: 1024407570}
   - {fileID: 869074430}
   - {fileID: 451620815}
   - {fileID: 1793189161}
@@ -2275,6 +2338,7 @@ MonoBehaviour:
   dayOfMonth: 0
   monthOfYear: 0
   season: 0
+  annualProgress: 0
   temperatureAdjust: 0
 --- !u!4 &1942988489
 Transform:

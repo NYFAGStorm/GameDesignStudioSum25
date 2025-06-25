@@ -290,5 +290,6 @@ public class TimeManager : MonoBehaviour
     public void SetGameSeedTime( long seedTime )
     {
         gameSeedTime = seedTime;
+        // TODO: perform global time progress calculation based on current time and seed
     }
 }

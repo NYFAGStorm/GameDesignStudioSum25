@@ -10,34 +10,23 @@ public class CastManager : MonoBehaviour
     private int birthNewCast; // apply effect for one cast at birth
     private int singleCastToRemove; // remove effect and cast upon expiration
 
-    private SaveLoadManager saveMgr;
-    private bool performCastListBirths;
+    //private SaveLoadManager saveMgr;
+    //private bool performCastListBirths;
 
 
-    void Awake()
-    {
-        saveMgr = GameObject.FindAnyObjectByType<SaveLoadManager>();
-        if (saveMgr != null && saveMgr.GetCurrentGameData().casts != null)
-            casts = saveMgr.GetCurrentGameData().casts;
-        // TIME PASSAGE MECHANICS
-        // apply effect of these casts
-        // 1. Cast Manager gets cast list (flag set if casts)
-        performCastListBirths = (casts.Length > 0);
-        // 2. Start() check flag and birth casts
-        // TODO: check in with time manager re: time passage
-        // TODO: fast forward time wrt cast lifetime
-        // TODO: remove casts for those that expired
-        // REVIEW: in case casts were removed in time passage,
-        //  ... find a way to allow a portion of effects to apply?
-        // NOTE: for each system, time passage should be defined
-        //  ... how does a unit of game time affect system?
-    }
+    // [x] push/pull from greener game manager istead
+    // [ ] allow time manager signal to fast forward time
 
-    void OnDestroy()
-    {
-        if (saveMgr != null)
-            saveMgr.GetCurrentGameData().casts = casts;
-    }
+    // TIME PASSAGE MECHANICS
+    // [x] apply effect of these casts
+    // TODO: check in with time manager re: time passage
+    // TODO: fast forward time wrt cast lifetime
+    // TODO: remove casts for those that expired
+    // REVIEW: in case casts were removed in time passage,
+    //  ... find a way to allow a portion of effects to apply?
+    // NOTE: for each system, time passage should be defined
+    //  ... how does a unit of game time affect system?
+
 
     void Start()
     {
@@ -47,14 +36,6 @@ public class CastManager : MonoBehaviour
         {
             birthNewCast = -1;
             singleCastToRemove = -1;
-
-            if (performCastListBirths)
-            {
-                for (int i = 0; i < casts.Length; i++)
-                {
-                    HandleCastBirth(i);
-                }
-            }
         }
     }
 
@@ -99,6 +80,29 @@ public class CastManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns the cast data array
+    /// </summary>
+    /// <returns>cast data array</returns>
+    public CastData[] GetCastData()
+    {
+        return casts;
+    }
+
+    /// <summary>
+    /// Sets the cast data array
+    /// </summary>
+    /// <param name="castData">cast data array</param>
+    public void SetCastData( CastData[] castData )
+    {
+        casts = castData;
+        // perform all cast births
+        for (int i = 0; i < casts.Length; i++)
+        {
+            HandleCastBirth(i);
+        }
+    }
+
     void RemoveCast( int index )
     {
         CastData[] tmp = new CastData[casts.Length-1];
@@ -130,8 +134,6 @@ public class CastManager : MonoBehaviour
         casts = tmp;
     }
 
-    // TODO: implement effects on plots and plants for the current master list of spells
-
     // add cast effects to plots (and plants, items, players?)
     void HandleCastBirth( int index )
     {
@@ -140,8 +142,7 @@ public class CastManager : MonoBehaviour
         float areaOfEffect = casts[index].rangeAOE;
 
         // REVIEW: the assumption is that most spells alter plots
-        // REVIEW: if that assumption is false,
-        //  we need to form lists of affected elements to operate on within switch
+        //  if not, we need to form lists of affected elements to operate on within switch
         float dist;
         PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
         for (int i = 0; i < plots.Length; i++)
@@ -210,8 +211,7 @@ public class CastManager : MonoBehaviour
         float areaOfEffect = casts[index].rangeAOE;
 
         // REVIEW: the assumption is that most spells alter plots
-        // REVIEW: if that assumption is false,
-        //  we need to form lists of affected elements to operate on within switch
+        //  if not, we need to form lists of affected elements to operate on within switch
         float dist;
         PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
         for (int i = 0; i < plots.Length; i++)

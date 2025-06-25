@@ -152,8 +152,11 @@ public class GreenerGameManager : MonoBehaviour
     {
         bool retBool = false;
 
-        // REVIEW:
-        // temp
+        IslandManager im = GameObject.FindFirstObjectByType<IslandManager>();
+        if (im == null)
+            return retBool;
+
+        game.islands = im.GetIslandData();
         retBool = true;
 
         return retBool;
@@ -187,7 +190,7 @@ public class GreenerGameManager : MonoBehaviour
         CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
         if (cm != null)
         {
-            game.casts = cm.casts;
+            game.casts = cm.GetCastData();
             retBool = true;
         }
         
@@ -213,8 +216,11 @@ public class GreenerGameManager : MonoBehaviour
     {
         bool retBool = false;
 
-        // REVIEW:
-        // temp
+        IslandManager im = GameObject.FindFirstObjectByType<IslandManager>();
+        if (im == null)
+            return retBool;
+
+        im.SetIslandData(game.islands);
         retBool = true;
 
         return retBool;
@@ -275,7 +281,7 @@ public class GreenerGameManager : MonoBehaviour
         CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
         if (cm != null)
         {
-            cm.casts = game.casts;
+            cm.SetCastData(game.casts);
             retBool = true;
         }
 
