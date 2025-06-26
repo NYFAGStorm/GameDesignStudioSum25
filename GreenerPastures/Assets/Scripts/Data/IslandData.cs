@@ -10,11 +10,13 @@ public struct TPortNodeConfig
     public PositionData cameraPosition;
 }
 
-public enum StructureType
+public enum StructureType  // REVIEW:
 {
-    Default, // REVIEW:
+    Default,
     WizardTower,
-    MarketShop
+    WizardInterior,
+    MarketShop,
+    MarketShopInterior
 }
 
 public enum StructureEffect

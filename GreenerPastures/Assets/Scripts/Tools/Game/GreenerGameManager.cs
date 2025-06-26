@@ -125,12 +125,12 @@ public class GreenerGameManager : MonoBehaviour
         // loose items
         if (!CollectLooseItemData())
             validShutdown = false;
-        else if (noisyLogging)
+        else if (noisyLogging && game.looseItems != null)
             Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : " + game.looseItems.Length + " loose items collected.");
         // casts
         if (!CollectCastData())
             validShutdown = false;
-        else if (noisyLogging)
+        else if (noisyLogging && game.casts != null)
             Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : " + game.casts.Length + " casts collected.");
 
         // validation notice
