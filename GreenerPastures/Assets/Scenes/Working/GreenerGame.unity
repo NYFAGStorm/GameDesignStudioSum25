@@ -400,6 +400,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1545876229}
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: cameraMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: tower
       objectReference: {fileID: 0}
@@ -407,6 +411,18 @@ PrefabInstance:
       propertyPath: associatedCamTrigger
       value: 
       objectReference: {fileID: 1459058643}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: cameraPanModePosition.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: cameraPanModePosition.y
+      value: -1.17
+      objectReference: {fileID: 0}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: cameraPanModePosition.z
+      value: -3
+      objectReference: {fileID: 0}
     - target: {fileID: 3695908429196013634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1
@@ -574,6 +590,10 @@ PrefabInstance:
       propertyPath: islandObj
       value: 
       objectReference: {fileID: 1545876229}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: cameraMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: tower
@@ -802,7 +822,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &913498056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1384,6 +1404,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1008077038}
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: cameraMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: testTPort
       objectReference: {fileID: 0}
@@ -1711,7 +1735,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1459058643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2562,6 +2586,10 @@ PrefabInstance:
       propertyPath: islandObj
       value: 
       objectReference: {fileID: 1545876229}
+    - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+      propertyPath: cameraMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2642617375186142634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
       propertyPath: teleporterTag
       value: testTPort

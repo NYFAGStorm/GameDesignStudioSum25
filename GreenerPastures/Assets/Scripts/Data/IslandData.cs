@@ -1,5 +1,15 @@
 // REVIEW: necessary namespaces
 
+[System.Serializable]
+public struct TPortNodeConfig
+{
+    public string tag;
+    public int tPortIndex; // 0 or 1 (the associated tports are indexed)
+    public PositionData location;
+    public CameraManager.CameraMode cameraMode;
+    public PositionData cameraPosition;
+}
+
 public enum StructureType
 {
     Default, // REVIEW:
@@ -41,8 +51,7 @@ public class IslandData
 {
     public string name;
     public PositionData location; // w = scale of island
-    public PositionData[] tportNodes; // local space to island parent
-    public string[] tportTags;
+    public TPortNodeConfig[] tports;
     public StructureData[] structures;
     public IslandEffect[] effects;
 }

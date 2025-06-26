@@ -14,10 +14,102 @@ public class IslandSystem
 
         retIsland.name = islandName;
         retIsland.location = islandLocation; // w = island scale
-        retIsland.tportNodes = new PositionData[0];
-        retIsland.tportTags = new string[0];
+        retIsland.tports = new TPortNodeConfig[0];
         retIsland.structures = new StructureData[0];
         retIsland.effects = new IslandEffect[0];
+
+        return retIsland;
+    }
+
+    /// <summary>
+    /// Creates new teleport node data based on given tag and position
+    /// </summary>
+    /// <param name="tPortTag">teleport node tag</param>
+    /// <param name="tPortIndex">teleport node index (0 or 1 for paired nodes)</param>
+    /// <param name="tPortLocation">teleport location</param>
+    /// <returns>initialized teleport node data</returns>
+    public static TPortNodeConfig InitializeTeleportNode( string tPortTag, int tPortIndex, PositionData tPortLocation )
+    {
+        TPortNodeConfig retTport = new TPortNodeConfig();
+
+        retTport.tag = tPortTag;
+        retTport.tPortIndex = tPortIndex;
+        retTport.location = tPortLocation;
+        retTport.cameraMode = CameraManager.CameraMode.Follow; // default config
+        retTport.cameraPosition = new PositionData();
+
+        return retTport;
+    }
+
+    /// <summary>
+    /// Adds given teleport node data to given island, if it doesn't already exist
+    /// </summary>
+    /// <param name="island">island data</param>
+    /// <param name="tportNode">teleport node data</param>
+    /// <returns>island data with teleport node added, if it didn't already exist</returns>
+    public static IslandData AddTeleportNodeToIsland( IslandData island, TPortNodeConfig tportNode )
+    {
+        IslandData retIsland = island;
+
+        // validate does not exist (match tag and index)
+        bool found = false;
+        for (int i = 0; i < retIsland.tports.Length; i++)
+        {
+            if (retIsland.tports[i].tag == tportNode.tag &&
+                retIsland.tports[i].tPortIndex == tportNode.tPortIndex)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            return retIsland;
+        TPortNodeConfig[] tmp = new TPortNodeConfig[retIsland.tports.Length + 1];
+        for (int i = 0; i < retIsland.tports.Length; i++)
+        {
+            tmp[i] = retIsland.tports[i];
+        }
+        tmp[retIsland.tports.Length] = tportNode;
+        retIsland.tports = tmp;
+
+        return retIsland;
+    }
+
+    /// <summary>
+    /// Removes given teleport node data from given island data, if it exists
+    /// </summary>
+    /// <param name="island">island data</param>
+    /// <param name="tportNode">teleport node data</param>
+    /// <returns>island data with teleport node removed, if it existed</returns>
+    public static IslandData RemoveTeleportNodeFromIsland( IslandData island, TPortNodeConfig tportNode )
+    {
+        IslandData retIsland = island;
+
+        // validate does exist (match tag and index)
+        bool found = false;
+        for (int i = 0; i < retIsland.tports.Length; i++)
+        {
+            if (retIsland.tports[i].tag == tportNode.tag &&
+                retIsland.tports[i].tPortIndex == tportNode.tPortIndex)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return retIsland;
+        TPortNodeConfig[] tmp = new TPortNodeConfig[retIsland.tports.Length - 1];
+        int count = 0;
+        for (int i = 0; i < retIsland.tports.Length; i++)
+        {
+            if (retIsland.tports[i].tag != tportNode.tag ||
+                retIsland.tports[i].tPortIndex != tportNode.tPortIndex)
+            {
+                tmp[count] = retIsland.tports[i];
+                count++;
+            }
+        }
+        retIsland.tports = tmp;
 
         return retIsland;
     }
@@ -29,7 +121,7 @@ public class IslandSystem
     /// <param name="structureType">structure type</param>
     /// <param name="structureLocation">structure location (relative to island center)</param>
     /// <returns>initialized structure data</returns>
-    public static StructureData InitialzieStructure( string structureName, StructureType structureType,  PositionData structureLocation )
+    public static StructureData InitialzieStructure( string structureName, StructureType structureType, PositionData structureLocation )
     {
         StructureData retStructure = new StructureData();
 

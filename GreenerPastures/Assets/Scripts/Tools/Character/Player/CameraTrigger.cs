@@ -5,6 +5,8 @@ public class CameraTrigger : MonoBehaviour
     // Author: Glenn Storm
     // This triggers the camera manager to change modes and behaviors upon player collision
 
+    // NOTE: this tool is depreciated from teleporter node use (handled by TeleportManager)
+
     public enum CameraTriggerMode
     {
         Default,

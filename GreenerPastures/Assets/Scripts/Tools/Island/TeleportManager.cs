@@ -1,4 +1,5 @@
 using UnityEngine;
+using static CameraTrigger;
 
 public class TeleportManager : MonoBehaviour
 {
@@ -8,8 +9,10 @@ public class TeleportManager : MonoBehaviour
 
     public string teleporterTag;
     public GameObject teleportSubject;
-    [Tooltip("if none defined, will ignore. otherwise reaching this node will trigger.")]
-    public CameraTrigger associatedCamTrigger;
+    [Tooltip("At destination, set local player main camera manager to this mode")]
+    public CameraManager.CameraMode cameraMode;
+    [Tooltip("At destination, if cam mode pan follow, set this cam saved position as anchor")]
+    public Vector3 cameraPanModePosition;
     public GameObject islandObj; // hold player to this center
     public float islandRadius = 7f;
 
@@ -154,9 +157,8 @@ public class TeleportManager : MonoBehaviour
             r.enabled = true; // REVIEW: are there things that should not be visible?
         }
 
-        // if associated camera trigger, trigger
-        if (pairedPad.associatedCamTrigger != null)
-            pairedPad.associatedCamTrigger.TriggerCameraMode();
+        // handle local player camera manager changes for node destination
+        pairedPad.HandleLocalCamera();
 
         // hold player to new location
         pcm.playerData.island.w = pairedPad.islandRadius;
@@ -177,5 +179,34 @@ public class TeleportManager : MonoBehaviour
         vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = Color.yellow;
         Destroy(vfx, 1f);
         // TODO: sfx
+    }
+
+    public void HandleLocalCamera()
+    {
+        // TODO: detect if this is a local player 
+        PlayerControlManager pcm = pairedPad.teleportSubject.GetComponent<PlayerControlManager>();
+        if (pcm != null)
+        {
+            CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+            if (cm == null)
+            {
+                Debug.LogError("--- TeleportManager [HandleLocalCamera] : " + gameObject.name + " no camera manager found in scene. aborting.");
+                return;
+            }
+            switch (cameraMode)
+            {
+                case CameraManager.CameraMode.Default:
+                    // should never be here
+                    break;
+                case CameraManager.CameraMode.Follow:
+                    cm.SetCameraFollowMode();
+                    break;
+                case CameraManager.CameraMode.PanFollow:
+                    cm.SetCameraPanMode(cameraPanModePosition);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

@@ -79,36 +79,34 @@ public class IslandManager : MonoBehaviour
 
     void ConfigureTPortNodes(IslandData island, GameObject islandObj)
     {
-        // validate same length of tportNodes and tportTags
-        if (island.tportNodes.Length != island.tportTags.Length)
-        {
-            Debug.LogError("--- IslandManager [ConfigureTPortNodes] : mismatch number between node positions and tags. aborting.");
-            return;
-        }
-
         // configure teleport nodes
-        for (int i = 0; i < island.tportNodes.Length; i++)
+        for (int i = 0; i < island.tports.Length; i++)
         {
             // create teleport node
             GameObject tportNode = GameObject.Instantiate((GameObject)Resources.Load("Teleport Node"));                //
             // name node & set tag
-            tportNode.name = "Teleport Node " + island.tportTags[i];
+            tportNode.name = "Teleport Node " + island.tports[i].tag + "[" + island.tports[i].tPortIndex + "]";
             TeleportManager tm = tportNode.GetComponent<TeleportManager>();
-            tm.teleporterTag = island.tportTags[i];
+            tm.teleporterTag = island.tports[i].tag;
             // configure to parent island
             tm.islandObj = islandObj;
             tm.islandRadius = island.location.w * 7f;
-            // TODO: configure associated camera trigger
-            // REVIEW: refactor camera trigger mechanism?
             // position node
             Vector3 pos = Vector3.zero;
-            pos.x = island.tportNodes[i].x;
-            pos.y = island.tportNodes[i].y;
-            pos.z = island.tportNodes[i].z;
+            pos.x = island.tports[i].location.x;
+            pos.y = island.tports[i].location.y;
+            pos.z = island.tports[i].location.z;
             pos += islandObj.transform.position;
             tportNode.transform.position = pos;
             // parent node to island
             tportNode.transform.parent = islandObj.transform;
+            // NOTE: camera manager trigger mechanics handled by teleport manager
+            tm.cameraMode = island.tports[i].cameraMode;
+            pos = Vector3.zero;
+            pos.x = island.tports[i].cameraPosition.x;
+            pos.y = island.tports[i].cameraPosition.y;
+            pos.z = island.tports[i].cameraPosition.z;
+            tm.cameraPanModePosition = pos;
         }
     }
 
