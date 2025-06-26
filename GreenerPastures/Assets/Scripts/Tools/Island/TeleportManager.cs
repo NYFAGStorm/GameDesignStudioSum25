@@ -1,5 +1,4 @@
 using UnityEngine;
-using static CameraTrigger;
 
 public class TeleportManager : MonoBehaviour
 {
