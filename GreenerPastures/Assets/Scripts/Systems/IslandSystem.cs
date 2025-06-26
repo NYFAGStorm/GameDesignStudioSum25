@@ -13,7 +13,7 @@ public class IslandSystem
         IslandData retIsland = new IslandData();
 
         retIsland.name = islandName;
-        retIsland.location = islandLocation;
+        retIsland.location = islandLocation; // w = island scale
         retIsland.tportNodes = new PositionData[0];
         retIsland.tportTags = new string[0];
         retIsland.structures = new StructureData[0];

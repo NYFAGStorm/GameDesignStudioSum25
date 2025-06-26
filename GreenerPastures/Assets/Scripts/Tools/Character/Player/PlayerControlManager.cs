@@ -172,6 +172,9 @@ public class PlayerControlManager : MonoBehaviour
 
     void Update()
     {
+        if (playerData == null)
+            return;
+
         if (!freezeCharacterActions)
         {
             // check action input
@@ -194,7 +197,8 @@ public class PlayerControlManager : MonoBehaviour
         // clear active loose item if moving
         ClearActiveItem();
         // disallow item pick up if player inventory is full
-        if (playerInventory.items.Length < playerInventory.maxSlots)
+        if (playerInventory != null && playerInventory.items != null && 
+            playerInventory.items.Length < playerInventory.maxSlots)
         {
             // check near loose item
             CheckNearItem();

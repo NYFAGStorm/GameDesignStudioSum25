@@ -40,7 +40,7 @@ public enum IslandEffect
 public class IslandData
 {
     public string name;
-    public PositionData location;
+    public PositionData location; // w = scale of island
     public PositionData[] tportNodes; // local space to island parent
     public string[] tportTags;
     public StructureData[] structures;

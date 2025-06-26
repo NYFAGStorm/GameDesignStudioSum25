@@ -305,45 +305,49 @@ public class GreenerGameManager : MonoBehaviour
             return retBool;
         }
 
-        if (game == null || game.looseItems == null)
+        if (game == null)
         {
-            Debug.LogError("GreenerGameManager [DistributeLooseItems] : no game data or no loose item array found in data. aborting.");
+            Debug.LogError("GreenerGameManager [DistributeLooseItems] : no game data found. aborting.");
             return retBool;
         }
 
-        for (int i = 0; i < game.looseItems.Length; i++)
+        if ( game.looseItems != null )
         {
-            GameObject lItem = GameObject.Instantiate((GameObject)Resources.Load("Loose Item"));
-            LooseItemManager lim = lItem.GetComponent<LooseItemManager>();
-            if (lim != null)
+            for (int i = 0; i < game.looseItems.Length; i++)
             {
-                Vector3 pos = Vector3.zero;
-                lim.looseItem = game.looseItems[i];
-                pos.x = lim.looseItem.location.x;
-                pos.y = lim.looseItem.location.y;
-                pos.z = lim.looseItem.location.z;
-                lim.transform.position = pos;
-                // parent within Environment/Items
-                GameObject itemsObjFolder = GameObject.Find("Items");
-                if (itemsObjFolder != null)
-                    lim.transform.parent = itemsObjFolder.transform;
-                // name appropriately
-                lim.gameObject.name = "Loose Item " + lim.looseItem.inv.items[0].name;
-                // get art (first try from plant type)
-                ArtData aData = new ArtData();
-                lim.frames = new Texture2D[1];
-                if (lim.looseItem.inv.items[0].plant != PlantType.Default)
+                GameObject lItem = GameObject.Instantiate((GameObject)Resources.Load("Loose Item"));
+                LooseItemManager lim = lItem.GetComponent<LooseItemManager>();
+                if (lim != null)
                 {
-                    aData = alm.GetArtData(lim.looseItem.inv.items[0].type, lim.looseItem.inv.items[0].plant);
+                    Vector3 pos = Vector3.zero;
+                    lim.looseItem = game.looseItems[i];
+                    pos.x = lim.looseItem.location.x;
+                    pos.y = lim.looseItem.location.y;
+                    pos.z = lim.looseItem.location.z;
+                    lim.transform.position = pos;
+                    // parent within Environment/Items
+                    GameObject itemsObjFolder = GameObject.Find("Items");
+                    if (itemsObjFolder != null)
+                        lim.transform.parent = itemsObjFolder.transform;
+                    // name appropriately
+                    lim.gameObject.name = "Loose Item " + lim.looseItem.inv.items[0].name;
+                    // get art (first try from plant type)
+                    ArtData aData = new ArtData();
+                    lim.frames = new Texture2D[1];
+                    if (lim.looseItem.inv.items[0].plant != PlantType.Default)
+                    {
+                        aData = alm.GetArtData(lim.looseItem.inv.items[0].type, lim.looseItem.inv.items[0].plant);
+                    }
+                    if (aData.type == ItemType.Default)
+                        aData = alm.GetArtData(lim.looseItem.inv.items[0].type);
+                    lim.frames[0] = alm.itemImages[aData.artIndexBase];
                 }
-                if (aData.type == ItemType.Default)
-                    aData = alm.GetArtData(lim.looseItem.inv.items[0].type);
-                lim.frames[0] = alm.itemImages[aData.artIndexBase];
             }
+            if (noisyLogging)
+                Debug.Log("--- GreenerGameManager [DistributeLooseItems] : " + game.looseItems.Length + " loose items distributed.");
+            game.looseItems = null;
         }
-        if (noisyLogging)
-            Debug.Log("--- GreenerGameManager [DistributeLooseItems] : " + game.looseItems.Length + " loose items distributed.");
-        game.looseItems = null;
+
         retBool = true;
 
         return retBool;
