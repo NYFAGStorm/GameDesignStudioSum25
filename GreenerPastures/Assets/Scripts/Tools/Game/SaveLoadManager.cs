@@ -92,12 +92,6 @@ public class SaveLoadManager : MonoBehaviour
         return GAMESPATH + GAMEFILEPREFIX + key + GAMEFILESUFFIX;
     }
 
-    // TODO: 
-    // . (upon selection of game...)
-    // . load game data .dat
-
-    // TODO: handle mismatch version data
-
     // TODO: once data loaded, find all timestamp data and handle tracked timer data
     //  (that is, subtract global time progress and _likely_ zero out timer values
     // use TimeManager.GetTimestampDifference( long ) to set float timer values
@@ -174,11 +168,13 @@ public class SaveLoadManager : MonoBehaviour
         if (roster.versionNumber == VERSIONNUMBERSTRING)
             return;
 
-        Debug.LogWarning("--- SaveLoadManager [HandleVersionMismatch] : version mismatch. game data may be unrealiable. will overwrite.");
+        Debug.LogWarning("--- SaveLoadManager [HandleVersionMismatch] : version mismatch. game data would be unrealiable. removing game files.");
 
-        // REVIEW: check numbers are incrementing? how to handle?
+        // if mismatch, remove all game files (game data structure unrealiable)
+        string gameDir = GetGameDataPath() + GAMESPATH;
+        Directory.Delete(gameDir, true);
 
-        roster.versionNumber = VERSIONNUMBERSTRING; // temp, just reset
+        roster.versionNumber = VERSIONNUMBERSTRING;
     }
 
     public void CreateNewRosterEntry( ProfileData profile )
