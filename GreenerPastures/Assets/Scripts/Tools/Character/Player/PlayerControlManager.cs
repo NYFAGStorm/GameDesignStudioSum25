@@ -170,10 +170,73 @@ public class PlayerControlManager : MonoBehaviour
         }
     }
 
+    void TestInitFarmData()
+    {
+        PositionData pos = new PositionData();
+
+        playerData.farm = FarmSystem.InitializeFarm();
+        playerData.farm.plots = new PlotData[10];
+
+        playerData.farm.plots[0] = FarmSystem.InitializePlot();
+        pos.x = -1f;
+        pos.y = 0f;
+        pos.z = -1f;
+        playerData.farm.plots[0].location = pos;
+        playerData.farm.plots[1] = FarmSystem.InitializePlot();
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = -1f;
+        playerData.farm.plots[1].location = pos;
+        playerData.farm.plots[2] = FarmSystem.InitializePlot();
+        pos.x = 1f;
+        pos.y = 0f;
+        pos.z = -1f;
+        playerData.farm.plots[2].location = pos;
+        playerData.farm.plots[3] = FarmSystem.InitializePlot();
+        pos.x = 2f;
+        pos.y = 0f;
+        pos.z = -1f;
+        playerData.farm.plots[3].location = pos;
+        playerData.farm.plots[4] = FarmSystem.InitializePlot();
+        pos.x = -1f;
+        pos.y = 0f;
+        pos.z = -2f;
+        playerData.farm.plots[4].location = pos;
+        playerData.farm.plots[5] = FarmSystem.InitializePlot();
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = -2f;
+        playerData.farm.plots[5].location = pos;
+        playerData.farm.plots[6] = FarmSystem.InitializePlot();
+        pos.x = 1f;
+        pos.y = 0f;
+        pos.z = -2f;
+        playerData.farm.plots[6].location = pos;
+        playerData.farm.plots[7] = FarmSystem.InitializePlot();
+        pos.x = 2f;
+        pos.y = 0f;
+        pos.z = -2f;
+        playerData.farm.plots[7].location = pos;
+        playerData.farm.plots[8] = FarmSystem.InitializePlot();
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = -3f;
+        playerData.farm.plots[8].location = pos;
+        playerData.farm.plots[9] = FarmSystem.InitializePlot();
+        pos.x = 1f;
+        pos.y = 0f;
+        pos.z = -3f;
+        playerData.farm.plots[9].location = pos;
+    }
+    
     void Update()
     {
         if (playerData == null)
             return;
+
+        // TEMP - test init farm data
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+            TestInitFarmData();
 
         if (!freezeCharacterActions)
         {
@@ -283,7 +346,42 @@ public class PlayerControlManager : MonoBehaviour
             playerData.camSaved.y = cSaved.y;
             playerData.camSaved.z = cSaved.z;
         }
+        // farm data collection
+        if (playerData.farm != null && playerData.farm.plots != null &&
+            playerData.farm.plots.Length > 0)
+        {
+            for (int i = 0; i < playerData.farm.plots.Length; i++)
+            {
+                PlotData pData = GetPlotData(playerData.farm.plots[i].location);
+                playerData.farm.plots[i] = pData;
+            }
+            // REVIEW: farm effects on the player data already?
+        }
         return playerData;
+    }
+
+    PlotData GetPlotData( PositionData pos )
+    {
+        PlotData retPlot = new PlotData();
+
+        PlotManager[] pms = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        bool found = false;
+        for (int i = 0; i < pms.Length; i++)
+        {
+            if (pms[i].data.location.x == pos.x && pms[i].data.location.y == pos.y &&
+                pms[i].data.location.z == pos.z)
+            {
+                retPlot = pms[i].data;
+                found = true;
+            }
+        }
+        if (!found)
+        {
+            Debug.LogWarning("--- PlayerControlManager [GetPlotData] : no plot found at " + pos.x + ", " + pos.y + ", " + pos.z + ". will ignore.");
+            return null;
+        }
+
+        return retPlot;
     }
 
     /// <summary>
@@ -314,6 +412,88 @@ public class PlayerControlManager : MonoBehaviour
         pos.z = playerData.camSaved.z;
         if (cam.mode == CameraManager.CameraMode.PanFollow)
             cam.SetCameraPanMode(pos);
+        // configure player farm (After island data distributed)
+        IslandData island = gameData.islands[playerData.playerIsland];
+        GameObject islandObj = GameObject.Find("Island " + gameData.islands[playerData.playerIsland].name);
+        if (islandObj != null)
+        {
+            if (island == null)
+                print("no island data");
+            else if (!ConfigurePlayerFarm(island, islandObj))
+                Debug.LogWarning("--- PlayerControlManager [SetPlayerData] : ConfigurePlayerFarm failed. will ignore.");
+        }
+        else
+            Debug.LogWarning("--- PlayerControlManager [SetPlayerData] : unable to find player island object 'Island " + gameData.islands[playerData.playerIsland].name + "'. will ignore.");
+    }
+
+    bool ConfigurePlayerFarm( IslandData iData, GameObject islandObj )
+    {
+        bool retBool = false;
+
+        if (playerData == null || playerData.farm == null ||
+            playerData.farm.plots == null)
+            return retBool;
+
+        // farm location at island center, establish plot array
+        for (int i = 0; i < playerData.farm.plots.Length; i++)
+        {
+            PlotData pData = playerData.farm.plots[i];
+            GameObject plot = GameObject.Instantiate((GameObject)Resources.Load("Plot"));
+            plot.name = "Plot";
+            PlotManager pm = plot.GetComponent<PlotManager>();
+            pm.data = pData;
+            Vector3 pos = Vector3.zero;
+            pos.x = pData.location.x;
+            pos.y = pData.location.y;
+            pos.z = pData.location.z;
+            plot.transform.position = pos + islandObj.transform.position;
+            if (pData.condition > PlotCondition.Wild)
+            {
+                // remove wild grasses
+                GameObject grasses = plot.transform.Find("Plot Wild Grasses").gameObject;
+                if (grasses == null)
+                    Debug.LogWarning("--- PlayerControlManager [ConfigurePlayerFarm] : no wild grasses on plot to remove. will ignore.");
+                else
+                    Destroy(grasses);
+            }
+            // establish plant
+            if (pData.plant.type != PlantType.Default)
+            {
+                pm.plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
+                pm.plant.transform.position = plot.transform.position;
+                pm.plant.transform.parent = plot.transform;
+            }
+            // set ground texture based on condition
+            Renderer r = plot.transform.Find("Ground").gameObject.GetComponent<Renderer>();
+            switch (pData.condition)
+            {
+                case PlotCondition.Default:
+                    // we should never be here
+                    break;
+                case PlotCondition.Wild:
+                    // default
+                    break;
+                case PlotCondition.Dirt:
+                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                    break;
+                case PlotCondition.Tilled:
+                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                    break;
+                case PlotCondition.Growing:
+                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                    break;
+                case PlotCondition.Uprooted:
+                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
+                    break;
+                default:
+                    break;
+            }
+            plot.transform.parent = islandObj.transform;
+            // REVIEW: local position instead?
+        }
+        retBool = true;
+
+        return retBool;
     }
 
     /// <summary>

@@ -188,6 +188,8 @@ public class PlotManager : MonoBehaviour
     /// <param name="active">if true, cursor will pulse</param>
     public void SetCursorPulse( bool active )
     {
+        if (cursor == null)
+            return;
         cursorActive = active;
         SetCursorHighlight(0f);
         cursorTimer = 0f;
@@ -200,6 +202,8 @@ public class PlotManager : MonoBehaviour
 
     void SetCursorHighlight( float value )
     {
+        if (cursor == null)
+            return;
         Color c = cursor.material.color;
         // REVIEW: with better art
         c.r = 1f;

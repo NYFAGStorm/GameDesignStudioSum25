@@ -65,11 +65,6 @@ public class GreenerGameManager : MonoBehaviour
     {
         bool retBool = true;
 
-        // player
-        if (!DistributePlayerData())
-            retBool = false;
-        else if (noisyLogging)
-            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : player data distributed.");
         // world
         if (!DistributeWorldData())
             retBool = false;
@@ -80,6 +75,11 @@ public class GreenerGameManager : MonoBehaviour
             retBool = false;
         else if (noisyLogging)
             Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : island data distributed.");
+        // player
+        if (!DistributePlayerData())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : player data distributed.");
         // loose items
         if (!DistributeLooseItems())
             retBool = false;
@@ -107,11 +107,6 @@ public class GreenerGameManager : MonoBehaviour
 
         bool validShutdown = true;
 
-        // player
-        if (!CollectPlayerData())
-            validShutdown = false;
-        else if (noisyLogging)
-            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : player data collected.");
         // world
         if (!CollectWorldData())
             validShutdown = false;
@@ -122,6 +117,11 @@ public class GreenerGameManager : MonoBehaviour
             validShutdown = false;
         else if (noisyLogging)
             Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : island data collected.");
+        // player
+        if (!CollectPlayerData())
+            validShutdown = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : player data collected.");
         // loose items
         if (!CollectLooseItemData())
             validShutdown = false;
@@ -184,7 +184,6 @@ public class GreenerGameManager : MonoBehaviour
             retBool = true;
         }
         
-
         return retBool;
     }
 

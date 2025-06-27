@@ -28,6 +28,7 @@ public enum PlotEffect
 [System.Serializable]
 public class PlotData
 {
+    public PositionData location; // relative to parent island location
     public PlotCondition condition;
     public float sun;
     public float water;
