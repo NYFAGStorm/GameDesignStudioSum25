@@ -74,7 +74,6 @@ public class PlotManager : MonoBehaviour
         // inititalize
         if (enabled)
         {
-            data = FarmSystem.InitializePlot();
             cursor.enabled = false;
             plotTimer = 0.1f;
         }

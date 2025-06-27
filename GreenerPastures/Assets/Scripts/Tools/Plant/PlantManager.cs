@@ -80,6 +80,21 @@ public class PlantManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calls the routine to set this plant image based on given growth amount
+    /// </summary>
+    /// <param name="growthAmount">growth amount</param>
+    /// <param name="harvested">is this plant harvested</param>
+    public void ForceGrowthImage( float growthAmount, bool harvested )
+    {
+        // if called from data distribution routine, this needs to be established
+        if (plantImage == null)
+            plantImage = transform.Find("Plant Image").gameObject.GetComponent<Renderer>();
+        Grow(growthAmount);
+        if (harvested)
+            plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+    }
+
     void Grow( float growth )
     {
         int growNumber = Mathf.RoundToInt(growth * 4f);

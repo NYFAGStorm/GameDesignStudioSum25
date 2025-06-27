@@ -10,13 +10,16 @@ public class GreenerGameManager : MonoBehaviour
 
     // TODO: indicate who is the server (owner of game data) [match profile ID]
     // TODO: indicate the local player (client player, has main camera control)
-    // TODO: integrate player character collection and distribution
+
+    // [x] integrate player character collection and distribution
+    // [x] establish 'first-run' data set, detect and init data
 
     private SaveLoadManager saveMgr;
     private ArtLibraryManager alm;
 
     private bool gameDataDistributed;
     private bool shutdownDataCollected;
+    private bool firstRunDetected;
 
 
     void Awake()
@@ -26,6 +29,11 @@ public class GreenerGameManager : MonoBehaviour
         {
             game = saveMgr.GetCurrentGameData();
             Debug.Log("--- GreenerGameManager [Awake] : game data loaded for '" + game.gameName + "'");
+            if (game.state == GameState.Initializing)
+            {
+                Debug.Log("--- GreenerGameManager [Awake] : game data 'first-run' detected. establishing data init.");
+                firstRunDetected = true;
+            }
         }
     }
 
@@ -58,7 +66,25 @@ public class GreenerGameManager : MonoBehaviour
     void Update()
     {
         if (!gameDataDistributed)
+        {
+            // first-run establish data
+            if (firstRunDetected)
+            {
+                FirstWorldData();
+                FirstIslandData();
+                FirstLooseItemData();
+                FirstCastData();
+                FirstPlayerData();
+                game.state = GameState.Established;
+                Debug.Log("--- GreenerGameManager [Update] : new game '" + game.gameName + "' established.");
+                firstRunDetected = false;
+            }
+
             gameDataDistributed = DoGameDataDistribution();
+
+            if (!gameDataDistributed) // REVIEW: still needed?
+                Debug.LogWarning("--- GreenerGameManager [Update] : DoGameDataDistribution routine attempt failed. will ignore.");
+        }
     }
 
     bool DoGameDataDistribution()
@@ -75,11 +101,6 @@ public class GreenerGameManager : MonoBehaviour
             retBool = false;
         else if (noisyLogging)
             Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : island data distributed.");
-        // player
-        if (!DistributePlayerData())
-            retBool = false;
-        else if (noisyLogging)
-            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : player data distributed.");
         // loose items
         if (!DistributeLooseItems())
             retBool = false;
@@ -90,6 +111,11 @@ public class GreenerGameManager : MonoBehaviour
             retBool = false;
         else if (noisyLogging)
             Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : cast data distributed.");
+        // player
+        if (!DistributePlayerData())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : player data distributed.");
 
         // validation notice
         if (retBool)
@@ -117,11 +143,6 @@ public class GreenerGameManager : MonoBehaviour
             validShutdown = false;
         else if (noisyLogging)
             Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : island data collected.");
-        // player
-        if (!CollectPlayerData())
-            validShutdown = false;
-        else if (noisyLogging)
-            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : player data collected.");
         // loose items
         if (!CollectLooseItemData())
             validShutdown = false;
@@ -132,6 +153,11 @@ public class GreenerGameManager : MonoBehaviour
             validShutdown = false;
         else if (noisyLogging && game.casts != null)
             Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : " + game.casts.Length + " casts collected.");
+        // player
+        if (!CollectPlayerData())
+            validShutdown = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : player data collected.");
 
         // validation notice
         if (validShutdown)
@@ -177,9 +203,10 @@ public class GreenerGameManager : MonoBehaviour
         */
         
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
-        if (pcm != null)
+        if (pcm != null && game != null && game.players != null &&
+            game.players.Length > 0)
         {
-            // temp
+            // temp (change for multiplayer)
             game.players[0] = pcm.GetPlayerData(); // REVIEW: [0] always data-owning player?
             retBool = true;
         }
@@ -250,21 +277,6 @@ public class GreenerGameManager : MonoBehaviour
         return retBool;
     }
 
-    bool DistributePlayerData()
-    {
-        bool retBool = false;
-
-        // REVIEW: we need to use a 'RemotePlayerManager' class for all non-client players?
-        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
-        if (pcm != null)
-        {
-            pcm.SetPlayerData();
-            retBool = true;
-        }
-
-        return retBool;
-    }
-
     bool DistributeWorldData()
     {
         bool retBool = false;
@@ -272,7 +284,7 @@ public class GreenerGameManager : MonoBehaviour
         TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
         if (tim != null)
         {
-            // REVIEW: confirm this is all time manager needs to set gloabl time progress
+            // REVIEW: confirm this is all time manager needs to set global time progress
             tim.SetGameSeedTime(game.stats.gameInitTime);
             retBool = true;
         }
@@ -285,8 +297,11 @@ public class GreenerGameManager : MonoBehaviour
         bool retBool = false;
 
         IslandManager im = GameObject.FindFirstObjectByType<IslandManager>();
-        if (im == null)
+        if (im == null) // REVIEW: still needed?
+        {
+            Debug.LogError("--- GreenerGameManager [DistributeIslandData] : no island manager found in scene. aborting.");
             return retBool;
+        }
 
         im.SetIslandData(game.islands);
         retBool = true;
@@ -342,8 +357,8 @@ public class GreenerGameManager : MonoBehaviour
                     lim.frames[0] = alm.itemImages[aData.artIndexBase];
                 }
             }
-            if (noisyLogging)
-                Debug.Log("--- GreenerGameManager [DistributeLooseItems] : " + game.looseItems.Length + " loose items distributed.");
+            //if (noisyLogging)
+            //    Debug.Log("--- GreenerGameManager [DistributeLooseItems] : " + game.looseItems.Length + " loose items distributed.");
             game.looseItems = null;
         }
 
@@ -364,5 +379,224 @@ public class GreenerGameManager : MonoBehaviour
         }
 
         return retBool;
+    }
+
+    bool DistributePlayerData()
+    {
+        bool retBool = false;
+
+        if (game.players == null || game.players.Length == 0)
+        {
+            Debug.LogError("--- GreenerGameManager [DistributePlayerData] : no players found in data. aborting.");
+            return retBool;
+        }
+
+        PlayerControlManager[] pcms = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+        if (pcms.Length != 0)
+        {
+            print("pcm already in scene, aborting");
+            return retBool;
+        }
+
+        // REVIEW: we need to use a 'RemotePlayerManager' class for all non-client players?
+
+        // establish player character in scene
+        GameObject pc = GameObject.Instantiate((GameObject)Resources.Load("Player Character"));
+        pc.name = "Player Character '" + game.players[0].playerName + "'";
+        Vector3 pos = Vector3.zero;
+        pos.x = game.players[0].location.x;
+        pos.y = game.players[0].location.y;
+        pos.z = game.players[0].location.z;
+        bool playerArtFlipped = game.players[0].location.w < 0f;
+        pc.transform.GetChild(0).GetComponent<PlayerAnimManager>().imageFlipped = playerArtFlipped;
+        pc.transform.parent = GameObject.Find("Character").transform;
+        PlayerControlManager pcm = pc.GetComponent<PlayerControlManager>();
+
+        if (Camera.main != null)
+        {
+            CameraManager cam = Camera.main.gameObject.AddComponent<CameraManager>();
+            cam.gameObject.GetComponent<AudioListener>().enabled = false; // REVIEW: remove?
+            pc.AddComponent<AudioListener>();
+        }
+
+        if (pcm != null)
+        {
+            pcm.SetPlayerData();
+            retBool = true;
+        }
+
+        return retBool;
+    }
+
+    void FirstWorldData()
+    {
+        if (game.world != null)
+            return;
+
+        game.world = WorldSystem.InitializeWorld();
+
+        Debug.Log("--- GreenerGameManager [FirstWorldData] : first world data established.");
+    }
+
+    void FirstIslandData()
+    {
+        if (game.islands != null && game.islands.Length > 0)
+            return;
+
+        PositionData pos = new PositionData();
+
+        game.islands = new IslandData[2];
+
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = 0f;
+        pos.w = 1f; // scale of 1,1,1
+        game.islands[0] = IslandSystem.InitializeIsland("Alpha", pos);
+        pos.x = 20f;
+        pos.y = 0f;
+        pos.z = -20f;
+        pos.w = 1f; // scale of 1,1,1
+        game.islands[1] = IslandSystem.InitializeIsland("Beta", pos);
+
+        game.islands[0].tports = new TPortNodeConfig[3];
+        pos.x = 1.3f;
+        pos.y = 0f;
+        pos.z = 0.75f;
+        pos.w = 0f;
+        game.islands[0].tports[0] = IslandSystem.InitializeTeleportNode("tower", 0, pos);
+        game.islands[0].tports[0].cameraMode = CameraManager.CameraMode.Follow;
+        pos.x = 1f;
+        pos.y = -3.67f;
+        pos.z = -2.5f;
+        pos.w = 0f;
+        game.islands[0].tports[1] = IslandSystem.InitializeTeleportNode("tower", 1, pos);
+        game.islands[0].tports[1].cameraMode = CameraManager.CameraMode.PanFollow;
+        pos.x = 1f;
+        pos.y = -1.17f;
+        pos.z = -3f;
+        pos.w = 0f;
+        game.islands[0].tports[1].cameraPosition = pos;
+        pos.x = 4f;
+        pos.y = 0f;
+        pos.z = -4f;
+        pos.w = 0f;
+        game.islands[0].tports[2] = IslandSystem.InitializeTeleportNode("testTPort", 0, pos);
+        game.islands[0].structures = new StructureData[2];
+        pos.x = 1f;
+        pos.y = 1f;
+        pos.z = 2f;
+        pos.w = 0f;
+        game.islands[0].structures[0] = IslandSystem.InitialzieStructure("wiz tower", StructureType.WizardTower, pos);
+        pos.x = 0f;
+        pos.y = -2f;
+        pos.z = 0f;
+        pos.w = 0f;
+        game.islands[0].structures[1] = IslandSystem.InitialzieStructure("tower interior", StructureType.WizardInterior, pos);
+
+
+        game.islands[1].tports = new TPortNodeConfig[1];
+        pos.x = -4f;
+        pos.y = 0f;
+        pos.z = 4f;
+        pos.w = 0f;
+        game.islands[1].tports[0] = IslandSystem.InitializeTeleportNode("testTPort", 1, pos);
+        game.islands[1].structures = new StructureData[1];
+        pos.x = -.75f;
+        pos.y = 0.5f;
+        pos.z = -2f;
+        pos.w = 0f;
+        game.islands[1].structures[0] = IslandSystem.InitialzieStructure("market", StructureType.MarketShop, pos);
+
+        Debug.Log("--- GreenerGameManager [FirstIslandData] : first island data established.");
+    }
+
+    void FirstLooseItemData()
+    {
+        if (game.looseItems != null && game.looseItems.Length > 0)
+            return;
+
+        // REVIEW: necessary?
+        game.looseItems = new LooseItemData[0];
+
+        Debug.Log("--- GreenerGameManager [FirstLooseItemData] : first loose item data established.");
+    }
+
+    void FirstCastData()
+    {
+        if (game.casts != null && game.casts.Length > 0)
+            return;
+
+        // REVIEW: necesary?
+        game.casts = new CastData[0];
+
+        Debug.Log("--- GreenerGameManager [FirstCastData] : first cast data established.");
+    }
+
+    void FirstPlayerData()
+    {
+        if (game.players == null || game.players.Length == 0)
+        {
+            Debug.LogError("--- GreenerGameManager [FirstPlayerData] : no owning player. aborting.");
+            enabled = false;
+        }
+
+        // init farm data
+        PositionData pos = new PositionData();
+
+        game.players[0].farm = FarmSystem.InitializeFarm();
+        game.players[0].farm.plots = new PlotData[10];
+
+        game.players[0].farm.plots[0] = FarmSystem.InitializePlot();
+        pos.x = -1f;
+        pos.y = 0f;
+        pos.z = -1f;
+        game.players[0].farm.plots[0].location = pos;
+        game.players[0].farm.plots[1] = FarmSystem.InitializePlot();
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = -1f;
+        game.players[0].farm.plots[1].location = pos;
+        game.players[0].farm.plots[2] = FarmSystem.InitializePlot();
+        pos.x = 1f;
+        pos.y = 0f;
+        pos.z = -1f;
+        game.players[0].farm.plots[2].location = pos;
+        game.players[0].farm.plots[3] = FarmSystem.InitializePlot();
+        pos.x = 2f;
+        pos.y = 0f;
+        pos.z = -1f;
+        game.players[0].farm.plots[3].location = pos;
+        game.players[0].farm.plots[4] = FarmSystem.InitializePlot();
+        pos.x = -1f;
+        pos.y = 0f;
+        pos.z = -2f;
+        game.players[0].farm.plots[4].location = pos;
+        game.players[0].farm.plots[5] = FarmSystem.InitializePlot();
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = -2f;
+        game.players[0].farm.plots[5].location = pos;
+        game.players[0].farm.plots[6] = FarmSystem.InitializePlot();
+        pos.x = 1f;
+        pos.y = 0f;
+        pos.z = -2f;
+        game.players[0].farm.plots[6].location = pos;
+        game.players[0].farm.plots[7] = FarmSystem.InitializePlot();
+        pos.x = 2f;
+        pos.y = 0f;
+        pos.z = -2f;
+        game.players[0].farm.plots[7].location = pos;
+        game.players[0].farm.plots[8] = FarmSystem.InitializePlot();
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = -3f;
+        game.players[0].farm.plots[8].location = pos;
+        game.players[0].farm.plots[9] = FarmSystem.InitializePlot();
+        pos.x = 1f;
+        pos.y = 0f;
+        pos.z = -3f;
+        game.players[0].farm.plots[9].location = pos;
+
+        Debug.Log("--- GreenerGameManager [FirstPlayerData] : first player data established.");
     }
 }

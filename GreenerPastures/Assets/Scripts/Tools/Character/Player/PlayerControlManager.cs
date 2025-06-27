@@ -76,9 +76,10 @@ public class PlayerControlManager : MonoBehaviour
 
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
-    const bool ALLOWPLAYERDATALOAD = true; // for testing
+    const bool ALLOWPLAYERDATALOAD = true; // set false for testing only
 
 
+    // REFACTOR: the entire validation and intialization happens when game manager called SetPlayerData()
     void Start()
     {
         // validate
@@ -120,8 +121,8 @@ public class PlayerControlManager : MonoBehaviour
         saveMgr = GameObject.FindAnyObjectByType<SaveLoadManager>();
         if ( saveMgr == null )
         {
-            Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no time manager found in scene. aborting.");
-            //enabled = false;
+            Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no save load manager found in scene. aborting.");
+            //enabled = false; // temp - keep enabled for prototype testing
         }
         // initialize
         if (enabled)
@@ -169,74 +170,11 @@ public class PlayerControlManager : MonoBehaviour
             }
         }
     }
-
-    void TestInitFarmData()
-    {
-        PositionData pos = new PositionData();
-
-        playerData.farm = FarmSystem.InitializeFarm();
-        playerData.farm.plots = new PlotData[10];
-
-        playerData.farm.plots[0] = FarmSystem.InitializePlot();
-        pos.x = -1f;
-        pos.y = 0f;
-        pos.z = -1f;
-        playerData.farm.plots[0].location = pos;
-        playerData.farm.plots[1] = FarmSystem.InitializePlot();
-        pos.x = 0f;
-        pos.y = 0f;
-        pos.z = -1f;
-        playerData.farm.plots[1].location = pos;
-        playerData.farm.plots[2] = FarmSystem.InitializePlot();
-        pos.x = 1f;
-        pos.y = 0f;
-        pos.z = -1f;
-        playerData.farm.plots[2].location = pos;
-        playerData.farm.plots[3] = FarmSystem.InitializePlot();
-        pos.x = 2f;
-        pos.y = 0f;
-        pos.z = -1f;
-        playerData.farm.plots[3].location = pos;
-        playerData.farm.plots[4] = FarmSystem.InitializePlot();
-        pos.x = -1f;
-        pos.y = 0f;
-        pos.z = -2f;
-        playerData.farm.plots[4].location = pos;
-        playerData.farm.plots[5] = FarmSystem.InitializePlot();
-        pos.x = 0f;
-        pos.y = 0f;
-        pos.z = -2f;
-        playerData.farm.plots[5].location = pos;
-        playerData.farm.plots[6] = FarmSystem.InitializePlot();
-        pos.x = 1f;
-        pos.y = 0f;
-        pos.z = -2f;
-        playerData.farm.plots[6].location = pos;
-        playerData.farm.plots[7] = FarmSystem.InitializePlot();
-        pos.x = 2f;
-        pos.y = 0f;
-        pos.z = -2f;
-        playerData.farm.plots[7].location = pos;
-        playerData.farm.plots[8] = FarmSystem.InitializePlot();
-        pos.x = 0f;
-        pos.y = 0f;
-        pos.z = -3f;
-        playerData.farm.plots[8].location = pos;
-        playerData.farm.plots[9] = FarmSystem.InitializePlot();
-        pos.x = 1f;
-        pos.y = 0f;
-        pos.z = -3f;
-        playerData.farm.plots[9].location = pos;
-    }
     
     void Update()
     {
         if (playerData == null)
             return;
-
-        // TEMP - test init farm data
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-            TestInitFarmData();
 
         if (!freezeCharacterActions)
         {
@@ -375,7 +313,7 @@ public class PlayerControlManager : MonoBehaviour
                 found = true;
             }
         }
-        if (!found)
+        if (!found) // REVIEW: still needed?
         {
             Debug.LogWarning("--- PlayerControlManager [GetPlotData] : no plot found at " + pos.x + ", " + pos.y + ", " + pos.z + ". will ignore.");
             return null;
@@ -390,6 +328,11 @@ public class PlayerControlManager : MonoBehaviour
     public void SetPlayerData()
     {
         // initialize player character
+
+        // validate and initialize 
+        if (saveMgr == null)
+            Start(); // REFACTOR: migrate bc this needs to happen every time
+
         ProfileData profData = saveMgr.GetCurrentProfile();
         GameData gameData = saveMgr.GetCurrentGameData();
         playerData = GameSystem.GetProfilePlayer(gameData, profData);
@@ -412,14 +355,12 @@ public class PlayerControlManager : MonoBehaviour
         pos.z = playerData.camSaved.z;
         if (cam.mode == CameraManager.CameraMode.PanFollow)
             cam.SetCameraPanMode(pos);
-        // configure player farm (After island data distributed)
+        // island data already distributed
         IslandData island = gameData.islands[playerData.playerIsland];
         GameObject islandObj = GameObject.Find("Island " + gameData.islands[playerData.playerIsland].name);
         if (islandObj != null)
         {
-            if (island == null)
-                print("no island data");
-            else if (!ConfigurePlayerFarm(island, islandObj))
+            if (!ConfigurePlayerFarm(island, islandObj))
                 Debug.LogWarning("--- PlayerControlManager [SetPlayerData] : ConfigurePlayerFarm failed. will ignore.");
         }
         else
@@ -447,6 +388,9 @@ public class PlayerControlManager : MonoBehaviour
             pos.y = pData.location.y;
             pos.z = pData.location.z;
             plot.transform.position = pos + islandObj.transform.position;
+            // NOTE: this next step was necessary for data on pm
+            // ensure plot manager location is set
+            pm.data.location = pData.location;
             if (pData.condition > PlotCondition.Wild)
             {
                 // remove wild grasses
@@ -462,6 +406,8 @@ public class PlayerControlManager : MonoBehaviour
                 pm.plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 pm.plant.transform.position = plot.transform.position;
                 pm.plant.transform.parent = plot.transform;
+                // set plant image now
+                pm.plant.GetComponent<PlantManager>().ForceGrowthImage(pData.plant.growth, pData.plant.isHarvested);
             }
             // set ground texture based on condition
             Renderer r = plot.transform.Find("Ground").gameObject.GetComponent<Renderer>();
@@ -774,7 +720,7 @@ public class PlayerControlManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (hidePlayerHUD)
+        if (hidePlayerHUD || playerInventory == null)
             return;
 
         Rect r = new Rect();

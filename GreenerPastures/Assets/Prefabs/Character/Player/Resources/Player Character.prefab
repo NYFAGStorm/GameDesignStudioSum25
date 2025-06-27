@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3494834401035346939}
   - component: {fileID: 261740017079920572}
   - component: {fileID: 3484861889041133304}
-  - component: {fileID: 1722252933839553243}
   - component: {fileID: 2783380199156033629}
   m_Layer: 0
   m_Name: Player Character
@@ -61,15 +60,33 @@ MonoBehaviour:
     farm:
       plots: []
       farmEffects: 
+    playerIsland: 0
     gold: 0
     arcana: 0
     xp: 0
     level: 0
     freeFly: 0
-    islandCenterX: 0
-    islandCenterY: 0
-    islandCenterZ: 0
-    islandRange: 0
+    location:
+      w: 0
+      x: 0
+      y: 0
+      z: 0
+    island:
+      w: 0
+      x: 0
+      y: 0
+      z: 0
+    camera:
+      w: 0
+      x: 0
+      y: 0
+      z: 0
+    camSaved:
+      w: 0
+      x: 0
+      y: 0
+      z: 0
+    camMode: 0
     inventory:
       maxSlots: 0
       items: []
@@ -99,6 +116,7 @@ MonoBehaviour:
   characterFrozen: 0
   freezeCharacterActions: 0
   hidePlayerHUD: 0
+  hidePlayerNameTag: 0
 --- !u!114 &3484861889041133304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,14 +130,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 0
---- !u!81 &1722252933839553243
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3232420859449547436}
-  m_Enabled: 1
 --- !u!114 &2783380199156033629
 MonoBehaviour:
   m_ObjectHideFlags: 0

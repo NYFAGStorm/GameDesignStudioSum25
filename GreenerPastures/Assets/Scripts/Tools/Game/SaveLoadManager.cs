@@ -25,8 +25,8 @@ public class SaveLoadManager : MonoBehaviour
     const string GAMESPATH = "/Games/";
     const string GAMEFILEPREFIX = "GreenerGame-";
     const string GAMEFILESUFFIX = ".dat";
-    const string VERSIONNUMBERSTRING = "06.24.0154.a";
-
+    const string VERSIONNUMBERSTRING = "06.27.0166.a";
+    // TODO: remove game files (the entire folder) if version mismatch
 
     void Awake()
     {

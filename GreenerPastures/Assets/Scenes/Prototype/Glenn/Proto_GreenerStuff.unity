@@ -1058,6 +1058,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1146,6 +1147,14 @@ MonoBehaviour:
   mode: 0
   cameraTargetPosition: {x: 0, y: 0, z: 0}
   cameraTargetRotation: {x: 0, y: 0, z: 0}
+--- !u!81 &963194230
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
 --- !u!1 &964324588
 GameObject:
   m_ObjectHideFlags: 0
@@ -2675,6 +2684,10 @@ PrefabInstance:
     - target: {fileID: 2783380199156033629, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
       propertyPath: SortKey
       value: 3166325409
+      objectReference: {fileID: 0}
+    - target: {fileID: 2783380199156033629, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3232420859449547436, guid: b4e99914aa78c974ab066e9cac2b8bca, type: 3}
       propertyPath: m_Name
