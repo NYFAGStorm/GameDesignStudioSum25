@@ -16,7 +16,8 @@ public enum StructureType  // REVIEW:
     WizardTower,
     WizardInterior,
     MarketShop,
-    MarketShopInterior
+    MarketShopInterior,
+    CompostBin
 }
 
 public enum StructureEffect

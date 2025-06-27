@@ -154,6 +154,9 @@ public class IslandManager : MonoBehaviour
                 case StructureType.MarketShop:
                     prefabName = "Market Shop";
                     break;
+                case StructureType.CompostBin:
+                    prefabName = "Compost Bin";
+                    break;
                 default:
                     break;
             }

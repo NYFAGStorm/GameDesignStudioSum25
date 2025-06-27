@@ -25,8 +25,7 @@ public class SaveLoadManager : MonoBehaviour
     const string GAMESPATH = "/Games/";
     const string GAMEFILEPREFIX = "GreenerGame-";
     const string GAMEFILESUFFIX = ".dat";
-    const string VERSIONNUMBERSTRING = "06.27.0166.a";
-    // TODO: remove game files (the entire folder) if version mismatch
+    const string VERSIONNUMBERSTRING = "06.27.0168.a";
 
     void Awake()
     {
@@ -170,9 +169,15 @@ public class SaveLoadManager : MonoBehaviour
 
         Debug.LogWarning("--- SaveLoadManager [HandleVersionMismatch] : version mismatch. game data would be unrealiable. removing game files.");
 
-        // if mismatch, remove all game files (game data structure unrealiable)
+        // if mismatch, game data structure unrealiable
+        // remove all game files
         string gameDir = GetGameDataPath() + GAMESPATH;
         Directory.Delete(gameDir, true);
+        // remove game keys from all profiles in roster
+        for (int i=0; i < roster.profiles.Length; i++)
+        {
+            roster.profiles[i].gameKeys = new string[0];
+        }
 
         roster.versionNumber = VERSIONNUMBERSTRING;
     }

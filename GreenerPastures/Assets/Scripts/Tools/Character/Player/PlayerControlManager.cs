@@ -336,7 +336,6 @@ public class PlayerControlManager : MonoBehaviour
         ProfileData profData = saveMgr.GetCurrentProfile();
         GameData gameData = saveMgr.GetCurrentGameData();
         playerData = GameSystem.GetProfilePlayer(gameData, profData);
-        print(" - player character initialized as '" + playerData.playerName + "' in '" + gameData.gameName + "' -");
         // connecting property to data _as a reference_
         playerInventory = playerData.inventory;
         playerName = playerData.playerName;

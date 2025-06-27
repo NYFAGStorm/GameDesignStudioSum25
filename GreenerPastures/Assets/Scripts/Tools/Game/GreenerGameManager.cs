@@ -6,13 +6,11 @@ public class GreenerGameManager : MonoBehaviour
     // This handles the highest level of game data during game scenes
 
     public GameData game;
-    public bool noisyLogging = true;
+
+    private bool noisyLogging = false;
 
     // TODO: indicate who is the server (owner of game data) [match profile ID]
     // TODO: indicate the local player (client player, has main camera control)
-
-    // [x] integrate player character collection and distribution
-    // [x] establish 'first-run' data set, detect and init data
 
     private SaveLoadManager saveMgr;
     private ArtLibraryManager alm;
@@ -28,10 +26,12 @@ public class GreenerGameManager : MonoBehaviour
         if (saveMgr != null)
         {
             game = saveMgr.GetCurrentGameData();
-            Debug.Log("--- GreenerGameManager [Awake] : game data loaded for '" + game.gameName + "'");
+            if (noisyLogging)
+                Debug.Log("--- GreenerGameManager [Awake] : game data loaded for '" + game.gameName + "'");
             if (game.state == GameState.Initializing)
             {
-                Debug.Log("--- GreenerGameManager [Awake] : game data 'first-run' detected. establishing data init.");
+                if (noisyLogging)
+                    Debug.Log("--- GreenerGameManager [Awake] : game data 'first-run' detected. establishing data init.");
                 firstRunDetected = true;
             }
         }
@@ -481,7 +481,7 @@ public class GreenerGameManager : MonoBehaviour
         pos.z = -4f;
         pos.w = 0f;
         game.islands[0].tports[2] = IslandSystem.InitializeTeleportNode("testTPort", 0, pos);
-        game.islands[0].structures = new StructureData[2];
+        game.islands[0].structures = new StructureData[3];
         pos.x = 1f;
         pos.y = 1f;
         pos.z = 2f;
@@ -492,7 +492,11 @@ public class GreenerGameManager : MonoBehaviour
         pos.z = 0f;
         pos.w = 0f;
         game.islands[0].structures[1] = IslandSystem.InitialzieStructure("tower interior", StructureType.WizardInterior, pos);
-
+        pos.x = -3f;
+        pos.y = 0f;
+        pos.z = -2f;
+        pos.w = 0f;
+        game.islands[0].structures[2] = IslandSystem.InitialzieStructure("compost bin", StructureType.CompostBin, pos);
 
         game.islands[1].tports = new TPortNodeConfig[1];
         pos.x = -4f;
