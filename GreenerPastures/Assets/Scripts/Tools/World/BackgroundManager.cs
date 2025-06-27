@@ -8,7 +8,6 @@ public class BackgroundManager : MonoBehaviour
     public GameObject[] childObjects;
     public Color[] elementColors;
 
-    private Color[] currentColors;
     private Color lowColor;
 
     const float LOWRED = 0.01f;
@@ -35,7 +34,6 @@ public class BackgroundManager : MonoBehaviour
                 childObjects[i] = gameObject.transform.GetChild(i).gameObject;
                 elementColors[i] = childObjects[i].GetComponent<Renderer>().material.color;
             }
-            currentColors = elementColors;
             lowColor = new Color(LOWRED,LOWGREEN,LOWBLUE,LOWALPHA);
         }
     }

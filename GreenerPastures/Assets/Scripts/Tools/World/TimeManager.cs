@@ -20,6 +20,7 @@ public class TimeManager : MonoBehaviour
     public Light sunLight;
     public Light moonLight;
 
+    // TODO: migrate temperature to weather manager
     public float baseTemperature;
     public float currentTempC;
     public float currentTempF;
@@ -34,7 +35,6 @@ public class TimeManager : MonoBehaviour
     // TODO: link to game for world data, run time based on game seed
     // TODO: revise UpdateGlobalTimeProgress() to include total game time
     // REVIEW: is that necessary if we use seed time? (doesn't this calculate from there?)
-    // TODO: migrate temperature to weather manager
     private long gameSeedTime;
     private long globalTimeProgress;
 
@@ -88,6 +88,8 @@ public class TimeManager : MonoBehaviour
         // initialize
         if (enabled)
         {
+            // REVIEW: will data distribution override?
+            print("time manager start called - time progress init'd here");
             dayProgress = 0.5f;
             dayOfMonth = 1;
             monthOfYear = WorldMonth.Mar;
@@ -133,32 +135,8 @@ public class TimeManager : MonoBehaviour
         // set sun rot based on day progress value
         skyLightObject.transform.localEulerAngles = new Vector3((dayProgress * 360f), ANGLETOSUN, 0f);
 
-        // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
-
-        if (dayProgress > .3f && dayProgress < .7f)
-        {
-            sunLight.intensity = SUNLIGHTINTENSITY;
-            moonLight.intensity = 0f;
-        }
-        else if (dayProgress < .2f && dayProgress > .8f)
-        {
-            sunLight.intensity = 0f;
-            moonLight.intensity = MOONLIGHTINTENSITY;
-        }
-        if (dayProgress > 0.2f && dayProgress < 0.3f)
-        {
-            // dawn fade
-            sunLight.intensity = (dayProgress - 0.2f) * 10f * SUNLIGHTINTENSITY;
-            moonLight.intensity = MOONLIGHTINTENSITY - ( (dayProgress - 0.2f) * 10f * MOONLIGHTINTENSITY);
-
-        }
-        if (dayProgress > 0.7f && dayProgress < 0.8f)
-        {
-            // dusk fade
-            sunLight.intensity = SUNLIGHTINTENSITY - ((dayProgress - 0.7f) * 10f * SUNLIGHTINTENSITY);
-            moonLight.intensity = ((dayProgress - 0.7f) * 10f * MOONLIGHTINTENSITY);
-        }
-        RenderSettings.ambientIntensity = MOONLIGHTINTENSITY + (sunLight.intensity * (1f-MOONLIGHTINTENSITY));
+        // ambient light change per day/night cycle
+        UpdateAmbientLighting();
 
         // REVIEW: base temperature based on season cycle
         // FIXME: the bottom seems 'to bounce' and not like a sine wave
@@ -186,9 +164,38 @@ public class TimeManager : MonoBehaviour
         annualProgress = seasonProgress;
     }
 
+    void UpdateAmbientLighting()
+    {
+        // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
+        if (dayProgress > .3f && dayProgress < .7f)
+        {
+            sunLight.intensity = SUNLIGHTINTENSITY;
+            moonLight.intensity = 0f;
+        }
+        else if (dayProgress < .2f || dayProgress > .8f)
+        {
+            sunLight.intensity = 0f;
+            moonLight.intensity = MOONLIGHTINTENSITY;
+        }
+        if (dayProgress > 0.2f && dayProgress < 0.3f)
+        {
+            // dawn fade
+            sunLight.intensity = (dayProgress - 0.2f) * 10f * SUNLIGHTINTENSITY;
+            moonLight.intensity = MOONLIGHTINTENSITY - ((dayProgress - 0.2f) * 10f * MOONLIGHTINTENSITY);
+        }
+        if (dayProgress > 0.7f && dayProgress < 0.8f)
+        {
+            // dusk fade
+            sunLight.intensity = SUNLIGHTINTENSITY - ((dayProgress - 0.7f) * 10f * SUNLIGHTINTENSITY);
+            moonLight.intensity = ((dayProgress - 0.7f) * 10f * MOONLIGHTINTENSITY);
+        }
+        RenderSettings.ambientIntensity = MOONLIGHTINTENSITY + (sunLight.intensity * (1f - MOONLIGHTINTENSITY));
+    }
+
     void UpdateGlobalTimeProgres( float seasonProgress )
     {
         // TODO: also add game data total game time
+        // REVIEW: is seasonProgess (annualProgress) irrelevant if we take real time - seed?
         globalTimeProgress = gameSeedTime + (long)(seasonProgress * (WORLDTIMEMULTIPLIER * cheatTimeScale));
     }
 
@@ -284,6 +291,24 @@ public class TimeManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Sets the world data from game data storage
+    /// </summary>
+    /// <param name="wData">world data</param>
+    public void SetWorldData( WorldData wData )
+    {
+        dayProgress = wData.worldTimeOfDay; // 24 hours in each day cycle
+        dayOfMonth = wData.worldDayOfMonth; // 30 days in each month cycle
+        monthOfYear = wData.worldMonth;
+        season = wData.worldSeason;
+        annualProgress = wData.annualProgress; // percentage of year cycle (0-1)
+        baseTemperature = wData.baseTemperature;
+        // wData.dawnTime = .25f; // temp
+        // wData.duskTime = .75f; // temp
+
+        UpdateAmbientLighting();
+    }
+
+    /// <summary>
     /// Sets the game seed time value for use in calculating global time progress. WARNING: use only with game data load
     /// </summary>
     /// <param name="seedTime">game seed time</param>
@@ -291,5 +316,15 @@ public class TimeManager : MonoBehaviour
     {
         gameSeedTime = seedTime;
         // TODO: perform global time progress calculation based on current time and seed
+        // 60 * 24 * 30 * 12 = how many real time seconds per year in game
+        // time forward (s) / 518,400 = season progress forward
+
+        long rightNow = System.DateTime.Now.ToFileTimeUtc();
+        //System.TimeSpan ts = System.TimeSpan().Ticks;
+        //long timeForward = System.DateTime.Now.ToFileTimeUtc().Subtract();
+        long timeForward = rightNow - gameSeedTime;
+
+        print("time forward is : " + timeForward);
+        print("... which is " + System.DateTime.FromFileTimeUtc(timeForward) + "s or game time minutes from init.");
     }
 }

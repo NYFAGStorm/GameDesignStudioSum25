@@ -1230,7 +1230,7 @@ public class MagicCraftingManager : MonoBehaviour
         if ( padMgr != null && padMgr.gamepads[0].isActive )
             s += "\n[X BUTTON]";
 
-        if (placedIngredients.Length == 0)
+        if (placedIngredients != null && placedIngredients.Length == 0)
             GUI.enabled = false;
         if (craftState == CraftState.Cauldron && 
             (GUI.Button(r, s, g) || 

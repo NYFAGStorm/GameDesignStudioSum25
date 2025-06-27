@@ -284,7 +284,7 @@ public class GreenerGameManager : MonoBehaviour
         TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
         if (tim != null)
         {
-            // REVIEW: confirm this is all time manager needs to set global time progress
+            tim.SetWorldData(game.world);
             tim.SetGameSeedTime(game.stats.gameInitTime);
             retBool = true;
         }
