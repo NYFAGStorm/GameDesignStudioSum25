@@ -32,7 +32,6 @@ public class TimeManager : MonoBehaviour
 
     public float temperatureAdjust;
 
-    // TODO: link to game for world data, run time based on game seed
     // TODO: revise UpdateGlobalTimeProgress() to include total game time
     // REVIEW: is that necessary if we use seed time? (doesn't this calculate from there?)
     private long gameSeedTime;
@@ -88,8 +87,7 @@ public class TimeManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-            // REVIEW: will data distribution override?
-            print("time manager start called - time progress init'd here");
+            // NOTE: data distribution will override
             dayProgress = 0.5f;
             dayOfMonth = 1;
             monthOfYear = WorldMonth.Mar;
@@ -140,7 +138,6 @@ public class TimeManager : MonoBehaviour
 
         // REVIEW: base temperature based on season cycle
         // FIXME: the bottom seems 'to bounce' and not like a sine wave
-
         baseTemperature = BASETEMPERATURE + (((Mathf.Sin(Mathf.PI * seasonProgress) * 2f) - 1f) * TEMPERATUREVARIANCE);
         baseTemperature += temperatureAdjust;
         baseTemperature = Mathf.RoundToInt(baseTemperature * 10f) / 10f;
@@ -315,16 +312,33 @@ public class TimeManager : MonoBehaviour
     public void SetGameSeedTime( long seedTime )
     {
         gameSeedTime = seedTime;
-        // TODO: perform global time progress calculation based on current time and seed
+        
+        // perform global time progress calculation based on current time and seed
         // 60 * 24 * 30 * 12 = how many real time seconds per year in game
         // time forward (s) / 518,400 = season progress forward
 
         long rightNow = System.DateTime.Now.ToFileTimeUtc();
-        //System.TimeSpan ts = System.TimeSpan().Ticks;
-        //long timeForward = System.DateTime.Now.ToFileTimeUtc().Subtract();
-        long timeForward = rightNow - gameSeedTime;
+        System.TimeSpan timeForward = System.DateTime.FromFileTimeUtc(rightNow).Subtract(System.DateTime.FromFileTimeUtc(gameSeedTime));
+        double realSecondsForward = timeForward.TotalSeconds;
 
-        print("time forward is : " + timeForward);
-        print("... which is " + System.DateTime.FromFileTimeUtc(timeForward) + "s or game time minutes from init.");
+        // crank world data forward from Mar 1st at noon
+        WorldData future = new WorldData();
+        future.worldTimeOfDay = 0.5f;
+        future.worldDayOfMonth = 1;
+        future.worldMonth = WorldMonth.Mar;
+
+        float daysAhead = (float)(realSecondsForward / (60 * 24));
+        //print("-> setting game world ahead by " + daysAhead + " days.");
+        
+        future.worldTimeOfDay += daysAhead;
+        future.worldTimeOfDay %= 1f;
+        // REVIEW: due to int (we do not want this to round up?)
+        future.worldDayOfMonth += Mathf.RoundToInt(daysAhead);
+        future.worldDayOfMonth %= 30;
+        // REVIEW: due to int
+        future.worldMonth += Mathf.RoundToInt((daysAhead/30f));
+        future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);
+
+        SetWorldData(future);
     }
 }
