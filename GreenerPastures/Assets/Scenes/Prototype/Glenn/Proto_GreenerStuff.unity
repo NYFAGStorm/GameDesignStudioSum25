@@ -3334,6 +3334,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Magic Crafting Manager
       objectReference: {fileID: 0}
+    - target: {fileID: 2879156982517683394, guid: e789e547dd0d1ef4390497240958f3c6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2888904461708948973, guid: e789e547dd0d1ef4390497240958f3c6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.25
