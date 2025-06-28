@@ -33,6 +33,8 @@ public class ProfileOptions : MonoBehaviour
     private int padMaxButton = 0;
 
     private string[] micNames = new string[0];
+    private int currentMicIndex = -1;
+    private float micCheckTimer;
 
     // REVIEW: there are only player stats per game, no profile stats
     private bool statsPopup; // is displaying popup
@@ -42,6 +44,7 @@ public class ProfileOptions : MonoBehaviour
     private AnimationCurve popupCurve;
 
     const float POPUPTIME = 1f;
+    const float MICCHECKTIME = 1.5f;
 
 
     void Start()
@@ -66,6 +69,9 @@ public class ProfileOptions : MonoBehaviour
             //
             currentProfile = saveMgr.GetCurrentProfile();
             profileOptions = currentProfile.options;
+            //
+            MicConfig();
+            micCheckTimer = MICCHECKTIME;
         }
     }
 
@@ -108,11 +114,36 @@ public class ProfileOptions : MonoBehaviour
                 padButtonSelection = 0;
         }
 
-        // microphone status update
-        // temp
-        micNames = new string[2];
-        micNames[0] = "Default Mic Input";
-        micNames[1] = "Fancy Microphone";
+        // run mic check timer
+        if (micCheckTimer > 0f)
+        {
+            micCheckTimer -= Time.deltaTime;
+            if (micCheckTimer < 0f)
+            {
+                micCheckTimer = MICCHECKTIME;
+                // mic status update
+                MicConfig();
+            }
+        }
+    }
+
+    void MicConfig()
+    {
+        micNames = Microphone.devices;
+        for (int i = 0; i < micNames.Length; i++)
+        {
+            string s = micNames[i];
+            int pos = s.IndexOf('(');
+            pos++;
+            if (pos + 18 < s.Length - 1)
+                s = s.Substring(pos, 18);
+            else
+                s = s.Substring(pos, s.Length - pos);
+            s = s.Replace(")", "");
+            micNames[i] = s;
+        }
+        if (micNames.Length > 0)
+            currentMicIndex = 0;
     }
 
     void OnGUI()
@@ -251,26 +282,17 @@ public class ProfileOptions : MonoBehaviour
         //configuredMicName
         r.y += 0.1f * h;
         s = profileOptions.configuredMicName;
-        GUI.enabled = profileOptions.micAvailable;
+        GUI.enabled = (profileOptions.micAvailable && micNames.Length > 1);
         if (GUI.Button(r, s, g))
         {
+            currentMicIndex++;
             // increment and wrap around
-            int found = -1;
-            for (int i = 0; i < micNames.Length; i++)
-            {
-                if (micNames[i] == profileOptions.configuredMicName)
-                    found = i;
-            }
-            if (found == -1 && micNames != null && micNames.Length > 0)
-                found = 0;
+            if (currentMicIndex >= micNames.Length)
+                currentMicIndex = 0;
+            if (currentMicIndex < micNames.Length)
+                profileOptions.configuredMicName = micNames[currentMicIndex];
             else
-            {
-                found++;
-                if (found >= micNames.Length)
-                    found = 0;
-            }
-            if (found > -1)
-                profileOptions.configuredMicName = micNames[found];
+                currentMicIndex = -1;
         }
         GUI.enabled = true;
         //micEnabled
