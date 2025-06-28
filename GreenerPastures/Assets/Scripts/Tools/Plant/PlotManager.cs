@@ -330,6 +330,9 @@ public class PlotManager : MonoBehaviour
 
             if (!ActionComplete(PLANTWINDOW, "PLANTING..."))
                 return;
+
+            // PLAYER STATS:
+            currentPlayer.playerData.stats.totalPlanted++;
         }
         else
         {
@@ -448,6 +451,9 @@ public class PlotManager : MonoBehaviour
 
         if (!ActionComplete(HARVESTWINDOW,"HARVESTING..."))
             return;
+
+        // PLAYER STATS:
+        currentPlayer.playerData.stats.totalHarvested++;
 
         if ( data.condition == PlotCondition.Growing )
         {

@@ -176,6 +176,9 @@ public class PlayerControlManager : MonoBehaviour
         if (playerData == null)
             return;
 
+        // PLAYER STATS:
+        playerData.stats.totalGameTime += Time.deltaTime;
+
         if (!freezeCharacterActions)
         {
             // check action input

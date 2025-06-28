@@ -246,6 +246,8 @@ public class MarketManager : MonoBehaviour
                     {
                         currentCustomer.playerData.gold += value;
                         currentCustomer.DeleteCurrentItemSelection();
+                        // PLAYER STATS:
+                        currentCustomer.playerData.stats.totalGoldEarned += value;
                     }
                 }
             }
