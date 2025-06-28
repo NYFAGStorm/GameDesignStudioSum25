@@ -24,7 +24,7 @@ public class CheatManager : MonoBehaviour
     private float codeTimer;
     private int validCode;
 
-    const int TOTALCHEATCODES = 10;
+    const int TOTALCHEATCODES = 11;
     const float CHEATCODEWINDOW = 1f;
 
 
@@ -169,6 +169,10 @@ public class CheatManager : MonoBehaviour
                 n = "gimmiespells";
                 d = "Enters two spells in the player's grimoire";
                 break;
+            case 10:
+                n = "discosky";
+                d = "Toggles a very colorful sky display";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -262,6 +266,11 @@ public class CheatManager : MonoBehaviour
                 pData.magic.library.grimiore[1].ingredients = new ItemType[2];
                 pData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
                 pData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
+                break;
+            case 10:
+                BackgroundManager bm = GameObject.FindFirstObjectByType<BackgroundManager>();
+                if (bm != null)
+                    bm.DiscoSky();
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");
