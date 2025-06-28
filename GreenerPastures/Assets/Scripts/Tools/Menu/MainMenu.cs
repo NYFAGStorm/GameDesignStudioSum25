@@ -98,6 +98,14 @@ public class MainMenu : MonoBehaviour
 
     void Update()
     {
+        // handle profile state
+        if (profileActive)
+        {
+            // returning from game playing state as 'disconnecting'
+            if (saveMgr.GetCurrentProfile().state == ProfileState.Disconnecting)
+                saveMgr.GetCurrentProfile().state = ProfileState.LoggedIn;
+        }
+
         // run popup timer
         if ( popupTimer > 0f )
         {
@@ -462,6 +470,8 @@ public class MainMenu : MonoBehaviour
                 {
                     if ((buttons[i].sceneName == "GreenerGame"))
                     {
+                        // profile state update
+                        saveMgr.GetCurrentProfile().state = ProfileState.Connecting;
                         // little cinematic menu fun
                         GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 2;
                         sceneSwitchName = buttons[i].sceneName;

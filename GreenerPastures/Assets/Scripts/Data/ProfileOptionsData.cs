@@ -4,6 +4,7 @@
 public class ProfileOptionsData
 {
     public bool micAvailable;
+    public string configuredMicName;
     public bool micEnabled;
-    public bool voiceChatMuted; // are other muted?
+    public bool voiceChatMuted;
 }

@@ -86,7 +86,12 @@ public class GreenerGameManager : MonoBehaviour
             if (!gameDataDistributed)
                 Debug.LogWarning("--- GreenerGameManager [Update] : DoGameDataDistribution routine attempt failed. will ignore.");
             else
+            {
                 SignalToFastForwardFeatures();
+                // game configured for startup
+                // profile connected to game
+                saveMgr.GetCurrentProfile().state = ProfileState.Playing;
+            }
         }
     }
 
@@ -181,6 +186,9 @@ public class GreenerGameManager : MonoBehaviour
             Debug.LogWarning("--- GreenerGameManager [DoShutDownGameDataCollection] : game data collection routine invalid. will ignore.");
 
         shutdownDataCollected = true;
+
+        // profile disconnecting from game
+        saveMgr.GetCurrentProfile().state = ProfileState.Disconnecting;
     }
 
     bool CollectWorldData()

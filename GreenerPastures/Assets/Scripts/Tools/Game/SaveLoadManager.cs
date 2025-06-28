@@ -25,7 +25,7 @@ public class SaveLoadManager : MonoBehaviour
     const string GAMESPATH = "/Games/";
     const string GAMEFILEPREFIX = "GreenerGame-";
     const string GAMEFILESUFFIX = ".dat";
-    const string VERSIONNUMBERSTRING = "06.27.0168.a";
+    const string VERSIONNUMBERSTRING = "06.28.0173.a";
 
     void Awake()
     {
@@ -51,6 +51,9 @@ public class SaveLoadManager : MonoBehaviour
 
     void OnDisable()
     {
+        // ensure current profile state is logged out
+        if (profile != null)
+            profile.state = ProfileState.LoggedOut;
         // auto-save roster data
         if (SaveRosterData())
         {
@@ -205,7 +208,7 @@ public class SaveLoadManager : MonoBehaviour
             return;
         }
         profile = pData;
-        profile.state = ProfileState.Connecting;
+        profile.state = ProfileState.LoggedIn;
     }
 
     public bool IsProfileLoggedIn()
@@ -238,7 +241,7 @@ public class SaveLoadManager : MonoBehaviour
             Debug.LogError("--- SaveLoadManager [LogoutProfile] : given profile data invalid. aborting.");
             return;
         }
-        profile.state = ProfileState.Offline;
+        profile.state = ProfileState.LoggedOut;
         profile = null;
     }
 

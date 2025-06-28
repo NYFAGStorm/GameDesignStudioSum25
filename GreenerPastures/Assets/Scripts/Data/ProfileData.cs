@@ -4,7 +4,8 @@ public enum ProfileState
 {
     Default,
     Creating,
-    Offline,
+    LoggedOut,
+    LoggedIn,
     Connecting,
     Playing,
     Disconnecting
