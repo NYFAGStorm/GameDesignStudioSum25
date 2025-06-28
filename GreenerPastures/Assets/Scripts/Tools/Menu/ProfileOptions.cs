@@ -15,7 +15,6 @@ public class ProfileOptions : MonoBehaviour
 
     // profile options elements
     // options control display
-    // statistics popup (back button)
 
     public string backButtonText = "BACK";
     public Rect backButton;
@@ -26,11 +25,16 @@ public class ProfileOptions : MonoBehaviour
     public int backButtonFontSizeAt1024 = 48;
 
     private SaveLoadManager saveMgr;
+    private ProfileData currentProfile;
+    private ProfileOptionsData profileOptions;
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 0;
 
+    private string[] micNames = new string[0];
+
+    // REVIEW: there are only player stats per game, no profile stats
     private bool statsPopup; // is displaying popup
     private bool popupEnabled; // is popping up or down
     private float popupTimer;
@@ -59,6 +63,9 @@ public class ProfileOptions : MonoBehaviour
         if (enabled)
         {
             popupCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            //
+            currentProfile = saveMgr.GetCurrentProfile();
+            profileOptions = currentProfile.options;
         }
     }
 
@@ -100,6 +107,12 @@ public class ProfileOptions : MonoBehaviour
             if (padButtonSelection > padMaxButton)
                 padButtonSelection = 0;
         }
+
+        // microphone status update
+        // temp
+        micNames = new string[2];
+        micNames[0] = "Default Mic Input";
+        micNames[1] = "Fancy Microphone";
     }
 
     void OnGUI()
@@ -126,7 +139,7 @@ public class ProfileOptions : MonoBehaviour
 
         GUI.Label(r, s, g);
 
-        // PROFILE STATS DISPLAY
+        // POPUP DISPLAY (REVIEW: there are no profile stats)
         if (statsPopup)
         {
             r = new Rect();
@@ -146,7 +159,6 @@ public class ProfileOptions : MonoBehaviour
             GUI.Box(r, s, g);
 
             // popup elements
-            // statistics popup (back button)
 
             // popup buttons
             r.x = 0.25f * w;
@@ -172,27 +184,112 @@ public class ProfileOptions : MonoBehaviour
                     padMaxButton = 1;
                 }
             }
-            // cancel
-            r.x += 0.3f * w;
-            if (padButtonSelection == 1)
-                g.normal.textColor = Color.white;
-            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
-            s = "CANCEL";
-            if (GUI.Button(r, s, g) || (padMgr != null &&
-                padMgr.gamepads[0].isActive && padButtonSelection == 1 &&
-                padMgr.gPadDown[0].aButton))
-            {
-                popupTimer = POPUPTIME;
-                if (padMgr != null && padMgr.gamepads[0].isActive)
-                {
-                    padButtonSelection = -1;
-                    padMaxButton = 1;
-                }
-            }
+
+            return; // hide other profile options elements
         }
-        else
+
+        // options control labels
+        r.x = 0.25f * w;
+        r.y = 0.2f * h;
+        r.width = 0.5f * w;
+        r.height = 0.075f * h;
+        g = new GUIStyle(GUI.skin.label);
+        g.normal.textColor = titleFontColor;
+        g.hover.textColor = titleFontColor;
+        g.active.textColor = titleFontColor;
+        g.alignment = TextAnchor.MiddleCenter;
+        g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
+        g.padding = new RectOffset(0, 20, 0, 0);
+        GUI.color = Color.white;
+        //profile name
+        s = "CURRENT PROFILE : '" + currentProfile.loginName + "'";
+        GUI.Label(r, s, g);
+        //micAvailable
+        r.y += 0.1f * h;
+        r.width = 0.225f * w;
+        g.alignment = TextAnchor.MiddleRight;
+        g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+        s = "Microphone Available :";
+        GUI.Label(r, s, g);
+        //configuredMicName
+        r.y += 0.1f * h;
+        s = "Configured Mic Name :";
+        GUI.Label(r, s, g);
+        //micEnabled
+        r.y += 0.1f * h;
+        s = "Microphone Enabled :";
+        GUI.Label(r, s, g);
+        //voiceChatMuted
+        r.y += 0.1f * h;
+        s = "Voice Chat Muted :";
+        GUI.Label(r, s, g);
+
+        // REVIEW: test button and meter?
+
+        // mic available is a label as well
+        r.x = 0.5125f * w;
+        r.y = 0.3f * h;
+        r.width = 0.2f * w;
+        g.alignment = TextAnchor.MiddleCenter;
+        s = "YES";
+        if (!profileOptions.micAvailable)
+            s = "NO";
+        GUI.Label(r, s, g);
+
+        // options control buttons
+        //r.x = 0.525f * w;
+        //r.y = 0.2f * h;
+        //r.width = 0.225f * w;
+        //r.height = 0.1f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.normal.textColor = buttonFontColor;
+        g.hover.textColor = Color.white;
+        g.active.textColor = buttonFontColor;
+        g.alignment = TextAnchor.MiddleCenter;
+        g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+        GUI.color = Color.white;
+        //configuredMicName
+        r.y += 0.1f * h;
+        s = profileOptions.configuredMicName;
+        GUI.enabled = profileOptions.micAvailable;
+        if (GUI.Button(r, s, g))
         {
-            // options control display
+            // increment and wrap around
+            int found = -1;
+            for (int i = 0; i < micNames.Length; i++)
+            {
+                if (micNames[i] == profileOptions.configuredMicName)
+                    found = i;
+            }
+            if (found == -1 && micNames != null && micNames.Length > 0)
+                found = 0;
+            else
+            {
+                found++;
+                if (found >= micNames.Length)
+                    found = 0;
+            }
+            if (found > -1)
+                profileOptions.configuredMicName = micNames[found];
+        }
+        GUI.enabled = true;
+        //micEnabled
+        r.y += 0.1f * h;
+        s = "Enabled";
+        if (!profileOptions.micEnabled)
+            s = "Disabled";
+        if (GUI.Button(r, s, g))
+        {
+            profileOptions.micEnabled = !profileOptions.micEnabled;
+        }
+        //voiceChatMuted
+        r.y += 0.1f * h;
+        s = "Open";
+        if (!profileOptions.voiceChatMuted)
+            s = "Muted";
+        if (GUI.Button(r, s, g))
+        {
+            profileOptions.voiceChatMuted = !profileOptions.voiceChatMuted;
         }
 
         // back button

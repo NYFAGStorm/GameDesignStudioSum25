@@ -458,7 +458,8 @@ public class GreenerGameManager : MonoBehaviour
 
         game.world = WorldSystem.InitializeWorld();
 
-        Debug.Log("--- GreenerGameManager [FirstWorldData] : first world data established.");
+        if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [FirstWorldData] : first world data established.");
     }
 
     void FirstIslandData()
@@ -534,7 +535,8 @@ public class GreenerGameManager : MonoBehaviour
         pos.w = 0f;
         game.islands[1].structures[0] = IslandSystem.InitialzieStructure("market", StructureType.MarketShop, pos);
 
-        Debug.Log("--- GreenerGameManager [FirstIslandData] : first island data established.");
+        if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [FirstIslandData] : first island data established.");
     }
 
     void FirstLooseItemData()
@@ -545,7 +547,8 @@ public class GreenerGameManager : MonoBehaviour
         // REVIEW: necessary?
         game.looseItems = new LooseItemData[0];
 
-        Debug.Log("--- GreenerGameManager [FirstLooseItemData] : first loose item data established.");
+        if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [FirstLooseItemData] : first loose item data established.");
     }
 
     void FirstCastData()
@@ -556,7 +559,8 @@ public class GreenerGameManager : MonoBehaviour
         // REVIEW: necesary?
         game.casts = new CastData[0];
 
-        Debug.Log("--- GreenerGameManager [FirstCastData] : first cast data established.");
+        if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [FirstCastData] : first cast data established.");
     }
 
     void FirstPlayerData()
@@ -624,6 +628,7 @@ public class GreenerGameManager : MonoBehaviour
         pos.z = -3f;
         game.players[0].farm.plots[9].location = pos;
 
-        Debug.Log("--- GreenerGameManager [FirstPlayerData] : first player data established.");
+        if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [FirstPlayerData] : first player data established.");
     }
 }
