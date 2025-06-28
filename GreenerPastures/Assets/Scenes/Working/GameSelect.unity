@@ -593,7 +593,7 @@ MonoBehaviour:
     width: 0.4
     height: 0.09
   buttonFont: {fileID: 0}
-  buttonFontStyle: 0
+  buttonFontStyle: 1
   buttonFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
   backButtonFontSizeAt1024: 32
 --- !u!1 &1742057200

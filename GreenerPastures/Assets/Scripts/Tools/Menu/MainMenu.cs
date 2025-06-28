@@ -406,6 +406,7 @@ public class MainMenu : MonoBehaviour
 
             // Cancel
             r.x += 0.3f * w;
+            g.normal.textColor = buttonFontColor;
             if (padButtonSelection == 1)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));

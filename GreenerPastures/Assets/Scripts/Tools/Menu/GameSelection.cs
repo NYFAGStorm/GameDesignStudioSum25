@@ -114,6 +114,11 @@ public class GameSelection : MonoBehaviour
             }
         }
 
+        if (gamePopup)
+            padMaxButton = 6;
+        else
+            padMaxButton = saveMgr.GetCurrentProfile().gameKeys.Length + 2;
+
         // determine ui selection from game pad input
         if (padMgr.gPadDown[0].YaxisL > 0f)
         {
@@ -268,7 +273,7 @@ public class GameSelection : MonoBehaviour
             g.fontStyle = buttonFontStyle;
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
-            if (padButtonSelection == 2) // NOTE: start popup buttons at 2
+            if (padButtonSelection == 0)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "-";
@@ -278,6 +283,9 @@ public class GameSelection : MonoBehaviour
                 popMaxPlayers = Mathf.Clamp(popMaxPlayers, 1, 8);
             }
             r.x += 0.075f * w;
+            g.normal.textColor = buttonFontColor;
+            if (padButtonSelection == 1)
+                g.normal.textColor = Color.white;
             s = "+";
             if (GUI.Button(r, s, g)) // TODO: gamepad support
             {
@@ -287,6 +295,9 @@ public class GameSelection : MonoBehaviour
             r.x -= 0.1f * w;
             r.y += 0.075f * h;
             r.width = 0.2f * w;
+            g.normal.textColor = buttonFontColor;
+            if (padButtonSelection == 2)
+                g.normal.textColor = Color.white;
             s = "ALLOWED";
             if (!popAllowCheats)
                 s = "OFF";
@@ -295,6 +306,9 @@ public class GameSelection : MonoBehaviour
                 popAllowCheats = !popAllowCheats;
             }
             r.y += 0.075f * h;
+            g.normal.textColor = buttonFontColor;
+            if (padButtonSelection == 3)
+                g.normal.textColor = Color.white;
             s = "ALLOWED";
             if (!popAllowHazards)
                 s = "OFF";
@@ -303,6 +317,9 @@ public class GameSelection : MonoBehaviour
                 popAllowHazards = !popAllowHazards;
             }
             r.y += 0.075f * h;
+            g.normal.textColor = buttonFontColor;
+            if (padButtonSelection == 4)
+                g.normal.textColor = Color.white;
             s = "ALLOWED";
             if (!popAllowCurses)
                 s = "OFF";
@@ -346,7 +363,7 @@ public class GameSelection : MonoBehaviour
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
             // UNLOAD / CREATE
-            if (padButtonSelection == 0)
+            if (padButtonSelection == 5)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "UNLOAD";
@@ -356,7 +373,8 @@ public class GameSelection : MonoBehaviour
             if (newGame)
                 GUI.enabled = (popGameName != "" && popPlayerName != "");
             if (GUI.Button(r, s, g) || (padMgr != null &&
-                padMgr.gamepads[0].isActive && padButtonSelection == 0 &&
+                padMgr.gamepads[0].isActive && 
+                ((gamePopup && padButtonSelection == 5) || (!gamePopup && padButtonSelection == 0)) &&
                 padMgr.gPadDown[0].aButton))
             {
                 // if new game, create new
@@ -399,12 +417,14 @@ public class GameSelection : MonoBehaviour
             GUI.enabled = true;
             // cancel
             r.x += 0.3f * w;
-            if (padButtonSelection == 1)
+            g.normal.textColor = buttonFontColor;
+            if (padButtonSelection == 6)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "CANCEL";
             if (GUI.Button(r, s, g) || (padMgr != null &&
-                padMgr.gamepads[0].isActive && padButtonSelection == 1 &&
+                padMgr.gamepads[0].isActive && 
+                ((gamePopup && padButtonSelection == 6) || (!gamePopup && padButtonSelection == 1)) &&
                 padMgr.gPadDown[0].aButton))
             {
                 popupTimer = POPUPTIME;
@@ -470,7 +490,8 @@ public class GameSelection : MonoBehaviour
         s = "Game Options";
 
         GUI.enabled = gameLoaded;
-        if (GUI.Button(r, s, g)) // TODO: gamepad support
+        if (GUI.Button(r, s, g) || 
+            (padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
         {
             newGame = false;
             GameData gData = saveMgr.GetCurrentGameData();
@@ -500,7 +521,7 @@ public class GameSelection : MonoBehaviour
         g.active.textColor = buttonFontColor;
         s = "Create Game";
 
-        if (GUI.Button(r, s, g)) // TODO: gamepad support
+        if (GUI.Button(r, s, g) || (padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
         {
             newGame = true;
             GameData gData = GameSystem.InitializeGame("temp"); // get default options
@@ -560,7 +581,7 @@ public class GameSelection : MonoBehaviour
                 if (gameLoaded)
                     GUI.enabled = saveMgr.GetCurrentGameData().gameKey != list[i];
 
-                if (GUI.Button(r, s, g)) // TODO: gamepad support
+                if (GUI.Button(r, s, g) || (padButtonSelection == (2+i) && padMgr.gPadDown[0].aButton)) // TODO: gamepad support
                 {
                     // unload current game data
                     if (saveMgr.IsGameCurrentlyLoaded())
@@ -597,7 +618,6 @@ public class GameSelection : MonoBehaviour
         // selection feedback
         r.y = (backButton.y - 0.1f) * h;
         g = new GUIStyle(GUI.skin.label);
-        g = new GUIStyle(GUI.skin.label);
         g.normal.textColor = labelFontColor;
         g.hover.textColor = labelFontColor;
         g.active.textColor = labelFontColor;
@@ -619,13 +639,13 @@ public class GameSelection : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(backButtonFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == 0)
+        if (padButtonSelection == gamelistNum + 2)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         s = backButtonText;
 
         if (GUI.Button(r, s, g) ||
-            padButtonSelection == 0 && padMgr.gPadDown[0].aButton)
+            padButtonSelection == gamelistNum+2 && padMgr.gPadDown[0].aButton)
         {
             SceneManager.LoadScene("Menu");
         }

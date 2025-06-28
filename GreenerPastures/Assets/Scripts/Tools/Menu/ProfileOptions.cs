@@ -30,7 +30,7 @@ public class ProfileOptions : MonoBehaviour
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
-    private int padMaxButton = 0;
+    private int padMaxButton = 3;
 
     private string[] micNames = new string[0];
     private int currentMicIndex = -1;
@@ -204,9 +204,7 @@ public class ProfileOptions : MonoBehaviour
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "OK";
-            if (GUI.Button(r, s, g) || (padMgr != null &&
-                padMgr.gamepads[0].isActive && padButtonSelection == 0 &&
-                padMgr.gPadDown[0].aButton))
+            if (GUI.Button(r, s, g))
             {
                 popupTimer = POPUPTIME;
                 if (padMgr != null && padMgr.gamepads[0].isActive)
@@ -274,6 +272,8 @@ public class ProfileOptions : MonoBehaviour
         //r.height = 0.1f * h;
         g = new GUIStyle(GUI.skin.button);
         g.normal.textColor = buttonFontColor;
+        if ( padButtonSelection == 0 )
+            g.normal.textColor = Color.white;
         g.hover.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         g.alignment = TextAnchor.MiddleCenter;
@@ -283,7 +283,8 @@ public class ProfileOptions : MonoBehaviour
         r.y += 0.1f * h;
         s = profileOptions.configuredMicName;
         GUI.enabled = (profileOptions.micAvailable && micNames.Length > 1);
-        if (GUI.Button(r, s, g))
+        if (GUI.Button(r, s, g) || (GUI.enabled && padMgr != null &&
+            padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
         {
             currentMicIndex++;
             // increment and wrap around
@@ -297,19 +298,27 @@ public class ProfileOptions : MonoBehaviour
         GUI.enabled = true;
         //micEnabled
         r.y += 0.1f * h;
+        g.normal.textColor = buttonFontColor;
+        if (padButtonSelection == 1)
+            g.normal.textColor = Color.white;
         s = "Enabled";
         if (!profileOptions.micEnabled)
             s = "Disabled";
-        if (GUI.Button(r, s, g))
+        if (GUI.Button(r, s, g) || (padMgr != null &&
+            padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
         {
             profileOptions.micEnabled = !profileOptions.micEnabled;
         }
         //voiceChatMuted
         r.y += 0.1f * h;
+        g.normal.textColor = buttonFontColor;
+        if (padButtonSelection == 2)
+            g.normal.textColor = Color.white;
         s = "Open";
         if (!profileOptions.voiceChatMuted)
             s = "Muted";
-        if (GUI.Button(r, s, g))
+        if (GUI.Button(r, s, g) || (padMgr != null &&
+            padButtonSelection == 2 && padMgr.gPadDown[0].aButton))
         {
             profileOptions.voiceChatMuted = !profileOptions.voiceChatMuted;
         }
@@ -326,13 +335,13 @@ public class ProfileOptions : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(backButtonFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == 0)
+        if (padButtonSelection == 3)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         s = backButtonText;
 
-        if (GUI.Button(r, s, g) ||
-            padButtonSelection == 0 && padMgr.gPadDown[0].aButton)
+        if (GUI.Button(r, s, g) || (padMgr != null &&
+            padButtonSelection == 3 && padMgr.gPadDown[0].aButton))
         {
             SceneManager.LoadScene("Menu");
         }
