@@ -55,6 +55,8 @@ public class PlotManager : MonoBehaviour
     const float HARVESTDISPLAYDURATION = 1f;
     const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
 
+    const float MASTERPLANTPROGRESSRATE = 0.0027f;
+
 
     void Start()
     {
@@ -93,13 +95,13 @@ public class PlotManager : MonoBehaviour
                 // set sun
                 data.sun = Mathf.Clamp01(Mathf.Sin((tim.dayProgress - .25f) * 2f * Mathf.PI));
                 // water drain
-                data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * Time.deltaTime * PLOTCHECKINTERVAL));
+                data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * 0.0027f * PLOTCHECKINTERVAL));
                 // water drain faster if plant, based on plant growth
                 if (plant != null)
-                    data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * Time.deltaTime * PLOTCHECKINTERVAL));
+                    data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * MASTERPLANTPROGRESSRATE * PLOTCHECKINTERVAL));
                 // soil degrade, if plant exists
                 if (plant != null)
-                    data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * Time.deltaTime * PLOTCHECKINTERVAL));
+                    data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * MASTERPLANTPROGRESSRATE * PLOTCHECKINTERVAL));
                 // PLOT EFFECTS:
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.SummonWaterI))
                     data.water = 1f;
@@ -156,7 +158,7 @@ public class PlotManager : MonoBehaviour
 
         // NOTE: must start at current time (offset)
         float dayCycle = timeOfDayStart;
-        float timeRate = 0.0027f; // REVIEW: should really have a proper rate
+        float timeRate = MASTERPLANTPROGRESSRATE;
         for (int i = 0; i < gameMinutes; i++)
         {
             // approximate minute cycles

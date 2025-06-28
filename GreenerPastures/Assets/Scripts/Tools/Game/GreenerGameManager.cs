@@ -76,7 +76,8 @@ public class GreenerGameManager : MonoBehaviour
                 FirstCastData();
                 FirstPlayerData();
                 game.state = GameState.Established;
-                Debug.Log("--- GreenerGameManager [Update] : new game '" + game.gameName + "' established.");
+                if (noisyLogging)
+                    Debug.Log("--- GreenerGameManager [Update] : new game '" + game.gameName + "' established.");
                 firstRunDetected = false;
             }
 
@@ -127,7 +128,10 @@ public class GreenerGameManager : MonoBehaviour
 
         // validation notice
         if (retBool)
-            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : game data distribution routine succeeded.");
+        {
+            if (noisyLogging)
+                Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : game data distribution routine succeeded.");
+        }
         else
             Debug.LogWarning("--- GreenerGameManager [DoGameDataDistribution] : game data distribution routine failed. will ignore.");
 
@@ -169,7 +173,10 @@ public class GreenerGameManager : MonoBehaviour
 
         // validation notice
         if (validShutdown)
-            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : game data collection routine complete. shut down success.");
+        {
+            if (noisyLogging)
+                Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : game data collection routine complete. shut down success.");
+        }
         else
             Debug.LogWarning("--- GreenerGameManager [DoShutDownGameDataCollection] : game data collection routine invalid. will ignore.");
 
