@@ -37,6 +37,9 @@ public class TimeManager : MonoBehaviour
     private long gameSeedTime;
     private long globalTimeProgress;
 
+    private float savedTimeOfDay; // day progress before fast-forward
+    private float fastForwardTime; // time amount to fast-forward, signal to other features
+
     private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
 
     const float ABSOLUTEMINIMUMFLOAT = -999999999999999f; // used for timestamp difference
@@ -312,10 +315,14 @@ public class TimeManager : MonoBehaviour
     public void SetGameSeedTime( long seedTime )
     {
         gameSeedTime = seedTime;
-        
+
         // perform global time progress calculation based on current time and seed
         // 60 * 24 * 30 * 12 = how many real time seconds per year in game
         // time forward (s) / 518,400 = season progress forward
+
+        savedTimeOfDay = dayProgress; // used for fast fwd features
+        // calculate fast forward time delta from current world data
+        WorldData now = GetWorldData();
 
         long rightNow = System.DateTime.Now.ToFileTimeUtc();
         System.TimeSpan timeForward = System.DateTime.FromFileTimeUtc(rightNow).Subtract(System.DateTime.FromFileTimeUtc(gameSeedTime));
@@ -328,7 +335,7 @@ public class TimeManager : MonoBehaviour
         future.worldMonth = WorldMonth.Mar;
 
         float daysAhead = (float)(realSecondsForward / (60 * 24));
-        //print("-> setting game world ahead by " + daysAhead + " days.");
+        // NOTE: we will hold onto this value until all features ready to fast-forward
         
         future.worldTimeOfDay += daysAhead;
         future.worldTimeOfDay %= 1f;
@@ -340,5 +347,32 @@ public class TimeManager : MonoBehaviour
         future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);
 
         SetWorldData(future);
+
+        float futureDayAmount = (future.worldTimeOfDay +
+            future.worldDayOfMonth + ((int)future.worldMonth * 30));
+        float nowDayAmount = (now.worldTimeOfDay +
+            now.worldDayOfMonth + ((int)now.worldMonth * 30));
+        if ((int)future.worldMonth < (int)now.worldMonth)
+            futureDayAmount += (12f * 30f); // assume only one year?
+        fastForwardTime = futureDayAmount - nowDayAmount;
+    }
+
+    public void FastForwardFeatures()
+    {
+        // use fastForwardTime value
+        if (fastForwardTime > 0f)
+        {
+            // cast manager
+            FindFirstObjectByType<CastManager>().FastForwardCasts(fastForwardTime);
+            // plots managers
+            PlotManager[] pms = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < pms.Length; i++)
+            {
+                pms[i].FastForwardPlot(fastForwardTime, savedTimeOfDay);
+            }
+            // reset
+            savedTimeOfDay = 0f;
+            fastForwardTime = 0f;
+        }
     }
 }

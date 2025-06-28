@@ -142,6 +142,61 @@ public class PlotManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Progresses all plot properties by given time passage amount
+    /// </summary>
+    /// <param name="daysAhead">game days that have passed</param>
+    /// <param name="timeOfDayStart">0-1 time of day value at beginning</param>
+    public void FastForwardPlot( float daysAhead, float timeOfDayStart )
+    {
+        // daysAhead * (60 * 24) = game minutes (real time seconds)
+        float gameMinutes = daysAhead * (60f * 24f);
+        // NOTE: delta time is used as time rate once every plot check interval (1s)
+        // _approximate_ with cycles representing one minute
+        // REVIEW: consider how cast effects (like summon water) are handled, interact?
+
+        // NOTE: must start at current time (offset)
+        float dayCycle = timeOfDayStart;
+        float timeRate = 0.0027f; // REVIEW: should really have a proper rate
+        for (int i = 0; i < gameMinutes; i++)
+        {
+            // approximate minute cycles
+            dayCycle += timeRate;
+            // sun to be calculated (sine of dayprogress, clamp 01, offset +.25f, *2*PI)
+            data.sun = Mathf.Clamp01(Mathf.Sin((dayCycle - .25f) * 2f * Mathf.PI));
+            // plant growth to be calculated (with resources * rate * time)
+            if (data.plant.type != PlantType.Default)
+            {
+                float resources = (Mathf.Clamp01(data.sun*4f) + data.water + data.soil) / 3f;
+                float vitalityDelta = (0.667f - resources) * -0.1f;
+                data.plant.vitality = Mathf.Clamp01(data.plant.vitality + vitalityDelta);
+                float healthDelta = (0.5f - data.plant.vitality) + (0.5f - resources);
+                healthDelta *= -0.001f;
+                data.plant.health = Mathf.Clamp01(0.01f + data.plant.health + healthDelta);
+                float growthDelta = resources * 0.2f * 0.1f * data.plant.vitality * data.plant.growthRate * data.plant.adjustedGrowthRate;
+                if (data.plant.growth < 1f)
+                {
+                    data.plant.growth = Mathf.Clamp01(data.plant.growth + growthDelta);
+                    // calculate quality
+                    data.plant.quality += growthDelta * data.plant.vitality;
+                }
+                // soil and water drains added (rate * growth * time) (if plant)
+                if (plant != null)
+                {
+                    data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * timeRate));
+                    data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * timeRate));
+                }
+            }
+            // water drains to be calculated (rate * time)
+            data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * timeRate));
+        }
+        if (data.plant.type != PlantType.Default)
+        {
+            // plant image set
+            plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant.growth, data.plant.isHarvested);
+        }
+    }
+
+    /// <summary>
     /// Can this plot accept a plant or stalk drop into the uprooted hole?
     /// </summary>
     /// <returns>true if plot can accept, false if pause timer still running</returns>

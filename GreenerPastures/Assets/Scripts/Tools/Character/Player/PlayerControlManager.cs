@@ -310,6 +310,7 @@ public class PlayerControlManager : MonoBehaviour
                 pms[i].data.location.z == pos.z)
             {
                 retPlot = pms[i].data;
+                retPlot.plant = pms[i].data.plant;
                 found = true;
             }
         }
@@ -405,6 +406,7 @@ public class PlayerControlManager : MonoBehaviour
                 pm.plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 pm.plant.transform.position = plot.transform.position;
                 pm.plant.transform.parent = plot.transform;
+                pm.data.plant = pData.plant;
                 // set plant image now
                 pm.plant.GetComponent<PlantManager>().ForceGrowthImage(pData.plant.growth, pData.plant.isHarvested);
             }

@@ -10,15 +10,9 @@ public class CastManager : MonoBehaviour
     private int birthNewCast; // apply effect for one cast at birth
     private int singleCastToRemove; // remove effect and cast upon expiration
 
-    //private SaveLoadManager saveMgr;
-    //private bool performCastListBirths;
-
-
-    // [x] push/pull from greener game manager istead
     // [ ] allow time manager signal to fast forward time
 
     // TIME PASSAGE MECHANICS
-    // [x] apply effect of these casts
     // TODO: check in with time manager re: time passage
     // TODO: fast forward time wrt cast lifetime
     // TODO: remove casts for those that expired
@@ -116,6 +110,21 @@ public class CastManager : MonoBehaviour
             }
         }
         casts = tmp;
+    }
+
+    /// <summary>
+    /// Reduces all cast lifetimes by given time passage amount
+    /// </summary>
+    /// <param name="daysAhead">game days that have passed</param>
+    public void FastForwardCasts( float daysAhead )
+    {
+        // daysAhead * (60 * 24) = game minutes (real time seconds)
+        for (int i = 0; i < casts.Length; i++)
+        {
+            casts[i].lifetime -= (daysAhead * (60f * 24f));
+            // expired casts are handled
+        }
+        // REVIEW: consider how effects of casts that have expired during this time should be handled
     }
 
     /// <summary>

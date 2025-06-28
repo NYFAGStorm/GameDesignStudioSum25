@@ -82,9 +82,17 @@ public class GreenerGameManager : MonoBehaviour
 
             gameDataDistributed = DoGameDataDistribution();
 
-            if (!gameDataDistributed) // REVIEW: still needed?
+            if (!gameDataDistributed)
                 Debug.LogWarning("--- GreenerGameManager [Update] : DoGameDataDistribution routine attempt failed. will ignore.");
+            else
+                SignalToFastForwardFeatures();
         }
+    }
+
+    void SignalToFastForwardFeatures()
+    {
+        // time mananger to signal to other features with 'daysAhead' amount
+        GameObject.FindFirstObjectByType<TimeManager>().FastForwardFeatures();
     }
 
     bool DoGameDataDistribution()
@@ -168,52 +176,6 @@ public class GreenerGameManager : MonoBehaviour
         shutdownDataCollected = true;
     }
 
-    bool CollectPlayerData()
-    {
-        bool retBool = false;
-
-        // REVIEW: hold off on collecting remote player character data until multiplayer
-
-        // REVIEW: have not filled in player data for this profile?
-        /*
-        string clientProfile = saveMgr.GetCurrentProfile().profileID;
-        PlayerData clientPlayerData = null;
-        PlayerControlManager[] pcms = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
-        for (int i=0; i < pcms.Length; i++)
-        {
-            if (pcms[i].playerData.profileID == clientProfile)
-            {
-                clientPlayerData = pcms[i].playerData;
-                break;
-            }
-        }
-
-        if (clientPlayerData == null)
-            return retBool;
-
-        for (int i = 0; i < game.players.Length; i++)
-        {
-            if (game.players[i].profileID == clientProfile)
-            {
-                game.players[i] = clientPlayerData;
-                retBool = true;
-                break;
-            }
-        }
-        */
-        
-        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
-        if (pcm != null && game != null && game.players != null &&
-            game.players.Length > 0)
-        {
-            // temp (change for multiplayer)
-            game.players[0] = pcm.GetPlayerData(); // REVIEW: [0] always data-owning player?
-            retBool = true;
-        }
-        
-        return retBool;
-    }
-
     bool CollectWorldData()
     {
         bool retBool = false;
@@ -274,6 +236,52 @@ public class GreenerGameManager : MonoBehaviour
             retBool = true;
         }
         
+        return retBool;
+    }
+
+    bool CollectPlayerData()
+    {
+        bool retBool = false;
+
+        // REVIEW: hold off on collecting remote player character data until multiplayer
+
+        // REVIEW: have not filled in player data for this profile?
+        /*
+        string clientProfile = saveMgr.GetCurrentProfile().profileID;
+        PlayerData clientPlayerData = null;
+        PlayerControlManager[] pcms = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+        for (int i=0; i < pcms.Length; i++)
+        {
+            if (pcms[i].playerData.profileID == clientProfile)
+            {
+                clientPlayerData = pcms[i].playerData;
+                break;
+            }
+        }
+
+        if (clientPlayerData == null)
+            return retBool;
+
+        for (int i = 0; i < game.players.Length; i++)
+        {
+            if (game.players[i].profileID == clientProfile)
+            {
+                game.players[i] = clientPlayerData;
+                retBool = true;
+                break;
+            }
+        }
+        */
+
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm != null && game != null && game.players != null &&
+            game.players.Length > 0)
+        {
+            // temp (change for multiplayer)
+            game.players[0] = pcm.GetPlayerData(); // REVIEW: [0] always data-owning player?
+            retBool = true;
+        }
+
         return retBool;
     }
 
