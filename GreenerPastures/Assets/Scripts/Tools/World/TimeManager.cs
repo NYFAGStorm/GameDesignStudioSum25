@@ -40,12 +40,16 @@ public class TimeManager : MonoBehaviour
     private float savedTimeOfDay; // day progress before fast-forward
     private float fastForwardTime; // time amount to fast-forward, signal to other features
 
+    private WeatherManager wm;
+    private BackgroundManager bm;
+
     private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
 
     const float ABSOLUTEMINIMUMFLOAT = -999999999999999f; // used for timestamp difference
 
     const float SUNLIGHTINTENSITY = 1f;
     const float MOONLIGHTINTENSITY = 0.1f;
+    const float MAXCLOUDAMBIENTLIGHTMULTIPLIER = 0.1f;
     const float WORLDTIMEMULTIPLIER = 60f; // default time rate
     const float BASETEMPERATURE = 20f; // C
     const float TEMPERATUREVARIANCE = 10f;
@@ -86,6 +90,18 @@ public class TimeManager : MonoBehaviour
                 Debug.LogError("--- TimeManager [Start] : gimble or sun or moon lights misconfigured. aborting.");
                 enabled = false;
             }
+        }
+        wm = GameObject.FindFirstObjectByType<WeatherManager>();
+        if (wm == null)
+        {
+            Debug.LogError("--- TimeManager [Start] : no weather manager found in scene. aborting.");
+            enabled = false;
+        }
+        bm = GameObject.FindFirstObjectByType<BackgroundManager>();
+        if (bm == null)
+        {
+            Debug.LogError("--- TimeManager [Start] : no background manager found in scene. aborting.");
+            enabled = false;
         }
         // initialize
         if (enabled)
@@ -189,7 +205,16 @@ public class TimeManager : MonoBehaviour
             sunLight.intensity = SUNLIGHTINTENSITY - ((dayProgress - 0.7f) * 10f * SUNLIGHTINTENSITY);
             moonLight.intensity = ((dayProgress - 0.7f) * 10f * MOONLIGHTINTENSITY);
         }
-        RenderSettings.ambientIntensity = MOONLIGHTINTENSITY + (sunLight.intensity * (1f - MOONLIGHTINTENSITY));
+        // get cloud cover from weather manager
+        float clouds = wm.cloudAmount;
+        // signal background manager of cloud cover (fog, etc.)
+        bm.SetCloudCover(clouds, sunLight.intensity);
+        // adjust ambient lighting for cloud cover
+        float cloudLightMult = 1f - (clouds * (1f-MAXCLOUDAMBIENTLIGHTMULTIPLIER));
+        // adjust sun (and moonlight) for cloud cover
+        sunLight.intensity *= cloudLightMult;
+        float moonAdjust = MOONLIGHTINTENSITY * cloudLightMult;
+        RenderSettings.ambientIntensity = moonAdjust + (sunLight.intensity * (1f - moonAdjust));
     }
 
     void UpdateGlobalTimeProgres( float seasonProgress )

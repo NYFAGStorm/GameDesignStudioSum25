@@ -20,6 +20,7 @@ public class WeatherManager : MonoBehaviour
     private TimeManager tim;
 
     const float WEATHERCHECKINTERVAL = 15f;
+
     const float WINDFACTORSCALE = 1f;
     const float WINDFACTOROFFSET = 3.81f;
     const float WINDVECTOROFFSET = 0.1f;
@@ -94,6 +95,7 @@ public class WeatherManager : MonoBehaviour
 
     float GetProceduralResult( float inputX, float inputY )
     {
-        return Mathf.PerlinNoise( globalTimeProgress * timeMultiplier * inputX, inputY );
+        long timeprogress = globalTimeProgress % 1000000; // long going past perlin range
+        return Mathf.PerlinNoise( timeprogress * timeMultiplier * inputX, inputY );
     }
 }
