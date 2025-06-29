@@ -142,8 +142,19 @@ public class ProfileOptions : MonoBehaviour
             s = s.Replace(")", "");
             micNames[i] = s;
         }
-        if (micNames.Length > 0)
+
+        profileOptions.micAvailable = true;
+        if (micNames.Length == 0)
+        {
+            profileOptions.micAvailable = false;
+            currentMicIndex = -1;
+            profileOptions.configuredMicName = "- none -";
+        }
+        if (micNames.Length == 1)
+        {
             currentMicIndex = 0;
+            profileOptions.configuredMicName = micNames[0];
+        }
     }
 
     void OnGUI()
@@ -286,6 +297,7 @@ public class ProfileOptions : MonoBehaviour
         if (GUI.Button(r, s, g) || (GUI.enabled && padMgr != null &&
             padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
         {
+            micCheckTimer = MICCHECKTIME;
             currentMicIndex++;
             // increment and wrap around
             if (currentMicIndex >= micNames.Length)
@@ -307,6 +319,7 @@ public class ProfileOptions : MonoBehaviour
         if (GUI.Button(r, s, g) || (padMgr != null &&
             padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
         {
+            micCheckTimer = MICCHECKTIME;
             profileOptions.micEnabled = !profileOptions.micEnabled;
         }
         //voiceChatMuted
@@ -320,6 +333,7 @@ public class ProfileOptions : MonoBehaviour
         if (GUI.Button(r, s, g) || (padMgr != null &&
             padButtonSelection == 2 && padMgr.gPadDown[0].aButton))
         {
+            micCheckTimer = MICCHECKTIME;
             profileOptions.voiceChatMuted = !profileOptions.voiceChatMuted;
         }
 
