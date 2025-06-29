@@ -26,6 +26,7 @@ public class CameraManager : MonoBehaviour
 
     private GameObject playerObject;
     private PlayerControlManager pcm;
+    private MultiGamepad padMgr;
 
     private float cameraPauseTimer;
     private float cameraMoveTimer;
@@ -56,6 +57,12 @@ public class CameraManager : MonoBehaviour
     void Start()
     {
         // validate
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if (padMgr == null)
+        {
+            Debug.LogWarning("--- CameraManager[Start] : no gamepad manager found. will ignore.");
+            // enabled = false;
+        }
         // initialize
         if (enabled)
         {
@@ -263,9 +270,16 @@ public class CameraManager : MonoBehaviour
         if ((mode == CameraMode.Follow || mode > CameraMode.PanFollow) && 
             cameraPauseTimer == 0f && cameraMoveTimer == 0f)
         {
-            // TODO: gamepad controls (dpad up and down)
             int camModeChange = 0;
             camModeChange += (int)Input.mouseScrollDelta.y;
+            // gamepad controls (dpad up and down)
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+            {
+                if (padMgr.gPadDown[0].DpadUp)
+                    camModeChange = 1;
+                else if (padMgr.gPadDown[0].DpadDown)
+                    camModeChange = -1;
+            }
             if (camModeChange != 0)
             {
                 if (mode == CameraMode.Follow)
