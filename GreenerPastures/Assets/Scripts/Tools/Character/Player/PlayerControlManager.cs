@@ -363,7 +363,9 @@ public class PlayerControlManager : MonoBehaviour
         GameObject islandObj = GameObject.Find("Island " + gameData.islands[playerData.playerIsland].name);
         if (islandObj != null)
         {
-            if (!ConfigurePlayerFarm(island, islandObj))
+            if (island == null)
+                Debug.LogWarning("--- PlayerControlManager [SetPlayerData] : no associated island data for this player. will ignore.");
+            else if (!ConfigurePlayerFarm(island, islandObj))
                 Debug.LogWarning("--- PlayerControlManager [SetPlayerData] : ConfigurePlayerFarm failed. will ignore.");
         }
         else

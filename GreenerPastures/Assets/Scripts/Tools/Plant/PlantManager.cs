@@ -99,6 +99,9 @@ public class PlantManager : MonoBehaviour
     void Grow( float growth )
     {
         int growNumber = Mathf.RoundToInt(growth * 4f);
+        // if a re-fruiting plant, and has harvested, keep image near top end
+        if ( plot.data.plant.canReFruit && plot.data.plant.isHarvested )
+            growNumber = Mathf.Clamp(growNumber, 3, 4);
         switch (growNumber)
         {
             case 0:
