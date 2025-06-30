@@ -1,3 +1,4 @@
+using System.Data;
 using UnityEngine;
 
 public class PlotManager : MonoBehaviour
@@ -460,7 +461,7 @@ public class PlotManager : MonoBehaviour
             // harvest if plant is 100% grown and not yet harvested
             if (data.plant.growth < 1f)
                 return;
-            if (!data.plant.isHarvested)
+            if (!data.plant.isHarvested || data.plant.canReFruit)
             {
                 data.plant.isHarvested = true;
                 plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
@@ -563,6 +564,9 @@ public class PlotManager : MonoBehaviour
                 // harvest results display
                 harvestDisplayTimer = HARVESTDISPLAYDURATION;
                 harvestQualityValue = data.plant.quality;
+                // plants that can re-fruit reset growth to 80%
+                if (data.plant.canReFruit)
+                    data.plant.growth = .8f;
             }
         }
     }
@@ -576,14 +580,14 @@ public class PlotManager : MonoBehaviour
             return;
 
         // cannot uproot unless plant exists in this plot
-        if (plant == null)
-            return;
+        //if (plant == null)
+        //    return;
 
         if (action != CurrentAction.Uprooting && action != CurrentAction.None)
             return;
         action = CurrentAction.Uprooting;
 
-        if (!ActionComplete(UPROOTWINDOW, "UPROOTING..."))
+        if (!ActionComplete(UPROOTWINDOW, "DIGGING..."))
             return;
 
         Renderer r = gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
