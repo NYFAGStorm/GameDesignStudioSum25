@@ -220,6 +220,7 @@ MonoBehaviour:
   titleFontSizeAt1024: 50
   credits:
   - creditText: Ellington Walters
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -228,6 +229,7 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 0
   - creditText: Esther Li (YT)
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.5
@@ -236,6 +238,7 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 1
   - creditText: Grayson Borchardt
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -244,6 +247,7 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 0
   - creditText: Gustavo Rojas Flores
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.5
@@ -252,6 +256,7 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 1
   - creditText: Huch Platt
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -260,6 +265,7 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 0
   - creditText: LiAi Yang
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.5
@@ -268,6 +274,7 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 1
   - creditText: Alithia Hadiwibowo (Tia)
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.1
@@ -276,6 +283,7 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 0
   - creditText: Glenn Storm
+    creditPage: 0
     creditPos:
       serializedVersion: 2
       x: 0.5
@@ -284,6 +292,43 @@ MonoBehaviour:
       height: 0.09
     creditAlign: 1
   - creditText: New York Film Academy | 3D Game Design | Summer 2025
+    creditPage: 0
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.7
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: '"Enchanted Valley" Kevin MacLeod (incompetech.com)'
+    creditPage: 1
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.3
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: 'Licensed under Creative Commons: By Attribution 4.0 License'
+    creditPage: 1
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.4
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: http://creativecommons.org/licenses/by/4.0/
+    creditPage: 1
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.5
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: New York Film Academy | 3D Game Design | Summer 2025
+    creditPage: 1
     creditPos:
       serializedVersion: 2
       x: 0

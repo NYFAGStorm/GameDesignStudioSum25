@@ -28,6 +28,7 @@ public class CreditsScreen : MonoBehaviour
     public struct CreditListing
     {
         public string creditText;
+        public int creditPage;
         public Rect creditPos;
         public CreditAlign creditAlign;
     }
@@ -50,22 +51,54 @@ public class CreditsScreen : MonoBehaviour
     private int padButtonSelection = -1;
     private int padMaxButton = 0;
 
-    // TODO: credits display rotation on timer
-    // (display music credits, etc)
+    private int currentPage;
+    private int maxPage;
+    private float pageTimer;
+
+    const float CREDITPAGETIME = 5f;
 
 
     void Start()
     {
+        // validate
+        if (credits == null || credits.Length == 0)
+        {
+            Debug.LogWarning("--- CreditsScreen [Start] : no credit listing configured. will ignore.");
+        }
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
         {
             Debug.LogError("--- CreditsScreen [Start] : no pad manager found in scene. aborting.");
             enabled = false;
         }
+        // initialize
+        if (enabled)
+        {
+            maxPage = 0;
+            for (int i = 0; i < credits.Length; i++)
+            {
+                if (credits[i].creditPage > maxPage)
+                    maxPage = credits[i].creditPage;
+            }
+            pageTimer = CREDITPAGETIME;
+        }
     }
 
     void Update()
     {
+        // run credits page timer
+        if (pageTimer > 0f)
+        {
+            pageTimer -= Time.deltaTime;
+            if (pageTimer < 0f)
+            {
+                pageTimer = CREDITPAGETIME;
+                currentPage++;
+                if (currentPage > maxPage)
+                    currentPage = 0;
+            }
+        }
+
         // determine ui selection from game pad input
         if (padMgr.gPadDown[0].YaxisL > 0f)
         {
@@ -105,6 +138,8 @@ public class CreditsScreen : MonoBehaviour
 
         for ( int i=0; i<credits.Length; i++ )
         {
+            if (credits[i].creditPage != currentPage)
+                continue;
             r = credits[i].creditPos;
             r.x *= w;
             r.y *= h;
