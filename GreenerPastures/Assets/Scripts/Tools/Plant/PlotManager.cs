@@ -1,4 +1,3 @@
-using System.Data;
 using UnityEngine;
 
 public class PlotManager : MonoBehaviour
@@ -564,9 +563,9 @@ public class PlotManager : MonoBehaviour
                 // harvest results display
                 harvestDisplayTimer = HARVESTDISPLAYDURATION;
                 harvestQualityValue = data.plant.quality;
-                // plants that can re-fruit reset growth to 80%
+                // plants that can re-fruit reset growth to 20%
                 if (data.plant.canReFruit)
-                    data.plant.growth = .8f;
+                    data.plant.growth = .2f;
             }
         }
     }
