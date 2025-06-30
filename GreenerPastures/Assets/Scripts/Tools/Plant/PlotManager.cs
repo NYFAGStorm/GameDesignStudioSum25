@@ -22,6 +22,7 @@ public class PlotManager : MonoBehaviour
     private TimeManager tim;
 
     private PlayerControlManager currentPlayer;
+    private NetworkPlayerController currentNetworkPlayer;
     private Renderer cursor;
     private bool cursorActive;
     private float cursorTimer;
@@ -145,6 +146,12 @@ public class PlotManager : MonoBehaviour
         // REVIEW: does this get confused in multiplayer?
         currentPlayer = player;
     }
+    
+    public void SetCurrentPlayerNetwork(NetworkPlayerController player)
+    {
+        // REVIEW: does this get confused in multiplayer?
+        currentNetworkPlayer = player;
+    }
 
     /// <summary>
     /// Sets this plot cursor pulse state
@@ -216,7 +223,7 @@ public class PlotManager : MonoBehaviour
         if (actionCompleteTimer > 0f && !actionClear)
             return;
 
-        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        NetworkPlayerController pcm = GameObject.FindFirstObjectByType<NetworkPlayerController>();
         ItemData iData = pcm.GetPlayerCurrentItemSelection();
 
         if (data.condition == PlotCondition.Tilled)

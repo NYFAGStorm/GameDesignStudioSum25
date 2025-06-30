@@ -1,13 +1,17 @@
+using System.Collections;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Fusion;
+using Fusion.Sockets;
 
-public class PlayerControlManager : MonoBehaviour
+public class NetworkPlayerController : NetworkBehaviour
 {
     // Author: Glenn Storm
     // This handles the local player controls for their character
 
     public PlayerData playerData;
-
-    public float characterSpeed = 2.7f;
 
     public enum PlayerControlType
     {
@@ -38,16 +42,9 @@ public class PlayerControlManager : MonoBehaviour
         public bool rBumpDown;
     }
 
-    public KeyCode upKey = KeyCode.W;
-    public KeyCode downKey = KeyCode.S;
-    public KeyCode leftKey = KeyCode.A;
-    public KeyCode rightKey = KeyCode.D;
-    public KeyCode actionAKey = KeyCode.E;
-    public KeyCode actionBKey = KeyCode.F;
-    public KeyCode actionCKey = KeyCode.C;
-    public KeyCode actionDKey = KeyCode.V;
-    public KeyCode lBumpKey = KeyCode.LeftBracket;
-    public KeyCode rBumpKey = KeyCode.RightBracket;
+    private PlayerInput inputs;
+
+    public float characterSpeed = 2.7f;
 
     public bool characterFrozen;
     public bool hidePlayerHUD;
@@ -55,7 +52,6 @@ public class PlayerControlManager : MonoBehaviour
     private Vector3 characterMove;
     private LooseItemManager activeItem;
     private PlotManager activePlot;
-    private PlayerActions characterActions;
 
     private InventoryData playerInventory;
     private int currentInventorySelection;
@@ -72,11 +68,11 @@ public class PlayerControlManager : MonoBehaviour
     void Start()
     {
         // validate
-        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        // padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         // TODO: change this to error and abort if no gamepad manager found (allow no pad for testing)
         // (then clean up below checks for padMgr existing)
-        if (padMgr == null )
-            Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no pad manager. will ignore.");
+        // if (padMgr == null )
+        //     Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no pad manager. will ignore.");
         cam = GameObject.FindFirstObjectByType<CameraManager>();
         if ( cam == null )
         {
@@ -164,7 +160,7 @@ public class PlayerControlManager : MonoBehaviour
         if ( activeItem != null )
         {
             // uses 'first press' control signal
-            if (characterActions.actionADown)
+            if (inputs.actionADown)
             {
                 // validate
                 if (activeItem.looseItem.inv.items.Length == 0)
@@ -189,17 +185,17 @@ public class PlayerControlManager : MonoBehaviour
         // temp (hold-type control detection)
         if (activePlot != null)
         {
-            if (characterActions.actionA)
+            if (inputs.actionA)
                 activePlot.WorkLand();
-            if (characterActions.actionB)
+            if (inputs.actionB)
                 activePlot.WaterPlot();
-            if (characterActions.actionC)
+            if (inputs.actionC)
                 activePlot.HarvestPlant();
-            if (characterActions.actionD)
+            if (inputs.actionD)
                 activePlot.UprootPlot();
             // if all controls un-pressed, signal plot action clear
-            if (!characterActions.actionA && !characterActions.actionB &&
-                !characterActions.actionC && !characterActions.actionD)
+            if (!inputs.actionA && !inputs.actionB &&
+                !inputs.actionC && !inputs.actionD)
                 activePlot.ActionClear();
         }
     }
@@ -231,7 +227,7 @@ public class PlayerControlManager : MonoBehaviour
     /// <returns>player actions struct data for this frame</returns>
     public PlayerActions GetPlayerActions()
     {
-        return characterActions;
+        return new PlayerActions();
     }
 
     void ReadMoveInput()
@@ -246,18 +242,18 @@ public class PlayerControlManager : MonoBehaviour
         float rightPad = 0f;
 
         // check gamepad move input (override if gamepad active)
-        if ( padMgr != null && padMgr.gamepads[0].isActive )
-        {
-            float padX = padMgr.gamepads[0].XaxisL;
-            float padY = padMgr.gamepads[0].YaxisL;
-            upPad = Mathf.Clamp01(padY);
-            downPad = Mathf.Clamp01(-padY);
-            leftPad = Mathf.Clamp01(-padX);
-            rightPad = Mathf.Clamp01(padX);
-        }
+        // if ( padMgr != null && padMgr.gamepads[0].isActive )
+        // {
+        //     float padX = padMgr.gamepads[0].XaxisL;
+        //     float padY = padMgr.gamepads[0].YaxisL;
+        //     upPad = Mathf.Clamp01(padY);
+        //     downPad = Mathf.Clamp01(-padY);
+        //     leftPad = Mathf.Clamp01(-padX);
+        //     rightPad = Mathf.Clamp01(padX);
+        // }
 
         // in each direction, test physics collision first, apply move if clear
-        if (Input.GetKey(upKey) || upPad > 0f)
+        if (inputs.up || upPad > 0f)
         {
             if (upPad == 0f)
                 upPad = 1f;
@@ -266,7 +262,7 @@ public class PlayerControlManager : MonoBehaviour
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.forward * characterSpeed * Time.deltaTime;
         }
-        if (Input.GetKey(downKey) || downPad > 0f)
+        if (inputs.down || downPad > 0f)
         {
             if (downPad == 0f)
                 downPad = 1f;
@@ -275,7 +271,7 @@ public class PlayerControlManager : MonoBehaviour
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.back * characterSpeed * Time.deltaTime;
         }
-        if (Input.GetKey(leftKey) || leftPad > 0f)
+        if (inputs.left || leftPad > 0f)
         {
             if (leftPad == 0f)
                 leftPad = 1f;
@@ -284,7 +280,7 @@ public class PlayerControlManager : MonoBehaviour
             if (!Physics.CheckCapsule(check, check + (Vector3.up * 0.5f), 0.25f))
                 characterMove += Vector3.left * characterSpeed * Time.deltaTime;
         }
-        if (Input.GetKey(rightKey) || rightPad > 0f)
+        if (inputs.right || rightPad > 0f)
         {
             if (rightPad == 0f)
                 rightPad = 1f;
@@ -335,7 +331,7 @@ public class PlayerControlManager : MonoBehaviour
             if (Vector3.Distance(plots[i].gameObject.transform.position,gameObject.transform.position) < PROXIMITYRANGE)
             {
                 activePlot = plots[i];
-                activePlot.SetCurrentPlayer(this);
+                activePlot.SetCurrentPlayerNetwork(this);
                 plots[i].SetCursorPulse(true);
                 break;
             }
@@ -344,49 +340,21 @@ public class PlayerControlManager : MonoBehaviour
 
     void ReadActionInput()
     {
-        characterActions = new PlayerActions();
-
-        characterActions.actionA = Input.GetKey(actionAKey);
-        characterActions.actionADown = Input.GetKeyDown(actionAKey);
-        characterActions.actionB = Input.GetKey(actionBKey);
-        characterActions.actionBDown = Input.GetKeyDown(actionBKey);
-        characterActions.actionC = Input.GetKey(actionCKey);
-        characterActions.actionCDown = Input.GetKeyDown(actionCKey);
-        characterActions.actionD = Input.GetKey(actionDKey);
-        characterActions.actionDDown = Input.GetKeyDown(actionDKey);
-        characterActions.lBump = Input.GetKey(lBumpKey);
-        characterActions.lBumpDown = Input.GetKeyDown(lBumpKey);
-        characterActions.rBump = Input.GetKey(rBumpKey);
-        characterActions.rBumpDown = Input.GetKeyDown(rBumpKey);
-
-        if (padMgr != null && padMgr.gamepads[0].isActive)
-        {
-            // use standard 'hold' signals from gamepad for these buttons
-            characterActions.actionA = padMgr.gamepads[0].aButton;
-            characterActions.actionADown = padMgr.gPadDown[0].aButton;
-            characterActions.actionB = padMgr.gamepads[0].bButton;
-            characterActions.actionBDown = padMgr.gPadDown[0].bButton;
-            characterActions.actionC = padMgr.gamepads[0].xButton;
-            characterActions.actionCDown = padMgr.gPadDown[0].xButton;
-            characterActions.actionD = padMgr.gamepads[0].yButton;
-            characterActions.actionDDown = padMgr.gPadDown[0].yButton;
-            characterActions.lBump = padMgr.gamepads[0].LBump;
-            characterActions.lBumpDown = padMgr.gPadDown[0].LBump;
-            characterActions.rBump = padMgr.gamepads[0].RBump;
-            characterActions.rBumpDown = padMgr.gPadDown[0].RBump;
+        if (GetInput(out PlayerInput playerInput)) {
+            inputs = playerInput;
         }
     }
 
     void DetectInventorySelectionInput()
     {
         // uses 'first press' control signal
-        if (characterActions.lBumpDown)
+        if (inputs.lBumpDown)
         {
             currentInventorySelection--;
             if (currentInventorySelection < 0)
                 currentInventorySelection = playerInventory.maxSlots - 1;
         }
-        if (characterActions.rBumpDown)
+        if (inputs.rBumpDown)
         {
             currentInventorySelection++;
             if (currentInventorySelection > playerInventory.maxSlots - 1)
@@ -397,7 +365,7 @@ public class PlayerControlManager : MonoBehaviour
     void CheckInventorySelectionDrop()
     {
         // handle drop item selected, uses 'first press' control signal
-        if (characterActions.actionCDown && currentInventorySelection < playerInventory.items.Length)
+        if (inputs.actionCDown && currentInventorySelection < playerInventory.items.Length)
         {
             // spawn loose item dropped from inventory
             ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
@@ -431,7 +399,6 @@ public class PlayerControlManager : MonoBehaviour
         if (characterMove != Vector3.zero && activePlot != null)
         {
             activePlot.SetCurrentPlayer(null);
-            activePlot.SetCurrentPlayerNetwork(null);
             activePlot.SetCursorPulse(false);
             activePlot = null;
         }

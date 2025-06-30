@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 261740017079920572}
   - component: {fileID: 3484861889041133304}
   - component: {fileID: 1722252933839553243}
-  - component: {fileID: 2783380199156033629}
   m_Layer: 0
   m_Name: Player Character
   m_TagString: Untagged
@@ -121,24 +120,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3232420859449547436}
   m_Enabled: 1
---- !u!114 &2783380199156033629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3232420859449547436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 1990014617
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0
 --- !u!1 &8989784619762191541
 GameObject:
   m_ObjectHideFlags: 0

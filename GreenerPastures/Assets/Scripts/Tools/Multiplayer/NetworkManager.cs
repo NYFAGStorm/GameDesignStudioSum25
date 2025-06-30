@@ -25,11 +25,24 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private GameObject multiplayerMenu;
     [SerializeField] private GameObject statusPanel;
 
-    private PlayerRef[] players = new PlayerRef[4];
+    private PlayerRef[] players = new PlayerRef[8];
     private NetworkRunner Runner;
     private int plrCount = 0;
     private Camera cam;
     private bool inGame;
+    private MultiplayerServer multiplayerServer;
+
+    public KeyCode upKey = KeyCode.W;
+    public KeyCode downKey = KeyCode.S;
+    public KeyCode leftKey = KeyCode.A;
+    public KeyCode rightKey = KeyCode.D;
+    public KeyCode actionAKey = KeyCode.E;
+    public KeyCode actionBKey = KeyCode.F;
+    public KeyCode actionCKey = KeyCode.C;
+    public KeyCode actionDKey = KeyCode.V;
+    public KeyCode lBumpKey = KeyCode.LeftBracket;
+    public KeyCode rBumpKey = KeyCode.RightBracket;
+    private PlayerInput inp = new PlayerInput();
 
     private void OpenMenu(int menu)
     {
@@ -92,6 +105,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (Runner.IsServer)
         {
+            multiplayerServer.RPC_AddPlayer(player);
             players[plrCount] = player;
             plrCount++;
         }
@@ -101,20 +115,26 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (Runner.IsServer)
         {
+            multiplayerServer.RPC_RemovePlayer(player);
             players[plrCount] = PlayerRef.None;
             plrCount--;
         }
     }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input) 
+    public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-
-        // input.Set(null);
+        input.Set(inp);
     }
-    
-    public void OnSceneLoadDone(NetworkRunner runner) 
+
+    public void OnSceneLoadDone(NetworkRunner runner)
     {
         OpenMenu(-1);
+
+        if (SceneManager.GetActiveScene().buildIndex == 8)
+        {
+            multiplayerServer = UnityEngine.Object.FindFirstObjectByType<MultiplayerServer>();
+            multiplayerServer.RPC_AddPlayer(players[plrCount]);
+        }
     }
     
     public void OnSceneLoadStart(NetworkRunner runner) {}

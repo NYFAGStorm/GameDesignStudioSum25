@@ -23,6 +23,7 @@ public class CameraManager : MonoBehaviour
 
     private GameObject playerObject;
     private PlayerControlManager pcm;
+    private NetworkPlayerController npc;
 
     private float cameraPauseTimer;
     private float cameraMoveTimer;
@@ -67,6 +68,12 @@ public class CameraManager : MonoBehaviour
     {
         playerObject = player.gameObject;
         pcm = player;
+    }
+    
+    public void SetPlayer(NetworkPlayerController player)
+    {
+        playerObject = player.gameObject;
+        npc = player;
     }
 
     /// <summary>
