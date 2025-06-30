@@ -52,6 +52,8 @@ public class CameraManager : MonoBehaviour
         // NOTE: do this here so recovered position and settings from player data can work
         // ensure unparented
         gameObject.transform.parent = null;
+        // configure cam offsets
+        ConfigureCamOffsets();
     }
 
     void Start()
@@ -75,8 +77,6 @@ public class CameraManager : MonoBehaviour
                 mode = CameraMode.Hold;
                 modeAfterHold = CameraMode.Follow;
                 SavePosAndRot();
-                // configure cam offsets
-                ConfigureCamOffsets();
                 // config curve
                 easeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             }
