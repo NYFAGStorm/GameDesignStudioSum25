@@ -66,6 +66,8 @@ public class WeatherManager : MonoBehaviour
                 return;
         }
 
+        // TODO: smooth results with lerp between checks
+
         // calculate wind factor and vector
         windFactor = GetProceduralResult(WINDFACTORSCALE, WINDFACTOROFFSET);
         windVector = GetProceduralResult(WINDFACTORSCALE, WINDVECTOROFFSET) - windFactor;

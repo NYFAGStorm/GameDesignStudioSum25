@@ -67,35 +67,10 @@ public class BackgroundManager : MonoBehaviour
 
     void Update()
     {
-        // handle cloud cover effects
-        RenderSettings.fog = (cloudCover > 0f);
-        if (cloudCover > 0f)
-        {
-            // update fog for cloud cover
-            RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogStartDistance = Mathf.Clamp(700f+(cloudCover * -1400f),-700f,700f);
-            CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
-            if (cm.mode == CameraManager.CameraMode.PanFollow)
-                RenderSettings.fogStartDistance = 30f;
-            RenderSettings.fogEndDistance = 700f;
-            Color cloudGray = new Color(.27f,.33f,.381f); // full day color
-            // fog color darker at night
-            Color darkerGray = Color.Lerp(cloudGray, cloudGray*0.1f, 1f-daylight);
-            darkerGray.a = 1f;
-            RenderSettings.fogColor = Color.Lerp(savedSkyTint, darkerGray, cloudCover);
-
-            // update sky tint for cloud cover
-            Color c = Color.Lerp(savedSkyTint, cloudGray, cloudCover);
-            RenderSettings.skybox.SetColor("_SkyTint", c);
-            // update skybox atmosphere and exposure for ugly gray
-            // default 1
-            RenderSettings.skybox.SetFloat("_AtmosphereThickness", 1f + (cloudCover * .33f));
-            // default 1.3
-            RenderSettings.skybox.SetFloat("_Exposure", 1.3f-(cloudCover*1.27f));
-        }
-        else
-            RenderSettings.skybox.SetFloat("_Exposure", 1.3f);
-
+        // TODO: re-implement cloud cover background effects
+        // update cloud cover lighting
+        //UpdateCloudCoverLighting();
+        
         // update bg layer colors based on ambient light intensity
         for (int i = 0; i < childObjects.Length; i++)
         {
@@ -116,6 +91,38 @@ public class BackgroundManager : MonoBehaviour
     {
         cloudCover = cloudAmount;
         daylight = dLight;
+    }
+
+    void UpdateCloudCoverLighting()
+    {
+        // handle cloud cover effects
+        RenderSettings.fog = (cloudCover > 0f);
+        if (cloudCover > 0f)
+        {
+            // update fog for cloud cover
+            RenderSettings.fogMode = FogMode.Linear;
+            RenderSettings.fogStartDistance = Mathf.Clamp(700f + (cloudCover * -1400f), -700f, 700f);
+            CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+            if (cm.mode == CameraManager.CameraMode.PanFollow)
+                RenderSettings.fogStartDistance = 30f;
+            RenderSettings.fogEndDistance = 700f;
+            Color cloudGray = new Color(.27f, .33f, .381f); // full day color
+            // fog color darker at night
+            Color darkerGray = Color.Lerp(cloudGray, cloudGray * 0.1f, 1f - daylight);
+            darkerGray.a = 1f;
+            RenderSettings.fogColor = Color.Lerp(savedSkyTint, darkerGray, cloudCover);
+
+            // update sky tint for cloud cover
+            Color c = Color.Lerp(savedSkyTint, cloudGray, cloudCover);
+            RenderSettings.skybox.SetColor("_SkyTint", c);
+            // update skybox atmosphere and exposure for ugly gray
+            // default 1
+            RenderSettings.skybox.SetFloat("_AtmosphereThickness", 1f + (cloudCover * .33f));
+            // default 1.3
+            RenderSettings.skybox.SetFloat("_Exposure", 1.3f - (cloudCover * 1.27f));
+        }
+        else
+            RenderSettings.skybox.SetFloat("_Exposure", 1.3f);
     }
 
     /// <summary>

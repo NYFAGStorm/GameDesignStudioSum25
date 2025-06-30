@@ -226,7 +226,7 @@ MonoBehaviour:
       y: 0.25
       width: 0.4
       height: 0.09
-    alignRight: 0
+    creditAlign: 0
   - creditText: Esther Li (YT)
     creditPos:
       serializedVersion: 2
@@ -234,7 +234,7 @@ MonoBehaviour:
       y: 0.25
       width: 0.4
       height: 0.09
-    alignRight: 1
+    creditAlign: 1
   - creditText: Grayson Borchardt
     creditPos:
       serializedVersion: 2
@@ -242,7 +242,7 @@ MonoBehaviour:
       y: 0.35
       width: 0.4
       height: 0.09
-    alignRight: 0
+    creditAlign: 0
   - creditText: Gustavo Rojas Flores
     creditPos:
       serializedVersion: 2
@@ -250,7 +250,7 @@ MonoBehaviour:
       y: 0.35
       width: 0.4
       height: 0.09
-    alignRight: 1
+    creditAlign: 1
   - creditText: Huch Platt
     creditPos:
       serializedVersion: 2
@@ -258,7 +258,7 @@ MonoBehaviour:
       y: 0.45
       width: 0.4
       height: 0.09
-    alignRight: 0
+    creditAlign: 0
   - creditText: LiAi Yang
     creditPos:
       serializedVersion: 2
@@ -266,7 +266,7 @@ MonoBehaviour:
       y: 0.45
       width: 0.4
       height: 0.09
-    alignRight: 1
+    creditAlign: 1
   - creditText: Alithia Hadiwibowo (Tia)
     creditPos:
       serializedVersion: 2
@@ -274,7 +274,23 @@ MonoBehaviour:
       y: 0.55
       width: 0.4
       height: 0.09
-    alignRight: 0
+    creditAlign: 0
+  - creditText: Glenn Storm
+    creditPos:
+      serializedVersion: 2
+      x: 0.5
+      y: 0.55
+      width: 0.4
+      height: 0.09
+    creditAlign: 1
+  - creditText: New York Film Academy | 3D Game Design | Summer 2025
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.7
+      width: 1
+      height: 0.09
+    creditAlign: 2
   creditFont: {fileID: 0}
   creditsFontStyle: 0
   creditFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}

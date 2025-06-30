@@ -7,6 +7,13 @@ public class CreditsScreen : MonoBehaviour
     // Author: Glenn Storm
     // This handles the credits screen
 
+    public enum CreditAlign
+    {
+        Left,
+        Right,
+        Center
+    }
+
     public string titleText;
     [Tooltip("These values represent a proportion of screen space, as percentages of screen space. Like, less than 1")]
     public Rect title;
@@ -22,7 +29,7 @@ public class CreditsScreen : MonoBehaviour
     {
         public string creditText;
         public Rect creditPos;
-        public bool alignRight;
+        public CreditAlign creditAlign;
     }
     public CreditListing[] credits;
     public Font creditFont;
@@ -42,6 +49,9 @@ public class CreditsScreen : MonoBehaviour
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 0;
+
+    // TODO: credits display rotation on timer
+    // (display music credits, etc)
 
 
     void Start()
@@ -104,8 +114,10 @@ public class CreditsScreen : MonoBehaviour
             g.fontStyle = creditsFontStyle;
             g.fontSize = Mathf.RoundToInt(creditFontSizeAt1024 * (w / 1024f));
             g.alignment = TextAnchor.MiddleLeft;
-            if ( credits[i].alignRight )
+            if ( credits[i].creditAlign == CreditAlign.Right )
                 g.alignment = TextAnchor.MiddleRight;
+            else if (credits[i].creditAlign == CreditAlign.Center )
+                g.alignment = TextAnchor.MiddleCenter;
             g.normal.textColor = creditFontColor;
             s = credits[i].creditText;
             GUI.Label(r, s, g);
