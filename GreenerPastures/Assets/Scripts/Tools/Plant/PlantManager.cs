@@ -72,7 +72,8 @@ public class PlantManager : MonoBehaviour
                     // show growth change
                     Grow(plot.data.plant.growth);
                     // calculate quality
-                    plot.data.plant.quality += growthDelta * plot.data.plant.vitality;
+                    if (!plot.data.plant.isHarvested)
+                        plot.data.plant.quality += growthDelta * plot.data.plant.vitality;
                 }
 
                 plantTimer = PLANTCHECKINTERVAL;

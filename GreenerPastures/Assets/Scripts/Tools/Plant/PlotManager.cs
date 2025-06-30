@@ -442,7 +442,7 @@ public class PlotManager : MonoBehaviour
             return;
 
         // cannot harvest unless a plant exists, plant at 100% growth and not yet harvested
-        if (plant == null || data.plant.growth < 1f || data.plant.isHarvested)
+        if (plant == null || data.plant.growth < 1f || (data.plant.isHarvested || !data.plant.canReFruit))
             return;
 
         if (action != CurrentAction.Harvesting && action != CurrentAction.None)
