@@ -1,8 +1,5 @@
 // REVIEW: necessary namespaces
 
-using Unity.VisualScripting;
-using UnityEngine;
-
 public static class GameSystem
 {
     /// <summary>
@@ -150,10 +147,10 @@ public static class GameSystem
         float retFloat = 0f;
 
         float dA, dB, dC;
-        dA = Mathf.Pow(Mathf.Abs(a.x - b.x), 2f);
-        dB = Mathf.Pow(Mathf.Abs(a.y - b.y), 2f);
-        dC = Mathf.Pow(Mathf.Abs(a.z - b.z), 2f);
-        retFloat = Mathf.Sqrt( dA + dB + dC );
+        dA = UnityEngine.Mathf.Pow(UnityEngine.Mathf.Abs(a.x - b.x), 2f);
+        dB = UnityEngine.Mathf.Pow(UnityEngine.Mathf.Abs(a.y - b.y), 2f);
+        dC = UnityEngine.Mathf.Pow(UnityEngine.Mathf.Abs(a.z - b.z), 2f);
+        retFloat = UnityEngine.Mathf.Sqrt( dA + dB + dC );
 
         return retFloat;
     }
@@ -169,9 +166,9 @@ public static class GameSystem
     {
         PositionData retPos = new PositionData();
 
-        retPos.x = Mathf.Lerp(a.x, b.x, progress);
-        retPos.y = Mathf.Lerp(a.y, b.y, progress);
-        retPos.z = Mathf.Lerp(a.z, b.z, progress);
+        retPos.x = UnityEngine.Mathf.Lerp(a.x, b.x, progress);
+        retPos.y = UnityEngine.Mathf.Lerp(a.y, b.y, progress);
+        retPos.z = UnityEngine.Mathf.Lerp(a.z, b.z, progress);
 
         return retPos;
     }
