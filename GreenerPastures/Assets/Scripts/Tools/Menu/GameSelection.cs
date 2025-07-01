@@ -731,6 +731,7 @@ public class GameSelection : MonoBehaviour
                     {
                         // ask for joining player name in tiny popup
                         // from there, "Join" does the routine below
+                        newPlayerName = "";
                         tinyPopup = true;
                     }
                     else
