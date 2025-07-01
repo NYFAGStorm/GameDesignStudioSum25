@@ -34,7 +34,9 @@ public class GameSelection : MonoBehaviour
     private string selectionFeedback;
     private float feedbackTimer;
 
-    public bool networkActive; // is there an active game network?
+    private MultiplayerHostPing[] hostPings; // host pings heard (collect over 1s intervals)
+    private bool tinyPopup; // ask new player name, offer "join" and "cancel"
+    private string newPlayerName;
 
     private string popGameName;
     private string popPlayerName;
@@ -495,7 +497,7 @@ public class GameSelection : MonoBehaviour
         g.active.textColor = buttonFontColor;
         s = "Game Options";
 
-        GUI.enabled = gameLoaded;
+        GUI.enabled = (gameLoaded && !tinyPopup);
         if (GUI.Button(r, s, g) || 
             (padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
         {
@@ -527,6 +529,9 @@ public class GameSelection : MonoBehaviour
         g.active.textColor = buttonFontColor;
         s = "Create Game";
 
+        if (tinyPopup)
+            GUI.enabled = false;
+
         if (GUI.Button(r, s, g) || (padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
         {
             newGame = true;
@@ -539,6 +544,7 @@ public class GameSelection : MonoBehaviour
             gamePopup = true;
             popupTimer = POPUPTIME;
         }
+        GUI.enabled = true;
 
         // GAME SELECTION OPTIONS
         // save game column
@@ -561,7 +567,12 @@ public class GameSelection : MonoBehaviour
             g.alignment = TextAnchor.MiddleCenter;
             s = "no saved games available";
 
+            if (tinyPopup)
+                GUI.enabled = false;
+
             GUI.Label(r, s, g);
+
+            GUI.enabled = true;
         }
         else
         {
@@ -584,12 +595,15 @@ public class GameSelection : MonoBehaviour
                 if (padButtonSelection == (2 + i))
                     g.normal.textColor = Color.white;
                 g.active.textColor = buttonFontColor;
-                s = "[SAVED " + (i+1) + "] : " + list[i]; // REVIEW: proper string format for this button
+                s = "[SAVED " + (i+1) + "] : " + list[i];
 
                 if (gameLoaded)
                     GUI.enabled = saveMgr.GetCurrentGameData().gameKey != list[i];
 
-                if (GUI.Button(r, s, g) || (padButtonSelection == (2+i) && padMgr.gPadDown[0].aButton)) // TODO: gamepad support
+                if (tinyPopup)
+                    GUI.enabled = false;
+
+                if (GUI.Button(r, s, g) || (padButtonSelection == (2+i) && padMgr.gPadDown[0].aButton))
                 {
                     // unload current game data
                     if (saveMgr.IsGameCurrentlyLoaded())
@@ -651,7 +665,7 @@ public class GameSelection : MonoBehaviour
             // TODO: use multiplayer information (host pings parsed to arrive at list)
             // temp - test data ---
             string currentProfileID = saveMgr.GetCurrentProfile().profileID;
-            MultiplayerHostPing[] hostPings = new MultiplayerHostPing[2];
+            hostPings = new MultiplayerHostPing[2];
             hostPings[0].gameKey = "[000]-a really fun game";
             hostPings[0].availablePlayerSlots = 1;
             hostPings[0].profiles = new string[2];
@@ -692,14 +706,18 @@ public class GameSelection : MonoBehaviour
                 g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f)); // smaller
                 g.alignment = TextAnchor.MiddleCenter;
                 g.normal.textColor = buttonFontColor;
-                if (padButtonSelection == (2 + i))
+                if (padButtonSelection == (2 + gamelistNum + i))
                     g.normal.textColor = Color.white;
                 g.active.textColor = buttonFontColor;
-                s = "[NET " + (i + 1) + "] : " + list[i]; // REVIEW: proper string format for this button
+                s = "[NET " + (i + 1) + "] : " + list[i];
 
                 GUI.enabled = MultiplayerSystem.CanProfileJoinGame(currentProfileID, hostPings[i]);
 
-                if (GUI.Button(r, s, g) || (padButtonSelection == (2 + i) && padMgr.gPadDown[0].aButton)) // TODO: gamepad support
+                if (tinyPopup)
+                    GUI.enabled = false;
+
+                if (GUI.Button(r, s, g) || 
+                    (padButtonSelection == (2 + gamelistNum + i) && padMgr.gPadDown[0].aButton))
                 {
                     // unload current game data
                     if (saveMgr.IsGameCurrentlyLoaded())
@@ -708,14 +726,16 @@ public class GameSelection : MonoBehaviour
                         saveMgr.SaveGameData(saveMgr.GetCurrentGameData().gameKey);
                         saveMgr.ClearCurrentGameData();
                     }
-
                     string playerName = MultiplayerSystem.GetProfilePlayerName(currentProfileID, hostPings[i]);
                     if (playerName == "New Player")
                     {
-                        // stay here and ask for joining player name
-                        // TODO: tiny popup for new player name "Join" and "Cancel" buttons
+                        // ask for joining player name in tiny popup
+                        // from there, "Join" does the routine below
+                        tinyPopup = true;
                     }
-                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), playerName);
+                    else
+                        newPlayerName = playerName;
+                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), newPlayerName);
                     // TODO: send remote join signal, hear back from host
                     // on host, that's MultiplayerSystem.HandleRemoteJoinRequest(saveMgr.GetCurrentGameData(), rJoin)
                     if ( false ) // we get that bool result back and use it here
@@ -726,10 +746,13 @@ public class GameSelection : MonoBehaviour
                         // PlayerSystem.InitializePlayer(playerName, profID), and add with
                         // GameSystem.AddPlayer(gameData, playerData) ... 
                         // ... or if profile already exists in game just pick up latest data
+                        
+                        //newPlayerName = "";
                     }
                     else
                     {
                         // join signal returned as rejected
+                        newPlayerName = "";
                         selectionFeedback = "join request denied";
                         feedbackTimer = FEEDBACKTIME;
                     }
@@ -754,6 +777,56 @@ public class GameSelection : MonoBehaviour
         s = selectionFeedback;
         GUI.Label(r, s, g);
 
+        // tiny popup
+        if (tinyPopup)
+        {
+            r.x = 0.3f * w;
+            r.y = 0.35f * h;
+            r.width = 0.4f * w;
+            r.height = 0.3f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.fontSize = Mathf.RoundToInt(20f * (w/1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.normal.textColor = labelFontColor;
+            g.hover.textColor = labelFontColor;
+            g.active.textColor = labelFontColor;
+            g.padding = new RectOffset(0, 0, 20, 0);
+            s = "Enter New Player Name";
+            GUI.Box(r,s,g);
+
+            r.x = 0.35f * w;
+            r.y = 0.45f * h;
+            r.width = 0.3f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.textField);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            newPlayerName = GUI.TextField(r, newPlayerName, g);
+
+            r.x = 0.325f * w;
+            r.y = 0.55f * h;
+            r.width = 0.15f * w;
+            r.height = 0.075f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            s = "Join";
+            GUI.enabled = (newPlayerName != "");
+            if (GUI.Button(r, s, g))
+            {
+                // TODO: join routine outlined above
+                tinyPopup = false;
+            }
+
+            r.x = 0.525f * w;
+            s = "Cancel";
+            GUI.enabled = true;
+            if (GUI.Button(r, s, g))
+            {
+                newPlayerName = "";
+                tinyPopup = false;
+            }
+        }
+
         // back button
         r = backButton;
         r.x *= w;
@@ -771,6 +844,8 @@ public class GameSelection : MonoBehaviour
         g.active.textColor = buttonFontColor;
         s = backButtonText;
 
+        if (tinyPopup)
+            GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
             padButtonSelection == gamelistNum+2 && padMgr.gPadDown[0].aButton)
         {
