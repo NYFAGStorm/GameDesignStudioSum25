@@ -149,10 +149,8 @@ public static class PlantSystem
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = .5f;
                 retData.isDarkPlant = true;
-                retData.springVitality = 1f;
-                retData.summerVitality = 1f;
-                retData.fallVitality = 1f;
-                retData.winterVitality = 1f;
+                retData.summerVitality = .75f;
+                retData.winterVitality = .5f;
                 retData.seedPotential = 0.6f;
                 break;
             case PlantType.Myosotis:

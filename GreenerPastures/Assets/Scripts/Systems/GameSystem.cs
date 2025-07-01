@@ -1,5 +1,8 @@
 // REVIEW: necessary namespaces
 
+using Unity.VisualScripting;
+using UnityEngine;
+
 public static class GameSystem
 {
     /// <summary>
@@ -134,5 +137,42 @@ public static class GameSystem
         }
 
         return retPlayer;
+    }
+
+    /// <summary>
+    /// Returns the distance between given position data points
+    /// </summary>
+    /// <param name="a">position data point A</param>
+    /// <param name="b">position data point B</param>
+    /// <returns>distance between position points</returns>
+    public static float PositionDistance( PositionData a, PositionData b )
+    {
+        float retFloat = 0f;
+
+        float dA, dB, dC;
+        dA = Mathf.Pow(Mathf.Abs(a.x - b.x), 2f);
+        dB = Mathf.Pow(Mathf.Abs(a.y - b.y), 2f);
+        dC = Mathf.Pow(Mathf.Abs(a.z - b.z), 2f);
+        retFloat = Mathf.Sqrt( dA + dB + dC );
+
+        return retFloat;
+    }
+
+    /// <summary>
+    /// Returns result position of linearly interpolating between two given position data points
+    /// </summary>
+    /// <param name="a">position data point A</param>
+    /// <param name="b">position data point B</param>
+    /// <param name="progress">normalized progress amount (0-1)</param>
+    /// <returns>point between position data points, based on proress amount</returns>
+    public static PositionData Lerp(PositionData a, PositionData b, float progress)
+    {
+        PositionData retPos = new PositionData();
+
+        retPos.x = Mathf.Lerp(a.x, b.x, progress);
+        retPos.y = Mathf.Lerp(a.y, b.y, progress);
+        retPos.z = Mathf.Lerp(a.z, b.z, progress);
+
+        return retPos;
     }
 }
