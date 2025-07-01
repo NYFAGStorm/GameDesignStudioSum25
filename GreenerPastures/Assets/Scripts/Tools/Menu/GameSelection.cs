@@ -34,6 +34,8 @@ public class GameSelection : MonoBehaviour
     private string selectionFeedback;
     private float feedbackTimer;
 
+    public bool networkActive; // is there an active game network?
+
     private string popGameName;
     private string popPlayerName;
     private int popMaxPlayers;
