@@ -82,6 +82,52 @@ public static class MultiplayerSystem
     }
 
     /// <summary>
+    /// Returns true if given profile ID may join the game specified in the given host ping
+    /// </summary>
+    /// <param name="profID">profile ID</param>
+    /// <param name="hostPing">host ping structure</param>
+    /// <returns>true if player may join, false if not a part of that game and no available player slots</returns>
+    public static bool CanProfileJoinGame( string profID, MultiplayerHostPing hostPing )
+    {
+        bool retBool = false;
+
+        for (int i = 0; i < hostPing.profiles.Length; i++)
+        {
+            if (hostPing.profiles[i] == profID)
+            {
+                retBool = true;
+                break;
+            }
+        }
+        if (!retBool)
+            retBool = hostPing.availablePlayerSlots > 0;
+
+        return retBool;
+    }
+
+    /// <summary>
+    /// Returns the player name associated with this profile, if existed in game specified by host ping structure
+    /// </summary>
+    /// <param name="profID">profile ID</param>
+    /// <param name="hostPing">host ping structure</param>
+    /// <returns>the player name in this game, if existed. otherwise 'New Player'.</returns>
+    public static string GetProfilePlayerName( string profID, MultiplayerHostPing hostPing )
+    {
+        string retString = "New Player"; // default (will prompt for player name)
+
+        for (int i = 0; i < hostPing.profiles.Length; i++)
+        {
+            if (hostPing.profiles[i] == profID)
+            {
+                retString = hostPing.playerNames[i];
+                break;
+            }
+        }
+
+        return retString;
+    }
+
+    /// <summary>
     /// Forms a remote ping from given profile data
     /// </summary>
     /// <param name="pData">profile data</param>

@@ -536,15 +536,17 @@ public class GameSelection : MonoBehaviour
             popupTimer = POPUPTIME;
         }
 
+        // GAME SELECTION OPTIONS
+        // save game column
         // associated games button list (based on profile game keys list)
         int gamelistNum = saveMgr.GetCurrentProfile().gameKeys.Length;
         if (gamelistNum == 0)
         {
             // label (if no games associated with this profile)
             // . 'no games available'
-            r.x = 0.2f * w;
+            r.x = 0.05f * w;
             r.y = 0.425f * h;
-            r.width = 0.6f * w;
+            r.width = 0.45f * w;
             r.height = 0.045f * h;
             g = new GUIStyle(GUI.skin.label);
             g.normal.textColor = labelFontColor;
@@ -553,7 +555,7 @@ public class GameSelection : MonoBehaviour
             g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
             g.fontStyle = FontStyle.Italic;
             g.alignment = TextAnchor.MiddleCenter;
-            s = "no games available";
+            s = "no saved games available";
 
             GUI.Label(r, s, g);
         }
@@ -563,9 +565,9 @@ public class GameSelection : MonoBehaviour
             // buttons (load game data from file)
             // . game name, key, timestamp
             // . TODO: nav buttons up / down for longer lists
-            r.x = 0.2f * w;
+            r.x = 0.05f * w;
             r.y = 0.425f * h;
-            r.width = 0.6f * w;
+            r.width = 0.45f * w;
             r.height = 0.07f * h;
             for (int i = 0; i < gamelistNum; i++)
             {
@@ -578,7 +580,7 @@ public class GameSelection : MonoBehaviour
                 if (padButtonSelection == (2 + i))
                     g.normal.textColor = Color.white;
                 g.active.textColor = buttonFontColor;
-                s = "[SLOT " + (i+1) + "] : " + list[i]; // REVIEW: proper string format for this button
+                s = "[SAVED " + (i+1) + "] : " + list[i]; // REVIEW: proper string format for this button
 
                 if (gameLoaded)
                     GUI.enabled = saveMgr.GetCurrentGameData().gameKey != list[i];
@@ -616,9 +618,125 @@ public class GameSelection : MonoBehaviour
                 r.y += 0.075f * h;
             }
         }
+        // remote game column
+        // associated games on network (based on profile game keys list or available player slots)
+        int remotelistNum = 2; // how many hosts are pinging now?
+        if (remotelistNum == 0)
+        {
+            // label (if no games associated with this profile or all games full)
+            // . 'no network games available'
+            r.x = 0.5125f * w;
+            r.y = 0.425f * h;
+            r.width = 0.45f * w;
+            r.height = 0.045f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.normal.textColor = labelFontColor;
+            g.hover.textColor = labelFontColor;
+            g.active.textColor = labelFontColor;
+            g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
+            g.fontStyle = FontStyle.Italic;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "no network games available";
+
+            GUI.Label(r, s, g);
+        }
+        else
+        {
+            // TODO: use multiplayer information (host pings parsed to arrive at list)
+            // temp - test data ---
+            string currentProfileID = saveMgr.GetCurrentProfile().profileID;
+            // we ask network traffic for current host pings
+            MultiplayerHostPing[] hostPings = new MultiplayerHostPing[2];
+            hostPings[0].gameKey = "[000]-a really fun game";
+            hostPings[0].availablePlayerSlots = 1;
+            hostPings[0].profiles = new string[2];
+            hostPings[0].profiles[0] = "hostprofile";
+            hostPings[0].profiles[1] = currentProfileID;
+            hostPings[0].playerNames = new string[2];
+            hostPings[0].playerNames[0] = "host player name";
+            hostPings[0].playerNames[1] = "your name";
+            hostPings[1].gameKey = "[111]-another game";
+            hostPings[1].availablePlayerSlots = 0;
+            hostPings[1].profiles = new string[1];
+            hostPings[1].profiles[0] = "hostprofile";
+            hostPings[1].playerNames = new string[1];
+            hostPings[1].playerNames[0] = "host player name";
+            // ---
+            string[] list = new string[hostPings.Length];
+            // parse host pings' data
+            for (int i = 0; i < hostPings.Length; i++)
+            {
+                list[i] = MultiplayerSystem.GetProfilePlayerName(currentProfileID, hostPings[i]);
+                list[i] += " in ";
+                if (!MultiplayerSystem.CanProfileJoinGame(currentProfileID, hostPings[i]))
+                    list[i] = "(full game) ";
+                list[i] += hostPings[i].gameKey;
+            }
+            // buttons (load game data from file)
+            // . game name, key, timestamp
+            // . TODO: nav buttons up / down for longer lists
+            r.x = 0.5125f * w;
+            r.y = 0.425f * h;
+            r.width = 0.45f * w;
+            r.height = 0.07f * h;
+            for (int i = 0; i < remotelistNum; i++)
+            {
+                g = new GUIStyle(GUI.skin.button);
+                g.font = buttonFont;
+                g.fontStyle = FontStyle.Normal;
+                g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f)); // smaller
+                g.alignment = TextAnchor.MiddleCenter;
+                g.normal.textColor = buttonFontColor;
+                if (padButtonSelection == (2 + i))
+                    g.normal.textColor = Color.white;
+                g.active.textColor = buttonFontColor;
+                s = "[NET " + (i + 1) + "] : " + list[i]; // REVIEW: proper string format for this button
+
+                GUI.enabled = MultiplayerSystem.CanProfileJoinGame(currentProfileID, hostPings[i]);
+
+                if (GUI.Button(r, s, g) || (padButtonSelection == (2 + i) && padMgr.gPadDown[0].aButton)) // TODO: gamepad support
+                {
+                    // unload current game data
+                    if (saveMgr.IsGameCurrentlyLoaded())
+                    {
+                        // save current and clear current
+                        saveMgr.SaveGameData(saveMgr.GetCurrentGameData().gameKey);
+                        saveMgr.ClearCurrentGameData();
+                    }
+
+                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), "tempName");
+                    // TODO: send remote join signal, recieve and load initital game data
+                    // something like, if (multiplayerTool.SendJoinRequest( rJoin ))
+                    if ( false ) // join request function call to host, returns bool if succesul join
+                    {
+                        // where a 'true' result allows join immediately if 
+                        // MultiplayerSystem.GetProfilePlayerName(currentProfileID, hostPings[i]) != "New Player"
+                        // else we prompt for player name with popup that has "Join" and "Cancel" (join button enabled if player name not blank)
+
+                        // with that, host has ability to add new player after create player
+                        // PlayerSystem.InitializePlayer(playerName, profID), and add with
+                        // GameSystem.AddPlayer(gameData, playerData) ... 
+                        // ... or if profile already exists in game just pick up latest data
+
+                        // TODO: tiny popup for new player name "Join" and "Cancel" buttons
+                    }
+                    else
+                    {
+                        // join signal returned as rejected
+                        selectionFeedback = "join request denied";
+                        feedbackTimer = FEEDBACKTIME;
+                    }
+                }
+
+                GUI.enabled = true;
+                r.y += 0.075f * h;
+            }
+        }
 
         // selection feedback
+        r.x = 0.2f * w;
         r.y = (backButton.y - 0.1f) * h;
+        r.width = 0.6f * w;
         g = new GUIStyle(GUI.skin.label);
         g.normal.textColor = labelFontColor;
         g.hover.textColor = labelFontColor;
