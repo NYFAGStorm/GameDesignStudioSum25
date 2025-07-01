@@ -69,7 +69,7 @@ public static class MultiplayerSystem
         }
 
         retPing.gameKey = gData.gameKey;
-        retPing.availablePlayerSlots = (gData.options.maxPlayers - gData.players.Length);
+        retPing.availablePlayerSlots = (gData.options.maxPlayers - gData.playersOnline);
         retPing.profiles = new string[gData.players.Length];
         retPing.playerNames = new string[gData.players.Length];
         for (int i = 0; i < retPing.profiles.Length; i++)
@@ -128,28 +128,6 @@ public static class MultiplayerSystem
     }
 
     /// <summary>
-    /// Forms a remote ping from given profile data
-    /// </summary>
-    /// <param name="pData">profile data</param>
-    /// <returns>formed multiplayer remote ping structure</returns>
-    public static MultiplayerRemotePing FormRemotePing( ProfileData pData )
-    {
-        MultiplayerRemotePing retPing = new MultiplayerRemotePing();
-
-        // validate
-        if (pData == null)
-        {
-            UnityEngine.Debug.LogError("--- MultiplayerSystem [FormRemotePing] : invalid profile data. returning empty ping structure.");
-            return retPing;
-        }
-
-        retPing.profileID = pData.profileID;
-        retPing.gameKeys = pData.gameKeys;
-
-        return retPing;
-    }
-
-    /// <summary>
     /// Forms a signal to join from remote client to host, given profile data and player name
     /// </summary>
     /// <param name="pData">profile data</param>
@@ -170,5 +148,23 @@ public static class MultiplayerSystem
         retJoin.playerName = pName;
 
         return retJoin;
+    }
+
+    public static bool HandleRemoteJoinRequest( GameData gData, MultiplayerRemoteJoin request )
+    {
+        bool retBool = false;
+
+        for (int i = 0; i < gData.players.Length; i++)
+        {
+            if (gData.players[i].profileID == request.profileID)
+            {
+                retBool = true;
+                break;
+            }
+        }
+        if (!retBool)
+            retBool = gData.options.maxPlayers - gData.players.Length > 0;
+
+        return retBool;
     }
 }

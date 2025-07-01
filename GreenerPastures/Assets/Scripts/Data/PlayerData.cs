@@ -27,6 +27,7 @@ public enum PlayerEffects
 public class PlayerData
 {
     public string playerName;
+    public bool nowPlaying;
     public PlayerStats stats;
     public string profileID;
     public FarmData farm;

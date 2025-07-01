@@ -91,6 +91,7 @@ public class GreenerGameManager : MonoBehaviour
                 // game configured for startup
                 // profile connected to game
                 saveMgr.GetCurrentProfile().state = ProfileState.Playing;
+                game = GameSystem.SetPlayerNowPlaying(game, GameSystem.GetProfilePlayer(game, saveMgr.GetCurrentProfile()), true);
             }
         }
     }
@@ -189,6 +190,7 @@ public class GreenerGameManager : MonoBehaviour
 
         // profile disconnecting from game
         saveMgr.GetCurrentProfile().state = ProfileState.Disconnecting;
+        game = GameSystem.SetPlayerNowPlaying(game, GameSystem.GetProfilePlayer(game, saveMgr.GetCurrentProfile()), false);
     }
 
     bool CollectWorldData()

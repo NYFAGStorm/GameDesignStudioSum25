@@ -70,6 +70,46 @@ public static class GameSystem
     }
 
     /// <summary>
+    /// Sets the now playing flag on the given player in the given game
+    /// </summary>
+    /// <param name="game">game data</param>
+    /// <param name="player">player data</param>
+    /// <param name="isPlaying">is this player now playing?</param>
+    /// <returns>game data with changed player now playing flag, if existed in game</returns>
+    public static GameData SetPlayerNowPlaying( GameData game, PlayerData player, bool isPlaying )
+    {
+        GameData retGame = game;
+
+        bool found = false;
+        // validate (in game)
+        for (int i = 0; i < retGame.players.Length; i++)
+        {
+            if (retGame.players[i] == player)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return retGame;
+        int nowPlaying = 0;
+        for (int i = 0; i < retGame.players.Length; i++)
+        {
+            if (retGame.players[i] == player)
+            {
+                retGame.players[i].nowPlaying = isPlaying;
+                break;
+            }
+            if (retGame.players[i].nowPlaying)
+                nowPlaying++;
+        }
+        // update game data for playersOnline
+        retGame.playersOnline = nowPlaying; 
+
+        return retGame;
+    }
+
+    /// <summary>
     /// Removes a player from a given game
     /// </summary>
     /// <param name="game">game data</param>

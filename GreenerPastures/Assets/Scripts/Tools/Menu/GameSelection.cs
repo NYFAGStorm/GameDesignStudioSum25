@@ -140,7 +140,11 @@ public class GameSelection : MonoBehaviour
     {
         gameLoaded = saveMgr.IsGameCurrentlyLoaded();
         if (gameLoaded)
-            gamePlayerName = GameSystem.GetProfilePlayer(saveMgr.GetCurrentGameData(), saveMgr.GetCurrentProfile()).playerName;
+        {
+            PlayerData pData = GameSystem.GetProfilePlayer(saveMgr.GetCurrentGameData(), saveMgr.GetCurrentProfile());
+            gamePlayerName = pData.playerName;
+
+        }
     }
 
     void OnGUI()
@@ -618,8 +622,9 @@ public class GameSelection : MonoBehaviour
                 r.y += 0.075f * h;
             }
         }
+
         // remote game column
-        // associated games on network (based on profile game keys list or available player slots)
+        // associated games on network
         int remotelistNum = 2; // how many hosts are pinging now?
         if (remotelistNum == 0)
         {
@@ -642,10 +647,10 @@ public class GameSelection : MonoBehaviour
         }
         else
         {
+            // we ask network traffic for current host pings
             // TODO: use multiplayer information (host pings parsed to arrive at list)
             // temp - test data ---
             string currentProfileID = saveMgr.GetCurrentProfile().profileID;
-            // we ask network traffic for current host pings
             MultiplayerHostPing[] hostPings = new MultiplayerHostPing[2];
             hostPings[0].gameKey = "[000]-a really fun game";
             hostPings[0].availablePlayerSlots = 1;
@@ -704,21 +709,23 @@ public class GameSelection : MonoBehaviour
                         saveMgr.ClearCurrentGameData();
                     }
 
-                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), "tempName");
-                    // TODO: send remote join signal, recieve and load initital game data
-                    // something like, if (multiplayerTool.SendJoinRequest( rJoin ))
-                    if ( false ) // join request function call to host, returns bool if succesul join
+                    string playerName = MultiplayerSystem.GetProfilePlayerName(currentProfileID, hostPings[i]);
+                    if (playerName == "New Player")
                     {
-                        // where a 'true' result allows join immediately if 
-                        // MultiplayerSystem.GetProfilePlayerName(currentProfileID, hostPings[i]) != "New Player"
-                        // else we prompt for player name with popup that has "Join" and "Cancel" (join button enabled if player name not blank)
+                        // stay here and ask for joining player name
+                        // TODO: tiny popup for new player name "Join" and "Cancel" buttons
+                    }
+                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), playerName);
+                    // TODO: send remote join signal, hear back from host
+                    // on host, that's MultiplayerSystem.HandleRemoteJoinRequest(saveMgr.GetCurrentGameData(), rJoin)
+                    if ( false ) // we get that bool result back and use it here
+                    {
+                        // where a 'true' result allows join immediately
 
-                        // with that, host has ability to add new player after create player
+                        // if new player, host has ability to add player after create player
                         // PlayerSystem.InitializePlayer(playerName, profID), and add with
                         // GameSystem.AddPlayer(gameData, playerData) ... 
                         // ... or if profile already exists in game just pick up latest data
-
-                        // TODO: tiny popup for new player name "Join" and "Cancel" buttons
                     }
                     else
                     {
