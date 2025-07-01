@@ -80,6 +80,8 @@ public class CameraManager : MonoBehaviour
                 // config curve
                 easeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             }
+            if (playerObject == null)
+                playerObject = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject;
         }
     }
 
@@ -219,8 +221,8 @@ public class CameraManager : MonoBehaviour
 
     void GetFollowTarget()
     {
-        cameraTargetPosition = playerObject.transform.position;
-        cameraTargetPosition += GetPosOffset(mode);
+        cameraTargetPosition = GetPosOffset(mode);
+        cameraTargetPosition += playerObject.transform.position;
         cameraTargetRotation = GetRotOffset(mode);
     }
 

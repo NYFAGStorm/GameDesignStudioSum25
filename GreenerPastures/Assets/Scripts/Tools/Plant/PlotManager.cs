@@ -194,7 +194,7 @@ public class PlotManager : MonoBehaviour
         if (data.plant.type != PlantType.Default)
         {
             // plant image set
-            plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant.growth, data.plant.isHarvested);
+            plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
         }
     }
 
@@ -442,7 +442,7 @@ public class PlotManager : MonoBehaviour
             return;
 
         // cannot harvest unless a plant exists, plant at 100% growth and not yet harvested
-        if (plant == null || data.plant.growth < 1f || (data.plant.isHarvested || !data.plant.canReFruit))
+        if (plant == null || data.plant.growth < 1f || (data.plant.isHarvested && !data.plant.canReFruit))
             return;
 
         if (action != CurrentAction.Harvesting && action != CurrentAction.None)
@@ -578,10 +578,6 @@ public class PlotManager : MonoBehaviour
         if (actionCompleteTimer > 0f && !actionClear)
             return;
 
-        // cannot uproot unless plant exists in this plot
-        //if (plant == null)
-        //    return;
-
         if (action != CurrentAction.Uprooting && action != CurrentAction.None)
             return;
         action = CurrentAction.Uprooting;
@@ -597,7 +593,7 @@ public class PlotManager : MonoBehaviour
             r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
         // player would collect stalk or full plant as inventory at this point if growth >50%
         // stalk if harvested, plant if not (data retains both isHarvested and growth)
-        if (data.plant.growth > 0.5f)
+        if (data.plant.growth > 0.5f || (data.plant.isHarvested && data.plant.canReFruit) )
         {
             // check if empty inventory slot availbale on player, drop loose if not
             if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
@@ -608,7 +604,7 @@ public class PlotManager : MonoBehaviour
                     Debug.LogWarning("--- PlotManager [UprootPlot] : unable to initialize plant or stalk item. will ignore.");
                 else
                 {
-                    if (data.plant.isHarvested)
+                    if (data.plant.isHarvested && !data.plant.canReFruit)
                     {
                         iData.type = ItemType.Stalk;
                         iData.name = "Stalk";
@@ -627,7 +623,7 @@ public class PlotManager : MonoBehaviour
                 LooseItemData loose = InventorySystem.CreateItem(ItemType.Plant);
                 // transfer properties of plant to item (revise item data)
                 loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
-                if (data.plant.isHarvested)
+                if (data.plant.isHarvested && !data.plant.canReFruit)
                 {
                     loose.inv.items[0].type = ItemType.Stalk;
                     loose.inv.items[0].name = "Stalk (" + data.plant.type.ToString() + ")";

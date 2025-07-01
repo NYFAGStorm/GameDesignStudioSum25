@@ -338,8 +338,23 @@ public class PlayerControlManager : MonoBehaviour
             Start(); // REFACTOR: migrate bc this needs to happen every time
 
         ProfileData profData = saveMgr.GetCurrentProfile();
+        if (profData == null)
+        {
+            Debug.LogError("--- PlayerControlManager [SetPlayerData] : no current profile data. aborting.");
+            return;
+        }
         GameData gameData = saveMgr.GetCurrentGameData();
+        if (gameData == null)
+        {
+            Debug.LogError("--- PlayerControlManager [SetPlayerData] : no current game data. aborting.");
+            return;
+        }
         playerData = GameSystem.GetProfilePlayer(gameData, profData);
+        if (playerData == null)
+        {
+            Debug.LogError("--- PlayerControlManager [SetPlayerData] : no profile player data. aborting.");
+            return;
+        }
         // connecting property to data _as a reference_
         playerInventory = playerData.inventory;
         playerName = playerData.playerName;
@@ -384,16 +399,27 @@ public class PlayerControlManager : MonoBehaviour
         for (int i = 0; i < playerData.farm.plots.Length; i++)
         {
             PlotData pData = playerData.farm.plots[i];
+            if (pData == null)
+            {
+                Debug.LogError("--- PlayerControlManager [ConfigurePlayerFarm] : player farm plot data missing. will ignore.");
+                continue;
+            }
+            else
+                pData.location = playerData.farm.plots[i].location;
             GameObject plot = GameObject.Instantiate((GameObject)Resources.Load("Plot"));
             plot.name = "Plot";
             PlotManager pm = plot.GetComponent<PlotManager>();
+            if (pm == null)
+            {
+                Debug.LogError("--- PlayerControlManager [ConfigurePlayerFarm] : plot manager not available on plot prefab. aborting.");
+                return false;
+            }    
             pm.data = pData;
             Vector3 pos = Vector3.zero;
             pos.x = pData.location.x;
             pos.y = pData.location.y;
             pos.z = pData.location.z;
             plot.transform.position = pos + islandObj.transform.position;
-            // NOTE: this next step was necessary for data on pm
             // ensure plot manager location is set
             pm.data.location = pData.location;
             if (pData.condition > PlotCondition.Wild)
@@ -408,15 +434,25 @@ public class PlayerControlManager : MonoBehaviour
             // establish plant
             if (pData.plant.type != PlantType.Default)
             {
+                if (pData.plant == null)
+                {
+                    Debug.LogError("--- PlayerControlManager [ConfigurePlayerFarm] : plant data missing for plant type '" +pData.plant.type+"'. aborting.");
+                    return false;
+                }
                 pm.plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 pm.plant.transform.position = plot.transform.position;
                 pm.plant.transform.parent = plot.transform;
                 pm.data.plant = pData.plant;
                 // set plant image now
-                pm.plant.GetComponent<PlantManager>().ForceGrowthImage(pData.plant.growth, pData.plant.isHarvested);
+                pm.plant.GetComponent<PlantManager>().ForceGrowthImage(pData.plant);
             }
             // set ground texture based on condition
             Renderer r = plot.transform.Find("Ground").gameObject.GetComponent<Renderer>();
+            if (r == null)
+            {
+                Debug.LogError("--- PlayerControlManager [ConfigurePlayerFarm] : plot missing 'ground' renderer. aborting.");
+                return false;
+            }
             switch (pData.condition)
             {
                 case PlotCondition.Default:

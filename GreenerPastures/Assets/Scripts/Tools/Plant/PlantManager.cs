@@ -70,7 +70,7 @@ public class PlantManager : MonoBehaviour
                 {
                     plot.data.plant.growth = Mathf.Clamp01(plot.data.plant.growth + growthDelta);
                     // show growth change
-                    Grow(plot.data.plant.growth);
+                    Grow(plot.data.plant);
                     // calculate quality
                     if (!plot.data.plant.isHarvested)
                         plot.data.plant.quality += growthDelta * plot.data.plant.vitality;
@@ -86,21 +86,21 @@ public class PlantManager : MonoBehaviour
     /// </summary>
     /// <param name="growthAmount">growth amount</param>
     /// <param name="harvested">is this plant harvested</param>
-    public void ForceGrowthImage( float growthAmount, bool harvested )
+    public void ForceGrowthImage( PlantData plantData )
     {
         // if called from data distribution routine, this needs to be established
         if (plantImage == null)
             plantImage = transform.Find("Plant Image").gameObject.GetComponent<Renderer>();
-        Grow(growthAmount);
-        if (harvested)
+        Grow(plantData);
+        if (plantData.isHarvested)
             plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
     }
 
-    void Grow( float growth )
+    void Grow( PlantData pData )
     {
-        int growNumber = Mathf.RoundToInt(growth * 4f);
+        int growNumber = Mathf.RoundToInt(pData.growth * 4f);
         // if a re-fruiting plant, and has harvested, keep image near top end
-        if ( plot.data.plant.canReFruit && plot.data.plant.isHarvested )
+        if (pData.canReFruit && pData.isHarvested)
             growNumber = Mathf.Clamp(growNumber, 3, 4);
         switch (growNumber)
         {

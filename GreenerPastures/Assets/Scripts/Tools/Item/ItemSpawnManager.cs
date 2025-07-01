@@ -286,7 +286,7 @@ public class ItemSpawnManager : MonoBehaviour
                 GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 plantObj.transform.parent = plots[i].gameObject.transform;
                 plantObj.transform.position = plots[i].gameObject.transform.position;
-                // REVIEW: how to configure proper plant prefab and art
+                // configure proper plant prefab and art
                 Texture2D t;
                 if (iData.type == ItemType.Stalk)
                     t = (Texture2D)Resources.Load("ProtoPlant_Stalk");
@@ -297,10 +297,10 @@ public class ItemSpawnManager : MonoBehaviour
                 PlantData plant = PlantSystem.InitializePlant(iData.plant);
                 plots[i].data.plant = plant;
                 // configure individual plant properties from item data
-                plots[i].data.plant.growth = iData.size;
+                plots[i].data.plant.growth = Mathf.Clamp01(0.01f+iData.size); // some growth to trigger grow art
                 plots[i].data.plant.health = iData.health;
                 plots[i].data.plant.quality = iData.quality;
-                plots[i].data.plant.isHarvested = (iData.type == ItemType.Stalk);
+                plots[i].data.plant.isHarvested = (iData.type == ItemType.Stalk || (iData.type == ItemType.Plant && plant.canReFruit));
                 plots[i].gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>().material.mainTexture = 
                     (Texture2D)Resources.Load("ProtoPlot_Tilled");
                 // NOTE: we have skipped improving soil quality
