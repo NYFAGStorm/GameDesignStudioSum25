@@ -29,12 +29,13 @@ public struct MultiplayerHostPing
     public GameOptionsData options; // this game's options
 }
 
-// a scanning remote client should provide this to hosts running a game
+// a scanning remote client should provide this to a host running a game
+// NOTE: this request result means the remote client may select this game
 [System.Serializable]
-public struct MultiplayerRemotePing
+public struct MultiplayerRemoteRequest
 {
     public string profileID; // this is a unique identifier for profiles (games know this)
-    public string[] gameKeys; // an array of game keys that this profile has been in as a player
+    public string playerName; // the player name this profile would use in the game
 
     // (can match this ping to a player who has been in this game before)
     // either a player can join because a) they have been in the game before,

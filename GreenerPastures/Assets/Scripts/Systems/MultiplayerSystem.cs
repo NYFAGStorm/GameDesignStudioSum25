@@ -77,6 +77,7 @@ public static class MultiplayerSystem
             retPing.profiles[i] = gData.players[i].profileID;
             retPing.playerNames[i] = gData.players[i].playerName;
         }
+        retPing.options = gData.options;
 
         return retPing;
     }
@@ -128,29 +129,35 @@ public static class MultiplayerSystem
     }
 
     /// <summary>
-    /// Forms a signal to join from remote client to host, given profile data and player name
+    /// Forms a request to select game from remote client to host, given profile data and player name
     /// </summary>
     /// <param name="pData">profile data</param>
     /// <param name="pName">player name</param>
-    /// <returns>formed multiplayer remove join signal structure</returns>
-    public static MultiplayerRemoteJoin FormRemoteJoin( ProfileData pData, string pName )
+    /// <returns>formed multiplayer remote request signal structure</returns>
+    public static MultiplayerRemoteRequest FormRemoteRequest( ProfileData pData, string pName )
     {
-        MultiplayerRemoteJoin retJoin = new MultiplayerRemoteJoin();
+        MultiplayerRemoteRequest retRequest = new MultiplayerRemoteRequest();
 
         // validate
         if (pData == null || pName == "")
         {
-            UnityEngine.Debug.LogError("--- MultiplayerSystem [FormRemoteJoin] : invalid profile data or empty name. returning empty join structure.");
-            return retJoin;
+            UnityEngine.Debug.LogError("--- MultiplayerSystem [FormRemoteRequest] : invalid profile data or empty name. returning empty request structure.");
+            return retRequest;
         }
 
-        retJoin.profileID = pData.profileID;
-        retJoin.playerName = pName;
+        retRequest.profileID = pData.profileID;
+        retRequest.playerName = pName;
 
-        return retJoin;
+        return retRequest;
     }
 
-    public static bool HandleRemoteJoinRequest( GameData gData, MultiplayerRemoteJoin request )
+    /// <summary>
+    /// A host uses this function when a remote client is trying to select this game (will join upon "Play")
+    /// </summary>
+    /// <param name="gData">the host's game data</param>
+    /// <param name="request">the remote </param>
+    /// <returns></returns>
+    public static bool HandleRemoteInvitationRequest( GameData gData, MultiplayerRemoteJoin request )
     {
         bool retBool = false;
 

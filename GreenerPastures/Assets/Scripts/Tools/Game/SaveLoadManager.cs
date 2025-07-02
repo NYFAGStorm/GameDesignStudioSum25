@@ -140,6 +140,24 @@ public class SaveLoadManager : MonoBehaviour
         joiningPlayerName = playerName;
     }
 
+    /// <summary>
+    /// Creates a host ping data from current loaded game, for hosts to use
+    /// </summary>
+    /// <returns>formed multiplayer host ping data from current loaded game</returns>
+    public MultiplayerHostPing CreateHostPing()
+    {
+        MultiplayerHostPing retPing = new MultiplayerHostPing();
+
+        if (game == null)
+        {
+            Debug.LogError("--- SaveLoadManager [CreateHostPing] : no game data loaded. aborting.");
+            return retPing;
+        }
+        retPing = MultiplayerSystem.FormHostPing(game);
+
+        return retPing;
+    }
+
     string GetGameDataPath()
     {
         return persistentPath;

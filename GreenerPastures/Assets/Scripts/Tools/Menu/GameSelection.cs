@@ -822,11 +822,11 @@ public class GameSelection : MonoBehaviour
                     }
                     else
                         popPlayerName = playerName;
-                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), popPlayerName);
-                    // TODO: send remote join signal, hear back from host
-                    // on host, that's MultiplayerSystem.HandleRemoteJoinRequest(saveMgr.GetCurrentGameData(), rJoin)
+                    MultiplayerRemoteRequest rRequest = MultiplayerSystem.FormRemoteRequest(saveMgr.GetCurrentProfile(), popPlayerName);
+                    // TODO: send remote request signal, hear back from host
+                    // on host, that's MultiplayerSystem.HandleRemoteInvitationRequest(saveMgr.GetCurrentGameData(), rRequest)
                     // NOTE: ! the following _actually_ needs to be a function call to the host, returning a bool value
-                    if (true) //if (MultiplayerSystem.HandleRemoteJoinRequest(saveMgr.GetCurrentGameData(), rJoin))
+                    if (true) //if (MultiplayerSystem.HandleRemoteInvitationRequest(saveMgr.GetCurrentGameData(), rRequest))
                     {
                         // 'true' holds hostPing data to allow main menu "play" to join
                         currentNet = hostPings[i];
@@ -839,7 +839,7 @@ public class GameSelection : MonoBehaviour
                         saveMgr.SetIsRemoteClient(true);
                         saveMgr.SetHostPing(currentNet, popPlayerName);
 
-                        // REVIEW: player name and join when "PLAY" is pressed on main menu?
+                        // when "PLAY" is pressed on main menu, join
 
                         // if new player, host has ability to add player after create player
                         // PlayerSystem.InitializePlayer(playerName, profID), and add with
@@ -851,7 +851,7 @@ public class GameSelection : MonoBehaviour
                     }
                     else
                     {
-                        // join signal returned as rejected
+                        // request signal returned as rejected
                         currentNet = new MultiplayerHostPing(); // empty
                         popPlayerName = "";
                         saveMgr.SetIsRemoteClient(false);
