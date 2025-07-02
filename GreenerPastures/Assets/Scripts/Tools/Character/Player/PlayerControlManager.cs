@@ -36,6 +36,7 @@ public class PlayerControlManager : MonoBehaviour
         public bool rBump;
         public bool rBumpDown;
         public bool castMagic;
+        public bool graftPlant;
     }
 
     public KeyCode upKey = KeyCode.W;
@@ -49,6 +50,7 @@ public class PlayerControlManager : MonoBehaviour
     public KeyCode lBumpKey = KeyCode.LeftBracket;
     public KeyCode rBumpKey = KeyCode.RightBracket;
     public KeyCode castKey = KeyCode.Q;
+    public KeyCode graftKey = KeyCode.G;
 
     public bool characterFrozen; // prevent movement controls
     public bool freezeCharacterActions; // prevent use of action controls
@@ -247,9 +249,12 @@ public class PlayerControlManager : MonoBehaviour
                 activePlot.HarvestPlant();
             if (characterActions.actionD)
                 activePlot.UprootPlot();
+            if (characterActions.graftPlant)
+                activePlot.GraftPlant();
             // if all controls un-pressed, signal plot action clear
             if (!characterActions.actionA && !characterActions.actionB &&
-                !characterActions.actionC && !characterActions.actionD)
+                !characterActions.actionC && !characterActions.actionD &&
+                !characterActions.graftPlant)
                 activePlot.ActionClear();
         }
 
@@ -657,6 +662,7 @@ public class PlayerControlManager : MonoBehaviour
         characterActions.rBumpDown = Input.GetKeyDown(rBumpKey);
         // REVIEW: no need for hold control of cast magic
         characterActions.castMagic = Input.GetKeyDown(castKey);
+        characterActions.graftPlant = Input.GetKey(graftKey);
 
         if (padMgr != null && padMgr.gamepads[0].isActive)
         {

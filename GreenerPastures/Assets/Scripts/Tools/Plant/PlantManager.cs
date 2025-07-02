@@ -75,7 +75,7 @@ public class PlantManager : MonoBehaviour
                     if (!plot.data.plant.isHarvested)
                         plot.data.plant.quality += growthDelta * plot.data.plant.vitality;
                 }
-
+                plot.data.plant.quality = Mathf.Clamp01(plot.data.plant.quality);
                 plantTimer = PLANTCHECKINTERVAL;
             }
         }

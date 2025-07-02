@@ -52,6 +52,12 @@ public static class PlantSystem
         return retBool;
     }
 
+    /// <summary>
+    /// Configures plant data given initialized plant data and a plant type
+    /// </summary>
+    /// <param name="data">plant data</param>
+    /// <param name="type">plant type</param>
+    /// <returns>configured plant data</returns>
     static PlantData ConfigurePlantByType( PlantData data, PlantType type )
     {
         PlantData retData = data;
@@ -420,5 +426,97 @@ public static class PlantSystem
         }
 
         return retData;
+    }
+
+    public static PlantData GetGraftResult( PlantData stalk, PlantData fruit )
+    {
+        PlantData retPlant = stalk;
+
+        switch (stalk.type)
+        {
+            case PlantType.Corn:
+                // poppy fruit = popcorn type
+                if (fruit.type == PlantType.Poppy)
+                    retPlant = InitializePlant(PlantType.Popcorn);
+                break;
+            case PlantType.Sunflower:
+                // moonflower fruit = eclipse flower type
+                if (fruit.type == PlantType.Moonflower)
+                    retPlant = InitializePlant(PlantType.EclipseFlower);
+                break;
+            case PlantType.Apple:
+                // marigold fruit = golden apple type
+                if (fruit.type == PlantType.Marigold)
+                    retPlant = InitializePlant(PlantType.GoldenApple);
+                break;
+            case PlantType.Underbloom:
+                // pumpkin fruit = hollowbloom type
+                if (fruit.type == PlantType.Pumpkin)
+                    retPlant = InitializePlant(PlantType.Hollowbloom);
+                break;
+            case PlantType.WaterLily:
+                // snowgrace fruit = frost lily
+                if (fruit.type == PlantType.Snowgrace)
+                    retPlant = InitializePlant(PlantType.FrostLily);
+                break;
+            case PlantType.Marigold:
+                // magnolia fruit or myosotis fruit = mysteria type
+                if (fruit.type == PlantType.Magnolia || fruit.type == PlantType.Myosotis)
+                    retPlant = InitializePlant(PlantType.Mysteria);
+                break;
+            case PlantType.Rose:
+                // chrystallia fruit = crystal rose
+                if (fruit.type == PlantType.Chrystalia)
+                    retPlant = InitializePlant(PlantType.CrystalRose);
+                break;
+            case PlantType.Mandrake:
+                // any 'rare' rarity fruit = dragonroot type
+                if (fruit.rarity == PlantRarity.Rare)
+                    retPlant = InitializePlant(PlantType.Dragonroot);
+                break;
+            case PlantType.FrostLily:
+                // crystal rose fruit = winter rose type
+                if (fruit.type == PlantType.CrystalRose)
+                    retPlant = InitializePlant(PlantType.WinterRose);
+                break;
+            case PlantType.Orange:
+                // banana fruit = tropicus type
+                if (fruit.type == PlantType.Banana)
+                    retPlant = InitializePlant(PlantType.Tropicus);
+                break;
+            case PlantType.Coconut:
+                // lemon fruit = tropicus type
+                if (fruit.type == PlantType.Lemon)
+                    retPlant = InitializePlant(PlantType.Tropicus);
+                break;
+            case PlantType.EclipseFlower:
+                // hollowbloom fruit = mourning nyx type
+                if (fruit.type == PlantType.Hollowbloom)
+                    retPlant = InitializePlant(PlantType.MourningNyx);
+                break;
+            case PlantType.Popcorn:
+                // golden apple fruit = blast apple type
+                if (fruit.type == PlantType.GoldenApple)
+                    retPlant = InitializePlant(PlantType.BlastApple);
+                break;
+            case PlantType.Mysteria:
+                // lotus fruit = druid's lotus type
+                if (fruit.type == PlantType.Lotus)
+                    retPlant = InitializePlant(PlantType.DruidsLotus);
+                break;
+            case PlantType.Tomato:
+                // pumpkin fruit = splat berry type
+                if (fruit.type == PlantType.Pumpkin)
+                    retPlant = InitializePlant(PlantType.SplatBerry);
+                break;
+        }
+
+        retPlant.growth = fruit.growth;
+        retPlant.vitality = fruit.vitality;
+        retPlant.health = fruit.health;
+        retPlant.quality = fruit.quality;
+        retPlant.isHarvested = false;
+
+        return retPlant;
     }
 }

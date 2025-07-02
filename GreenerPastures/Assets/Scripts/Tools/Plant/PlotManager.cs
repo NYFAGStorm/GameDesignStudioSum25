@@ -12,7 +12,8 @@ public class PlotManager : MonoBehaviour
         Planting,
         Watering,
         Harvesting,
-        Uprooting
+        Uprooting,
+        Grafting
     }
 
     public PlotData data;
@@ -51,6 +52,8 @@ public class PlotManager : MonoBehaviour
     const float PLANTWINDOW = .5f;
     const float HARVESTWINDOW = 1.5f;
     const float UPROOTWINDOW = 2.5f;
+    const float GRAFTWINDOW = 3f;
+    // 
     const float ACTIONCOMPLETEDURATION = 0.5f;
     const float HARVESTDISPLAYDURATION = 1f;
     const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
@@ -626,7 +629,7 @@ public class PlotManager : MonoBehaviour
                 if (data.plant.isHarvested && !data.plant.canReFruit)
                 {
                     loose.inv.items[0].type = ItemType.Stalk;
-                    loose.inv.items[0].name = "Stalk (" + data.plant.type.ToString() + ")";
+                    loose.inv.items[0].name = "Stalk (" + data.plant.plantName + ")";
                 }
                 ism.SpawnItem(loose, gameObject.transform.position, target);
             }
@@ -636,6 +639,72 @@ public class PlotManager : MonoBehaviour
         data.plant = PlantSystem.InitializePlant(PlantType.Default);
         data.condition = PlotCondition.Uprooted;
         uprootedTimer = UPROOTEDPLOTPAUSE; // disallow plant drop in hole for a short time
+    }
+
+    public void GraftPlant()
+    {
+        if (actionDirty)
+            return;
+
+        if (actionCompleteTimer > 0f && !actionClear)
+            return;
+
+        if (plant == null || (data.plant.growth < 1f && !data.plant.canReFruit) || !data.plant.isHarvested)
+            return;
+
+        if (action != CurrentAction.Grafting && action != CurrentAction.None)
+            return;
+
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        ItemData iData = pcm.GetPlayerCurrentItemSelection();
+        if (iData == null || iData.type != ItemType.Fruit)
+        {
+            actionLabel = "Need Fruit Selected";
+            return;
+        }
+        else if (iData.plant == data.plant.type)
+        {
+            actionLabel = "Need Different Fruit";
+            return;
+        }
+        action = CurrentAction.Grafting;
+
+        if (!ActionComplete(GRAFTWINDOW, "GRAFTING..."))
+            return;
+
+        // graft result is either null (plant graft failed, drop fruit)
+        // or graft result is whole plant with plant type changed (un-harvested)
+
+        PlantData stalk = data.plant;
+        PlantData fruit = PlantSystem.InitializePlant(iData.plant);
+        fruit.type = iData.plant;
+        fruit.growth = iData.size;
+        fruit.health = iData.health;
+        fruit.quality = iData.quality;
+        PlantData newPlant = PlantSystem.GetGraftResult(stalk, fruit);
+        if (newPlant == stalk)
+        {
+            // result failed, drop fruit
+            ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
+            // drop as loose item
+            Vector3 target = gameObject.transform.position;
+            target.x += RandomSystem.GaussianRandom01() - .5f;
+            target.z -= 0.01f; // in front of plant
+            LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
+            // transfer properties of plant to item (revise item data)
+            loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], fruit);
+            ism.SpawnItem(loose, gameObject.transform.position, target);
+            // using data, remove from player inventory
+            pcm.DeleteCurrentItemSelection();
+        }
+        else
+        {
+            // graft succeeded, delete fruit from player inventory, change stalk
+            data.plant = newPlant;
+            plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
+            // using data, remove from player inventory
+            pcm.DeleteCurrentItemSelection();
+        }
     }
 
     void OnGUI()
