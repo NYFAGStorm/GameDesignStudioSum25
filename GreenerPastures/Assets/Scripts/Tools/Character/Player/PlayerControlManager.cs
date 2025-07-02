@@ -131,6 +131,7 @@ public class PlayerControlManager : MonoBehaviour
         {
             // TODO: fix in prep for multiplayer
             cam.SetPlayer(this);
+            GameObject.FindFirstObjectByType<InGameControls>().SetPlayerControlManager(this);
 
             if (saveMgr == null || !ALLOWPLAYERDATALOAD)
             {
