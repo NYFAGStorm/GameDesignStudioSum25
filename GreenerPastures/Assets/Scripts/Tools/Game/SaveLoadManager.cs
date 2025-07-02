@@ -12,6 +12,15 @@ public class SaveLoadManager : MonoBehaviour
     // <path>/GreenerRoster.dat
     // <path>/Games/GreenerGame-[gamekey].dat
 
+    // NOTE: as a central place for game data, this tool is used in net games
+    // As host, this game still holds the game data from save data files
+    // As remote client, this tool holds game data as sent from host
+    // Other tools can then still use this as the source of game data
+    private bool isRemoteClient; // has joined a host's game?
+    private MultiplayerHostPing currentHostPing; // host ping to use in join signal
+    private string joiningPlayerName; // used joining remote game as new player
+    // REVIEW: the alternative is developing a parallel tool doing same job
+
     private RosterData roster; // roster of profiles available (local)
 
     private ProfileData profile; // the current profile logged in (local)
@@ -25,7 +34,7 @@ public class SaveLoadManager : MonoBehaviour
     const string GAMESPATH = "/Games/";
     const string GAMEFILEPREFIX = "GreenerGame-";
     const string GAMEFILESUFFIX = ".dat";
-    const string VERSIONNUMBERSTRING = "06.28.0173.a";
+    const string VERSIONNUMBERSTRING = "07.02.0201.a";
 
     void Awake()
     {
@@ -82,6 +91,53 @@ public class SaveLoadManager : MonoBehaviour
     public string GetVersionNumber()
     {
         return VERSIONNUMBERSTRING;
+    }
+
+    /// <summary>
+    /// Returns true if this tool has been set to act as relay for host game data
+    /// </summary>
+    /// <returns>true if set to be remote client, false if is game host</returns>
+    public bool IsRemoteClient()
+    {
+        return isRemoteClient;
+    }
+
+    /// <summary>
+    /// Sets this tool to act as a relay for game data from the host owner of data
+    /// </summary>
+    /// <param name="isRemote">true if should act as remote client, false if host</param>
+    public void SetIsRemoteClient( bool isRemote )
+    {
+        isRemoteClient = isRemote;
+    }
+
+    /// <summary>
+    /// Returns the current host ping data structure for joining a remote game
+    /// </summary>
+    /// <returns>multiplayer host ping data</returns>
+    public MultiplayerHostPing GetJoinInfo()
+    {
+        return currentHostPing;
+    }
+
+    /// <summary>
+    /// Returns the configured joining player name
+    /// </summary>
+    /// <returns>player name to use in joining a host's game</returns>
+    public string GetJoiningPlayerName()
+    {
+        return joiningPlayerName;
+    }
+
+    /// <summary>
+    /// Sets the current host ping data for joining a remote game as playerName
+    /// </summary>
+    /// <param name="ping">multiplayer host ping data</param>
+    /// <param name="playerName">joining as player name</param>
+    public void SetHostPing( MultiplayerHostPing ping, string playerName )
+    {
+        currentHostPing = ping;
+        joiningPlayerName = playerName;
     }
 
     string GetGameDataPath()

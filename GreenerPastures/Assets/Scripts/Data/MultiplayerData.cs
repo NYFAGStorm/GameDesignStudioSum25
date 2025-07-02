@@ -26,6 +26,7 @@ public struct MultiplayerHostPing
     public int availablePlayerSlots; // game.options.maxPlayers - game.players.length
     public string[] profiles; // an array of profile IDs who have been in this game as players
     public string[] playerNames; // an array of player names matching the array of profile IDs
+    public GameOptionsData options; // this game's options
 }
 
 // a scanning remote client should provide this to hosts running a game
@@ -56,7 +57,8 @@ public class MultiplayerData
     public NetworkState network;
     public MultiplayerState state;
     public string profileID; // this local profile
-    public bool actingAsHost; // owner of game data
+    public bool actingAsHost; // is owner of game data?
     public string gameKey; // current game
     public string playerName; // game player name
+    public GameOptionsData options; // the game's options
 }

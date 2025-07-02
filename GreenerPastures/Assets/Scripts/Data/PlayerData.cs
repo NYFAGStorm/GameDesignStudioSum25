@@ -2,7 +2,7 @@
 
 // as we develop, continue to add statistics to keep for the player
 [System.Serializable]
-public class PlayerStats
+public struct PlayerStats
 {
     public float totalGameTime;
     public int totalPlanted;
@@ -10,6 +10,46 @@ public class PlayerStats
     public int totalGoldEarned;
     public int totalArcanaEarned;
     public int totalXPEarned;
+}
+
+public enum PlayerModelType
+{
+    Default,
+    Male,
+    Female
+}
+
+public enum PlayerSkinColor
+{
+    Default,
+    ToneA,
+    ToneB,
+    ToneC,
+    ToneD,
+    ToneE,
+    ToneF,
+    ToneG
+}
+
+public enum PlayerColor
+{
+    Default,
+    ColorA,
+    ColorB,
+    ColorC,
+    ColorD,
+    ColorE,
+    ColorF,
+    ColorG
+}
+
+[System.Serializable]
+public struct PlayerOptions
+{
+    public PlayerModelType model;
+    public PlayerSkinColor skinColor;
+    public PlayerColor mainColor;
+    public PlayerColor accentColor;
 }
 
 // if there are discrete effects that can be applied to a player character
@@ -28,6 +68,7 @@ public class PlayerData
 {
     public string playerName;
     public bool nowPlaying;
+    public PlayerOptions options;
     public PlayerStats stats;
     public string profileID;
     public FarmData farm;

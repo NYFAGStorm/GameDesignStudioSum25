@@ -36,7 +36,7 @@ public class GameSelection : MonoBehaviour
 
     private MultiplayerHostPing[] hostPings; // host pings heard (collect over 1s intervals)
     private bool tinyPopup; // ask new player name, offer "join" and "cancel"
-    private string newPlayerName;
+    private MultiplayerHostPing currentNet; // the host ping selected to join
 
     private string popGameName;
     private string popPlayerName;
@@ -145,7 +145,6 @@ public class GameSelection : MonoBehaviour
         {
             PlayerData pData = GameSystem.GetProfilePlayer(saveMgr.GetCurrentGameData(), saveMgr.GetCurrentProfile());
             gamePlayerName = pData.playerName;
-
         }
     }
 
@@ -245,28 +244,30 @@ public class GameSelection : MonoBehaviour
                 g.alignment = TextAnchor.MiddleCenter;
                 g.fontStyle = FontStyle.Italic;
                 s = "Playing as '" + gamePlayerName + "' in this game";
+                if (saveMgr.IsRemoteClient())
+                    s = "Playing as '" + popPlayerName + "' in this game";
                 GUI.Label(r, s, g);
             }
 
-            // text fields (read-only if not new)
+            // text fields (read-only if not new or if remote)
             // . name
             r.x += 0.25f * w;
             r.y -= 0.375f * h;
             r.width = 0.2f * w;
-            if (newGame)
+            if (newGame && !saveMgr.IsRemoteClient())
                 g = new GUIStyle(GUI.skin.textField);
             g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
             g.alignment = TextAnchor.MiddleCenter;
             g.normal.textColor = labelFontColor;
             g.hover.textColor = labelFontColor;
             g.active.textColor = labelFontColor;
-            if (newGame)
+            if (newGame && !saveMgr.IsRemoteClient())
                 popGameName = GUI.TextField(r, popGameName, 20, g);
             else
                 GUI.Label(r, popGameName, g);
 
             // buttons (option buttons disabled if not new)
-            GUI.enabled = newGame;
+            GUI.enabled = newGame && !saveMgr.IsRemoteClient();
             // . + / - max players
             // . toggle cheats
             // . toggle hazards
@@ -285,7 +286,8 @@ public class GameSelection : MonoBehaviour
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "-";
-            if (GUI.Button(r, s, g)) // TODO: gamepad support
+            if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
+                padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
             {
                 popMaxPlayers--;
                 popMaxPlayers = Mathf.Clamp(popMaxPlayers, 1, 8);
@@ -295,7 +297,8 @@ public class GameSelection : MonoBehaviour
             if (padButtonSelection == 1)
                 g.normal.textColor = Color.white;
             s = "+";
-            if (GUI.Button(r, s, g)) // TODO: gamepad support
+            if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
+                padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
             {
                 popMaxPlayers++;
                 popMaxPlayers = Mathf.Clamp(popMaxPlayers, 1, 8);
@@ -309,7 +312,8 @@ public class GameSelection : MonoBehaviour
             s = "ALLOWED";
             if (!popAllowCheats)
                 s = "OFF";
-            if (GUI.Button(r, s, g)) // TODO: gamepad support
+            if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
+                padButtonSelection == 2 && padMgr.gPadDown[0].aButton))
             {
                 popAllowCheats = !popAllowCheats;
             }
@@ -320,7 +324,8 @@ public class GameSelection : MonoBehaviour
             s = "ALLOWED";
             if (!popAllowHazards)
                 s = "OFF";
-            if (GUI.Button(r, s, g)) // TODO: gamepad support
+            if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
+                padButtonSelection == 3 && padMgr.gPadDown[0].aButton))
             {
                 popAllowHazards = !popAllowHazards;
             }
@@ -331,7 +336,8 @@ public class GameSelection : MonoBehaviour
             s = "ALLOWED";
             if (!popAllowCurses)
                 s = "OFF";
-            if (GUI.Button(r, s, g)) // TODO: gamepad support
+            if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
+                padButtonSelection == 4 && padMgr.gPadDown[0].aButton))
             {
                 popAllowCurses = !popAllowCurses;
             }
@@ -358,7 +364,10 @@ public class GameSelection : MonoBehaviour
                 g.hover.textColor = labelFontColor;
                 g.active.textColor = labelFontColor;
                 GUI.enabled = true;
-                GUI.Label(r, ("Playing as '" + gamePlayerName + "' in this game"), g);
+                s = "Playing as '" + gamePlayerName + "' in this game";
+                if (saveMgr.IsRemoteClient())
+                    s = "Playing as '" + popPlayerName + "' in this game";
+                GUI.Label(r, s, g);
             }
             GUI.enabled = true;
 
@@ -375,13 +384,15 @@ public class GameSelection : MonoBehaviour
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "UNLOAD";
+            if (saveMgr.IsRemoteClient())
+                s = "DESELECT";
             if (newGame)
                 s = "CREATE";
             // validate new game info (game name and player name)
             if (newGame)
                 GUI.enabled = (popGameName != "" && popPlayerName != "");
             if (GUI.Button(r, s, g) || (padMgr != null &&
-                padMgr.gamepads[0].isActive && 
+                padMgr.gamepads[0].isActive &&
                 ((gamePopup && padButtonSelection == 5) || (!gamePopup && padButtonSelection == 0)) &&
                 padMgr.gPadDown[0].aButton))
             {
@@ -404,6 +415,15 @@ public class GameSelection : MonoBehaviour
                     saveMgr.SaveGameData(newGameData.gameKey);
                     gamePlayerName = popPlayerName;
                     selectionFeedback = "new game created";
+                    feedbackTimer = FEEDBACKTIME;
+                }
+                else if (saveMgr.IsRemoteClient())
+                {
+                    currentNet = new MultiplayerHostPing(); // empty
+                    popPlayerName = "";
+                    saveMgr.SetIsRemoteClient(false);
+                    saveMgr.SetHostPing(currentNet, popPlayerName);
+                    selectionFeedback = "net game deselected";
                     feedbackTimer = FEEDBACKTIME;
                 }
                 else
@@ -462,7 +482,13 @@ public class GameSelection : MonoBehaviour
         g.fontStyle = FontStyle.Bold;
         g.alignment = TextAnchor.MiddleCenter;
         s = "CURRENT GAME:\n";
-        if ( gameLoaded )
+        if (saveMgr.IsRemoteClient())
+        {
+            s += "Playing as '" + popPlayerName + "' in ";
+            s += popGameName + "\n";
+            s += "(a network game you may join)";
+        }
+        else if ( gameLoaded )
         {
             GameData gData = saveMgr.GetCurrentGameData();
             gamePlayerName = GameSystem.GetProfilePlayer( gData, saveMgr.GetCurrentProfile() ).playerName;
@@ -497,13 +523,27 @@ public class GameSelection : MonoBehaviour
         g.active.textColor = buttonFontColor;
         s = "Game Options";
 
-        GUI.enabled = (gameLoaded && !tinyPopup);
+        GUI.enabled = ((gameLoaded || saveMgr.IsRemoteClient()) && !tinyPopup);
         if (GUI.Button(r, s, g) || 
             (padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
         {
             newGame = false;
-            GameData gData = saveMgr.GetCurrentGameData();
-            if (gData != null)
+            GameData gData = new GameData();
+            if (saveMgr.IsGameCurrentlyLoaded())
+                gData = saveMgr.GetCurrentGameData();
+            else
+                ConfigureCurrentGameEnabled();
+            if (saveMgr.IsRemoteClient())
+            {
+                int idx = currentNet.gameKey.IndexOf("]-");
+                popGameName = currentNet.gameKey.Substring(idx + 2);
+                popMaxPlayers = currentNet.options.maxPlayers;
+                popAllowCheats = currentNet.options.allowCheats;
+                popAllowHazards = currentNet.options.allowHazards;
+                popAllowCurses = currentNet.options.allowCurses;
+                // popPlayerName already received
+            }
+            else if (gData != null)
             {
                 popGameName = gData.gameName;
                 popMaxPlayers = gData.options.maxPlayers;
@@ -534,6 +574,19 @@ public class GameSelection : MonoBehaviour
 
         if (GUI.Button(r, s, g) || (padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
         {
+            // unload current game data
+            if (saveMgr.IsGameCurrentlyLoaded())
+            {
+                // save current and clear current
+                saveMgr.SaveGameData(saveMgr.GetCurrentGameData().gameKey);
+                saveMgr.ClearCurrentGameData();
+            }
+            // REVIEW: if create game is selected, net game selection is abandoned
+            currentNet = new MultiplayerHostPing(); // empty
+            popPlayerName = "";
+            saveMgr.SetIsRemoteClient(false);
+            saveMgr.SetHostPing(currentNet, popPlayerName);
+            // --
             newGame = true;
             GameData gData = GameSystem.InitializeGame("temp"); // get default options
             popGameName = "UNNAMED GAME";
@@ -597,14 +650,22 @@ public class GameSelection : MonoBehaviour
                 g.active.textColor = buttonFontColor;
                 s = "[SAVED " + (i+1) + "] : " + list[i];
 
-                if (gameLoaded)
+                if (gameLoaded && saveMgr.IsGameCurrentlyLoaded())
                     GUI.enabled = saveMgr.GetCurrentGameData().gameKey != list[i];
+                else
+                    ConfigureCurrentGameEnabled();
 
                 if (tinyPopup)
-                    GUI.enabled = false;
+                        GUI.enabled = false;
 
                 if (GUI.Button(r, s, g) || (padButtonSelection == (2+i) && padMgr.gPadDown[0].aButton))
                 {
+                    // REVIEW: if saved game is selected, net game selection is abandoned
+                    currentNet = new MultiplayerHostPing(); // empty
+                    popPlayerName = "";
+                    saveMgr.SetIsRemoteClient(false);
+                    saveMgr.SetHostPing(currentNet, popPlayerName);
+                    // --
                     // unload current game data
                     if (saveMgr.IsGameCurrentlyLoaded())
                     {
@@ -674,12 +735,22 @@ public class GameSelection : MonoBehaviour
             hostPings[0].playerNames = new string[2];
             hostPings[0].playerNames[0] = "host player name";
             hostPings[0].playerNames[1] = "your name";
+            hostPings[0].options = new GameOptionsData();
+            hostPings[0].options.maxPlayers = 2;
+            hostPings[0].options.allowCheats = true;
+            hostPings[0].options.allowHazards = true;
+            hostPings[0].options.allowCurses = true;
             hostPings[1].gameKey = "[111]-another game";
             hostPings[1].availablePlayerSlots = 0;
             hostPings[1].profiles = new string[1];
             hostPings[1].profiles[0] = "hostprofile";
             hostPings[1].playerNames = new string[1];
             hostPings[1].playerNames[0] = "host player name";
+            hostPings[1].options = new GameOptionsData();
+            hostPings[1].options.maxPlayers = 1;
+            hostPings[1].options.allowCheats = false;
+            hostPings[1].options.allowHazards = false;
+            hostPings[1].options.allowCurses = false;
             // ---
             string[] list = new string[hostPings.Length];
             // parse host pings' data
@@ -713,12 +784,21 @@ public class GameSelection : MonoBehaviour
 
                 GUI.enabled = MultiplayerSystem.CanProfileJoinGame(currentProfileID, hostPings[i]);
 
+                if (hostPings[i].gameKey == currentNet.gameKey)
+                    GUI.enabled = false;
+
                 if (tinyPopup)
                     GUI.enabled = false;
 
                 if (GUI.Button(r, s, g) || 
                     (padButtonSelection == (2 + gamelistNum + i) && padMgr.gPadDown[0].aButton))
                 {
+                    // REVIEW: if net game is selected, previous net game selection is abandoned
+                    currentNet = new MultiplayerHostPing(); // empty
+                    popPlayerName = "";
+                    saveMgr.SetIsRemoteClient(false);
+                    saveMgr.SetHostPing(currentNet, popPlayerName);
+                    // --
                     // unload current game data
                     if (saveMgr.IsGameCurrentlyLoaded())
                     {
@@ -731,30 +811,46 @@ public class GameSelection : MonoBehaviour
                     {
                         // ask for joining player name in tiny popup
                         // from there, "Join" does the routine below
-                        newPlayerName = "";
+                        currentNet = hostPings[i];
                         tinyPopup = true;
                     }
                     else
-                        newPlayerName = playerName;
-                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), newPlayerName);
+                        popPlayerName = playerName;
+                    MultiplayerRemoteJoin rJoin = MultiplayerSystem.FormRemoteJoin(saveMgr.GetCurrentProfile(), popPlayerName);
                     // TODO: send remote join signal, hear back from host
                     // on host, that's MultiplayerSystem.HandleRemoteJoinRequest(saveMgr.GetCurrentGameData(), rJoin)
-                    if ( false ) // we get that bool result back and use it here
+                    // NOTE: ! the following _actually_ needs to be a function call to the host, returning a bool value
+                    if (true) //if (MultiplayerSystem.HandleRemoteJoinRequest(saveMgr.GetCurrentGameData(), rJoin))
                     {
-                        // where a 'true' result allows join immediately
+                        // 'true' holds hostPing data to allow main menu "play" to join
+                        currentNet = hostPings[i];
+                        int idx = currentNet.gameKey.IndexOf("]-");
+                        popGameName = currentNet.gameKey.Substring(idx + 2);
+                        popMaxPlayers = currentNet.options.maxPlayers;
+                        popAllowCheats = currentNet.options.allowCheats;
+                        popAllowHazards = currentNet.options.allowHazards;
+                        popAllowCurses = currentNet.options.allowCurses;
+                        saveMgr.SetIsRemoteClient(true);
+                        saveMgr.SetHostPing(currentNet, popPlayerName);
+
+                        // REVIEW: player name and join when "PLAY" is pressed on main menu?
 
                         // if new player, host has ability to add player after create player
                         // PlayerSystem.InitializePlayer(playerName, profID), and add with
                         // GameSystem.AddPlayer(gameData, playerData) ... 
                         // ... or if profile already exists in game just pick up latest data
-                        
-                        //newPlayerName = "";
+
+                        selectionFeedback = "net game selected";
+                        feedbackTimer = FEEDBACKTIME;
                     }
                     else
                     {
                         // join signal returned as rejected
-                        newPlayerName = "";
-                        selectionFeedback = "join request denied";
+                        currentNet = new MultiplayerHostPing(); // empty
+                        popPlayerName = "";
+                        saveMgr.SetIsRemoteClient(false);
+                        saveMgr.SetHostPing(currentNet, popPlayerName);
+                        selectionFeedback = "invitation request denied";
                         feedbackTimer = FEEDBACKTIME;
                     }
                 }
@@ -802,7 +898,7 @@ public class GameSelection : MonoBehaviour
             g = new GUIStyle(GUI.skin.textField);
             g.alignment = TextAnchor.MiddleCenter;
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
-            newPlayerName = GUI.TextField(r, newPlayerName, g);
+            popPlayerName = GUI.TextField(r, popPlayerName, g);
 
             r.x = 0.325f * w;
             r.y = 0.55f * h;
@@ -810,12 +906,22 @@ public class GameSelection : MonoBehaviour
             r.height = 0.075f * h;
             g = new GUIStyle(GUI.skin.button);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
-            s = "Join";
-            GUI.enabled = (newPlayerName != "");
+            s = "Accept";
+            GUI.enabled = (popPlayerName != "");
             if (GUI.Button(r, s, g))
             {
-                // TODO: join routine outlined above
+                // hold hostPing data to allow main menu "play" to join
+                int idx = currentNet.gameKey.IndexOf("]-");
+                popGameName = currentNet.gameKey.Substring(idx + 2);
+                popMaxPlayers = currentNet.options.maxPlayers;
+                popAllowCheats = currentNet.options.allowCheats;
+                popAllowHazards = currentNet.options.allowHazards;
+                popAllowCurses = currentNet.options.allowCurses;
+                saveMgr.SetIsRemoteClient(true);
+                saveMgr.SetHostPing(currentNet, popPlayerName);
                 tinyPopup = false;
+                selectionFeedback = "net game selected";
+                feedbackTimer = FEEDBACKTIME;
             }
 
             r.x = 0.525f * w;
@@ -823,8 +929,13 @@ public class GameSelection : MonoBehaviour
             GUI.enabled = true;
             if (GUI.Button(r, s, g))
             {
-                newPlayerName = "";
+                currentNet = new MultiplayerHostPing(); // empty
+                popPlayerName = "";
+                saveMgr.SetIsRemoteClient(false);
+                saveMgr.SetHostPing(currentNet, popPlayerName);
                 tinyPopup = false;
+                selectionFeedback = "net game selection cancelled";
+                feedbackTimer = FEEDBACKTIME;
             }
         }
 
