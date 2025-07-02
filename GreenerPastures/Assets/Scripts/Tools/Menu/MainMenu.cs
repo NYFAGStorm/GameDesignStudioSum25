@@ -51,6 +51,7 @@ public class MainMenu : MonoBehaviour
     private string profileName;
     private bool gameLoaded; // from data, is game data loaded
     private string gameName;
+    private bool netGameSelected; // for network, is game selected
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
@@ -185,7 +186,10 @@ public class MainMenu : MonoBehaviour
         gameLoaded = saveMgr.IsGameCurrentlyLoaded();
         if (gameLoaded)
             gameName = saveMgr.GetCurrentGameData().gameName;
-        buttons[0].buttonEnabled = (profileActive && gameLoaded);
+        netGameSelected = saveMgr.IsRemoteClient();
+        if (netGameSelected)
+            gameName = saveMgr.GetJoinInfo().gameKey.Substring(saveMgr.GetJoinInfo().gameKey.IndexOf("]-")+2);
+        buttons[0].buttonEnabled = (profileActive && (gameLoaded || netGameSelected));
         buttons[2].buttonEnabled = profileActive;
         buttons[3].buttonEnabled = profileActive;
     }
@@ -456,7 +460,7 @@ public class MainMenu : MonoBehaviour
                 s = "Profile : " + profileName;
                 g.fontSize = Mathf.RoundToInt((buttonFontSizeAt1024 - 8f) * (w / 1024f));
             }
-            if (i == GAMESELECTIONBUTTON && profileActive && gameLoaded)
+            if (i == GAMESELECTIONBUTTON && profileActive && (gameLoaded || netGameSelected))
             {
                 s = "Game : " + gameName;
                 g.fontSize = Mathf.RoundToInt((buttonFontSizeAt1024 - 8f) * (w / 1024f));
@@ -471,6 +475,14 @@ public class MainMenu : MonoBehaviour
                 {
                     if ((buttons[i].sceneName == "GreenerGame"))
                     {
+                        // NOTE: for net game, we JOIN here
+                        if ( saveMgr.IsRemoteClient() )
+                        {
+                            // use the host ping data and player name
+                            string joiningPlayerName = saveMgr.GetJoiningPlayerName();
+                            MultiplayerHostPing hostPingData = saveMgr.GetJoinInfo();
+                            // save load manager tool continues to be the source of game data
+                        }
                         // profile state update
                         saveMgr.GetCurrentProfile().state = ProfileState.Connecting;
                         // little cinematic menu fun

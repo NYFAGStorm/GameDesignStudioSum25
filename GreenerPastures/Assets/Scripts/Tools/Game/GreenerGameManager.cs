@@ -28,6 +28,12 @@ public class GreenerGameManager : MonoBehaviour
             game = saveMgr.GetCurrentGameData();
             if (noisyLogging)
                 Debug.Log("--- GreenerGameManager [Awake] : game data loaded for '" + game.gameName + "'");
+            if (game == null)
+            {
+                Debug.LogError("--- GreenerGameManager [Awake] : no game data. aborting.");
+                enabled = false;
+                return;
+            }
             if (game.state == GameState.Initializing)
             {
                 if (noisyLogging)

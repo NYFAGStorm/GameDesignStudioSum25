@@ -79,6 +79,12 @@ public class GameSelection : MonoBehaviour
         {
             popupCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             ConfigureCurrentGameEnabled();
+            // if selected net game, restore player name and host ping
+            if (saveMgr.IsRemoteClient())
+            {
+                popPlayerName = saveMgr.GetJoiningPlayerName();
+                currentNet = saveMgr.GetJoinInfo();
+            }
         }
     }
 

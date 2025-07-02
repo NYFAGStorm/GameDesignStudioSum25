@@ -96,7 +96,7 @@ public class QuitOnEscape : MonoBehaviour
             (padMgr != null && padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
         {
             GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
-            if (ggm != null)
+            if (ggm != null && ggm.enabled)
                 ggm.DoShutDownGameDataCollection();
             popup = false;
             SceneManager.LoadScene("Splash");
