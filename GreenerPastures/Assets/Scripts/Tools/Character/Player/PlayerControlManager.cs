@@ -285,7 +285,7 @@ public class PlayerControlManager : MonoBehaviour
                 r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
                 // fill (_MainTex, _Color)
                 r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizard_FillMain"));
-                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.accentColor));
+                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.mainColor));
             }
             else if (options.model == PlayerModelType.Female)
             {
@@ -299,7 +299,7 @@ public class PlayerControlManager : MonoBehaviour
                 r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
                 // fill (_MainTex, _Color)
                 r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizardF_FillMain"));
-                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.accentColor));
+                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.mainColor));
             }
         }
     }

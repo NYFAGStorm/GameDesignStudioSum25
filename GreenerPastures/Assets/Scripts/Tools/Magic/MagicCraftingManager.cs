@@ -239,6 +239,10 @@ public class MagicCraftingManager : MonoBehaviour
                     pcm.characterFrozen = true;
                     pcm.freezeCharacterActions = true;
                     pcm.hidePlayerHUD = true;
+                    // hide controls display hud item
+                    InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+                    if (igc != null)
+                        igc.enabled = false;
                     libraryState = LibraryState.Activating;
                     libraryStateTimer = LIBRARYSTATETIMERMAX;
                     // configure cauldron grid size
@@ -285,6 +289,10 @@ public class MagicCraftingManager : MonoBehaviour
                         pcm.characterFrozen = false;
                         pcm.freezeCharacterActions = false;
                         pcm.hidePlayerHUD = false;
+                        // hide controls display hud item
+                        InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+                        if (igc != null)
+                            igc.enabled = true;
                         libraryState = LibraryState.Deactivating;
                         libraryStateTimer = LIBRARYSTATETIMERMAX;
                         break;

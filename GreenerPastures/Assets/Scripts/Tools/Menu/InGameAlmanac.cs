@@ -90,10 +90,13 @@ public class InGameAlmanac : MonoBehaviour
         if ( Input.GetKeyDown(KeyCode.Backslash) )
         {
             showAlmanac = !showAlmanac;
+            // control player hud
+            if (showAlmanac && !pcm.hidePlayerHUD)
+                pcm.hidePlayerHUD = true;
+            if (!showAlmanac && pcm.hidePlayerHUD)
+                pcm.hidePlayerHUD = false;
         }
 
-        // control player hud
-        pcm.hidePlayerHUD = showAlmanac;
     }
 
     public void SetPlayerControlManager(PlayerControlManager pControlManager)
@@ -130,9 +133,9 @@ public class InGameAlmanac : MonoBehaviour
         GUI.Box(r, s, g);
 
         // PAGE BOX
-        r.x = 0.15f * w;
+        r.x = 0.125f * w;
         r.y = 0.125f * w;
-        r.width = 0.7f * w;
+        r.width = 0.75f * w;
         r.height = 0.55f * h;
         g = new GUIStyle(GUI.skin.box);
         c = Color.white;
@@ -224,7 +227,7 @@ public class InGameAlmanac : MonoBehaviour
         }
 
         // NAVIGATION BUTTONS (up and down)
-        r.x = 0.8f * w;
+        r.x = 0.8125f * w;
         r.y = 0.4f * h;
         r.width = 0.05f * w;
         r.height = r.width; // square

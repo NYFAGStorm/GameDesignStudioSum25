@@ -60,7 +60,10 @@ public class InGameControls : MonoBehaviour
         controlsDisplay = Input.GetKey(KeyCode.Tab);
 
         // control player hud
-        pcm.hidePlayerHUD = controlsDisplay;
+        if (controlsDisplay && !pcm.hidePlayerHUD)
+            pcm.hidePlayerHUD = true;
+        else if (pcm.hidePlayerHUD && Input.GetKeyUp(KeyCode.Tab))
+            pcm.hidePlayerHUD = false;
     }
 
     public void SetPlayerControlManager( PlayerControlManager pControlManager )

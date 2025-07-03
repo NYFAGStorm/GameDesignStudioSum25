@@ -3,9 +3,52 @@ using UnityEngine;
 public class PlayerIntroduction : MonoBehaviour
 {
     // Author: Glenn Storm
-    // Handles a popup seen only when a new player arrives, to configure options
+    // Handles a routine seen only when a new player arrives (a.k.a. onboarding)
 
+    // world view, clouds part
+    // zoom into Eden on central market island
+    // "Welcome Biomancer! My name is Eden. Tell me about yourself."
+    // popup displayed to configure options
+    // zoom out to normal follow view
+    // (can skip intro now)
+    // "We are so happy you chose to help grow our magical community."
+    // "Here we tend to the floating islands our Genesis Tree provides us."
+    // "This central island connects every other through our teleporter nodes."
+    // "Here is the market, where we can buy supplies and sell your wares."
+    // "Let me purchase a couple seeds and take you to your floating island."
+    // [pause - walk toward teleporter - island rise]
+    // "Isn't that a beautiful sight! Your new island with greener pastures."
+    // [walk to teleporter - teleport to island - walk to farm plot]
+    // "Here is your farm, where you are to grow crops, harvest and sell them."
+    // "We work the land and improve the soil. First let's get this plot ready."
+    // [till plot from wild - till plot from dirt]
+    // "We care for the land and it provides. Let's water this plot and plant."
+    // [water plot - drop seed - plant grows]
+    // "Different plants grow faster or slower, yield more or less, ..."
+    // "...some grow better in certain seasons, some even grow only at night!"
+    // "You can learn about everything in your Biomancer's Almanac. (PRESS \)"
+    // "With our plant all grown, we can harvest the fruit or flower."
+    // [harvest plant - flower drops, stalk remains]
+    // "Take your flower with the action button. Now, I'll dig up this stalk."
+    // [uproot stalk - stalk drops]
+    // "Stalks and other plant material go in the compost bin to make fertilizer."
+    // "By adding fertilizer to the soil, it improves and so does you harvest."
+    // [fertilizer drops - plot tilled to dirt]
+    // "Now you try. You can check the player controls by holding the TAB key."
+    // "All this hard work pays off at the market, and it all leads to magic."
+    // "When you level up, you'll find the magic crafting table in your tower."
+    // "On the table, your grimiore will have new spells available to craft."
+    // "Crafted spells are stored in your spell book, so you can cast them."
+    // "Like this!"
+    // [magic spell cast for fast grow - local magic vfx]
+    // "Great! You're a natural. May the grace of the Genesis Tree be with you."
+    // (cut to here if cancel intro)
+    // "Again, welcome and enjoy your time with us."
+    // [walk to teleporter - teleport to market island - walk into market]
+
+    public bool introRunning;
     public bool introPop;
+    public bool dialogPop;
 
     private Texture2D[] characterLines;
     private Texture2D[] characterSkins;
@@ -19,20 +62,34 @@ public class PlayerIntroduction : MonoBehaviour
     private bool configValid;
     private bool[] configsTouched = new bool[4];
 
+    private bool canSkipIntro;
+    private bool cancelIntro;
+
+    private string[] introDialog;
+    private int introScriptStep;
+    private float introTimer;
+
     private int modelSelection = 0;
     private int skinSelection = 0;
     private int accentSelection = 0;
     private int fillSelection = 0;
 
+    const float DEFAULTINTROTIME = 0.618f;
+    const float PAUSETIME = 1f;
+    const float LONGPAUSETIME = 2f;
+
 
     void Start()
     {
         // validate
+
         // initialize
         if (enabled)
         {
             InitializeCharacterTextures();
             InitializeCharacterColors();
+
+            ConfigureIntroDialog();
         }
     }
 
@@ -66,20 +123,84 @@ public class PlayerIntroduction : MonoBehaviour
         }
     }
 
+    void ConfigureIntroDialog()
+    {
+        introDialog = new string[25];
+        introDialog[0] = "Welcome Biomancer! My name is Eden. Tell me about yourself.";
+        introDialog[1] = "We are so happy you chose to help grow our magical community.";
+        introDialog[2] = "Here we tend to the floating islands our Genesis Tree provides us.";
+        introDialog[3] = "This central island connects every other through our teleporter nodes.";
+        introDialog[4] = "Here is the market, where we can buy supplies and sell your wares.";
+        introDialog[5] = "Let me purchase a couple seeds and take you to your floating island.";
+        introDialog[6] = "Isn't that a beautiful sight! Your new island with greener pastures.";
+        introDialog[7] = "Here is your farm, where you are to grow crops, harvest and sell them.";
+        introDialog[8] = "We work the land and improve the soil. First let's get this plot ready.";
+        introDialog[9] = "We care for the land and it provides. Let's water this plot and plant.";
+        introDialog[10] = "Different plants grow faster or slower, yield more or less, ...";
+        introDialog[11] = "...some grow better in certain seasons, some even grow only at night!";
+        introDialog[12] = "You can learn about everything in your Biomancer's Almanac. (PRESS \\)";
+        introDialog[13] = "With our plant all grown, we can harvest the fruit or flower.";
+        introDialog[14] = "Take your flower with the action button. Now, I'll dig up this stalk.";
+        introDialog[15] = "Stalks and other plant material go in the compost bin to make fertilizer.";
+        introDialog[16] = "By adding fertilizer to the soil, it improves and so does you harvest.";
+        introDialog[17] = "Now you try. You can check the player controls by holding the TAB key.";
+        introDialog[18] = "All this hard work pays off at the market, and it all leads to magic.";
+        introDialog[19] = "When you level up, you'll find the magic crafting table in your tower.";
+        introDialog[20] = "On the table, your grimiore will have new spells available to craft.";
+        introDialog[21] = "Crafted spells are stored in your spell book, so you can cast them.";
+        introDialog[22] = "Like this!";
+        introDialog[23] = "Great! You're a natural. May the grace of the Genesis Tree be with you.";
+        introDialog[24] = "Again, welcome and enjoy your time with us.";
+    }
+
     void Update()
     {
+        // handle intro dialog step
+        if (cancelIntro)
+        {
+            cancelIntro = false;
+            dialogPop = false;
+            introScriptStep = 24;
+            introTimer = DEFAULTINTROTIME;
+        }
+        // run intro timer
+        if (introTimer > 0f)
+        {
+            introTimer -= Time.deltaTime;
+            if (introTimer < 0f)
+            {
+                introTimer = 0f;
+                dialogPop = true;
+            }
+        }
+        
+        // temp controls for testing
         if (Input.GetKeyDown(KeyCode.I))
-            introPop = !introPop;
+        {
+            TakeOverHUD(true);
+            introRunning = true;
+            introScriptStep = 0;
+            introTimer = LONGPAUSETIME;
+        }
     }
 
-    public void SetPlayerOptions( PlayerOptions options )
+    void TakeOverHUD( bool claim )
     {
-        configOptions = options;
-    }
-
-    public PlayerOptions GetPlayerOptions()
-    {
-        return configOptions;
+        InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+        if (igc != null)
+        {
+            igc.enabled = !claim;
+        }
+        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+        if (iga != null)
+        {
+            iga.enabled = !claim;
+        }
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm != null)
+        {
+            pcm.hidePlayerHUD = claim;
+        }
     }
 
     void TryConfigPlayerInScene( PlayerOptions options )
@@ -88,32 +209,135 @@ public class PlayerIntroduction : MonoBehaviour
         if (pcm == null)
             return;
         pcm.playerData.options = options;
-        pcm.ConfigureAppearance(options);
+        pcm.ConfigureAppearance(pcm.playerData.options);
     }
 
     void OnGUI()
     {
-        if (!introPop)
+        if (!introRunning || (!canSkipIntro && !introPop && !dialogPop))
             return;
 
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;
+        GUIStyle g = new GUIStyle(GUI.skin.box);
+        Texture2D t = Texture2D.whiteTexture;
+        Color c = Color.white;
+        string s = "";
 
+        if (canSkipIntro)
+        {
+            r.x = 0.875f * w;
+            r.y = 0.05f * h;
+            r.width = 0.1f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.black;
+            GUI.color = Color.white;
+            s = "SKIP INTRO";
+            if (GUI.Button(r, s, g))
+            {
+                cancelIntro = true;
+                canSkipIntro = false;
+            }
+        }
+
+        if (dialogPop)
+        {
+            // box
+            r.x = 0.675f * w;
+            r.y = 0.125f * h;
+            r.width = 0.3f * w;
+            r.height = 0.25f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.padding = new RectOffset(0, 0, 20, 0);
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            t = Texture2D.whiteTexture;
+            c.r = 0.85f;
+            c.g = 0.8f;
+            c.b = 0.618f;
+            c.a = 1f;
+            g.normal.background = t;
+            g.hover.background = t;
+            g.active.background = t;
+            GUI.color = c;
+            s = "EDEN";
+            GUI.Box(r, s, g);
+
+            // dialog label
+            r.x = 0.6875f * w;
+            r.y = 0.14f * h;
+            r.width = 0.2625f * w;
+            r.height = 0.225f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.BoldAndItalic;
+            g.alignment = TextAnchor.MiddleLeft;
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            g.wordWrap = true;
+            s = introDialog[introScriptStep];
+            GUI.color = Color.white;
+            GUI.Label(r, s, g);
+            // next button
+            r.x = 0.86f * w;
+            r.y = 0.3125f * h;
+            r.width = 0.1f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.Normal;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.normal.textColor = c;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            s = "NEXT";
+            GUI.color = Color.white;
+            if (GUI.Button(r, s, g))
+            {
+                // next dialog
+                dialogPop = false;
+                introScriptStep++;
+                if (introScriptStep >= introDialog.Length)
+                {
+                    introRunning = false;
+                    TakeOverHUD(false);
+                    return;
+                }
+                else if (introScriptStep == 1)
+                {
+                    introPop = true;
+                    return;
+                }
+                introTimer = PAUSETIME;
+            }
+        }
+
+        if (!introPop)
+            return;
+
+        // INTRODUCTION POP UP
         r.x = 0.1f * w;
         r.y = 0.1f * h;
         r.width = 0.8f * w;
         r.height = 0.8f * h;
 
-        GUIStyle g = new GUIStyle(GUI.skin.box);
         g.fontSize = Mathf.RoundToInt(20f * ( w / 1024f ));
         g.fontStyle = FontStyle.Bold;
         g.padding = new RectOffset(0, 0, 30, 0);
         g.normal.textColor = Color.black;
         g.hover.textColor = Color.black;
         g.active.textColor = Color.black;
-        Texture2D t = Texture2D.whiteTexture;
-        Color c = Color.white;
         c.r = 0.85f;
         c.g = 0.8f;
         c.b = 0.618f;
@@ -122,7 +346,7 @@ public class PlayerIntroduction : MonoBehaviour
         g.hover.background = t;
         g.active.background = t;
         GUI.color = c;
-        string s = "Player Character Customization";
+        s = "Player Character Customization";
 
         GUI.Box(r, s, g);
 
@@ -326,12 +550,6 @@ public class PlayerIntroduction : MonoBehaviour
             configsTouched[3] = true;
         }
 
-        // store player options
-        configOptions.model = (PlayerModelType)modelSelection+1;
-        configOptions.skinColor = (PlayerSkinColor)skinSelection;
-        configOptions.mainColor = (PlayerColor)fillSelection;
-        configOptions.accentColor = (PlayerColor)accentSelection;
-
         // detect config valid
         configValid = (configsTouched[0] && configsTouched[1] &&
             configsTouched[2] && configsTouched[3]);
@@ -351,9 +569,19 @@ public class PlayerIntroduction : MonoBehaviour
         GUI.enabled = configValid;
         if (GUI.Button(r,s,g))
         {
+            // store player options
+            configOptions.model = (PlayerModelType)modelSelection + 1;
+            configOptions.skinColor = (PlayerSkinColor)skinSelection;
+            configOptions.mainColor = (PlayerColor)fillSelection;
+            configOptions.accentColor = (PlayerColor)accentSelection;
+            // end of player options configuration
             introPop = false;
             // confirm player options
             TryConfigPlayerInScene(configOptions);
+            // reset intro timer
+            introTimer = LONGPAUSETIME;
+            // may skip remainder of introduction
+            canSkipIntro = true;
         }
     }
 }
