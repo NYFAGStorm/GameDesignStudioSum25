@@ -38,7 +38,9 @@ public static class PlayerSystem
         switch (tone)
         {
             case PlayerSkinColor.Default:
-                // we should never be here
+                retColor.r = 1f;
+                retColor.g = 1f;
+                retColor.b = 1f;
                 break;
             case PlayerSkinColor.ToneA:
                 retColor.r = 0.25f;
@@ -88,7 +90,9 @@ public static class PlayerSystem
         switch (tone)
         {
             case PlayerColor.Default:
-                // we should never be here
+                retColor.r = 1f;
+                retColor.g = 1f;
+                retColor.b = 1f;
                 break;
             case PlayerColor.ColorA:
                 retColor.r = 0.8f;
@@ -126,6 +130,7 @@ public static class PlayerSystem
                 retColor.b = 0.381f;
                 break;
         }
+        retColor.a = 1f;
 
         return retColor;
     }
