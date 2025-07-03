@@ -267,6 +267,42 @@ public class PlayerControlManager : MonoBehaviour
                 Debug.LogWarning("--- PlayerControlManager [Update] : unable to enter spell cast mode without spell charges. will ignore.");
         }
     }
+
+    public void ConfigureAppearance( PlayerOptions options )
+    {
+        Renderer r = transform.GetComponentInChildren<Renderer>();
+        if (r != null)
+        {
+            if (options.model == PlayerModelType.Male)
+            {
+                // line (_LineArt)
+                r.material.SetTexture("_LineArt", (Texture2D)Resources.Load("ProtoWizard_LineArt"));
+                // skin (_AccentFill,_AccentCol)
+                r.material.SetTexture("_AccentFill", (Texture2D)Resources.Load("ProtoWizard_FillSkin"));
+                r.material.SetColor("_AccentCol", PlayerSystem.GetPlayerSkinColor(options.skinColor));
+                // accent (_AltFill, _AltCol)
+                r.material.SetTexture("_AltFill", (Texture2D)Resources.Load("ProtoWizard_FillAccent"));
+                r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
+                // fill (_MainTex, _Color)
+                r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizard_FillMain"));
+                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.accentColor));
+            }
+            else if (options.model == PlayerModelType.Female)
+            {
+                // line (_LineArt)
+                r.material.SetTexture("_LineArt", (Texture2D)Resources.Load("ProtoWizardF_LineArt"));
+                // skin (_AccentFill,_AccentCol)
+                r.material.SetTexture("_AccentFill", (Texture2D)Resources.Load("ProtoWizardF_FillSkin"));
+                r.material.SetColor("_AccentCol", PlayerSystem.GetPlayerSkinColor(options.skinColor));
+                // accent (_AltFill, _AltCol)
+                r.material.SetTexture("_AltFill", (Texture2D)Resources.Load("ProtoWizardF_FillAccent"));
+                r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
+                // fill (_MainTex, _Color)
+                r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizardF_FillMain"));
+                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.accentColor));
+            }
+        }
+    }
     
     /// <summary>
     /// Gets the player data and camera data for the 'game-owning player character'
@@ -362,6 +398,8 @@ public class PlayerControlManager : MonoBehaviour
             Debug.LogError("--- PlayerControlManager [SetPlayerData] : no profile player data. aborting.");
             return;
         }
+        // configure appearance (model and colors)
+        ConfigureAppearance(playerData.options);
         // connecting property to data _as a reference_
         playerInventory = playerData.inventory;
         playerName = playerData.playerName;
