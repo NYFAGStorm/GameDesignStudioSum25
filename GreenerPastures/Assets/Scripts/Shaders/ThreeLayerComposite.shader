@@ -82,7 +82,7 @@ Shader "Unlit/Three Layer Composite"
                 fixed4 alt = tex2D(_AltFill, i.uv);
                 fixed4 col = tex2D(_MainTex, i.uv);
                 // apply accent fill color
-                acc = acc + _AccentCol;
+                acc = acc * _AccentCol;
                 // apply alt fill color
                 alt = alt * _AltCol;
                 // apply main fill color
