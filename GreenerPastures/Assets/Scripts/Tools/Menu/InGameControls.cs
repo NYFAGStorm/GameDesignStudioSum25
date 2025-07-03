@@ -18,6 +18,7 @@ public class InGameControls : MonoBehaviour
     private PlayerControlManager pcm;
     private MultiGamepad padMgr;
     private QuitOnEscape qoe;
+    private InGameAlmanac iga;
 
 
     void Start()
@@ -32,6 +33,12 @@ public class InGameControls : MonoBehaviour
             Debug.LogError("--- InGameControls [Start] : no quit on escape tool found in scene. aborting.");
             enabled = false;
         }
+        iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+        if (iga == null)
+        {
+            Debug.LogError("--- InGameControls [Start] : no in game almanac tool found in scene. aborting.");
+            enabled = false;
+        }
         // initialize
         if (enabled)
         {
@@ -44,7 +51,16 @@ public class InGameControls : MonoBehaviour
         if (pcm == null)
             return;
 
+        if (iga.showAlmanac)
+        {
+            controlsDisplay = false;
+            return;
+        }
+
         controlsDisplay = Input.GetKey(KeyCode.Tab);
+
+        // control player hud
+        pcm.hidePlayerHUD = controlsDisplay;
     }
 
     public void SetPlayerControlManager( PlayerControlManager pControlManager )
@@ -54,7 +70,7 @@ public class InGameControls : MonoBehaviour
 
     void ConfigureControlItems()
     {
-        int totalItems = 12;
+        int totalItems = 13;
         controlItems = new ControlItem[totalItems];
 
         controlItems[0].controlName = "CHARACTER MOVEMENT";
@@ -90,9 +106,12 @@ public class InGameControls : MonoBehaviour
         controlItems[10].controlName = "ZOOM VIEW OUT";
         controlItems[10].keyboardLabel = "Mouse Wheel Down";
         controlItems[10].gamepadLabel = "D-Pad Down";
-        controlItems[11].controlName = "QUIT GAME";
-        controlItems[11].keyboardLabel = "ESC Key";
-        controlItems[11].gamepadLabel = "START Button";
+        controlItems[11].controlName = "BIOMANCER'S ALMANAC";
+        controlItems[11].keyboardLabel = "\\ Key";
+        controlItems[11].gamepadLabel = "BACK Button";
+        controlItems[12].controlName = "QUIT GAME";
+        controlItems[12].keyboardLabel = "ESC Key";
+        controlItems[12].gamepadLabel = "START Button";
     }
 
     string GetControlName( int control )
@@ -112,7 +131,7 @@ public class InGameControls : MonoBehaviour
 
     void OnGUI()
     {
-        if (pcm == null)
+        if (pcm == null || iga.showAlmanac)
             return;
 
         Rect r = new Rect();
@@ -120,9 +139,9 @@ public class InGameControls : MonoBehaviour
         float h = Screen.height;
 
         r.x = 0.1f * w;
-        r.y = 0.1f * h;
+        r.y = 0.125f * h;
         r.width = 0.8f * w;
-        r.height = 0.8f * h;
+        r.height = 0.75f * h;
 
         GUIStyle g = new GUIStyle(GUI.skin.box);
         g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
