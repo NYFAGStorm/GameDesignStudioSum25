@@ -255,7 +255,7 @@ public class GameSelection : MonoBehaviour
                 GUI.Label(r, s, g);
             }
 
-            // text fields (read-only if not new or if remote)
+            // text fields (read-only if not new, or if remote)
             // . name
             r.x += 0.25f * w;
             r.y -= 0.375f * h;
@@ -272,8 +272,6 @@ public class GameSelection : MonoBehaviour
             else
                 GUI.Label(r, popGameName, g);
 
-            // buttons (option buttons disabled if not new)
-            GUI.enabled = newGame && !saveMgr.IsRemoteClient();
             // . + / - max players
             // . toggle cheats
             // . toggle hazards
@@ -292,6 +290,8 @@ public class GameSelection : MonoBehaviour
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "-";
+            // allow less max players if new game or owner of game max is more than player length
+            GUI.enabled = popMaxPlayers > 1 && (newGame || (!saveMgr.IsRemoteClient() && gameLoaded && saveMgr.GetCurrentGameData().players.Length < popMaxPlayers));
             if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
                 padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
             {
@@ -303,6 +303,8 @@ public class GameSelection : MonoBehaviour
             if (padButtonSelection == 1)
                 g.normal.textColor = Color.white;
             s = "+";
+            // alow more max players if new game or owner of game and less than 8
+            GUI.enabled = popMaxPlayers < 8 && (newGame || !saveMgr.IsRemoteClient());
             if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
                 padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
             {
@@ -318,6 +320,7 @@ public class GameSelection : MonoBehaviour
             s = "ALLOWED";
             if (!popAllowCheats)
                 s = "OFF";
+            GUI.enabled = (!saveMgr.IsRemoteClient()); // only owner of data can change options
             if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
                 padButtonSelection == 2 && padMgr.gPadDown[0].aButton))
             {
@@ -356,6 +359,7 @@ public class GameSelection : MonoBehaviour
                 g.normal.textColor = labelFontColor;
                 g.hover.textColor = labelFontColor;
                 g.active.textColor = labelFontColor;
+                GUI.enabled = true;
                 popPlayerName = GUI.TextField(r, popPlayerName, g);
             }
             else

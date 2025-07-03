@@ -69,7 +69,7 @@ public static class MultiplayerSystem
         }
 
         retPing.gameKey = gData.gameKey;
-        retPing.availablePlayerSlots = (gData.options.maxPlayers - gData.playersOnline);
+        retPing.availablePlayerSlots = (gData.options.maxPlayers - gData.players.Length);
         retPing.profiles = new string[gData.players.Length];
         retPing.playerNames = new string[gData.players.Length];
         for (int i = 0; i < retPing.profiles.Length; i++)
