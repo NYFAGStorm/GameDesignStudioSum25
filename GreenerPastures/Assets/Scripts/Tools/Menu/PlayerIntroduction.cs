@@ -83,6 +83,9 @@ public class PlayerIntroduction : MonoBehaviour
     private int accentSelection = 0;
     private int fillSelection = 0;
 
+    private PlayerControlManager pcm;
+    private CameraManager camMgr;
+
     const float DEFAULTINTROTIME = 0.618f;
     const float PAUSETIME = 1f;
     const float LONGPAUSETIME = 2f;
@@ -91,7 +94,6 @@ public class PlayerIntroduction : MonoBehaviour
     void Start()
     {
         // validate
-
         // initialize
         if (enabled)
         {
@@ -172,10 +174,10 @@ public class PlayerIntroduction : MonoBehaviour
             introMarks[i] = Vector3.zero;
         }
         // + + zoom into Eden on central market island
-        introMarks[0].x = 20f;
+        introMarks[0].x = 19.75f;
         introMarks[0].z = -24f;
         introMarks[1].x = 20f;
-        introMarks[1].z = -25f;
+        introMarks[1].z = -26f;
         // "Welcome Biomancer! My name is Eden. Tell me about yourself."
         introMarks[2].x = 22f;
         introMarks[2].z = -24f;
@@ -238,6 +240,7 @@ public class PlayerIntroduction : MonoBehaviour
             dialogPop = false;
             introScriptStep = 24;
             introTimer = DEFAULTINTROTIME;
+            camMgr.allowPlayerControlCam = true;
         }
         // run intro timer
         if (introTimer > 0f)
@@ -253,6 +256,7 @@ public class PlayerIntroduction : MonoBehaviour
         // temp controls for testing
         if (Input.GetKeyDown(KeyCode.I))
         {
+            /*
             TakeOverHUD(true);
             introRunning = true;
             introScriptStep = 0;
@@ -263,7 +267,44 @@ public class PlayerIntroduction : MonoBehaviour
             eden.ghostMode = true;
             eden.mode = NPCController.NPCMode.Scripted;
             eden.moveTarget = introMarks[++currentMark];
+            */
         }
+    }
+
+    public void LaunchIntro()
+    {
+        // 
+        // PLAYER INTRODUCTION
+        //
+        pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        camMgr = GameObject.FindAnyObjectByType<CameraManager>();
+        // REVIEW: we are making a big assumption that only a first-run host can see the introduction
+        // configure player character frozen, hidden, hud hidden
+        if (pcm != null)
+        {
+            pcm.characterFrozen = true;
+            pcm.freezeCharacterActions = true;
+            pcm.hidePlayerHUD = true;
+            pcm.playerData.island.x = 20.5f;
+            pcm.playerData.island.z = -26.5f;
+            pcm.playerData.island.w = .381f;
+            GameObject playerObj = pcm.gameObject;
+            playerObj.transform.GetChild(0).GetComponent<Renderer>().enabled = false;
+            playerObj.transform.position = new Vector3(20.5f, 0, -26.5f);
+            camMgr.SetWorldViewIntro();
+            camMgr.allowPlayerControlCam = false;
+        }
+
+        TakeOverHUD(true);
+        introRunning = true;
+        introScriptStep = 0;
+        introTimer = LONGPAUSETIME;
+        // eden arrives
+        currentMark = 0;
+        eden = SpawnEden(introMarks[currentMark]);
+        eden.ghostMode = true;
+        eden.mode = NPCController.NPCMode.Scripted;
+        eden.moveTarget = introMarks[++currentMark];
     }
 
     void TakeOverHUD( bool claim )
@@ -278,11 +319,11 @@ public class PlayerIntroduction : MonoBehaviour
         {
             iga.enabled = !claim;
         }
-        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         if (pcm != null)
         {
             pcm.hidePlayerHUD = claim;
         }
+        camMgr.allowPlayerControlCam = !claim;
     }
 
     NPCController SpawnEden( Vector3 pos )
@@ -667,6 +708,14 @@ public class PlayerIntroduction : MonoBehaviour
             introPop = false;
             // confirm player options
             TryConfigPlayerInScene(configOptions);
+            // reveal player character
+            if (pcm != null)
+            {
+                pcm.characterFrozen = false;
+                pcm.freezeCharacterActions = false;
+                GameObject playerObj = pcm.gameObject;
+                playerObj.transform.GetChild(0).GetComponent<Renderer>().enabled = true;
+            }
             // reset intro timer
             introTimer = LONGPAUSETIME;
             // may skip remainder of introduction

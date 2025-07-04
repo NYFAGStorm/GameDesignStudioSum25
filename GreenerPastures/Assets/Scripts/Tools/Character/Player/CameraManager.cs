@@ -24,12 +24,15 @@ public class CameraManager : MonoBehaviour
     public CameraMode modeAfterHold = CameraMode.Follow;
     public CameraMode modeAfterMove = CameraMode.Hold;
 
+    public bool allowPlayerControlCam = true;
+
     private GameObject playerObject;
     private PlayerControlManager pcm;
     private MultiGamepad padMgr;
 
     private float cameraPauseTimer;
     private float cameraMoveTimer;
+    private float cameraMoveDuration;
     private Vector3 savedPostion;
     private Vector3 savedRotation;
 
@@ -45,6 +48,7 @@ public class CameraManager : MonoBehaviour
     const float MAXPANCRANEDIST = 10f;
     const float MINPANCRANEHEIGHT = 0.5f;
     const float LATERALPANMULTIPLIER = 0.618f;
+    const float INTROMOVEDURATION = 3f;
 
 
     void Awake()
@@ -208,6 +212,35 @@ public class CameraManager : MonoBehaviour
         GetPanTarget();
     }
 
+    public void SetWorldViewIntro()
+    {
+        mode = CameraMode.World;
+        gameObject.transform.position = GetPosOffset(mode);
+        gameObject.transform.eulerAngles = GetRotOffset(mode);
+        Vector3 introPos = new Vector3(20.5f, 0, -26.5f);
+        gameObject.transform.position += introPos;
+        savedPostion = transform.position;
+        savedRotation = transform.eulerAngles;
+        cameraPauseTimer = 1f;
+        cameraMoveTimer = INTROMOVEDURATION;
+        cameraMoveDuration = cameraMoveTimer;
+        cameraTargetPosition = introPos + GetPosOffset(CameraMode.CloseUp);
+        cameraTargetRotation = GetRotOffset(CameraMode.CloseUp);
+        modeAfterMove = CameraMode.Default;
+    }
+
+    public void SetMediumViewIntro()
+    {
+        modeAfterHold = CameraMode.Medium;
+        SavePosAndRot();
+        // use modeAfterHold for target acquisition
+        mode = modeAfterHold;
+        GetFollowTarget();
+        SetDefaultTimers();
+        mode = CameraMode.Hold;
+        modeAfterMove = modeAfterHold; // stay there
+    }
+
     void SavePosAndRot()
     {
         savedPostion = transform.position;
@@ -249,6 +282,8 @@ public class CameraManager : MonoBehaviour
     {
         cameraPauseTimer = CAMERAPAUSEDURATION;
         cameraMoveTimer = CAMERAMOVEDURATION;
+
+        cameraMoveDuration = cameraMoveTimer;
     }
 
     void PerformMove()
@@ -269,7 +304,8 @@ public class CameraManager : MonoBehaviour
             return;
 
         // detect player cam controls
-        if ((mode == CameraMode.Follow || mode > CameraMode.PanFollow) && 
+        if (allowPlayerControlCam && 
+            (mode == CameraMode.Follow || mode > CameraMode.PanFollow) && 
             cameraPauseTimer == 0f && cameraMoveTimer == 0f)
         {
             int camModeChange = 0;
@@ -364,7 +400,9 @@ public class CameraManager : MonoBehaviour
         }
 
         // smooth progress to target
-        float progress = ((CAMERAMOVEDURATION - cameraMoveTimer) / CAMERAMOVEDURATION);
+        float progress = ((cameraMoveDuration - cameraMoveTimer) / cameraMoveDuration);
+        if (easeCurve == null)
+            easeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         if (easeCurve != null)
             progress = easeCurve.Evaluate(progress);
 

@@ -108,7 +108,7 @@ public class GreenerGameManager : MonoBehaviour
                 game.state = GameState.Established;
                 if (noisyLogging)
                     Debug.Log("--- GreenerGameManager [Update] : new game '" + game.gameName + "' established.");
-                firstRunDetected = false;
+                //firstRunDetected = false;
             }
 
             gameDataDistributed = DoGameDataDistribution();
@@ -125,6 +125,21 @@ public class GreenerGameManager : MonoBehaviour
                 // if not remote, remind player they are a host
                 if (!saveMgr.IsRemoteClient())
                     AddNotification("You are considered a host and are 'pinging' to network.");
+
+                if (firstRunDetected)
+                {
+                    firstRunDetected = false;
+                    // REVIEW: maybe do not host ping yet?
+                    notificationMessages = new string[0];
+                    notificationTimers = new float[0];
+                    displayNotifications = false;
+                    // launch introduction
+                    PlayerIntroduction pIntro = GameObject.FindFirstObjectByType<PlayerIntroduction>();
+                    if (pIntro != null)
+                    {
+                        pIntro.LaunchIntro();
+                    }
+                }
             }
         }
 
