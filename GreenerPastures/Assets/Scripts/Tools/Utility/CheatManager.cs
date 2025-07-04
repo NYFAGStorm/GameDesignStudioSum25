@@ -26,7 +26,7 @@ public class CheatManager : MonoBehaviour
 
     private GreenerGameManager ggMgr;
 
-    const int TOTALCHEATCODES = 12;
+    const int TOTALCHEATCODES = 13;
     const float CHEATCODEWINDOW = 1f;
 
 
@@ -107,6 +107,14 @@ public class CheatManager : MonoBehaviour
         if (validCode == -1)
             return;
 
+        // interrupt if cheats not allowed in this game
+        if ((validCode != 12 || !ggMgr.IsHostGame()) && !ggMgr.game.options.allowCheats)
+        {
+            ggMgr.AddNotification("cheat codes not allowed in this game.");
+            validCode = -1; // initialized
+            return;
+        }
+
         // perform valid cheat code
         PerformValidCode();
     }
@@ -186,6 +194,10 @@ public class CheatManager : MonoBehaviour
                 n = "bumpmaxplayers";
                 d = "Adds one to the max players of this game (up to 8)";
                 break;
+            case 12:
+                n = "togglecheats";
+                d = "Toggles the setting to allow cheats in this game";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -220,7 +232,7 @@ public class CheatManager : MonoBehaviour
             case 5:
                 if (GameObject.Find("player light") == null)
                 {
-                    GameObject player = GameObject.Find("Player Character");
+                    GameObject player = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject;
                     GameObject light = new GameObject();
                     light.name = "player light";
                     light.transform.position = player.transform.position + Vector3.up;
@@ -286,7 +298,15 @@ public class CheatManager : MonoBehaviour
                     bm.DiscoSky();
                 break;
             case 11:
-                ggMgr.game.options.maxPlayers = Mathf.Clamp(ggMgr.game.options.maxPlayers + 1, 1, 8);
+                // only allow this cheat if host
+                if (ggMgr.IsHostGame())
+                    ggMgr.game.options.maxPlayers = Mathf.Clamp(ggMgr.game.options.maxPlayers + 1, 1, 8);
+                break;
+            case 12:
+                // only allow this cheat if host
+                // (always allow if host)
+                if (ggMgr.IsHostGame())
+                    ggMgr.game.options.allowCheats = !ggMgr.game.options.allowCheats;
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");

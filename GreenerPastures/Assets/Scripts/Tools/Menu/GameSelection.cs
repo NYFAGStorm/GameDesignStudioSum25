@@ -31,6 +31,8 @@ public class GameSelection : MonoBehaviour
     private bool gameLoaded;
     private string gamePlayerName; // player name in loaded game
     private bool newGame; // is user creating a new game
+    private GameOptionsData currentGameOptions;
+
     private string selectionFeedback;
     private float feedbackTimer;
 
@@ -45,6 +47,7 @@ public class GameSelection : MonoBehaviour
     private bool popAllowCheats;
     private bool popAllowHazards;
     private bool popAllowCurses;
+    private bool gameOptionsChanged;
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
@@ -350,8 +353,8 @@ public class GameSelection : MonoBehaviour
             // . toggle hazards
             // . toggle curses
             // . (textfield) joining player name
-            // . Create new game ('Unload' if not new)
-            // . Cancel ('Close' if not new)
+            // . Create new game ('Unload' if not new, 'Accept' if editing)
+            // . Cancel
             r.x += 0.025f * w;
             r.y += 0.075f * h;
             r.width = 0.075f * w;
@@ -454,6 +457,12 @@ public class GameSelection : MonoBehaviour
             }
             GUI.enabled = true;
 
+            gameOptionsChanged = (currentGameOptions != null &&
+                (currentGameOptions.maxPlayers != popMaxPlayers ||
+                currentGameOptions.allowCheats != popAllowCheats ||
+                currentGameOptions.allowHazards != popAllowHazards ||
+                currentGameOptions.allowHazards != popAllowHazards));
+
             // popup buttons
             r.x = 0.25f * w;
             r.y += 0.1f * h;
@@ -462,13 +471,15 @@ public class GameSelection : MonoBehaviour
             g = new GUIStyle(GUI.skin.button);
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
-            // UNLOAD / CREATE
+            // UNLOAD / ACCEPT / CREATE
             if (padButtonSelection == 5)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "UNLOAD";
             if (saveMgr.IsRemoteClient())
                 s = "DESELECT";
+            else if (gameOptionsChanged)
+                s = "ACCEPT";
             if (newGame)
                 s = "CREATE";
             // validate new game info (game name and player name)
@@ -508,6 +519,16 @@ public class GameSelection : MonoBehaviour
                     saveMgr.SetHostPing(currentNet, popPlayerName);
                     selectionFeedback = "net game deselected";
                     feedbackTimer = FEEDBACKTIME;
+                }
+                else if (gameOptionsChanged)
+                {
+                    // game option changes accepted
+                    GameData gData = saveMgr.GetCurrentGameData();
+                    gData.options.maxPlayers = popMaxPlayers;
+                    gData.options.allowCheats = popAllowCheats;
+                    gData.options.allowHazards = popAllowHazards;
+                    gData.options.allowCurses = popAllowCurses;
+                    saveMgr.SetCurrentGameData(gData); // will overwrite
                 }
                 else
                 {
@@ -574,6 +595,7 @@ public class GameSelection : MonoBehaviour
         else if ( gameLoaded )
         {
             GameData gData = saveMgr.GetCurrentGameData();
+            currentGameOptions = gData.options;
             gamePlayerName = GameSystem.GetProfilePlayer( gData, saveMgr.GetCurrentProfile() ).playerName;
             s += "Playing as '" + gamePlayerName + "' in ";
             s += gData.gameName + " " + gData.gameKey.Substring(0, gData.gameKey.IndexOf("]")+1 ) + "\n";

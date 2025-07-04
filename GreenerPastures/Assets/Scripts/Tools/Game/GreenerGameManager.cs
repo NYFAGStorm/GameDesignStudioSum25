@@ -134,7 +134,7 @@ public class GreenerGameManager : MonoBehaviour
         // run notification timers
         for (int i = 0; i < notificationTimers.Length; i++)
         {
-            if (notificationTimers[i] > 0f)
+            if (notificationTimers[i] >= 0f)
             {
                 notificationTimers[i] -= Time.deltaTime;
                 if (notificationTimers[i] < 0f)
@@ -190,6 +190,15 @@ public class GreenerGameManager : MonoBehaviour
         AddNotification(request.playerName + " has selected this game.");
 
         return retBool;
+    }
+
+    /// <summary>
+    /// Returns true if this game is locally run as a host for net players
+    /// </summary>
+    /// <returns>true if acting as host, false if acting as remote client</returns>
+    public bool IsHostGame()
+    {
+        return isHostGame;
     }
 
     /// <summary>
