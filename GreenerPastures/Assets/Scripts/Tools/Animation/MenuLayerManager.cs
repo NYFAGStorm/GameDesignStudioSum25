@@ -7,6 +7,13 @@ public class MenuLayerManager : MonoBehaviour
     // This handles bg layer movement for menus
     // (NOTE: while not in menus, layers hidden)
 
+    public enum CinematicFade
+    {
+        Default,
+        FadeWhite,
+        FadeBlack
+    }
+
     [System.Serializable]
     public struct BGLayer
     {
@@ -20,11 +27,19 @@ public class MenuLayerManager : MonoBehaviour
     public AnimationCurve animCurve;
     public int targetKey = 0;
 
+    public CinematicFade fadeType;
+    public bool fadingDownFromColor;
+    public float pauseTimer;
+    public float fadeTimer;
+
     private float currentAnimProgress;
     private string previousSceneName;
+    private string currentSceneName;
 
     const int TOTALANIMKEYS = 3;
     const float ANIMATIONINTERPDURATION = 3f;
+    const float FADETIME = 1f;
+    const float LAUNCHPAUSETIME = 2f;
 
 
     void Start()
@@ -44,11 +59,33 @@ public class MenuLayerManager : MonoBehaviour
             {
                 layers[i].savedVerticalPos = layers[i].layerObj.transform.localPosition.y;
             }
+            // configure fade to white
+            fadeType = CinematicFade.Default;
+            fadingDownFromColor = false;
         }
     }
 
     void Update()
     {
+        // run pause timer
+        if (pauseTimer > 0f)
+        {
+            pauseTimer -= Time.deltaTime;
+            if (pauseTimer < 0f)
+                pauseTimer = 0f;
+        }
+        // run fade timer
+        if (pauseTimer == 0f && fadeTimer > 0f)
+        {
+            fadeTimer -= Time.deltaTime;
+            if (fadeTimer < 0f)
+            {
+                fadeTimer = 0f;
+                if (fadingDownFromColor)
+                    fadeType = CinematicFade.Default; // reset
+            }
+        }
+
         // run animation
         if ( targetKey > currentAnimProgress * (TOTALANIMKEYS-1) )
         {
@@ -76,6 +113,16 @@ public class MenuLayerManager : MonoBehaviour
         targetKey = Mathf.RoundToInt(progress);
     }
 
+    public void LaunchGameAnimation()
+    {
+        targetKey = 2;
+        // fade to white
+        fadeType = CinematicFade.FadeWhite;
+        fadingDownFromColor = false;
+        fadeTimer = FADETIME;
+        pauseTimer = LAUNCHPAUSETIME;
+    }
+
     void OnSceneLoaded(Scene s, LoadSceneMode mode)
     {
         // hide all layers if in game
@@ -84,6 +131,13 @@ public class MenuLayerManager : MonoBehaviour
             for (int i=0; i<layers.Length; i++)
             {
                 layers[i].layerObj.SetActive(false);
+            }
+            // fade from white
+            if (currentSceneName == "Menu")
+            {
+                fadeType = CinematicFade.FadeWhite;
+                fadingDownFromColor = true;
+                fadeTimer = FADETIME;
             }
         }
         else if (previousSceneName == "GreenerGame")
@@ -100,5 +154,31 @@ public class MenuLayerManager : MonoBehaviour
             SetAnimProgress(0);
 
         previousSceneName = s.name;
+        currentSceneName = s.name;
+    }
+
+    void OnGUI()
+    {
+        if (fadeTimer == 0f && fadeType == CinematicFade.Default)
+            return;
+
+        Rect r = new Rect();
+        float w = Screen.width;
+        float h = Screen.height;
+
+        r.x = -0.1f * w;
+        r.y = -0.1f * h;
+        r.width = 1.2f * w;
+        r.height = 1.2f * h;
+        Texture2D t = Texture2D.whiteTexture;
+        Color c = Color.white;
+        if (fadeType == CinematicFade.FadeBlack)
+            c = Color.black;
+        if (fadingDownFromColor)
+            c.a = (fadeTimer / FADETIME);
+        else
+            c.a = 1f - (fadeTimer / FADETIME);
+        GUI.color = c;
+        GUI.DrawTexture(r, t);
     }
 }

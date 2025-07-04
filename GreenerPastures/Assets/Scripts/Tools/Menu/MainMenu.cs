@@ -486,7 +486,7 @@ public class MainMenu : MonoBehaviour
                         // profile state update
                         saveMgr.GetCurrentProfile().state = ProfileState.Connecting;
                         // little cinematic menu fun
-                        GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 2;
+                        GameObject.FindAnyObjectByType<MenuLayerManager>().LaunchGameAnimation();
                         sceneSwitchName = buttons[i].sceneName;
                         sceneSwitchTimer = 4f;
                     }
