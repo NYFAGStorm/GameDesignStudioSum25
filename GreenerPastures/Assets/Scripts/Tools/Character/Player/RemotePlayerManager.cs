@@ -3,7 +3,7 @@ using UnityEngine;
 public class RemotePlayerManager : MonoBehaviour
 {
     // Author: Glenn Storm
-    // This handles un-packing and manipulation of a remote player's character in this client's game
+    // This handles un-packing and manipulation of a remote player's character in this net game
 
     // TODO: declare main reference to multiplayer data coming in
 
@@ -49,6 +49,18 @@ public class RemotePlayerManager : MonoBehaviour
     {
         profileID = profID;
         playerName = pName;
+        // get player options from game data, configure appearance
+        SaveLoadManager saveMgr = GameObject.FindFirstObjectByType<SaveLoadManager>();
+        if (saveMgr != null)
+        {
+            GameData gData = saveMgr.GetCurrentGameData();
+            if (gData != null)
+            {
+                PlayerData pData = GameSystem.GetProfilePlayer(gData, profileID);
+                if (pData != null)
+                    ConfigureAppearance(pData.options);
+            }
+        }
         remotePlayerIntialized = true;
     }
 
@@ -82,5 +94,42 @@ public class RemotePlayerManager : MonoBehaviour
         pos.z = playerPosition.z;
         pam.imageFlipped = playerPosition.w < 0f;
         gameObject.transform.position = pos;
+    }
+
+    // the same routine as used in player control manager
+    public void ConfigureAppearance( PlayerOptions options )
+    {
+        Renderer r = transform.GetComponentInChildren<Renderer>();
+        if (r != null)
+        {
+            if (options.model == PlayerModelType.Male)
+            {
+                // line (_LineArt)
+                r.material.SetTexture("_LineArt", (Texture2D)Resources.Load("ProtoWizard_LineArt"));
+                // skin (_AccentFill,_AccentCol)
+                r.material.SetTexture("_AccentFill", (Texture2D)Resources.Load("ProtoWizard_FillSkin"));
+                r.material.SetColor("_AccentCol", PlayerSystem.GetPlayerSkinColor(options.skinColor));
+                // accent (_AltFill, _AltCol)
+                r.material.SetTexture("_AltFill", (Texture2D)Resources.Load("ProtoWizard_FillAccent"));
+                r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
+                // fill (_MainTex, _Color)
+                r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizard_FillMain"));
+                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.mainColor));
+            }
+            else if (options.model == PlayerModelType.Female)
+            {
+                // line (_LineArt)
+                r.material.SetTexture("_LineArt", (Texture2D)Resources.Load("ProtoWizardF_LineArt"));
+                // skin (_AccentFill,_AccentCol)
+                r.material.SetTexture("_AccentFill", (Texture2D)Resources.Load("ProtoWizardF_FillSkin"));
+                r.material.SetColor("_AccentCol", PlayerSystem.GetPlayerSkinColor(options.skinColor));
+                // accent (_AltFill, _AltCol)
+                r.material.SetTexture("_AltFill", (Texture2D)Resources.Load("ProtoWizardF_FillAccent"));
+                r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
+                // fill (_MainTex, _Color)
+                r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizardF_FillMain"));
+                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.mainColor));
+            }
+        }
     }
 }

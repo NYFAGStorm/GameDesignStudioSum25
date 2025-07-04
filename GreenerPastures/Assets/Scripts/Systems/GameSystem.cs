@@ -177,6 +177,35 @@ public static class GameSystem
     }
 
     /// <summary>
+    /// Returns the player data in the given game matching the given profile
+    /// </summary>
+    /// <param name="game">game data</param>
+    /// <param name="profileID">profile ID</param>
+    /// <returns>player data with matching profile ID, or empty player data if not found</returns>
+    public static PlayerData GetProfilePlayer(GameData game, string profileID)
+    {
+        PlayerData retPlayer = new PlayerData();
+
+        // validate
+        if (game == null || game.players == null || game.players.Length == 0)
+        {
+            UnityEngine.Debug.LogError("--- GameSystem [GetProfilePlayer] : invalid game or player data. will return empty player data.");
+            return retPlayer;
+        }
+
+        for (int i = 0; i < game.players.Length; i++)
+        {
+            if (game.players[i].profileID == profileID)
+            {
+                retPlayer = game.players[i];
+                break;
+            }
+        }
+
+        return retPlayer;
+    }
+
+    /// <summary>
     /// Returns the distance between given position data points
     /// </summary>
     /// <param name="a">position data point A</param>
