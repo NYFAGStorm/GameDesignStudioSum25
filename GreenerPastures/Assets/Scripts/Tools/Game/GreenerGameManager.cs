@@ -19,6 +19,18 @@ public class GreenerGameManager : MonoBehaviour
     private bool shutdownDataCollected;
     private bool firstRunDetected;
 
+    private bool isHostGame; // a local flag we get from save load manager
+    private float hostPingTimer;
+    private MultiplayerHostPing hostPingData;
+
+    private bool displayNotifications;
+    private string[] notificationMessages; // able to 'stack'
+    private float[] notificationTimers;
+    private int notificationToRemove = -1; // remove only one per tick
+
+    const float HOSTPINGINTERVAL = 1f;
+    const float NOTIFICATIONHOLDTIME = 5f;
+
 
     void Awake()
     {
@@ -65,12 +77,24 @@ public class GreenerGameManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-
+            // should we begin to 'host ping'?
+            isHostGame = !saveMgr.IsRemoteClient();
+            if (isHostGame)
+            {
+                if (noisyLogging)
+                    Debug.Log("--- GreenerGameManager [Start] : host ping rhythm initiated.");
+                // initialize host ping timer
+                hostPingTimer = HOSTPINGINTERVAL;
+                // init notification system
+                notificationMessages = new string[0];
+                notificationTimers = new float[0];
+            }
         }
     }
 
     void Update()
     {
+        // handle game data distribution
         if (!gameDataDistributed)
         {
             // first-run establish data
@@ -98,8 +122,118 @@ public class GreenerGameManager : MonoBehaviour
                 // profile connected to game
                 saveMgr.GetCurrentProfile().state = ProfileState.Playing;
                 game = GameSystem.SetPlayerNowPlaying(game, GameSystem.GetProfilePlayer(game, saveMgr.GetCurrentProfile()), true);
+                // if not remote, remind player they are a host
+                if (!saveMgr.IsRemoteClient())
+                    AddNotification("You are considered a host and are 'pinging' to network.");
             }
         }
+
+        if (!gameDataDistributed)
+            return;
+
+        // run notification timers
+        for (int i = 0; i < notificationTimers.Length; i++)
+        {
+            if (notificationTimers[i] > 0f)
+            {
+                notificationTimers[i] -= Time.deltaTime;
+                if (notificationTimers[i] < 0f)
+                {
+                    notificationTimers[i] = 0f;
+                    notificationMessages[i] = "";
+                    if (notificationToRemove == -1)
+                        notificationToRemove = i; // one per tick
+                }
+            }
+        }
+        // handle remove notification
+        if (notificationToRemove > -1)
+            RemoveNotification();
+        displayNotifications = (notificationMessages.Length > 0);
+
+        // run host ping timer
+        if (hostPingTimer > 0f)
+        {
+            hostPingTimer -= Time.deltaTime;
+            if (hostPingTimer < 0f)
+            {
+                hostPingTimer = HOSTPINGINTERVAL;
+                // form proper host ping data structure from current state of game
+                hostPingData = MultiplayerSystem.FormHostPing(game);
+                // _this_ ping is ready to broadcast to clients running greener pastures
+                PingAsHost();
+            }
+        }
+    }
+
+    // this function could easily live on another tool, if that makes sense
+    void PingAsHost()
+    {
+        // -> ping with hostPingData here <-
+    }
+
+    /// <summary>
+    /// Remote client attempts to select this game, so this host can accept or deny request for invitation. Also, this serves as a 'knock on the door' friendly notification that a player has selected and will join when ready (they hit PLAY to join).
+    /// </summary>
+    /// <param name="request">multiplayer remote request data</param>
+    /// <returns>true if this host extends an invitation (and allows remote to select this game), false if request is denied</returns>
+    public bool ProcessRemoteInvitationRequest( MultiplayerRemoteRequest request )
+    {
+        bool retBool = false;
+
+        // really, only condition to deny request is if game is suddenly full
+        // (technically, if all available 'new player' slots have been taken)
+        if (game.options.maxPlayers > game.players.Length)
+            retBool = true;
+
+        // 'knock at door' heard
+        AddNotification(request.playerName + " has selected this game.");
+
+        return retBool;
+    }
+
+    void AddNotification( string message )
+    {
+        if (message == "")
+            return;
+
+        string[] tmpStrings = new string[notificationMessages.Length + 1];
+        float[] tmpFloats = new float[notificationMessages.Length + 1];
+        for (int i = 0; i < notificationMessages.Length; i++)
+        {
+            tmpStrings[i] = notificationMessages[i];
+            tmpFloats[i] = notificationTimers[i];
+        }
+        tmpStrings[notificationMessages.Length] = message;
+        tmpFloats[notificationMessages.Length] = NOTIFICATIONHOLDTIME;
+        notificationMessages = tmpStrings;
+        notificationTimers = tmpFloats;
+    }
+
+    void RemoveNotification()
+    {
+        if (notificationToRemove < 0 || notificationToRemove > notificationMessages.Length)
+        {
+            notificationToRemove = -1;
+            return;
+        }
+
+        string[] tmpStrings = new string[notificationMessages.Length-1];
+        float[] tmpFloats = new float[notificationMessages.Length-1];
+        int count = 0;
+        for (int i = 0; i < notificationMessages.Length; i++)
+        {
+            if (i != notificationToRemove)
+            {
+                tmpStrings[count] = notificationMessages[i];
+                tmpFloats[count] = notificationTimers[i];
+                count++;
+            }
+        }
+        notificationMessages = tmpStrings;
+        notificationTimers = tmpFloats;
+
+        notificationToRemove = -1;
     }
 
     void SignalToFastForwardFeatures()
@@ -638,5 +772,47 @@ public class GreenerGameManager : MonoBehaviour
 
         if (noisyLogging)
             Debug.Log("--- GreenerGameManager [FirstPlayerData] : first player data established.");
+    }
+
+    void OnGUI()
+    {
+        if (!displayNotifications)
+            return;
+
+        Rect r = new Rect();
+        float w = Screen.width;
+        float h = Screen.height;
+
+        r.x = 0.025f * w;
+        r.y = 0.15f * h;
+        r.width = 0.2f * w;
+        r.height = 0.095f * h;
+
+        GUIStyle g = new GUIStyle(GUI.skin.box);
+        g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+        g.fontStyle = FontStyle.BoldAndItalic;
+        g.alignment = TextAnchor.MiddleCenter;
+        g.normal.textColor = Color.black;
+        g.hover.textColor = Color.black;
+        g.active.textColor = Color.black;
+        g.wordWrap = true;
+
+        Texture2D t = Texture2D.whiteTexture;
+        g.normal.background = t;
+        g.hover.background = t;
+        g.active.background = t;
+        Color c = Color.white;
+        c.r = 0.8f;
+        c.g = 0.7f;
+        c.b = 0.6f;
+        c.a = 0.618f;
+
+        for (int i = 0; i < notificationMessages.Length; i++)
+        {
+            c.a = 0.618f * Mathf.Clamp01(notificationTimers[i] / (NOTIFICATIONHOLDTIME - (NOTIFICATIONHOLDTIME - 1f)));
+            GUI.color = c;
+            GUI.Box(r, notificationMessages[i], g);
+            r.y += 0.1f * h;
+        }
     }
 }

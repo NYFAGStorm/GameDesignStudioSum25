@@ -34,7 +34,8 @@ public class GameSelection : MonoBehaviour
     private string selectionFeedback;
     private float feedbackTimer;
 
-    private MultiplayerHostPing[] hostPings; // host pings heard (collect over 1s intervals)
+    private float pingPollTimer; // interval when collection of hostPings takes place
+    private MultiplayerHostPing[] hostPings; // host pings heard within interval
     private bool tinyPopup; // ask new player name, offer "join" and "cancel"
     private MultiplayerHostPing currentNet; // the host ping selected to join
 
@@ -57,6 +58,7 @@ public class GameSelection : MonoBehaviour
 
     const float POPUPTIME = 1f;
     const float FEEDBACKTIME = 4f;
+    const float POLLINTERVAL = 1f;
 
 
     void Start()
@@ -85,6 +87,10 @@ public class GameSelection : MonoBehaviour
                 popPlayerName = saveMgr.GetJoiningPlayerName();
                 currentNet = saveMgr.GetJoinInfo();
             }
+            // start host ping poll timer
+            pingPollTimer = POLLINTERVAL;
+            // initialize host ping array
+            hostPings = new MultiplayerHostPing[0];
         }
     }
 
@@ -124,6 +130,22 @@ public class GameSelection : MonoBehaviour
             }
         }
 
+        // run host ping poll timer
+        if (pingPollTimer > 0f)
+        {
+            pingPollTimer -= Time.deltaTime;
+            if ( pingPollTimer < 0f )
+            {
+                // NOTE: if there were any reason not to listen, can stop here
+                pingPollTimer = POLLINTERVAL;
+                // clear list of host pings
+                hostPings = new MultiplayerHostPing[0];
+                // TEMP - remove me (this just to demonstrate game selection)
+                CreateFakeHostPings();
+            }
+            CollectHostPings();
+        }
+
         if (gamePopup)
             padMaxButton = 6;
         else
@@ -142,6 +164,57 @@ public class GameSelection : MonoBehaviour
             if (padButtonSelection > padMaxButton)
                 padButtonSelection = 0;
         }
+    }
+
+    // NOTE: we can do this lots of ways, and
+    // if something like a public function to call when hostPing arrives makes sense,
+    // we can just take that input here, for example (assuming for now we listen per tick)
+    void CollectHostPings()
+    {
+        MultiplayerHostPing liveHostPingSignal = new MultiplayerHostPing();
+
+        // NOTE: here, the function just treats 'liveHostPingSignal' as a currently heard ping
+        if (liveHostPingSignal.options == null)
+            return; // empty ping, invalid game key
+
+        // add ping to array
+        MultiplayerHostPing[] tmp = new MultiplayerHostPing[hostPings.Length + 1];
+        for (int i = 0; i < hostPings.Length; i++)
+        {
+            tmp[i] = hostPings[i];
+        }
+        tmp[hostPings.Length] = liveHostPingSignal;
+        hostPings = tmp;
+    }
+
+    void CreateFakeHostPings()
+    {
+        // TEMP : 'polling' fake host ping data for demonstraton of game select
+        hostPings = new MultiplayerHostPing[2];
+        hostPings[0].gameKey = "[000]-a really fun game";
+        hostPings[0].availablePlayerSlots = 1;
+        hostPings[0].profiles = new string[2];
+        hostPings[0].profiles[0] = "hostprofile";
+        hostPings[0].profiles[1] = saveMgr.GetCurrentProfile().profileID;
+        hostPings[0].playerNames = new string[2];
+        hostPings[0].playerNames[0] = "host player name";
+        hostPings[0].playerNames[1] = "your name";
+        hostPings[0].options = new GameOptionsData();
+        hostPings[0].options.maxPlayers = 2;
+        hostPings[0].options.allowCheats = true;
+        hostPings[0].options.allowHazards = true;
+        hostPings[0].options.allowCurses = true;
+        hostPings[1].gameKey = "[111]-another game";
+        hostPings[1].availablePlayerSlots = 0;
+        hostPings[1].profiles = new string[1];
+        hostPings[1].profiles[0] = "hostprofile";
+        hostPings[1].playerNames = new string[1];
+        hostPings[1].playerNames[0] = "host player name";
+        hostPings[1].options = new GameOptionsData();
+        hostPings[1].options.maxPlayers = 1;
+        hostPings[1].options.allowCheats = false;
+        hostPings[1].options.allowHazards = false;
+        hostPings[1].options.allowCurses = false;
     }
 
     void ConfigureCurrentGameEnabled()
@@ -710,7 +783,7 @@ public class GameSelection : MonoBehaviour
 
         // remote game column
         // associated games on network
-        int remotelistNum = 2; // how many hosts are pinging now?
+        int remotelistNum = hostPings.Length;
         if (remotelistNum == 0)
         {
             // label (if no games associated with this profile or all games full)
@@ -733,36 +806,9 @@ public class GameSelection : MonoBehaviour
         else
         {
             // we ask network traffic for current host pings
-            // TODO: use multiplayer information (host pings parsed to arrive at list)
-            // temp - test data ---
-            string currentProfileID = saveMgr.GetCurrentProfile().profileID;
-            hostPings = new MultiplayerHostPing[2];
-            hostPings[0].gameKey = "[000]-a really fun game";
-            hostPings[0].availablePlayerSlots = 1;
-            hostPings[0].profiles = new string[2];
-            hostPings[0].profiles[0] = "hostprofile";
-            hostPings[0].profiles[1] = currentProfileID;
-            hostPings[0].playerNames = new string[2];
-            hostPings[0].playerNames[0] = "host player name";
-            hostPings[0].playerNames[1] = "your name";
-            hostPings[0].options = new GameOptionsData();
-            hostPings[0].options.maxPlayers = 2;
-            hostPings[0].options.allowCheats = true;
-            hostPings[0].options.allowHazards = true;
-            hostPings[0].options.allowCurses = true;
-            hostPings[1].gameKey = "[111]-another game";
-            hostPings[1].availablePlayerSlots = 0;
-            hostPings[1].profiles = new string[1];
-            hostPings[1].profiles[0] = "hostprofile";
-            hostPings[1].playerNames = new string[1];
-            hostPings[1].playerNames[0] = "host player name";
-            hostPings[1].options = new GameOptionsData();
-            hostPings[1].options.maxPlayers = 1;
-            hostPings[1].options.allowCheats = false;
-            hostPings[1].options.allowHazards = false;
-            hostPings[1].options.allowCurses = false;
-            // ---
             string[] list = new string[hostPings.Length];
+            // use the current profile id
+            string currentProfileID = saveMgr.GetCurrentProfile().profileID;
             // parse host pings' data
             for (int i = 0; i < hostPings.Length; i++)
             {
@@ -828,9 +874,9 @@ public class GameSelection : MonoBehaviour
                         popPlayerName = playerName;
                     MultiplayerRemoteRequest rRequest = MultiplayerSystem.FormRemoteRequest(saveMgr.GetCurrentProfile(), popPlayerName);
                     // TODO: send remote request signal, hear back from host
-                    // on host, that's MultiplayerSystem.HandleRemoteInvitationRequest(saveMgr.GetCurrentGameData(), rRequest)
-                    // NOTE: ! the following _actually_ needs to be a function call to the host, returning a bool value
-                    if (true) //if (MultiplayerSystem.HandleRemoteInvitationRequest(saveMgr.GetCurrentGameData(), rRequest))
+                    // on host, that's a public function GreenerGameManager.ProcessRemoteInvitationRequest(rRequest)
+                    // NOTE: ! the following actually needs to be that return bool value
+                    if (true) //if (host says GreenerGameManager.ProcessRemoteInvitationRequest(rRequest) == true)
                     {
                         // 'true' holds hostPing data to allow main menu "play" to join
                         currentNet = hostPings[i];
