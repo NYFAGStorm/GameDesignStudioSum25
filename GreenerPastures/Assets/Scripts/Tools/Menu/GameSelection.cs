@@ -175,7 +175,7 @@ public class GameSelection : MonoBehaviour
 
         // NOTE: here, the function just treats 'liveHostPingSignal' as a currently heard ping
         if (liveHostPingSignal.options == null)
-            return; // empty ping, invalid game key
+            return; // empty ping, invalid game options
 
         // add ping to array
         MultiplayerHostPing[] tmp = new MultiplayerHostPing[hostPings.Length + 1];

@@ -85,10 +85,10 @@ public class GreenerGameManager : MonoBehaviour
                     Debug.Log("--- GreenerGameManager [Start] : host ping rhythm initiated.");
                 // initialize host ping timer
                 hostPingTimer = HOSTPINGINTERVAL;
-                // init notification system
-                notificationMessages = new string[0];
-                notificationTimers = new float[0];
             }
+            // init notification system
+            notificationMessages = new string[0];
+            notificationTimers = new float[0];
         }
     }
 
