@@ -24,7 +24,9 @@ public class CheatManager : MonoBehaviour
     private float codeTimer;
     private int validCode;
 
-    const int TOTALCHEATCODES = 11;
+    private GreenerGameManager ggMgr;
+
+    const int TOTALCHEATCODES = 12;
     const float CHEATCODEWINDOW = 1f;
 
 
@@ -33,6 +35,12 @@ public class CheatManager : MonoBehaviour
         // validate
         if ( codes != null && codes.Length > 0 )
             Debug.LogWarning("--- CheatManager [Start] : cheat code data detected in "+gameObject.name+", but data set via script. will ignore.");
+        ggMgr = GameObject.FindFirstObjectByType<GreenerGameManager>();
+        if (ggMgr == null)
+        {
+            Debug.LogError("--- CheatManager [Start] : no greener game manager found in scene. aborting.");
+            enabled = false;
+        }
         // initialize
         if (enabled)
         {
@@ -118,6 +126,7 @@ public class CheatManager : MonoBehaviour
             {
                 validCode = i;
                 Debug.Log("--- CheatManager [DetectCode] : cheat code '" + codes[i].name +"' ["+validCode+"] detected.");
+                ggMgr.AddNotification("cheat code '" + codes[i].name + "' detected.");
                 ResetCurrentCode();
                 break;
             }
@@ -172,6 +181,10 @@ public class CheatManager : MonoBehaviour
             case 10:
                 n = "discosky";
                 d = "Toggles a very colorful sky display";
+                break;
+            case 11:
+                n = "bumpmaxplayers";
+                d = "Adds one to the max players of this game (up to 8)";
                 break;
             default:
                 n = "-";
@@ -271,6 +284,9 @@ public class CheatManager : MonoBehaviour
                 BackgroundManager bm = GameObject.FindFirstObjectByType<BackgroundManager>();
                 if (bm != null)
                     bm.DiscoSky();
+                break;
+            case 11:
+                ggMgr.game.options.maxPlayers = Mathf.Clamp(ggMgr.game.options.maxPlayers + 1, 1, 8);
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");

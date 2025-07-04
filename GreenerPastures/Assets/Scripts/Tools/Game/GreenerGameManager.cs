@@ -192,7 +192,11 @@ public class GreenerGameManager : MonoBehaviour
         return retBool;
     }
 
-    void AddNotification( string message )
+    /// <summary>
+    /// Provides a timed notification tag on the HUD of the local player
+    /// </summary>
+    /// <param name="message">The brief message to display on the notification</param>
+    public void AddNotification( string message )
     {
         if (message == "")
             return;
