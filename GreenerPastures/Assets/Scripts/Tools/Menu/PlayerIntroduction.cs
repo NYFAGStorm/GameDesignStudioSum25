@@ -5,6 +5,10 @@ public class PlayerIntroduction : MonoBehaviour
     // Author: Glenn Storm
     // Handles a routine seen only when a new player arrives (a.k.a. onboarding)
 
+    // TODO: create a master script schedule
+    // able to handle npc moves, teleports, vfx, item drops,
+    // pauses, wait for player, etc.
+
     // world view, clouds part
     // zoom into Eden on central market island
     // "Welcome Biomancer! My name is Eden. Tell me about yourself."
@@ -46,6 +50,7 @@ public class PlayerIntroduction : MonoBehaviour
     // "Again, welcome and enjoy your time with us."
     // [walk to teleporter - teleport to market island - walk into market]
 
+
     public bool introRunning;
     public bool introPop;
     public bool dialogPop;
@@ -69,6 +74,10 @@ public class PlayerIntroduction : MonoBehaviour
     private int introScriptStep;
     private float introTimer;
 
+    private Vector3[] introMarks;
+    private int currentMark;
+    private NPCController eden;
+
     private int modelSelection = 0;
     private int skinSelection = 0;
     private int accentSelection = 0;
@@ -90,6 +99,8 @@ public class PlayerIntroduction : MonoBehaviour
             InitializeCharacterColors();
 
             ConfigureIntroDialog();
+
+            ConfigureIntroMarks();
         }
     }
 
@@ -153,6 +164,71 @@ public class PlayerIntroduction : MonoBehaviour
         introDialog[24] = "Again, welcome and enjoy your time with us.";
     }
 
+    void ConfigureIntroMarks()
+    {
+        introMarks = new Vector3[21];
+        for (int i=0; i<21; i++)
+        {
+            introMarks[i] = Vector3.zero;
+        }
+        // + + zoom into Eden on central market island
+        introMarks[0].x = 20f;
+        introMarks[0].z = -24f;
+        introMarks[1].x = 20f;
+        introMarks[1].z = -25f;
+        // "Welcome Biomancer! My name is Eden. Tell me about yourself."
+        introMarks[2].x = 22f;
+        introMarks[2].z = -24f;
+        // + "This central island connects every other through our teleporter nodes."
+        introMarks[3].x = 22f;
+        introMarks[3].z = -22.5f;
+        // + "Here is the market, where we can buy supplies and sell your wares."
+        introMarks[4].x = 20.5f;
+        introMarks[4].z = -23f;
+        introMarks[5].x = 18f;
+        introMarks[5].z = -20f;
+        // + + "Let me purchase a couple seeds and take you to your floating island."
+        // [pause - walk toward teleporter - island rise]
+        introMarks[6].x = 16f;
+        introMarks[6].z = -16f;
+        introMarks[7].x = 4f;
+        introMarks[7].z = -4f;
+        introMarks[8].x = 3f;
+        introMarks[8].z = -2f;
+        // + + +[walk to teleporter - teleport to island - walk to farm plot]
+        introMarks[9].x = 2.25f;
+        introMarks[9].z = -2f;
+        introMarks[10].x = 1.75f;
+        introMarks[10].z = -2.25f;
+        // + + [till plot from wild - till plot from dirt]
+        introMarks[11].x = 2.25f;
+        introMarks[11].z = -1.75f;
+        introMarks[12].x = 2f;
+        introMarks[12].z = -2f;
+        // + + [water plot - drop seed - plant grows]
+        introMarks[13].x = 2.25f;
+        introMarks[13].z = -2.25f;
+        // + [harvest plant - flower drops, stalk remains]
+        introMarks[14].x = 2f;
+        introMarks[14].z = -2f;
+        introMarks[15].x = -3f;
+        introMarks[15].z = -2f;
+        // + + [uproot stalk - stalk drops]
+        introMarks[16].x = 1.75f;
+        introMarks[16].z = -1.75f;
+        // + [fertilizer drops - plot tilled to dirt]
+        introMarks[17].x = 2.75f;
+        introMarks[17].z = -2f;
+        // + [magic spell cast for fast grow - local magic vfx]
+        introMarks[18].x = 4f;
+        introMarks[18].z = -4f;
+        introMarks[19].x = 16f;
+        introMarks[19].z = -16f;
+        introMarks[20].x = 21f;
+        introMarks[20].z = -22f;
+        // + + +[walk to teleporter - teleport to market island - walk into market]
+    }
+
     void Update()
     {
         // handle intro dialog step
@@ -181,6 +257,12 @@ public class PlayerIntroduction : MonoBehaviour
             introRunning = true;
             introScriptStep = 0;
             introTimer = LONGPAUSETIME;
+            // eden arrives
+            currentMark = 0;
+            eden = SpawnEden(introMarks[currentMark]);
+            eden.ghostMode = true;
+            eden.mode = NPCController.NPCMode.Scripted;
+            eden.moveTarget = introMarks[++currentMark];
         }
     }
 
@@ -201,6 +283,13 @@ public class PlayerIntroduction : MonoBehaviour
         {
             pcm.hidePlayerHUD = claim;
         }
+    }
+
+    NPCController SpawnEden( Vector3 pos )
+    {
+        GameObject eNPC = GameObject.Instantiate((GameObject)Resources.Load("NPC Eden"));
+        eNPC.transform.position = pos;
+        return eNPC.GetComponent<NPCController>();
     }
 
     void TryConfigPlayerInScene( PlayerOptions options )
