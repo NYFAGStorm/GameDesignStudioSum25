@@ -24,7 +24,7 @@ public class NPCController : MonoBehaviour
     private bool imageFlipped;
     private Renderer rend;
 
-    const float MOVETARGETTHRESHOLD = 0.2f;
+    const float MOVETARGETTHRESHOLD = 0.1f;
 
 
     void Start()

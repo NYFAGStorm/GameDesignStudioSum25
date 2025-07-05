@@ -113,6 +113,8 @@ public class PlayerIntroduction : MonoBehaviour
         Vector3 prevMark = Vector3.zero;
         for (int i = 0; i < introBeats.Length; i++)
         {
+            print("validating prev name is '"+prevName+"' , prev mark is "+prevMark.x+" , "+prevMark.z);
+
             if (prevName == introBeats[i].name)
                 Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : intro beat " + i + " has the same name as previous. this will cause errors at runtime.");
             introBeats[i].name = "[" + i + "] " + introBeats[i].name;
@@ -123,13 +125,26 @@ public class PlayerIntroduction : MonoBehaviour
             {
                 if (introBeats[i].npcMark == Vector3.zero)
                     Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : intro beat " + i + " has an npc mark configured, but mark is zero. this will cause errors at runtime.");
-                else if (Vector3.Distance(prevMark, introBeats[i].npcMark) <= .2f )
-                    Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : intro beat " + i + " has an npc mark configured, but mark too close to previous mark ("+ Vector3.Distance(prevMark, introBeats[i].npcMark) + "). this will cause errors at runtime.");
+                else if (Vector3.Distance(prevMark, introBeats[i].npcMark) <= .25f )
+                {
+                    Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : intro beat " + i + " has an npc mark configured, but mark too close to npc position (" + Vector3.Distance(prevMark, introBeats[i].npcMark) + "). this will cause errors at runtime. will adjust this mark further away.");
+                    Vector3 newMarkPos = introBeats[i].npcMark;
+                    newMarkPos += (introBeats[i].npcMark-prevMark);
+                    introBeats[i].npcMark = newMarkPos;
+                }
             }
             if (introBeats[i].action == ScriptedBeatAction.Dialog && introBeats[i].dialogLine == "")
                 Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : intro beat " + i + " has dialog configured, but no dialog line is found. this will cause errors at runtime.");
+            if (introBeats[i].action == ScriptedBeatAction.Dialog && 
+                introBeats[i].transition != ScriptedBeatTransition.PlayerResponse &&
+                introBeats[i].transition != ScriptedBeatTransition.TimedDuration)
+                Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : intro beat " + i + " has dialog configured, but transition from this beat is '" + introBeats[i].transition.ToString() +"'. this will cause errors at runtime.");
             if (introBeats[i].action == ScriptedBeatAction.EndIntro)
                 beatScriptEndIndex = i;
+
+            prevName = introBeats[i].name;
+            if (introBeats[i].npcMark != Vector3.zero)
+                prevMark = introBeats[i].npcMark;
         }
         if ( beatScriptEndIndex == 0)
             Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : no final beat with 'end intro' configured. this will cause errors at runtime.");
@@ -541,7 +556,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
             "Stalks and other plant material go in the compost bin to make fertilizer.";
-        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "eden moves to plant";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -563,16 +578,16 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
         beat++;
+        introBeats[beat].name = "step away";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].npcMark = new Vector3(-2.25f, 0f, -2f);
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
         introBeats[beat].name = "'By adding fertilizer to the soil'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
             "By adding fertilizer to the soil, it improves and so does you harvest.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
-        beat++;
-        introBeats[beat].name = "step away";
-        introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(-2.25f, 0f, -2f);
-        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "compost pause";
         introBeats[beat].action = ScriptedBeatAction.Default;
