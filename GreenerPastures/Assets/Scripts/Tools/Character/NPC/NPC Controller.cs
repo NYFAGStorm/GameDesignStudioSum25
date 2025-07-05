@@ -16,7 +16,7 @@ public class NPCController : MonoBehaviour
     public NPCMode mode;
     public bool ghostMode; // can move through solid objects
 
-    public float movementSpeed = 1f;
+    public float movementSpeed = 1.5f;
     public Vector3 moveTarget;
     public bool destinationReached; // readable as a call-back
 
@@ -67,7 +67,7 @@ public class NPCController : MonoBehaviour
 
         // calculate move vector
         Vector3 move = (moveTarget - gameObject.transform.position);
-        if (move.magnitude < movementSpeed)
+        if (move.magnitude < MOVETARGETTHRESHOLD)
             move = move.normalized * (move.magnitude / movementSpeed);
         else
             move.Normalize();

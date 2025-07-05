@@ -229,14 +229,16 @@ public class CameraManager : MonoBehaviour
         modeAfterMove = CameraMode.Default;
     }
 
-    public void SetMediumViewIntro()
+    public void SetCameraViewIntro( CameraMode cMode )
     {
-        modeAfterHold = CameraMode.Medium;
+        modeAfterHold = cMode;
         SavePosAndRot();
         // use modeAfterHold for target acquisition
         mode = modeAfterHold;
         GetFollowTarget();
-        SetDefaultTimers();
+        cameraPauseTimer = 1f;
+        cameraMoveTimer = 2f;
+        cameraMoveDuration = cameraMoveTimer;
         mode = CameraMode.Hold;
         modeAfterMove = modeAfterHold; // stay there
     }
