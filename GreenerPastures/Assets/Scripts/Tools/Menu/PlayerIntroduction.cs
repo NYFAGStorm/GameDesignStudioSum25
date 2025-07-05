@@ -5,51 +5,44 @@ public class PlayerIntroduction : MonoBehaviour
     // Author: Glenn Storm
     // Handles a routine seen only when a new player arrives (a.k.a. onboarding)
 
-    // TODO: create a master script schedule
-    // able to handle npc moves, teleports, vfx, item drops,
-    // pauses, wait for player, etc.
+    public enum ScriptedBeatAction
+    {
+        Default,
+        Dialog,
+        EdenMark,
+        TeleportEden,
+        CameraChange,
+        EnableSkip,
+        PlayerSetting,
+        MoveIsland,
+        VFXSpawn,
+        ItemSpawn,
+        PlotChange,
+        DeleteItem
+    }
 
-    // world view, clouds part
-    // zoom into Eden on central market island
-    // "Welcome Biomancer! My name is Eden. Tell me about yourself."
-    // popup displayed to configure options
-    // zoom out to normal follow view
-    // (can skip intro now)
-    // "We are so happy you chose to help grow our magical community."
-    // "Here we tend to the floating islands our Genesis Tree provides us."
-    // "This central island connects every other through our teleporter nodes."
-    // "Here is the market, where we can buy supplies and sell your wares."
-    // "Let me purchase a couple seeds and take you to your floating island."
-    // [pause - walk toward teleporter - island rise]
-    // "Isn't that a beautiful sight! Your new island with greener pastures."
-    // [walk to teleporter - teleport to island - walk to farm plot]
-    // "Here is your farm, where you are to grow crops, harvest and sell them."
-    // "We work the land and improve the soil. First let's get this plot ready."
-    // [till plot from wild - till plot from dirt]
-    // "We care for the land and it provides. Let's water this plot and plant."
-    // [water plot - drop seed - plant grows]
-    // "Different plants grow faster or slower, yield more or less, ..."
-    // "...some grow better in certain seasons, some even grow only at night!"
-    // "You can learn about everything in your Biomancer's Almanac. (PRESS \)"
-    // "With our plant all grown, we can harvest the fruit or flower."
-    // [harvest plant - flower drops, stalk remains]
-    // "Take your flower with the action button. Now, I'll dig up this stalk."
-    // [uproot stalk - stalk drops]
-    // "Stalks and other plant material go in the compost bin to make fertilizer."
-    // "By adding fertilizer to the soil, it improves and so does you harvest."
-    // [fertilizer drops - plot tilled to dirt]
-    // "Now you try. You can check the player controls by holding the TAB key."
-    // "All this hard work pays off at the market, and it all leads to magic."
-    // "When you level up, you'll find the magic crafting table in your tower."
-    // "On the table, your grimiore will have new spells available to craft."
-    // "Crafted spells are stored in your spell book, so you can cast them."
-    // "Like this!"
-    // [magic spell cast for fast grow - local magic vfx]
-    // "Great! You're a natural. May the grace of the Genesis Tree be with you."
-    // (cut to here if cancel intro)
-    // "Again, welcome and enjoy your time with us."
-    // [walk to teleporter - teleport to market island - walk into market]
+    public enum ScriptedBeatTransition
+    {
+        Default,
+        TimedDuration,
+        PlayerResponse,
+        EdenCallback
+    }
 
+    [System.Serializable]
+    public struct ScriptedBeat
+    {
+        public string name;
+        public ScriptedBeatAction action;
+        public bool actionDone;
+        public ScriptedBeatTransition transition;
+        public bool transitionDone;
+        public float duration;
+        public CameraManager.CameraMode cam;
+        public PositionData islandPos;
+    }
+    public ScriptedBeat[] introBeats;
+    public ScriptedBeat currentBeat; // for use in debugging via inspector only
 
     public bool introRunning;
     public bool introPop;
@@ -86,6 +79,12 @@ public class PlayerIntroduction : MonoBehaviour
     private PlayerControlManager pcm;
     private CameraManager camMgr;
 
+    private int currentBeatIndex;
+    private float beatTimer;
+    public bool beatTimeUp;
+    public bool npcCallback;
+    public bool playerResponse;
+
     const float DEFAULTINTROTIME = 0.618f;
     const float PAUSETIME = 1f;
     const float LONGPAUSETIME = 2f;
@@ -103,6 +102,8 @@ public class PlayerIntroduction : MonoBehaviour
             ConfigureIntroDialog();
 
             ConfigureIntroMarks();
+
+            ConfigureIntroBeats();
         }
     }
 
@@ -231,6 +232,373 @@ public class PlayerIntroduction : MonoBehaviour
         // + + +[walk to teleporter - teleport to market island - walk into market]
     }
 
+    void ConfigureIntroBeats()
+    {
+        introBeats = new ScriptedBeat[100]; // we use 77 so far
+        int beat = 0;
+        introBeats[beat].name = "intro launch - world view";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "intro zoom in - eden move";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "'welcome biomancer!'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "config appearance";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "player appears - camera follow";
+        introBeats[beat].action = ScriptedBeatAction.CameraChange;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        introBeats[beat].cam = CameraManager.CameraMode.Follow;
+        beat++;
+        introBeats[beat].name = "(can skip now)";
+        introBeats[beat].action = ScriptedBeatAction.EnableSkip;
+        introBeats[beat].transition = ScriptedBeatTransition.Default; // immediate transition
+        beat++;
+        introBeats[beat].name = "'happy you chose'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'we tend to the floating islands'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "set island pos wider";
+        introBeats[beat].action = ScriptedBeatAction.PlayerSetting;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.x = 20f;
+        introBeats[beat].islandPos.y = 0f;
+        introBeats[beat].islandPos.z = -20f;
+        introBeats[beat].islandPos.w = 7f;
+        beat++;
+        introBeats[beat].name = "move eden wider";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        beat++;
+        introBeats[beat].name = "'This central island'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "move eden near market";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        beat++;
+        introBeats[beat].name = "'Here is the market'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "move eden to market";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        beat++;
+        introBeats[beat].name = "'Let me purchase'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "eden purchase";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "wider shot for island risse";
+        introBeats[beat].action = ScriptedBeatAction.CameraChange;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].cam = CameraManager.CameraMode.Long;
+        beat++;
+        introBeats[beat].name = "eden move toward teleporter";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "magic vfx";
+        introBeats[beat].action = ScriptedBeatAction.VFXSpawn; // at eden
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "island rise";
+        introBeats[beat].action = ScriptedBeatAction.MoveIsland;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 3f;
+        beat++;
+        introBeats[beat].name = "'isn't that beautiful'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "cam follow";
+        introBeats[beat].action = ScriptedBeatAction.CameraChange;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].cam = CameraManager.CameraMode.Follow;
+        beat++;
+        introBeats[beat].name = "eden to teleporter";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "teleporter vfx (a)";
+        introBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.x = 16f;
+        introBeats[beat].islandPos.z = -16f;
+        beat++;
+        introBeats[beat].name = "teleporter vfx (b)";
+        introBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.x = 4f;
+        introBeats[beat].islandPos.z = -4f;
+        beat++;
+        introBeats[beat].name = "eden teleport";
+        introBeats[beat].action = ScriptedBeatAction.TeleportEden;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "force player to teleporter";
+        introBeats[beat].action = ScriptedBeatAction.PlayerSetting;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = 16f;
+        introBeats[beat].islandPos.z = -16f;
+        introBeats[beat].islandPos.w = 0.1f;
+        beat++;
+        introBeats[beat].name = "eden walk to farm";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "'here is your farm'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'we work the land'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "eden to plot";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "tilling plot from wild";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        beat++;
+        introBeats[beat].name = "eden around plot";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "tilling plot from dirt";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "'we care for the land'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "water";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange; // water
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "drop seed";
+        introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // seed
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "'Different plants grow faster'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'...some grow better'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'in your biomancer's almanac'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "- pause -";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "'with our plant all grown'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "harvest plant";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange; // harvest
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "flower drops";
+        introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // flower
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "'take your flower'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "move eden to plant";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "digging up stalk pause";
+        introBeats[beat].action = ScriptedBeatAction.Default; // dig up
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 3f;
+        beat++;
+        introBeats[beat].name = "uprooted";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        beat++;
+        introBeats[beat].name = "drop stalk";
+        introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // stalk
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "'stalks and other plant material'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        beat++;
+        introBeats[beat].name = "eden moves to plant";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "eden picks up stalk";
+        introBeats[beat].action = ScriptedBeatAction.DeleteItem;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "eden moves to compost bin";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "eden drops stalk in bin";
+        introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // stalk
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "'By adding fertilizer to the soil'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "compost pause";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 3f;
+        beat++;
+        introBeats[beat].name = "eden picks up fertilizer";
+        introBeats[beat].action = ScriptedBeatAction.DeleteItem; // fertilizer
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "eden moves back to plot";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "drops fertilizer on plot";
+        introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // fertilizer
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "till plot to dirt";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "eden moves back";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "'Now you try'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'All this hard work pays'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'When you level up'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'On the table, your grimiore'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'Crafted spells are stored'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "- dramatic pause -";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "'Like this!'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "- magic pause -";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = .5f;
+        beat++;
+        introBeats[beat].name = "magic vfx";
+        introBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        beat++;
+        introBeats[beat].name = "plant grows";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange; // plant 
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "'Great! your're a natural'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'Again, welcome'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "walk to teleporter";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "teleport vfx (a)";
+        introBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.x = 4f;
+        introBeats[beat].islandPos.z = -4f;
+        beat++;
+        introBeats[beat].name = "teleport vfx (b)";
+        introBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.x = 16f;
+        introBeats[beat].islandPos.z = -16f;
+        beat++;
+        introBeats[beat].name = "eden teleports";
+        introBeats[beat].action = ScriptedBeatAction.TeleportEden;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        introBeats[beat].islandPos.x = 16f;
+        introBeats[beat].islandPos.z = -16f;
+        beat++;
+        introBeats[beat].name = "eden walks into market";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+    }
+
+    public void NPCCallback()
+    {
+        npcCallback = true;
+    }
+
     void Update()
     {
         // handle intro dialog step
@@ -252,27 +620,128 @@ public class PlayerIntroduction : MonoBehaviour
                 dialogPop = true;
             }
         }
-        
-        // temp controls for testing
-        if (Input.GetKeyDown(KeyCode.I))
+
+        // intro beat script
+        if (!introRunning)
+            return;
+
+        // run beat timer
+        if (beatTimer > 0f)
         {
-            /*
-            TakeOverHUD(true);
-            introRunning = true;
-            introScriptStep = 0;
-            introTimer = LONGPAUSETIME;
-            // eden arrives
-            currentMark = 0;
-            eden = SpawnEden(introMarks[currentMark]);
-            eden.ghostMode = true;
-            eden.mode = NPCController.NPCMode.Scripted;
-            eden.moveTarget = introMarks[++currentMark];
-            */
+            beatTimer -= Time.deltaTime;
+            if (beatTimer < 0f)
+            {
+                beatTimer = 0f;
+                beatTimeUp = true;
+            }
+        }
+        // handle beat script transition
+        switch (currentBeat.transition)
+        {
+            case ScriptedBeatTransition.Default:
+                currentBeatIndex++; // immediate transition
+                currentBeat.transitionDone = true;
+                break;
+            case ScriptedBeatTransition.TimedDuration:
+                if (beatTimeUp)
+                {
+                    currentBeatIndex++;
+                    beatTimeUp = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
+            case ScriptedBeatTransition.PlayerResponse:
+                if (playerResponse)
+                {
+                    currentBeatIndex++;
+                    playerResponse = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
+            case ScriptedBeatTransition.EdenCallback:
+                if (npcCallback)
+                {
+                    currentBeatIndex++;
+                    npcCallback = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
+            default:
+                break;
+        }
+        if (!currentBeat.actionDone)
+        {
+            // handle beat script action
+            switch (currentBeat.action)
+            {
+                case ScriptedBeatAction.Default:
+                    // do nothing (pause)
+                    break;
+                case ScriptedBeatAction.Dialog:
+                    introScriptStep++;
+                    introTimer = DEFAULTINTROTIME;
+                    break;
+                case ScriptedBeatAction.EdenMark:
+                    currentMark++;
+                    eden.moveTarget = introMarks[currentMark];
+                    break;
+                case ScriptedBeatAction.TeleportEden:
+                    Vector3 pos = eden.gameObject.transform.position;
+                    pos.x = currentBeat.islandPos.x;
+                    pos.z = currentBeat.islandPos.z;
+                    eden.gameObject.transform.position = pos;
+                    break;
+                case ScriptedBeatAction.CameraChange:
+                    camMgr.mode = currentBeat.cam;
+                    // TODO: other cam mgr stuff
+                    break;
+                case ScriptedBeatAction.EnableSkip:
+                    canSkipIntro = true;
+                    break;
+                case ScriptedBeatAction.PlayerSetting:
+                    // all the stuff
+                    break;
+                case ScriptedBeatAction.MoveIsland:
+                    // configure move based on target position
+                    Vector3 targetPos = Vector3.zero;
+                    break;
+                case ScriptedBeatAction.VFXSpawn:
+                    Vector3 vfxPos = Vector3.zero;
+                    // either teleport or magic
+                    GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+                    vfxPos.x = currentBeat.islandPos.x;
+                    vfxPos.z = currentBeat.islandPos.z;
+                    vfx.transform.position = vfxPos;
+                    break;
+                case ScriptedBeatAction.ItemSpawn:
+                    // item type
+                    // hit up item spawn manager
+                    break;
+                case ScriptedBeatAction.PlotChange:
+                    // plot reference - type of change
+                    break;
+                case ScriptedBeatAction.DeleteItem:
+                    // item reference
+                    break;
+            }
+            currentBeat.actionDone = true;
+        }
+        if (introBeats[currentBeatIndex].name != currentBeat.name)
+        {
+            // set current beat (transition incremented index value)
+            currentBeat = introBeats[currentBeatIndex];
+            // display new beat name
+            print("beat '" + introBeats[currentBeatIndex].name + "'");
+            // if timed duration transition, set timer
+            if (currentBeat.transition == ScriptedBeatTransition.TimedDuration)
+                beatTimer = currentBeat.duration;
         }
     }
 
     public void LaunchIntro()
     {
+        // WIP - skip intro
+        return;
         // 
         // PLAYER INTRODUCTION
         //
@@ -298,13 +767,12 @@ public class PlayerIntroduction : MonoBehaviour
         TakeOverHUD(true);
         introRunning = true;
         introScriptStep = 0;
-        introTimer = LONGPAUSETIME;
+        introTimer = 5f; // LONGPAUSETIME;
         // eden arrives
         currentMark = 0;
         eden = SpawnEden(introMarks[currentMark]);
         eden.ghostMode = true;
         eden.mode = NPCController.NPCMode.Scripted;
-        eden.moveTarget = introMarks[++currentMark];
     }
 
     void TakeOverHUD( bool claim )
@@ -437,7 +905,7 @@ public class PlayerIntroduction : MonoBehaviour
             {
                 // next dialog
                 dialogPop = false;
-                introScriptStep++;
+                //introScriptStep++;
                 if (introScriptStep >= introDialog.Length)
                 {
                     introRunning = false;
@@ -449,7 +917,8 @@ public class PlayerIntroduction : MonoBehaviour
                     introPop = true;
                     return;
                 }
-                introTimer = PAUSETIME;
+                //introTimer = PAUSETIME;
+                playerResponse = true;
             }
         }
 
@@ -720,6 +1189,8 @@ public class PlayerIntroduction : MonoBehaviour
             introTimer = LONGPAUSETIME;
             // may skip remainder of introduction
             canSkipIntro = true;
+            // indicaate player reponse has happened
+            playerResponse = true;
         }
     }
 }
