@@ -40,7 +40,15 @@ public enum PlayerColor
     ColorD,
     ColorE,
     ColorF,
-    ColorG
+    ColorG,
+    ColorH,
+    ColorI,
+    ColorJ,
+    ColorK,
+    ColorL,
+    ColorM,
+    ColorN,
+    ColorO
 }
 
 [System.Serializable]

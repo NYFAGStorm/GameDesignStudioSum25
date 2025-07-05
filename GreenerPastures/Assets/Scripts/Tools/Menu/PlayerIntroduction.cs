@@ -173,8 +173,8 @@ public class PlayerIntroduction : MonoBehaviour
         {
             characterSkinTones[i] = PlayerSystem.GetPlayerSkinColor((PlayerSkinColor)i);
         }
-        characterColors = new Color[8];
-        for (int i = 0; i < 8; i++)
+        characterColors = new Color[16];
+        for (int i = 0; i < 16; i++)
         {
             characterColors[i] = PlayerSystem.GetPlayerColor((PlayerColor)i);
         }
