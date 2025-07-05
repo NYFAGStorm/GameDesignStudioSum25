@@ -48,7 +48,7 @@ public class CameraManager : MonoBehaviour
     const float MAXPANCRANEDIST = 10f;
     const float MINPANCRANEHEIGHT = 0.5f;
     const float LATERALPANMULTIPLIER = 0.618f;
-    const float INTROMOVEDURATION = 3f;
+    const float INTROMOVEDURATION = 4f;
 
 
     void Awake()
