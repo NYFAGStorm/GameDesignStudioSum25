@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerIntroduction : MonoBehaviour
@@ -71,6 +70,8 @@ public class PlayerIntroduction : MonoBehaviour
     private float introTimer;
 
     private NPCController eden;
+    private PlotManager managedPlot;
+    private LooseItemManager droppedItem;
 
     private int modelSelection = 0;
     private int skinSelection = 0;
@@ -113,8 +114,6 @@ public class PlayerIntroduction : MonoBehaviour
         Vector3 prevMark = Vector3.zero;
         for (int i = 0; i < introBeats.Length; i++)
         {
-            print("validating prev name is '"+prevName+"' , prev mark is "+prevMark.x+" , "+prevMark.z);
-
             if (prevName == introBeats[i].name)
                 Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : intro beat " + i + " has the same name as previous. this will cause errors at runtime.");
             introBeats[i].name = "[" + i + "] " + introBeats[i].name;
@@ -177,6 +176,39 @@ public class PlayerIntroduction : MonoBehaviour
         for (int i = 0; i < 16; i++)
         {
             characterColors[i] = PlayerSystem.GetPlayerColor((PlayerColor)i);
+        }
+    }
+
+    void FindManagedPlot()
+    {
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i = 0; i < plots.Length; i++)
+        {
+            if (plots[i].gameObject.transform.localPosition.x == 2f &&
+                plots[i].gameObject.transform.localPosition.z == -2f)
+            {
+                managedPlot = plots[i];
+                break;
+            }
+        }
+        if (managedPlot == null)
+        {
+            Debug.LogError("--- PlayerIntroduction [FindManagedPlot] : no managed plot found at local position 2,0,-2 in scene. aborting.");
+            enabled = false;
+        }
+    }
+
+    void TowerTeleporterControl( bool turnOn )
+    {
+        TeleportManager[] tporters = GameObject.FindObjectsByType<TeleportManager>(FindObjectsSortMode.None);
+        print("found "+tporters.Length+" teleport managers to configure");
+        for (int i = 0; i < tporters.Length; i++)
+        {
+            print("teleport manager with tag '" + tporters[i].tag +"'");
+            if (tporters[i].tag == "tower")
+            {
+                tporters[i].enabled = turnOn;
+            }
         }
     }
 
@@ -420,6 +452,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.PlotChange;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.w = -3f; // <=-3 = wild to dirt
         beat++;
         introBeats[beat].name = "eden around plot";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -430,6 +463,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.PlotChange;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.w = -2f; // <=-2 dirt to tilled
         beat++;
         introBeats[beat].name = "'we care for the land'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
@@ -446,6 +480,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.PlotChange; // water
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 1f;
+        introBeats[beat].islandPos.w = -1f; // <=-1 watered
         beat++;
         introBeats[beat].name = "eden moves around plot";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -462,6 +497,13 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // seed
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = .381f;
+        introBeats[beat].islandPos.w = -1f; // <= -1 seed
+        beat++;
+        introBeats[beat].name = "- planted -";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange; // planted
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 0f; // <=0 planted
         beat++;
         introBeats[beat].name = "eden steps away from plot";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -491,10 +533,22 @@ public class PlayerIntroduction : MonoBehaviour
             "Later, you can learn more about everything in your Biomancer's Almanac.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
+        introBeats[beat].name = "cheat grow 1";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1f;
+        introBeats[beat].islandPos.w = 4f; // <4 magic grow
+        beat++;
         introBeats[beat].name = "- pause -";
         introBeats[beat].action = ScriptedBeatAction.Default;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        introBeats[beat].duration = 2f;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "cheat grow 2";
+        introBeats[beat].action = ScriptedBeatAction.PlotChange;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 3f;
+        introBeats[beat].islandPos.w = 4f; // <4 magic grow
         beat++;
         introBeats[beat].name = "'with our plant all grown'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
@@ -511,11 +565,14 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.PlotChange; // harvest
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.w = 1f; // <=1 harvested
         beat++;
         introBeats[beat].name = "flower drops";
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // flower
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = -.618f;
+        introBeats[beat].islandPos.w = 0f; // <= 0 fruit
         beat++;
         introBeats[beat].name = "eden moves around plot";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -546,11 +603,14 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].name = "uprooted";
         introBeats[beat].action = ScriptedBeatAction.PlotChange;
         introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 2f; // <=2 uprooted
         beat++;
         introBeats[beat].name = "drop stalk";
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // stalk
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = .618f;
+        introBeats[beat].islandPos.w = 1f; // <= 1 stalk
         beat++;
         introBeats[beat].name = "'stalks and other plant material'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
@@ -577,6 +637,8 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // stalk
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = -.618f;
+        introBeats[beat].islandPos.w = 1f; // <= 1 stalk
         beat++;
         introBeats[beat].name = "step away";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -593,6 +655,13 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.Default;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 3f;
+        beat++;
+        introBeats[beat].name = "poo drop";
+        introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // fertilizer
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = 0f;
+        introBeats[beat].islandPos.w = 2f; // <= 2 fertilizer
         beat++;
         introBeats[beat].name = "step to poo";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -613,6 +682,8 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // fertilizer
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = .618f;
+        introBeats[beat].islandPos.w = 2f; // <= 2 fertilizer
         beat++;
         introBeats[beat].name = "eden goes to till plot";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -623,6 +694,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.PlotChange;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.w = 3f; // <3 uproot to dirt
         beat++;
         introBeats[beat].name = "eden moves back";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -634,10 +706,28 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].npcMark = new Vector3(3f, 0f, -2f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
+        introBeats[beat].name = "'Here's the rest of the seed'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].dialogLine =
+            "Here's the rest of the seed I got for you from the market.";
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "drop seed";
+        introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // seed
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 2f;
+        introBeats[beat].islandPos.x = -.618f;
+        introBeats[beat].islandPos.w = -1f; // <= -1 seed
+        beat++;
+        introBeats[beat].name = ".short pause.";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = .5f;
+        beat++;
         introBeats[beat].name = "'Now you try'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
-            "Now you try. You can check the player controls by holding the TAB key.";
+            "Now you try. You can use your action key 'E' to till and plant this plot.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "'All this hard work pays'";
@@ -689,8 +779,9 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].islandPos.w = -1f;
         beat++;
         introBeats[beat].name = "plant grows";
-        introBeats[beat].action = ScriptedBeatAction.PlotChange; // plant
+        introBeats[beat].action = ScriptedBeatAction.PlotChange;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].islandPos.w = 4f; // <4 magic grow
         introBeats[beat].duration = 1f;
         beat++;
         introBeats[beat].name = "'Great! your're a natural'";
@@ -906,28 +997,168 @@ public class PlayerIntroduction : MonoBehaviour
                     break;
                 case ScriptedBeatAction.ItemSpawn:
                     // item type
+                    // using data in islandPos
+                    ItemType it = ItemType.Seed;
                     // .seed
+                    if( currentBeat.islandPos.w <= -1f)
+                        it = ItemType.Seed;
                     // .flower
+                    if (currentBeat.islandPos.w > -1f && 
+                        currentBeat.islandPos.w <= 0f)
+                        it = ItemType.Fruit;
                     // .stalk
+                    if (currentBeat.islandPos.w > 0f &&
+                        currentBeat.islandPos.w <= 1f)
+                        it = ItemType.Stalk;
                     // .fertilizer
-                    // start end positions
+                    if (currentBeat.islandPos.w > 1f &&
+                        currentBeat.islandPos.w <= 2f)
+                        it = ItemType.Fertilizer;
+                    // start end positions (start on eden, end eden + island.x)
                     // hit up item spawn manager
+                    ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+                    if (ism != null)
+                    {
+                        Vector3 dropVector = Vector3.zero;
+                        dropVector.x = currentBeat.islandPos.x;
+                        ism.SpawnNewItem(it, eden.transform.position, eden.transform.position + dropVector);
+                        droppedItem = GameObject.FindFirstObjectByType<LooseItemManager>();
+                        if (it == ItemType.Fruit || it == ItemType.Seed)
+                        {
+                            droppedItem.looseItem.inv.items[0].plant = PlantType.Corn;
+                            droppedItem.looseItem.inv.items[0].name = "Fruit (Corn)";
+                            droppedItem.looseItem.inv.items[0].health = 1f;
+                            if (it == ItemType.Fruit)
+                            {
+                                droppedItem.looseItem.inv.items[0].quality = 1f;
+                                droppedItem.looseItem.inv.items[0].size = 1f;
+                            }
+                        }
+                        if (droppedItem != null && it == ItemType.Fruit)
+                            droppedItem = null; // gift to player
+                    }
                     break;
                 case ScriptedBeatAction.PlotChange:
                     // plot reference - type of change
+                    // using data in islandPos
+                    PlotCondition pc = PlotCondition.Dirt;
+                    float water = 0f;
+                    float soil = 0f;
+                    float grow = 0f;
                     // wild to dirt
+                    if (currentBeat.islandPos.w <= -3f)
+                    {
+                        pc = PlotCondition.Dirt;
+                    }
                     // dirt to tilled
+                    if (currentBeat.islandPos.w > -3f &&
+                       currentBeat.islandPos.w <= -2f)
+                    {
+                        pc = PlotCondition.Tilled;
+                        soil = 0.2f;
+                    }
                     // watered
+                    if (currentBeat.islandPos.w > -2f &&
+                       currentBeat.islandPos.w <= -1f)
+                    {
+                        pc = PlotCondition.Tilled;
+                        water = 1f;
+                    }
                     // planted
+                    if (currentBeat.islandPos.w > -1f &&
+                       currentBeat.islandPos.w <= 0f)
+                    {
+                        pc = PlotCondition.Tilled;
+                        if (managedPlot.plant != null)
+                            Destroy(managedPlot.plant);
+                        managedPlot.plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
+                        managedPlot.plant.transform.parent = managedPlot.transform;
+                        managedPlot.plant.transform.position = managedPlot.transform.position;
+                        // just corn
+                        managedPlot.data.plant = PlantSystem.InitializePlant(PlantType.Corn);
+                        // fast grow
+                        managedPlot.data.plant.growth = .1f;
+                        managedPlot.data.plant.quality = .1f;
+                    }
                     // harvested
+                    if (currentBeat.islandPos.w > 0f &&
+                       currentBeat.islandPos.w <= 1f)
+                    {
+                        pc = PlotCondition.Tilled;
+                        managedPlot.data.plant.isHarvested = true;
+                        managedPlot.plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+                    }
                     // uprooted
+                    if (currentBeat.islandPos.w > 1f &&
+                       currentBeat.islandPos.w <= 2f)
+                    {
+                        pc = PlotCondition.Uprooted;
+                        if (managedPlot.plant != null)
+                            Destroy(managedPlot.plant);
+                    }
                     // uprooted to dirt
+                    if (currentBeat.islandPos.w > 2f &&
+                       currentBeat.islandPos.w <= 3f)
+                    {
+                        pc = PlotCondition.Dirt;
+                        soil = 0.15f;
+                    }
+                    // magic grow
+                    if (currentBeat.islandPos.w > 3f &&
+                       currentBeat.islandPos.w <= 4f)
+                    {
+                        pc = PlotCondition.Tilled;
+                        if (managedPlot.data.plant.growth < 5f)
+                            grow = 0.618f;
+                        else
+                            grow = 0.9f;
+                    }
+                    // use managed plot
+                    managedPlot.data.condition = pc;
+                    Renderer r = managedPlot.gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
+                    switch (pc)
+                    {
+                        case PlotCondition.Dirt:
+                            GameObject grass = null;
+                            if (managedPlot.transform.childCount > 0 && managedPlot.gameObject.transform.Find("Plot Wild Grasses") != null)
+                                grass = managedPlot.gameObject.transform.Find("Plot Wild Grasses").gameObject;
+                            if (grass != null)
+                                Destroy(grass);
+                            if (r != null)
+                                r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                            break;
+                        case PlotCondition.Tilled:
+                            if (r != null)
+                                r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                            break;
+                        case PlotCondition.Uprooted:
+                            if (r != null)
+                                r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
+                            break;
+                    }
+                    managedPlot.data.water = Mathf.Clamp01(managedPlot.data.water + water);
+                    managedPlot.data.soil = Mathf.Clamp01(managedPlot.data.soil + soil);
+                    managedPlot.data.plant.growth = Mathf.Clamp01(managedPlot.data.plant.growth + grow)-0.01f;
                     break;
                 case ScriptedBeatAction.DeleteItem:
-                    // item reference
-                    // seed
-                    // stalk
-                    // fertilizer
+                    // item reference (not needed?)
+                    if (droppedItem != null)
+                        Destroy(droppedItem.gameObject, 0.1f);
+                    else
+                    {
+                        // we have eden 'picking up' fertilizer than may not be dropped item
+                        LooseItemManager[] allLoose = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+                        for (int i=0; i<allLoose.Length; i++)
+                        {
+                            if (allLoose[i].looseItem.inv.items[0].type == ItemType.Fertilizer)
+                            {
+                                droppedItem = allLoose[i];
+                                break;
+                            }
+                        }
+                        if (droppedItem != null)
+                            Destroy(droppedItem.gameObject, 0.1f);
+                    }
                     break;
                 case ScriptedBeatAction.EndIntro:
                     introRunning = false;
@@ -977,8 +1208,6 @@ public class PlayerIntroduction : MonoBehaviour
 
     public void LaunchIntro()
     {
-        // WIP - skip intro
-        // return;
         // 
         // PLAYER INTRODUCTION
         //
@@ -1001,6 +1230,9 @@ public class PlayerIntroduction : MonoBehaviour
             camMgr.allowPlayerControlCam = false;
         }
 
+        // find managed plot
+        FindManagedPlot();
+
         // alpha island out of frame
         GameObject islandA = GameObject.Find("Island Alpha");
         Vector3 iPos = Vector3.zero;
@@ -1015,11 +1247,21 @@ public class PlayerIntroduction : MonoBehaviour
         currentBeatIndex = 0;
         currentBeat = introBeats[currentBeatIndex];
         beatTimer = currentBeat.duration;
+
         // eden arrives
         eden = SpawnEden(currentBeat.npcMark);
         eden.moveTarget = currentBeat.npcMark;
         eden.ghostMode = true;
         eden.mode = NPCController.NPCMode.Scripted;
+
+        // set to morning
+        TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
+        if (tim != null)
+        {
+            WorldData morning = tim.GetWorldData();
+            morning.worldTimeOfDay = 0.381f;
+            tim.SetWorldData(morning);
+        }
     }
 
     void TakeOverHUD( bool claim )
@@ -1039,6 +1281,7 @@ public class PlayerIntroduction : MonoBehaviour
             pcm.hidePlayerHUD = claim;
         }
         camMgr.allowPlayerControlCam = !claim;
+        TowerTeleporterControl(!claim);
     }
 
     NPCController SpawnEden( Vector3 pos )
