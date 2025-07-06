@@ -21,6 +21,8 @@ public class PlotManager : MonoBehaviour
 
     private TimeManager tim;
 
+    private PositionData seasonValues; // all four seasons as a percentage
+
     private PlayerControlManager currentPlayer;
     private Renderer cursor;
     private bool cursorActive;
@@ -110,6 +112,12 @@ public class PlotManager : MonoBehaviour
                     data.water = 1f;
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.EclipseI))
                     data.sun = Mathf.Clamp( (data.sun * 0.5f), 0f, 0.5f );
+
+                // update season values
+                seasonValues.x = tim.GetAmountOfSeason(WorldSeason.Spring);
+                seasonValues.y = tim.GetAmountOfSeason(WorldSeason.Summer);
+                seasonValues.z = tim.GetAmountOfSeason(WorldSeason.Fall);
+                seasonValues.w = tim.GetAmountOfSeason(WorldSeason.Winter);
             }
         }
 
@@ -199,6 +207,23 @@ public class PlotManager : MonoBehaviour
             // plant image set
             plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
         }
+    }
+
+    public float GetPlantSeasonalVitality()
+    {
+        float retFloat = 0f;
+
+        // take plant data, and profile of seasonal vitalities
+        // use current season values and evaluate to arrive at
+        // this plant's current seasonal vitality
+        // (will be a multiplier to plant's vitality delta value)
+        float sp = seasonValues.x * data.plant.springVitality;
+        float sm = seasonValues.y * data.plant.summerVitality;
+        float fl = seasonValues.z * data.plant.fallVitality;
+        float wn = seasonValues.w * data.plant.winterVitality;
+        retFloat = sp + sm + fl + wn;
+
+        return retFloat;
     }
 
     /// <summary>

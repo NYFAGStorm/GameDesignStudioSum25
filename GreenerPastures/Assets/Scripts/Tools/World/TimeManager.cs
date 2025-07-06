@@ -141,8 +141,8 @@ public class TimeManager : MonoBehaviour
         // rotate sky lights object once per game day
         // set sun angle to seasonal sine wave
         float seasonProgress = ((1 / 30) + (((dayProgress + dayOfMonth) / 30) + (int)monthOfYear)) / 12;
-        // TODO: seasonal sine wave longer-shorter days, sky light tilt
-        // TODO: slow sun daytime during summer, speed up at night
+        // seasonal sine wave sky light tilt
+        // TODO: longer-shorter days, slow sun daytime during summer, speed up at night
         // TODO: speed up sun daytime during winter, slow down at night
         // ... update GetWorldData() below once this is in place
         float seasonalSin = Mathf.Sin((seasonProgress + SEASONALSINEOFFSET) * 2f * Mathf.PI); // season progress 0-1
@@ -223,6 +223,35 @@ public class TimeManager : MonoBehaviour
         // TODO: also add game data total game time
         // REVIEW: is seasonProgess (annualProgress) irrelevant if we take real time - seed?
         globalTimeProgress = gameSeedTime + (long)(seasonProgress * (WORLDTIMEMULTIPLIER * cheatTimeScale));
+    }
+
+    /// <summary>
+    /// Returns a percentage the world is currently in given season (0-1)
+    /// </summary>
+    /// <param name="season">world season</param>
+    /// <returns>0-1 value representing amount of season in effect</returns>
+    public float GetAmountOfSeason( WorldSeason season )
+    {
+        float retFloat = 0f;
+
+        float dayProgressInYear = dayProgress;
+        dayProgressInYear += dayOfMonth;
+        dayProgressInYear += (float)monthOfYear * 30f; // Jan = 0
+        // center of the season is in the center of the middle month
+        // extents of the season is +/- 55 days
+        // overlap of seasons is 10 days between months (50/50 at start of season)
+        dayProgressInYear--;
+        float dayOfSeasonCenter = 60f + ((((float)season + 1) * 90f) - 45f);
+        if (dayOfSeasonCenter > 360 && dayProgressInYear >= 15f && dayProgressInYear < 310f)
+            dayOfSeasonCenter -= 360f;
+        float deltaSeason = Mathf.Abs(dayOfSeasonCenter - dayProgressInYear);
+        if (deltaSeason > 360f && dayProgressInYear < 15f)
+            deltaSeason -= 360f;
+        retFloat = Mathf.Clamp(50f - deltaSeason, 0f, 10f) / 10f;
+
+        //Debug.Log("--- TimeManager [GetAmountOfSeason] : given day of year is "+dayProgressInYear+" and season center is "+dayOfSeasonCenter+", this is "+retFloat+" of season "+season.ToString()+" with a season delta of "+deltaSeason);
+
+        return retFloat;
     }
 
     /// <summary>
@@ -371,6 +400,16 @@ public class TimeManager : MonoBehaviour
         // REVIEW: due to int
         future.worldMonth += Mathf.RoundToInt((daysAhead/30f));
         future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);
+        // set season
+        future.worldSeason = WorldSeason.Winter;
+        if (future.worldMonth > WorldMonth.Feb)
+            future.worldSeason = WorldSeason.Spring;
+        if (future.worldMonth > WorldMonth.May)
+            future.worldSeason = WorldSeason.Summer;
+        if (future.worldMonth > WorldMonth.Aug)
+            future.worldSeason = WorldSeason.Fall;
+        if (future.worldMonth > WorldMonth.Nov)
+            future.worldSeason = WorldSeason.Winter;
 
         SetWorldData(future);
 

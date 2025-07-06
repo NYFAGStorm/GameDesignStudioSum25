@@ -14,7 +14,6 @@ public class PlantManager : MonoBehaviour
     const float PLANTCHECKINTERVAL = 1f;
 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // validate
@@ -51,12 +50,19 @@ public class PlantManager : MonoBehaviour
                 // find resources amount as an average of sun, water and soil quality
                 // if even a little (25%) sun is available, this counts as 100% sun resource
                 float sunResource = Mathf.Clamp01(plot.data.sun * 4f);
+                // [ ] if this is a dark plant (grows in moonlight) invert sun
+                // REVIEW: when we have moon phases, adjust to moonlight intensity
+                if (plot.data.plant.isDarkPlant)
+                    sunResource = Mathf.Clamp01(1f - sunResource);
                 // PLANT EFFECTS:
                 if (PlantSystem.PlantHasEffect(plot.data.plant, PlantEffect.DayNightPlant))
                     sunResource = 1f;
                 float resources = (sunResource + plot.data.water + plot.data.soil) / 3f;
-                // calculate vitality
+                // calculate vitality delta             
                 float vitalityDelta = (0.667f - resources) * -0.1f;
+                // adjust vitality for current season
+                vitalityDelta *= plot.GetPlantSeasonalVitality();
+                // calculate current vitality
                 plot.data.plant.vitality = Mathf.Clamp01(plot.data.plant.vitality + vitalityDelta);
                 // calculate health
                 float healthDelta = (0.5f - plot.data.plant.vitality) + (0.5f - resources);
