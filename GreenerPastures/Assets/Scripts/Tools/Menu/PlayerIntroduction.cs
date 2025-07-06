@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using UnityEngine;
 
 public class PlayerIntroduction : MonoBehaviour
@@ -10,6 +11,7 @@ public class PlayerIntroduction : MonoBehaviour
         Default,
         Dialog,
         EdenMark,
+        HelpMessage,
         TeleportEden,
         CameraChange,
         EnableSkip,
@@ -63,6 +65,19 @@ public class PlayerIntroduction : MonoBehaviour
     private bool configValid;
     private bool[] configsTouched = new bool[4];
 
+    private enum IntroHelpMessage
+    {
+        Default,
+        MoveControls,
+        ActionButton,
+        InventorySelect,
+        DropButton,
+        ControlsDisplay,
+        AlmanacDisplay
+    }
+    private int helpMessage;
+    private float helpMessageTimer;
+
     private bool canSkipIntro;
     private bool cancelIntro;
     private bool pauseIntro;
@@ -91,6 +106,7 @@ public class PlayerIntroduction : MonoBehaviour
     const float DEFAULTINTROTIME = 0.618f;
     const float PAUSETIME = 1f;
     const float LONGPAUSETIME = 2f;
+    const float HELPMESSAGETIME = 7f;
 
 
     void Start()
@@ -200,6 +216,8 @@ public class PlayerIntroduction : MonoBehaviour
 
     void TowerTeleporterControl( bool turnOn )
     {
+        // TODO: make worky
+
         TeleportManager[] tporters = GameObject.FindObjectsByType<TeleportManager>(FindObjectsSortMode.None);
         print("found "+tporters.Length+" teleport managers to configure");
         for (int i = 0; i < tporters.Length; i++)
@@ -208,6 +226,7 @@ public class PlayerIntroduction : MonoBehaviour
             if (tporters[i].tag == "tower")
             {
                 tporters[i].enabled = turnOn;
+                print("teleporter " + tporters[i].gameObject.name + " set to active : "+turnOn);
             }
         }
     }
@@ -255,6 +274,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].dialogLine =
             "We are so happy you chose to help grow our magical community.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "help message WASD";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 0f;
         beat++;
         introBeats[beat].name = "'we tend to the floating islands'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
@@ -459,6 +483,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].npcMark = new Vector3(1.75f, 0f, -2f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
+        introBeats[beat].name = "help message action button";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 1f;
+        beat++;
         introBeats[beat].name = "tilling plot from dirt";
         introBeats[beat].action = ScriptedBeatAction.PlotChange;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
@@ -507,12 +536,12 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "eden steps away from plot";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(2.25f, 0f, -1.75f);
+        introBeats[beat].npcMark = new Vector3(3.25f, 0f, -1.75f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "eden turns around";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(2f, 0f, -2f);
+        introBeats[beat].npcMark = new Vector3(3f, 0f, -2f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "'Different plants grow faster'";
@@ -571,7 +600,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // flower
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
-        introBeats[beat].islandPos.x = -.618f;
+        introBeats[beat].islandPos.x = -1f;
         introBeats[beat].islandPos.w = 0f; // <= 0 fruit
         beat++;
         introBeats[beat].name = "eden moves around plot";
@@ -589,6 +618,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].dialogLine =
             "Take your flower with the action button. Now, I'll dig up this stalk.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "help message action button";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 1f;
         beat++;
         introBeats[beat].name = "move eden to plant";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -609,7 +643,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // stalk
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
-        introBeats[beat].islandPos.x = .618f;
+        introBeats[beat].islandPos.x = -.381f;
         introBeats[beat].islandPos.w = 1f; // <= 1 stalk
         beat++;
         introBeats[beat].name = "'stalks and other plant material'";
@@ -623,6 +657,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].npcMark = new Vector3(1.75f, 0f, -1.75f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
+        introBeats[beat].name = "help message inventory";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 2f;
+        beat++;
         introBeats[beat].name = "eden picks up stalk";
         introBeats[beat].action = ScriptedBeatAction.DeleteItem;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
@@ -630,14 +669,14 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "eden moves to compost bin";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(-3f, 0f, -2f);
+        introBeats[beat].npcMark = new Vector3(-2.75f, 0f, -2f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "eden drops stalk in bin";
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // stalk
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
-        introBeats[beat].islandPos.x = -.618f;
+        introBeats[beat].islandPos.x = -.381f;
         introBeats[beat].islandPos.w = 1f; // <= 1 stalk
         beat++;
         introBeats[beat].name = "step away";
@@ -656,11 +695,16 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 3f;
         beat++;
+        introBeats[beat].name = "help message drop";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 3f;
+        beat++;
         introBeats[beat].name = "poo drop";
         introBeats[beat].action = ScriptedBeatAction.ItemSpawn; // fertilizer
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
-        introBeats[beat].islandPos.x = 0f;
+        introBeats[beat].islandPos.x = -0.1f;
         introBeats[beat].islandPos.w = 2f; // <= 2 fertilizer
         beat++;
         introBeats[beat].name = "step to poo";
@@ -729,6 +773,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].dialogLine =
             "Now you try. You can use your action key 'E' to till and plant this plot.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "help message action button";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 1f;
         beat++;
         introBeats[beat].name = "'All this hard work pays'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
@@ -801,6 +850,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 1f;
         beat++;
+        introBeats[beat].name = "help message player controls";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 4f;
+        beat++;
         introBeats[beat].name = "walk to teleporter";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
         introBeats[beat].npcMark = new Vector3(4f, 0f, -4f);
@@ -834,6 +888,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
         introBeats[beat].npcMark = new Vector3(19.5f, 0f, -22f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "help message almanac";
+        introBeats[beat].action = ScriptedBeatAction.HelpMessage;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 5f;
         beat++;
         introBeats[beat].name = "--- intro end ---";
         introBeats[beat].action = ScriptedBeatAction.EndIntro;
@@ -871,6 +930,16 @@ public class PlayerIntroduction : MonoBehaviour
             {
                 introTimer = 0f;
                 dialogPop = true;
+            }
+        }
+        // run help message timer
+        if (helpMessageTimer > 0f)
+        {
+            helpMessageTimer -= Time.deltaTime;
+            if (helpMessageTimer < 0f)
+            {
+                helpMessageTimer = 0f;
+                helpMessage = 0;
             }
         }
 
@@ -951,6 +1020,61 @@ public class PlayerIntroduction : MonoBehaviour
                 case ScriptedBeatAction.EdenMark:
                     eden.moveTarget = currentBeat.npcMark;
                     eden.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.HelpMessage:
+                    if (currentBeat.islandPos.w <= 0f)
+                    {
+                        // WASD
+                        helpMessage = 1;
+                        helpMessageTimer = HELPMESSAGETIME;
+                    }
+                    else if (currentBeat.islandPos.w > 0f &&
+                        currentBeat.islandPos.w <= 1f)
+                    {
+                        // ACTION
+                        helpMessage = 2;
+                        helpMessageTimer = HELPMESSAGETIME;
+                    }
+                    else if (currentBeat.islandPos.w > 1f &&
+                        currentBeat.islandPos.w <= 2f)
+                    {
+                        // INVENTORY
+                        if (pcm != null)
+                            pcm.hidePlayerHUD = false;
+                        helpMessage = 3;
+                        helpMessageTimer = HELPMESSAGETIME;
+                    }
+                    else if (currentBeat.islandPos.w > 2f &&
+                        currentBeat.islandPos.w <= 3f)
+                    {
+                        // DROP
+                        helpMessage = 4;
+                        helpMessageTimer = HELPMESSAGETIME;
+                    }
+                    else if (currentBeat.islandPos.w > 3f &&
+                        currentBeat.islandPos.w <= 4f)
+                    {
+                        // CONTROLS
+                        helpMessage = 5;
+                        helpMessageTimer = HELPMESSAGETIME;
+                        InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+                        if (igc != null)
+                        {
+                            igc.enabled = true;
+                        }
+                    }
+                    else if (currentBeat.islandPos.w > 4f &&
+                        currentBeat.islandPos.w <= 5f)
+                    {
+                        // ALMANAC
+                        helpMessage = 6;
+                        helpMessageTimer = HELPMESSAGETIME;
+                        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                        if (iga != null)
+                        {
+                            iga.enabled = true;
+                        }
+                    }
                     break;
                 case ScriptedBeatAction.TeleportEden:
                     Vector3 pos = eden.gameObject.transform.position;
@@ -1068,7 +1192,7 @@ public class PlayerIntroduction : MonoBehaviour
                     if (currentBeat.islandPos.w > -1f &&
                        currentBeat.islandPos.w <= 0f)
                     {
-                        pc = PlotCondition.Tilled;
+                        pc = PlotCondition.Growing;
                         if (managedPlot.plant != null)
                             Destroy(managedPlot.plant);
                         managedPlot.plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
@@ -1077,16 +1201,19 @@ public class PlayerIntroduction : MonoBehaviour
                         // just corn
                         managedPlot.data.plant = PlantSystem.InitializePlant(PlantType.Corn);
                         // fast grow
+                        managedPlot.data.plant.health = 1f;
                         managedPlot.data.plant.growth = .1f;
                         managedPlot.data.plant.quality = .1f;
+                        // set to growing
+                        managedPlot.data.condition = PlotCondition.Growing;
                     }
                     // harvested
                     if (currentBeat.islandPos.w > 0f &&
                        currentBeat.islandPos.w <= 1f)
                     {
-                        pc = PlotCondition.Tilled;
+                        pc = PlotCondition.Growing;
+                        managedPlot.data.plant.growth = 1f;
                         managedPlot.data.plant.isHarvested = true;
-                        managedPlot.plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                     }
                     // uprooted
                     if (currentBeat.islandPos.w > 1f &&
@@ -1107,7 +1234,7 @@ public class PlayerIntroduction : MonoBehaviour
                     if (currentBeat.islandPos.w > 3f &&
                        currentBeat.islandPos.w <= 4f)
                     {
-                        pc = PlotCondition.Tilled;
+                        pc = PlotCondition.Growing;
                         if (managedPlot.data.plant.growth < 5f)
                             grow = 0.618f;
                         else
@@ -1130,6 +1257,17 @@ public class PlayerIntroduction : MonoBehaviour
                         case PlotCondition.Tilled:
                             if (r != null)
                                 r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                            break;
+                        case PlotCondition.Growing:
+                            // grow baby grow
+                            managedPlot.data.plant.vitality = 1f;
+                            // if harvested show stalk
+                            if (managedPlot.data.plant.isHarvested)
+                            {
+                                managedPlot.plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+                                managedPlot.data.plant.growth = 1f;
+                                // FIXME: prevent grow image update
+                            }
                             break;
                         case PlotCondition.Uprooted:
                             if (r != null)
@@ -1302,7 +1440,7 @@ public class PlayerIntroduction : MonoBehaviour
 
     void OnGUI()
     {
-        if (!introRunning || (!canSkipIntro && !introPop && !dialogPop))
+        if ((helpMessage == 0 && !introRunning) || (!canSkipIntro && !introPop && !dialogPop))
             return;
 
         Rect r = new Rect();
@@ -1312,6 +1450,66 @@ public class PlayerIntroduction : MonoBehaviour
         Texture2D t = Texture2D.whiteTexture;
         Color c = Color.white;
         string s = "";
+
+        if (helpMessage > 0 && helpMessageTimer > 0f)
+        {
+            // help message label
+            r.x = 0.35f * w;
+            r.y = 0.775f * h;
+            r.width = 0.3f * w;
+            r.height = 0.2f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.white;
+            g.wordWrap = true;
+            c = Color.white;
+            s = "";
+            switch ((IntroHelpMessage)helpMessage)
+            {
+                case IntroHelpMessage.MoveControls:
+                    s = "Move your character\nwith W-A-S-D";
+                    break;
+                case IntroHelpMessage.ActionButton:
+                    s = "Your action button\nis E";
+                    break;
+                case IntroHelpMessage.InventorySelect:
+                    s = "Use [ and ] to select\nitems in your inventory";
+                    break;
+                case IntroHelpMessage.DropButton:
+                    s = "Use C to drop your\ncurrently selected item";
+                    break;
+                case IntroHelpMessage.ControlsDisplay:
+                    s = "All player controls are\ndisplayed by holding TAB";
+                    break;
+                case IntroHelpMessage.AlmanacDisplay:
+                    s = "You may toggle the\nBiomancer's Almanac with \\";
+                    break;
+                default:
+                    break;
+            }
+            GUI.color = Color.white;
+            // drop shadow
+            r.x += 0.0025f * w;
+            r.y += 0.003f * h;
+            c = Color.black;
+            c.a = Mathf.Clamp01(helpMessageTimer / 1f);
+            g.normal.textColor = c;
+            g.hover.textColor = c;
+            g.active.textColor = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.0025f * w;
+            r.y -= 0.003f * h;
+            c = Color.white;
+            c.a = Mathf.Clamp01(helpMessageTimer / 1f);
+            g.normal.textColor = c;
+            g.hover.textColor = c;
+            g.active.textColor = c;
+            GUI.Label(r, s, g);
+        }
 
         if (canSkipIntro)
         {
@@ -1374,7 +1572,7 @@ public class PlayerIntroduction : MonoBehaviour
             g.hover.textColor = Color.black;
             g.active.textColor = Color.black;
             g.wordWrap = true;
-            s = currentBeat.dialogLine; //introDialog[introScriptStep];
+            s = currentBeat.dialogLine;
             GUI.color = Color.white;
             GUI.Label(r, s, g);
             // next button
@@ -1397,13 +1595,13 @@ public class PlayerIntroduction : MonoBehaviour
                 dialogPop = false;
                 //introScriptStep++;
                 playerResponse = true;
-                if (currentBeatIndex >= introBeats.Length) //introScriptStep >= introDialog.Length)
+                if (currentBeatIndex >= introBeats.Length)
                 {
                     introRunning = false;
                     TakeOverHUD(false);
                     return;
                 }
-                else if (currentBeatIndex == 2) //introScriptStep == 0)
+                else if (currentBeatIndex == 2)
                 {
                     introPop = true;
                     return;
@@ -1523,6 +1721,8 @@ public class PlayerIntroduction : MonoBehaviour
         g.hover.textColor = Color.black;
         g.active.textColor = Color.black;
         s = "New Player";
+        if (pcm != null)
+            s = pcm.playerData.playerName;
         GUI.color = Color.white;
         GUI.Label(r, s, g);
         // model label
