@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using UnityEngine;
 
 public class PlayerIntroduction : MonoBehaviour
@@ -11,6 +10,7 @@ public class PlayerIntroduction : MonoBehaviour
         Default,
         Dialog,
         EdenMark,
+        TeleportConfig,
         HelpMessage,
         TeleportEden,
         CameraChange,
@@ -214,20 +214,15 @@ public class PlayerIntroduction : MonoBehaviour
         }
     }
 
-    void TowerTeleporterControl( bool turnOn )
+    void TeleporterControl( bool turnOn, string teleporterTag )
     {
-        // TODO: make worky
-
         TeleportManager[] tporters = GameObject.FindObjectsByType<TeleportManager>(FindObjectsSortMode.None);
-        print("found "+tporters.Length+" teleport managers to configure");
         for (int i = 0; i < tporters.Length; i++)
         {
-            print("teleport manager with tag '" + tporters[i].tag +"'");
-            if (tporters[i].tag == "tower")
-            {
+            if (teleporterTag == "")
                 tporters[i].enabled = turnOn;
-                print("teleporter " + tporters[i].gameObject.name + " set to active : "+turnOn);
-            }
+            else if (tporters[i].teleporterTag == teleporterTag)
+                tporters[i].enabled = turnOn;
         }
     }
 
@@ -264,6 +259,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 1f;
         introBeats[beat].cam = CameraManager.CameraMode.Medium;
+        beat++;
+        introBeats[beat].name = "disable teleporters";
+        introBeats[beat].action = ScriptedBeatAction.TeleportConfig;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 0f;
         beat++;
         introBeats[beat].name = "(can skip now)";
         introBeats[beat].action = ScriptedBeatAction.EnableSkip;
@@ -383,6 +383,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].npcMark = new Vector3(16.5f, 0f, -17.5f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
+        introBeats[beat].name = "enable teleporters";
+        introBeats[beat].action = ScriptedBeatAction.TeleportConfig;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 1f;
+        beat++;
         introBeats[beat].name = "cam medium";
         introBeats[beat].action = ScriptedBeatAction.CameraChange;
         introBeats[beat].transition = ScriptedBeatTransition.Default;
@@ -433,7 +438,12 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].name = "- pause for player -";
         introBeats[beat].action = ScriptedBeatAction.Default;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        introBeats[beat].duration = 1.5f;
+        introBeats[beat].duration = 1f;
+        beat++;
+        introBeats[beat].name = "disable tower teleporters";
+        introBeats[beat].action = ScriptedBeatAction.TeleportConfig;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 2f;
         beat++;
         introBeats[beat].name = "eden step to farm edge";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -443,7 +453,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].name = "- pause at farm -";
         introBeats[beat].action = ScriptedBeatAction.Default;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        introBeats[beat].duration = 0.5f;
+        introBeats[beat].duration = 1f;
         beat++;
         introBeats[beat].name = "eden step up to speak";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -855,6 +865,11 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].transition = ScriptedBeatTransition.Default;
         introBeats[beat].islandPos.w = 4f;
         beat++;
+        introBeats[beat].name = "enable teleporters";
+        introBeats[beat].action = ScriptedBeatAction.TeleportConfig;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        introBeats[beat].islandPos.w = 1f;
+        beat++;
         introBeats[beat].name = "walk to teleporter";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
         introBeats[beat].npcMark = new Vector3(4f, 0f, -4f);
@@ -915,7 +930,7 @@ public class PlayerIntroduction : MonoBehaviour
             cancelIntro = false;
             dialogPop = false;
             // set cut-to-end beat index
-            currentBeatIndex = beatScriptEndIndex - 8;
+            currentBeatIndex = beatScriptEndIndex - 11;
             currentBeat = introBeats[currentBeatIndex - 1];
             currentBeat.transition = ScriptedBeatTransition.TimedDuration;
             beatTimeUp = false;
@@ -1020,6 +1035,16 @@ public class PlayerIntroduction : MonoBehaviour
                 case ScriptedBeatAction.EdenMark:
                     eden.moveTarget = currentBeat.npcMark;
                     eden.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.TeleportConfig:
+                    if (currentBeat.islandPos.w <= 0f)
+                        TeleporterControl(false, "");
+                    else if (currentBeat.islandPos.w > 0f &&
+                        currentBeat.islandPos.w <= 1f)
+                        TeleporterControl(true, "");
+                    else if (currentBeat.islandPos.w > 1f &&
+                        currentBeat.islandPos.w <= 2f)
+                        TeleporterControl(false, "tower");
                     break;
                 case ScriptedBeatAction.HelpMessage:
                     if (currentBeat.islandPos.w <= 0f)
@@ -1267,6 +1292,8 @@ public class PlayerIntroduction : MonoBehaviour
                                 managedPlot.plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                                 managedPlot.data.plant.growth = 1f;
                                 // FIXME: prevent grow image update
+                                managedPlot.plant.GetComponent<PlantManager>().ForceGrowthImage(managedPlot.data.plant);
+                                managedPlot.plant.GetComponent<PlantManager>().enabled = false;
                             }
                             break;
                         case PlotCondition.Uprooted:
@@ -1419,7 +1446,7 @@ public class PlayerIntroduction : MonoBehaviour
             pcm.hidePlayerHUD = claim;
         }
         camMgr.allowPlayerControlCam = !claim;
-        TowerTeleporterControl(!claim);
+        TeleporterControl(!claim, "");
     }
 
     NPCController SpawnEden( Vector3 pos )
