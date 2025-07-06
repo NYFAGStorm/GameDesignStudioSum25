@@ -230,7 +230,7 @@ public class PlayerIntroduction : MonoBehaviour
     //
     void ConfigureIntroBeats()
     {
-        introBeats = new ScriptedBeat[125]; // we use ~100 beats, currently
+        introBeats = new ScriptedBeat[125]; // we use ~122 beats, currently
         int beat = 0;
         introBeats[beat].name = "intro launch - world view";
         introBeats[beat].action = ScriptedBeatAction.Default;
@@ -432,7 +432,7 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "eden walk over to farm";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(3.25f, 0f, -1.75f);
+        introBeats[beat].npcMark = new Vector3(3.381f, 0f, -1.75f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "- pause for player -";
@@ -447,7 +447,7 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "eden step to farm edge";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(3f, 0f, -1.75f);
+        introBeats[beat].npcMark = new Vector3(3f, 0f, -1.618f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "- pause at farm -";

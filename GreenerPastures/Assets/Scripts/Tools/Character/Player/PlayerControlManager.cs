@@ -570,11 +570,12 @@ public class PlayerControlManager : MonoBehaviour
         center.z = playerData.island.z;
         float radius = playerData.island.w;
         float dist = Vector3.Distance(gameObject.transform.position, center);
-        if (dist > radius )
+        if (dist > radius)
         {
             Vector3 pushBack = (center - gameObject.transform.position);
-            pushBack *= ISLANDTETHERSTRENGTH * Time.deltaTime;
-
+            float extraPush = Mathf.Clamp((7f - pushBack.magnitude), 1f, 7f);
+            pushBack *= ISLANDTETHERSTRENGTH * extraPush * Time.deltaTime;
+            
             Vector3 pos = gameObject.transform.position;
             pos += pushBack;
             gameObject.transform.position = pos;
