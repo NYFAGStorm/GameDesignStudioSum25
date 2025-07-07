@@ -1,10 +1,10 @@
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class CameraClip : MonoBehaviour
 {
+    // Author: Gustavo
+    // Fades object if player goes behind it
+
     private bool attached = false;
     private Renderer target;
     private Transform player;
