@@ -29,7 +29,7 @@ public class CheatManager : MonoBehaviour
     private float cheatDisplayTimer;
     private string cheatDisplayString;
 
-    const int TOTALCHEATCODES = 15;
+    const int TOTALCHEATCODES = 16;
     const float CHEATCODEWINDOW = 1f;
     const float CHEATDISPLAYTIME = 20f;
 
@@ -218,6 +218,10 @@ public class CheatManager : MonoBehaviour
                 n = "listcheats";
                 d = "Temporarily displays a list of cheat codes";
                 break;
+            case 15:
+                n = "revealalmanac";
+                d = "Reveals all entries in the Biomancer's Almanac";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -359,6 +363,17 @@ public class CheatManager : MonoBehaviour
                 Debug.Log(s);
                 cheatDisplayString = s;
                 cheatDisplayTimer = CHEATDISPLAYTIME;
+                break;
+            case 15:
+                // unlock all almanac entries
+                InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                if (iga != null)
+                {
+                    for (int i = 0; i < iga.almanac.entries.Length; i++)
+                    {
+                        iga.almanac.entries[i].revealed = true;
+                    }
+                }
                 break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");
