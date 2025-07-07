@@ -341,6 +341,10 @@ public class TimeManager : MonoBehaviour
         retWData.baseTemperature = baseTemperature;
         retWData.dawnTime = .25f; // temp
         retWData.duskTime = .75f; // temp
+        retWData.windAmount = wm.windAmount;
+        retWData.windDirection = wm.windDirection;
+        retWData.cloudAmount = wm.cloudAmount;
+        retWData.rainAmount = wm.rainAmount;
 
         return retWData;
     }
@@ -359,6 +363,12 @@ public class TimeManager : MonoBehaviour
         baseTemperature = wData.baseTemperature;
         // wData.dawnTime = .25f; // temp
         // wData.duskTime = .75f; // temp
+        PositionData startWeather = new PositionData();
+        startWeather.x = wData.windAmount;
+        startWeather.y = wData.windDirection;
+        startWeather.z = wData.cloudAmount;
+        startWeather.w = wData.rainAmount;
+        wm.SetStartWeather(startWeather);
 
         UpdateAmbientLighting();
     }
@@ -411,6 +421,12 @@ public class TimeManager : MonoBehaviour
         if (future.worldMonth > WorldMonth.Nov)
             future.worldSeason = WorldSeason.Winter;
 
+        // preserve weather conditions (already distributed)
+        future.windAmount = wm.windAmount;
+        future.windDirection = wm.windDirection;
+        future.cloudAmount = wm.cloudAmount;
+        future.rainAmount = wm.rainAmount;
+
         SetWorldData(future);
 
         float futureDayAmount = (future.worldTimeOfDay +
@@ -435,6 +451,8 @@ public class TimeManager : MonoBehaviour
             {
                 pms[i].FastForwardPlot(fastForwardTime, savedTimeOfDay);
             }
+            // weather manager
+            wm.FastForwardWeather(fastForwardTime);
             // reset
             savedTimeOfDay = 0f;
             fastForwardTime = 0f;

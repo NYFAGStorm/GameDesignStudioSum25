@@ -1,5 +1,7 @@
 // REVIEW: necessary namespaces
 
+using Unity.VisualScripting;
+
 public enum WorldMonth
 {
     Jan,
@@ -35,5 +37,9 @@ public class WorldData
     public float baseTemperature;
     public float dawnTime;
     public float duskTime;
+    public float windAmount;
+    public float windDirection;
+    public float cloudAmount;
+    public float rainAmount;
 }
 
