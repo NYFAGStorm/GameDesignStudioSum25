@@ -207,13 +207,13 @@ public class TimeManager : MonoBehaviour
         }
         // TODO: re-implement weather lighting results
         // get cloud cover from weather manager
-        //float clouds = wm.cloudAmount;
+        float clouds = wm.cloudAmount;
         // signal background manager of cloud cover (fog, etc.)
-        //bm.SetCloudCover(clouds, sunLight.intensity);
+        bm.SetCloudCover(clouds, sunLight.intensity);
         // adjust ambient lighting for cloud cover
-        //float cloudLightMult = 1f - (clouds * (1f-MAXCLOUDAMBIENTLIGHTMULTIPLIER));
+        float cloudLightMult = 1f - (clouds * (1f-MAXCLOUDAMBIENTLIGHTMULTIPLIER));
         // adjust sun (and moonlight) for cloud cover
-        //sunLight.intensity *= cloudLightMult;
+        sunLight.intensity *= cloudLightMult;
         float moonAdjust = MOONLIGHTINTENSITY; //MOONLIGHTINTENSITY * cloudLightMult;
         RenderSettings.ambientIntensity = moonAdjust + (sunLight.intensity * (1f - moonAdjust));
     }

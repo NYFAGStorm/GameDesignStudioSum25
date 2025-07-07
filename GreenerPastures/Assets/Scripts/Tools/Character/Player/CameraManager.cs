@@ -1,3 +1,4 @@
+using NUnit.Framework.Interfaces;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
@@ -40,6 +41,9 @@ public class CameraManager : MonoBehaviour
 
     private PositionData[] offsetPositions;
     private PositionData[] offsetRotations;
+
+    private GameObject rainBox;
+    private ParticleSystem rainVFX;
 
     const float CAMERAPAUSEDURATION = 0.381f;
     const float CAMERAMOVEDURATION = 0.618f;
@@ -85,8 +89,68 @@ public class CameraManager : MonoBehaviour
                 easeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             }
             if (playerObject == null)
-                playerObject = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject;
+            {
+                PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                if (pcm != null)
+                    playerObject = pcm.gameObject;
+            }
+            // rain box
+            rainBox = GameObject.Instantiate((GameObject)Resources.Load("VFX Rain Box"));
+            rainBox.name = "VFX Rain Box";
+            rainBox.transform.position = gameObject.transform.position;
+            rainBox.transform.parent = gameObject.transform;
+            rainVFX = rainBox.GetComponent<ParticleSystem>();
+            rainVFX.Stop();
+            // config weather manager
+            WeatherManager wm = GameObject.FindFirstObjectByType<WeatherManager>();
+            if (wm != null)
+                wm.ConfigCameraManager(this);
+            else
+                Debug.LogWarning("--- CameraManager [Start] : no weather manager found in scene. will ignore.");
         }
+    }
+
+    public void SetRain( float rainAmount, float windAmount, bool windLeft )
+    {
+        // start colors
+        ParticleSystem.MainModule rainMain = rainVFX.main;
+        ParticleSystem.MinMaxGradient grad = new ParticleSystem.MinMaxGradient();
+        Color mn = Color.white;
+        Color mx = Color.white;
+        // change color by light level
+        mn.r = 0.618f;
+        mn.g = 0.925f;
+        mn.b = 1f;
+        mx.r = 0.75f;
+        mx.g = 0.75f;
+        mx.b = 0.9f;
+        float intensity = RenderSettings.sun.intensity;
+        mn *= intensity;
+        mx *= intensity;
+        grad.colorMin = mn;
+        grad.colorMax = mx;
+        rainMain.startColor = grad;
+
+        // (emission rate over time = 618 * rain amount)
+        // linear vel x countered by shape position x
+        // every 10 lin vel x means -3 shape pos
+
+        ParticleSystem.EmissionModule rainEmission = rainVFX.emission;
+        rainEmission.rateOverTime = rainAmount * 618f;
+
+        ParticleSystem.VelocityOverLifetimeModule rainVel = rainVFX.velocityOverLifetime;
+        float wForce = windAmount * 100f;
+        if (windLeft)
+            wForce *= -1f;
+        rainVel.x = wForce;
+        ParticleSystem.ShapeModule rainShape = rainVFX.shape;
+        Vector3 pos = new Vector3((wForce * -.03f), 6.18f, 10f);
+        rainShape.position = pos;
+
+        if (rainAmount > 0f && !rainVFX.isPlaying)
+            rainVFX.Play();
+        else if (rainVFX.isPlaying && rainAmount == 0f)
+            rainVFX.Stop();
     }
 
     void ConfigureCamOffsets()
@@ -298,6 +362,9 @@ public class CameraManager : MonoBehaviour
 
         gameObject.transform.position = pos;
         gameObject.transform.eulerAngles = rot;
+
+        rot.x = 90f - rot.x;
+        rainBox.transform.localEulerAngles = rot;
     }
 
     void Update()
@@ -411,6 +478,9 @@ public class CameraManager : MonoBehaviour
         // move camera
         gameObject.transform.position = Vector3.Lerp(savedPostion, cameraTargetPosition, progress);
         gameObject.transform.eulerAngles = Vector3.Lerp(savedRotation, cameraTargetRotation, progress);
+        Vector3 rot = gameObject.transform.eulerAngles;
+        rot.x = 90f - rot.x;
+        rainBox.transform.localEulerAngles = rot;
 
         // progress done
         if (progress >= 1f)

@@ -9,6 +9,8 @@ public class WeatherManager : MonoBehaviour
     public float windDirection; // negative is left to right, positive right to left
     public float cloudAmount;
 
+    public float rainAmount;
+
     private float windFactor;
     private float windVector; // the delta of wind factor (not direction)
     private float cloudFactor;
@@ -18,6 +20,7 @@ public class WeatherManager : MonoBehaviour
     private float timeMultiplier;
     private float weatherTimer;
     private TimeManager tim;
+    private CameraManager cm;
 
     const float WEATHERCHECKINTERVAL = 15f;
 
@@ -32,6 +35,9 @@ public class WeatherManager : MonoBehaviour
     const float CLOUDVECTOROFFSET = 0.2f;
     const float CLOUDCHANGEMULTIPLIER = 0.381f;
     const float CLOUDWEIGHT = 0.00618f;
+
+    const float RAINCLOUDTHRESHOLD = 0.8f;
+    const float RAINWATERINGRATE = 0.1f;
 
 
     void Start()
@@ -48,6 +54,11 @@ public class WeatherManager : MonoBehaviour
         {
             weatherTimer = 1f;
         }
+    }
+
+    public void ConfigCameraManager(CameraManager camMgr)
+    {
+        cm = camMgr;
     }
 
     void Update()
@@ -81,10 +92,27 @@ public class WeatherManager : MonoBehaviour
         // adjust cloud
         cloudAmount = Mathf.Clamp01(cloudAmount - CLOUDWEIGHT + (cloudVector * CLOUDCHANGEMULTIPLIER));
 
+        // calculate rain
+        rainAmount = Mathf.Clamp01(cloudAmount - RAINCLOUDTHRESHOLD) * (1f / (1f - RAINCLOUDTHRESHOLD)); 
+
         // calculate wind direction
         windDirection = ((windFactor * 2f) - 1f) / Mathf.Abs( (windFactor * 2f) - 1f );
         if (windAmount == 0)
             windDirection = 0f;
+
+        // tell camera manager about rain
+        if (cm != null)
+            cm.SetRain(rainAmount, windAmount, windDirection < 0f);
+
+        // water all plots per rain amount
+        if (rainAmount > 0f)
+        {
+            PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+            for (int i = 0; i <  plots.Length; i++)
+            {
+                plots[i].data.water += Mathf.Clamp01(rainAmount * RAINWATERINGRATE * Time.deltaTime);
+            }
+        }
 
         // use wind and cloud to adjust temperature (on time manager)
         if ( windAmount > 0f || cloudAmount > 0f )

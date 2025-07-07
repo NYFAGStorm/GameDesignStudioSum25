@@ -69,7 +69,7 @@ public class BackgroundManager : MonoBehaviour
     {
         // TODO: re-implement cloud cover background effects
         // update cloud cover lighting
-        //UpdateCloudCoverLighting();
+        UpdateCloudCoverLighting();
         
         // update bg layer colors based on ambient light intensity
         for (int i = 0; i < childObjects.Length; i++)

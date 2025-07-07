@@ -132,7 +132,8 @@ public class ItemSpawnManager : MonoBehaviour
                 {
                     drops[i].dropTimer = 0f;
                     Vector3 land = drops[i].dropTarget + (Vector3.up * VERTICALORIGIN);
-                    drops[i].dropItem.transform.position = land;
+                    if (drops[i].dropItem != null)
+                        drops[i].dropItem.transform.position = land;
 
                     // drop item affects
                     LooseItemManager looseD = drops[i].dropItem.GetComponent<LooseItemManager>();

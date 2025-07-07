@@ -1367,7 +1367,7 @@ public class PlayerIntroduction : MonoBehaviour
                 npcCallback = false;
                 s += " npc mark x:"+currentBeat.npcMark.x+" , z:"+currentBeat.npcMark.z;
             }
-            Debug.Log(s);
+            //Debug.Log(s);
         }
     }
 

@@ -1158,6 +1158,7 @@ MonoBehaviour:
   cameraTargetRotation: {x: 0, y: 0, z: 0}
   modeAfterHold: 1
   modeAfterMove: 2
+  allowPlayerControlCam: 1
 --- !u!81 &963194230
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1845,6 +1846,7 @@ MonoBehaviour:
   windAmount: 0
   windDirection: 0
   cloudAmount: 0
+  rainAmount: 0
 --- !u!4 &1211474065
 Transform:
   m_ObjectHideFlags: 0
