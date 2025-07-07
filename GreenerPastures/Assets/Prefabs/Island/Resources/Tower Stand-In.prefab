@@ -97,9 +97,10 @@ GameObject:
   - component: {fileID: 79325890603358083}
   - component: {fileID: 2288285787406975002}
   - component: {fileID: 8156687140063778198}
+  - component: {fileID: 6014513863472510591}
   m_Layer: 0
   m_Name: Tower Top
-  m_TagString: Untagged
+  m_TagString: CamClip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,6 +173,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6014513863472510591
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3360659549022905317}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4230755866497057140
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,7 +208,7 @@ GameObject:
   - component: {fileID: 4046057402855058573}
   m_Layer: 0
   m_Name: Tower Stand-In
-  m_TagString: Untagged
+  m_TagString: CamClip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -29,6 +29,7 @@ public class CameraManager : MonoBehaviour
     private GameObject playerObject;
     private PlayerControlManager pcm;
     private MultiGamepad padMgr;
+    private CameraClip cc;
 
     private float cameraPauseTimer;
     private float cameraMoveTimer;
@@ -254,6 +255,9 @@ public class CameraManager : MonoBehaviour
     {
         playerObject = player.gameObject;
         pcm = player;
+
+        cc = UnityEngine.Object.FindFirstObjectByType<CameraClip>();
+        cc.ConnectPlayer(playerObject.transform);
     }
 
     /// <summary>
