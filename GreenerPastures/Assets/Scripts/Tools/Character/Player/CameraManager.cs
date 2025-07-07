@@ -1,4 +1,3 @@
-using NUnit.Framework.Interfaces;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
@@ -44,6 +43,7 @@ public class CameraManager : MonoBehaviour
 
     private GameObject rainBox;
     private ParticleSystem rainVFX;
+    private bool rainOn;
 
     const float CAMERAPAUSEDURATION = 0.381f;
     const float CAMERAMOVEDURATION = 0.618f;
@@ -125,8 +125,10 @@ public class CameraManager : MonoBehaviour
         mx.g = 0.75f;
         mx.b = 0.9f;
         float intensity = RenderSettings.sun.intensity;
-        mn *= intensity;
-        mx *= intensity;
+        mn *= Mathf.Clamp01(intensity + 0.618f);
+        mn.a = 1f;
+        mx *= Mathf.Clamp01(intensity + 0.618f);
+        mx.a = 1f;
         grad.colorMin = mn;
         grad.colorMax = mx;
         rainMain.startColor = grad;
@@ -136,7 +138,7 @@ public class CameraManager : MonoBehaviour
         // every 10 lin vel x means -3 shape pos
 
         ParticleSystem.EmissionModule rainEmission = rainVFX.emission;
-        rainEmission.rateOverTime = rainAmount * 618f;
+        rainEmission.rateOverTime = rainAmount * 3810f;
 
         ParticleSystem.VelocityOverLifetimeModule rainVel = rainVFX.velocityOverLifetime;
         float wForce = windAmount * 100f;
@@ -144,7 +146,7 @@ public class CameraManager : MonoBehaviour
             wForce *= -1f;
         rainVel.x = wForce;
         ParticleSystem.ShapeModule rainShape = rainVFX.shape;
-        Vector3 pos = new Vector3((wForce * -.03f), 6.18f, 10f);
+        Vector3 pos = new Vector3((wForce * -.3f), 6.18f, -10f);
         rainShape.position = pos;
 
         if (rainAmount > 0f && !rainVFX.isPlaying)
@@ -262,6 +264,11 @@ public class CameraManager : MonoBehaviour
         mode = CameraMode.Follow;
         GetFollowTarget();
         gameObject.transform.eulerAngles = savedRotation;
+
+        // rain vfx config (on)
+        rainBox.SetActive(true);
+        if (rainOn)
+            rainVFX.Play();
     }
 
     /// <summary>
@@ -274,6 +281,10 @@ public class CameraManager : MonoBehaviour
         savedPostion = camPosition;
         mode = CameraMode.PanFollow;
         GetPanTarget();
+
+        // rain vfx config (off)
+        rainOn = rainVFX.isPlaying;
+        rainBox.SetActive(false);
     }
 
     public void SetWorldViewIntro()

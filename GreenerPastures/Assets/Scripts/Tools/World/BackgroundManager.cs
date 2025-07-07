@@ -67,7 +67,6 @@ public class BackgroundManager : MonoBehaviour
 
     void Update()
     {
-        // TODO: re-implement cloud cover background effects
         // update cloud cover lighting
         UpdateCloudCoverLighting();
         

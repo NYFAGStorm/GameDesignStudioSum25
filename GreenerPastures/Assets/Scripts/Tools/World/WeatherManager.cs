@@ -37,7 +37,7 @@ public class WeatherManager : MonoBehaviour
     const float CLOUDWEIGHT = 0.00618f;
 
     const float RAINCLOUDTHRESHOLD = 0.618f;
-    const float RAINWATERINGRATE = 0.1f;
+    const float RAINWATERINGRATE = 38.1f;
 
 
     void Start()
@@ -110,7 +110,7 @@ public class WeatherManager : MonoBehaviour
             PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
             for (int i = 0; i <  plots.Length; i++)
             {
-                plots[i].data.water += Mathf.Clamp01(rainAmount * RAINWATERINGRATE * Time.deltaTime);
+                plots[i].data.water = Mathf.Clamp01(plots[i].data.water + (rainAmount * RAINWATERINGRATE * Time.deltaTime));
             }
         }
 
