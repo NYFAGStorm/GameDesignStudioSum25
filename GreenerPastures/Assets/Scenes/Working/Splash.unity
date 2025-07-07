@@ -272,7 +272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - name: Menu Loop
-    clip: {fileID: 8300000, guid: e41e506adf1c24df5a5bc27a2949f01b, type: 3}
+    clip: {fileID: 8300000, guid: 0253433723c664a8ead335f574ac4c37, type: 3}
     type: 3
     delay: 0
     maxDelay: 0
