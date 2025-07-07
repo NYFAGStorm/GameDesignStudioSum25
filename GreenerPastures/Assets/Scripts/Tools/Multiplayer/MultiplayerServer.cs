@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 public class MultiplayerServer : NetworkBehaviour
 {
@@ -21,19 +22,25 @@ public class MultiplayerServer : NetworkBehaviour
     [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_AddPlayer(PlayerRef plr)
     {
+        if (!Runner.IsServer) return;
+
         NetworkObject newPlayer = Runner.Spawn(playerObject);
         playerRefs[playerCount] = plr;
         playerCharacters[playerCount] = newPlayer;
         newPlayer.AssignInputAuthority(plr);
+        playerCount++;
     }
 
     [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RemovePlayer(PlayerRef plr)
     {
+        if (!Runner.IsServer) return;
+
         int plrSlot = GetPlayerNumber(plr);
         Runner.Despawn(playerCharacters[plrSlot]);
         playerCharacters[plrSlot] = null;
         playerRefs[plrSlot] = PlayerRef.None;
+        playerCount--;
     }
 
     private int GetPlayerNumber(PlayerRef plr)

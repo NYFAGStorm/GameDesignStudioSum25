@@ -421,7 +421,6 @@ GameObject:
   - component: {fileID: 1617891700076370775}
   - component: {fileID: 4164797008503242345}
   - component: {fileID: 2608772365857234711}
-  - component: {fileID: 5581969619802328762}
   m_Layer: 5
   m_Name: Multiplayer
   m_TagString: Untagged
@@ -537,24 +536,16 @@ MonoBehaviour:
   loginMenu: {fileID: 5235993964147470255}
   multiplayerMenu: {fileID: 3780038840353364666}
   statusPanel: {fileID: 5694186343654815932}
---- !u!114 &5581969619802328762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 796655248739488144}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 1357722365
-  ObjectInterest: 1
-  Flags: 327681
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0
+  upKey: 119
+  downKey: 115
+  leftKey: 97
+  rightKey: 100
+  actionAKey: 101
+  actionBKey: 102
+  actionCKey: 99
+  actionDKey: 118
+  lBumpKey: 91
+  rBumpKey: 93
 --- !u!1 &927342169872623807
 GameObject:
   m_ObjectHideFlags: 0

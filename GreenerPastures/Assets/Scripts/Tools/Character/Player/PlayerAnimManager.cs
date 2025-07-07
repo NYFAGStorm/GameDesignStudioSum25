@@ -7,14 +7,14 @@ public class PlayerAnimManager : MonoBehaviour
 
     public bool imageFlipped;
 
-    private PlayerControlManager pcm;
+    private NetworkPlayerController pcm;
     private Renderer rend;
 
 
     void Start()
     {
         // validate
-        pcm = gameObject.transform.parent.GetComponent<PlayerControlManager>();
+        pcm = gameObject.transform.parent.GetComponent<NetworkPlayerController>();
         if ( pcm == null )
         {
             Debug.LogError("--- PlayerAnimManager [Start] : "+gameObject.name+" no player control manager found in parent. aborting.");

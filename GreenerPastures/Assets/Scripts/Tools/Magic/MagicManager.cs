@@ -5,14 +5,14 @@ public class MagicManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles a player's use of their spell book
 
-    private PlayerControlManager pcm;
+    private NetworkPlayerController pcm;
     private CastManager castMgr;
 
 
     void Start()
     {
         // validate
-        pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        pcm = GameObject.FindFirstObjectByType<NetworkPlayerController>();
         if (pcm == null)
         {
             Debug.LogError("--- MagicManager [Start] : no player control manager found on this game object. aborting.");

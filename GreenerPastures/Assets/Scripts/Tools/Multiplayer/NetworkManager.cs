@@ -8,6 +8,7 @@ using Fusion.Sockets;
 using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -123,6 +124,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
+        inp.up = Input.GetKey(upKey);
+        inp.down = Input.GetKey(downKey);
+        inp.left = Input.GetKey(leftKey);
+        inp.right = Input.GetKey(rightKey);
+
         input.Set(inp);
     }
 
@@ -133,7 +139,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         if (SceneManager.GetActiveScene().buildIndex == 8)
         {
             multiplayerServer = UnityEngine.Object.FindFirstObjectByType<MultiplayerServer>();
-            multiplayerServer.RPC_AddPlayer(players[plrCount]);
         }
     }
     

@@ -130,10 +130,16 @@ public class NetworkPlayerController : NetworkBehaviour
         }
     }
 
-    void Update()
+    public override void FixedUpdateNetwork()
     {
+        if (!Runner.IsServer) return;
+
         // check action input
-        ReadActionInput();
+        if (GetInput(out PlayerInput playerInput))
+        {
+            inputs = playerInput;
+            UnityEngine.Debug.Log(inputs.up);
+        }
 
         // detect inventory selection input
         DetectInventorySelectionInput();
@@ -335,13 +341,6 @@ public class NetworkPlayerController : NetworkBehaviour
                 plots[i].SetCursorPulse(true);
                 break;
             }
-        }
-    }
-
-    void ReadActionInput()
-    {
-        if (GetInput(out PlayerInput playerInput)) {
-            inputs = playerInput;
         }
     }
 

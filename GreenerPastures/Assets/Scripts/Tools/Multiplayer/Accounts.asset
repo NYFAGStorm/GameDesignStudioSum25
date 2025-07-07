@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   accounts:
   - username: gustavo
-    password: mypassword
+    password: pass

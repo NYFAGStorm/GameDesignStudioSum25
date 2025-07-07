@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3494834401035346939}
-  - component: {fileID: 261740017079920572}
+  - component: {fileID: 2072142417921448102}
   - component: {fileID: 3484861889041133304}
   - component: {fileID: 1722252933839553243}
   - component: {fileID: 2783380199156033629}
@@ -36,7 +36,7 @@ Transform:
   - {fileID: 7289482480599027668}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &261740017079920572
+--- !u!114 &2072142417921448102
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3232420859449547436}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d722d560232d6f3418cc340b8468d5dc, type: 3}
+  m_Script: {fileID: 11500000, guid: 55a62eb6fe420d347a43feec2565b2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerData:
@@ -89,16 +89,6 @@ MonoBehaviour:
         spellBook: []
     effects: 
   characterSpeed: 2.7
-  upKey: 119
-  downKey: 115
-  leftKey: 97
-  rightKey: 100
-  actionAKey: 101
-  actionBKey: 102
-  actionCKey: 99
-  actionDKey: 118
-  lBumpKey: 91
-  rBumpKey: 93
   characterFrozen: 0
   hidePlayerHUD: 0
 --- !u!114 &3484861889041133304
@@ -137,7 +127,8 @@ MonoBehaviour:
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 2072142417921448102}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &8989784619762191541
 GameObject:

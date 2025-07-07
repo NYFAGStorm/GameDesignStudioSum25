@@ -1143,6 +1143,76 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3707677030043376523, guid: 1fbb451aa960449458741614c45879e8, type: 3}
   m_PrefabInstance: {fileID: 290969565}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &306440431
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 306440434}
+  - component: {fileID: 306440433}
+  - component: {fileID: 306440432}
+  m_Layer: 0
+  m_Name: ArtLibraryManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &306440432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306440431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91639726277a9c24caa52505b0eceb3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 0
+  cameraTargetPosition: {x: 0, y: 0, z: 0}
+  cameraTargetRotation: {x: 0, y: 0, z: 0}
+--- !u!114 &306440433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306440431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfecf7d6a46e8bc4587f7cde1ced391f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemArtData:
+    images:
+    - name: Fertilizer
+      type: 1
+      artIndexBase: 0
+      artAnimLength: 0
+      animFrameTime: 0
+      animLoop: 0
+  itemImages:
+  - {fileID: 2800000, guid: e24812a97bc33da49933647c14f8c5b7, type: 3}
+--- !u!4 &306440434
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306440431}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &311349289 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3695908429196013634, guid: 05732be752a652d439e8f7677717b70c, type: 3}
@@ -6432,3 +6502,4 @@ SceneRoots:
   - {fileID: 264950275}
   - {fileID: 269118573}
   - {fileID: 750276727}
+  - {fileID: 306440434}
