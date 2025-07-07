@@ -217,6 +217,6 @@ public class WeatherManager : MonoBehaviour
         // reset global time progress
         globalTimeProgress = tim.GetGlobalTimeProgress();
         // set check timer
-        weatherTimer = 0.0618f;
+        weatherTimer = 0.618f;
     }
 }
