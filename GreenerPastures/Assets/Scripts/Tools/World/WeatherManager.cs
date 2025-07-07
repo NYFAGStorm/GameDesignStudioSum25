@@ -36,7 +36,7 @@ public class WeatherManager : MonoBehaviour
     const float CLOUDCHANGEMULTIPLIER = 0.381f;
     const float CLOUDWEIGHT = 0.00618f;
 
-    const float RAINCLOUDTHRESHOLD = 0.8f;
+    const float RAINCLOUDTHRESHOLD = 0.618f;
     const float RAINWATERINGRATE = 0.1f;
 
 
