@@ -212,7 +212,7 @@ public class CheatManager : MonoBehaviour
                 break;
             case 13:
                 n = "mediumrare";
-                d = "Drops corn seed in front of the player";
+                d = "Drops potentially rare seed in front of the player";
                 break;
             case 14:
                 n = "listcheats";
