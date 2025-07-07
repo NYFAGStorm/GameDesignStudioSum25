@@ -376,6 +376,8 @@ public class PlayerControlManager : MonoBehaviour
     {
         // initialize player character
 
+        // TODO: return confirm bool, this is where crashes occur in startup
+
         // validate and initialize 
         if (saveMgr == null)
             Start(); // REFACTOR: migrate bc this needs to happen every time
@@ -416,8 +418,16 @@ public class PlayerControlManager : MonoBehaviour
         pos.x = playerData.camSaved.x;
         pos.y = playerData.camSaved.y;
         pos.z = playerData.camSaved.z;
-        if (cam.mode == CameraManager.CameraMode.PanFollow)
-            cam.SetCameraPanMode(pos);
+        if (cam != null)
+        {
+            if (cam.mode == CameraManager.CameraMode.PanFollow)
+                cam.SetCameraPanMode(pos);
+        }
+        else
+        {
+            Debug.LogError("--- PlayerControlManger [SetPlayerData] : cam reference lost during setup. aborting.");
+            enabled = false;
+        }
         // island data already distributed
         IslandData island = gameData.islands[playerData.playerIsland];
         GameObject islandObj = GameObject.Find("Island " + gameData.islands[playerData.playerIsland].name);
