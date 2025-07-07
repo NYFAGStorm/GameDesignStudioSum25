@@ -1196,8 +1196,15 @@ MonoBehaviour:
       artAnimLength: 0
       animFrameTime: 0
       animLoop: 0
+    - name: Seed
+      type: 2
+      artIndexBase: 1
+      artAnimLength: 0
+      animFrameTime: 0
+      animLoop: 0
   itemImages:
   - {fileID: 2800000, guid: e24812a97bc33da49933647c14f8c5b7, type: 3}
+  - {fileID: 2800000, guid: 72b7f0b33e9254a4fbb4fb5cd2af0fcb, type: 3}
 --- !u!4 &306440434
 Transform:
   m_ObjectHideFlags: 0

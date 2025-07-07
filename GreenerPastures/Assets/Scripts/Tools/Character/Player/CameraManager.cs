@@ -161,7 +161,7 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {
-        if (pcm == null)
+        if (npc == null && pcm == null)
             return;
 
         if (mode == CameraMode.Follow)

@@ -129,6 +129,20 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         inp.left = Input.GetKey(leftKey);
         inp.right = Input.GetKey(rightKey);
 
+        inp.actionA = Input.GetKey(actionAKey);
+        inp.actionB = Input.GetKey(actionBKey);
+        inp.actionC = Input.GetKey(actionCKey);
+        inp.actionD = Input.GetKey(actionDKey);
+        inp.lBump = Input.GetKey(lBumpKey);
+        inp.rBump = Input.GetKey(rBumpKey);
+
+        inp.actionADown = Input.GetKeyDown(actionAKey);
+        inp.actionBDown = Input.GetKeyDown(actionBKey);
+        inp.actionCDown = Input.GetKeyDown(actionCKey);
+        inp.actionDDown = Input.GetKeyDown(actionDKey);
+        inp.lBumpDown = Input.GetKeyDown(lBumpKey);
+        inp.rBumpDown = Input.GetKeyDown(rBumpKey);
+
         input.Set(inp);
     }
 

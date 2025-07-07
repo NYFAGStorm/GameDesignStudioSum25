@@ -138,7 +138,6 @@ public class NetworkPlayerController : NetworkBehaviour
         if (GetInput(out PlayerInput playerInput))
         {
             inputs = playerInput;
-            UnityEngine.Debug.Log(inputs.up);
         }
 
         // detect inventory selection input
