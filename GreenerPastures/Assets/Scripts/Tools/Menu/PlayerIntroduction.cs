@@ -80,7 +80,7 @@ public class PlayerIntroduction : MonoBehaviour
 
     private bool canSkipIntro;
     private bool cancelIntro;
-    private bool pauseIntro;
+    //private bool pauseIntro;
 
     private float introTimer;
 
@@ -916,6 +916,7 @@ public class PlayerIntroduction : MonoBehaviour
 
     void Update()
     {
+        /*
         if (Input.GetKeyDown(KeyCode.P))
         {
             pauseIntro = !pauseIntro;
@@ -923,6 +924,7 @@ public class PlayerIntroduction : MonoBehaviour
         }
         if (pauseIntro)
             return;
+        */
 
         // handle intro dialog step
         if (cancelIntro)

@@ -26,8 +26,12 @@ public class CheatManager : MonoBehaviour
 
     private GreenerGameManager ggMgr;
 
-    const int TOTALCHEATCODES = 13;
+    private float cheatDisplayTimer;
+    private string cheatDisplayString;
+
+    const int TOTALCHEATCODES = 15;
     const float CHEATCODEWINDOW = 1f;
+    const float CHEATDISPLAYTIME = 20f;
 
 
     void Start()
@@ -67,6 +71,14 @@ public class CheatManager : MonoBehaviour
 
     void Update()
     {
+        // run cheat display timer
+        if (cheatDisplayTimer > 0f)
+        {
+            cheatDisplayTimer -= Time.deltaTime;
+            if (cheatDisplayTimer < 0f)
+                cheatDisplayTimer = 0f;
+        }
+        
         // detect keyboard input
         if (Input.anyKeyDown)
         {
@@ -198,6 +210,14 @@ public class CheatManager : MonoBehaviour
                 n = "togglecheats";
                 d = "Toggles the setting to allow cheats in this game";
                 break;
+            case 13:
+                n = "mediumrare";
+                d = "Drops corn seed in front of the player";
+                break;
+            case 14:
+                n = "listcheats";
+                d = "Temporarily displays a list of cheat codes";
+                break;
             default:
                 n = "-";
                 d = "--";
@@ -247,6 +267,7 @@ public class CheatManager : MonoBehaviour
                     Destroy(GameObject.Find("player light").gameObject);
                 break;
             case 6:
+                // drop fertilizer
                 ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
                 if (ism != null)
                 {
@@ -258,6 +279,7 @@ public class CheatManager : MonoBehaviour
                 }
                 break;
             case 7:
+                // drop corn seed
                 ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
                 if (ism != null)
                 {
@@ -308,11 +330,78 @@ public class CheatManager : MonoBehaviour
                 if (ggMgr.IsHostGame())
                     ggMgr.game.options.allowCheats = !ggMgr.game.options.allowCheats;
                 break;
+            case 13:
+                // drop potentially rare seed
+                ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+                if (ism != null)
+                {
+                    PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                    float facing = pcm.gameObject.transform.GetChild(0).GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
+                    Vector3 pos = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject.transform.position;
+                    Vector3 targ = pos + (facing * Vector3.right);
+                    float maybeRarePlantType = RandomSystem.WeightedRandom01() * 41f;
+                    PlantType pt = (PlantType)(((int)maybeRarePlantType+1));
+                    PlantData p = PlantSystem.InitializePlant(pt);
+                    LooseItemData seed = InventorySystem.CreateItem(ItemType.Seed);
+                    seed.inv.items[0] = InventorySystem.SetItemAsPlant(seed.inv.items[0],p);
+                    seed.inv.items[0].name = "Seed ("+p.plantName+")";
+                    seed.inv.items[0].plant = pt;
+                    ism.SpawnItem(seed, pos, targ);
+                }
+                break;
+            case 14:
+                Debug.Log("CHEAT CODE LIST");
+                string s = "";
+                for (int i = 0; i < codes.Length; i++)
+                {
+                    s += codes[i].name + "\n   " + codes[i].description + "\n";
+                }
+                Debug.Log(s);
+                cheatDisplayString = s;
+                cheatDisplayTimer = CHEATDISPLAYTIME;
+                break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");
                 break;
         }
 
         validCode = -1; // initialized
+    }
+
+    void OnGUI()
+    {
+        if (cheatDisplayTimer == 0f)
+            return;
+
+        Rect r = new Rect();
+        float w = Screen.width;
+        float h = Screen.height;
+
+        r.x = 0.25f * w;
+        r.y = 0.2f * h;
+        r.width = 0.5f * w;
+        r.height = 0.8f * h;
+
+        GUIStyle g = new GUIStyle(GUI.skin.label);
+        g.fontSize = Mathf.RoundToInt(12f * (w/1024f));
+        g.fontStyle = FontStyle.Bold;
+        g.alignment = TextAnchor.MiddleLeft;
+        // drop shadow
+        r.x += 0.001f * w;
+        r.y += 0.002f * h;
+        Color c = Color.black;
+        //c.a = Mathf.Clamp01(cheatDisplayTimer + (CHEATDISPLAYTIME - 1f) / CHEATDISPLAYTIME);
+        g.normal.textColor = c;
+        g.hover.textColor = c;
+        g.active.textColor = c;
+        GUI.Label(r, cheatDisplayString, g);
+        r.x -= 0.001f * w;
+        r.y -= 0.002f * h;
+        c = Color.white;
+        //c.a = Mathf.Clamp01(cheatDisplayTimer + (CHEATDISPLAYTIME - 1f) / CHEATDISPLAYTIME);
+        g.normal.textColor = c;
+        g.hover.textColor = c;
+        g.active.textColor = c;
+        GUI.Label(r, cheatDisplayString, g);
     }
 }
