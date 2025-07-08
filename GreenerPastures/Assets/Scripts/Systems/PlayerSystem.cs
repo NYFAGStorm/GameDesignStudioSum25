@@ -174,4 +174,211 @@ public static class PlayerSystem
 
         return retColor;
     }
+
+    /// <summary>
+    /// Returns the regular interval a player can reach the next level
+    /// </summary>
+    /// <returns>xp amount of the level interval</returns>
+    public static int GetXPLevelInterval()
+    {
+        const int XPLEVELINTERVAL = 300; // x10 spreadsheet numbers (we could x100)
+
+        return XPLEVELINTERVAL;
+    }
+
+    /// <summary>
+    /// Returns the level of player based on total xp amount
+    /// </summary>
+    /// <param name="xp">xp amount total</param>
+    /// <returns>associated level</returns>
+    public static int GetPlayerLevel( int xp )
+    {
+        int retInt = 0;
+
+        // x2 interval needed to reach level 1
+        retInt = (xp / GetXPLevelInterval()) - 1;
+
+        if (retInt < 0)
+            retInt = 0;
+        
+        return retInt;
+    }
+
+    /// <summary>
+    /// Returns the amount of xp a player would need to reach next level, given current xp and level
+    /// </summary>
+    /// <param name="currentXP">total player xp</param>
+    /// <param name="currentLevel">current player level</param>
+    /// <returns>amount of xp to reach next level</returns>
+    public static int GetXPAmountToNextLevel( int currentXP, int currentLevel )
+    {
+        int retInt = 0;
+
+        int targetAmount = (currentLevel + 1) * GetXPLevelInterval();
+        // x2 interval needed to reach level 1
+        targetAmount += GetXPLevelInterval();
+        retInt = targetAmount - currentXP;
+
+        return retInt;
+    }
+
+    /// <summary>
+    /// Returns true if given player data will level up if awarded given xp amount
+    /// </summary>
+    /// <param name="pData">player data</param>
+    /// <param name="xpAmount">xp amount to be awarded</param>
+    /// <returns>true if award will result in level up, false if not</returns>
+    public static bool WillPlayerLevelUp( PlayerData pData, int xpAmount )
+    {
+        return GetXPAmountToNextLevel(pData.xp, pData.level) <= xpAmount;
+    }
+
+    /// <summary>
+    /// Awards the given player data the given amount of xp
+    /// </summary>
+    /// <param name="pData">player data</param>
+    /// <param name="amount">awarded xp amount</param>
+    /// <returns>player data with xp added and level increased, if level up</returns>
+    public static PlayerData AwardPlayerXP( PlayerData pData, int amount )
+    {
+        PlayerData retData = pData;
+
+        if (amount <= 0)
+            return retData;
+
+        if (WillPlayerLevelUp(retData, amount))
+        {
+            retData.level++;
+            retData = AwardPlayerForLevelUp(retData);
+            // player control manager also calls GetLevelUpNotifications()
+        }
+        retData.xp += amount;
+
+        return retData;
+    }
+
+    /// <summary>
+    /// Applies awards to player for reaching their current level (at level-up)
+    /// </summary>
+    /// <param name="pData">player data</param>
+    /// <returns>player data with awards configured</returns>
+    public static PlayerData AwardPlayerForLevelUp( PlayerData pData )
+    {
+        PlayerData retData = pData;
+
+        // NOTE: mirror this with the GetLevelUpNotifications() function below
+        // the level this player just reached
+        switch (retData.level)
+        {
+            case 0:
+                // welcome to the game, no participation award
+                break;
+            case 1:
+                retData.magic = MagicSystem.IntializeMagic();
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, retData.magic.library);
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, retData.magic.library);
+                break;
+            case 2:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.BlessI, retData.magic.library);
+                break;
+            case 3:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.MalnutritionI, retData.magic.library);
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ProsperousI, retData.magic.library);
+                break;
+            case 4:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.LesionI, retData.magic.library);
+                break;
+            case 5:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.EclipseI, retData.magic.library);
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.GoldenThumbI, retData.magic.library);
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                break;
+            case 9:
+                break;
+            case 10:
+                break;
+            case 11:
+                break;
+            case 12:
+                break;
+            case 13:
+                break;
+            case 14:
+                break;
+            case 15:
+                break;
+        }
+
+        return retData;
+    }
+
+    /// <summary>
+    /// Returns a list of notifications of awards recieved by leveling up to given level
+    /// </summary>
+    /// <param name="level">new level reached</param>
+    /// <returns>an array of string messages intended to use as player notifications</returns>
+    public static string[] GetLevelUpNotifications( int level )
+    {
+        string[] retNotifications = new string[0];
+
+        // the level this player just reached
+        switch (level)
+        {
+            case 0:
+                // welcome to the game
+                break;
+            case 1:
+                retNotifications = new string[3];
+                retNotifications[0] = "Magic Crafting\nUNLOCKED";
+                retNotifications[1] = "New spell in Grimoire:\nFast Grow I";
+                retNotifications[2] = "New spell in Grimoire:\nSummon Water I";
+                break;
+            case 2:
+                retNotifications = new string[2];
+                retNotifications[0] = "Plant Grafting\nUNLOCKED";
+                retNotifications[1] = "New spell in Grimoire:\nBless I";
+                break;
+            case 3:
+                retNotifications = new string[2];
+                retNotifications[0] = "New spell in Grimoire:\nMalnutrition I";
+                retNotifications[1] = "New spell in Grimoire:\nProsperous I";
+                break;
+            case 4:
+                retNotifications = new string[1];
+                retNotifications[0] = "New spell in Grimoire:\nLesion I";
+                break;
+            case 5:
+                retNotifications = new string[2];
+                retNotifications[0] = "New spell in Grimoire:\nEclipse I";
+                retNotifications[1] = "New spell in Grimoire:\nGolden Thumb I";
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                break;
+            case 9:
+                break;
+            case 10:
+                break;
+            case 11:
+                break;
+            case 12:
+                break;
+            case 13:
+                break;
+            case 14:
+                break;
+            case 15:
+                break;
+        }
+
+        return retNotifications;
+    }
 }

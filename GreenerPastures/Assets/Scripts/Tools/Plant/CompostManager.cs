@@ -98,7 +98,7 @@ public class CompostManager : MonoBehaviour
     void SpawnFertilizer()
     {
         Vector3 targ = gameObject.transform.position + (Vector3.right * RandomSystem.GaussianRandom01()) - (Vector3.left * 0.5f);
-        ism.SpawnNewItem(ItemType.Fertilizer, gameObject.transform.position, targ);
+        ism.SpawnNewItem(ItemType.Fertilizer, gameObject.transform.position, targ, true);
         compostAmount -= 1f;
         cookedAmount = 0f;
     }

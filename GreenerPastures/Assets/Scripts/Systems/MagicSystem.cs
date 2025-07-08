@@ -405,16 +405,14 @@ public static class MagicSystem
     /// <returns>spell library data with added entry in grimoire</returns>
     public static SpellLibrary AddSpellToGrimoire( SpellType spell, SpellLibrary library )
     {
-        SpellLibrary retLibrary = new SpellLibrary();
+        SpellLibrary retLibrary = library;
 
         // validate does not yet exist in grimoire
         bool found = false;
         if (retLibrary.grimiore == null || retLibrary.grimiore.Length == 0)
         {
             // no spell data yet, create
-            // add first listing to grimoire
-            retLibrary.grimiore = new GrimioreData[1];
-            retLibrary.grimiore[0] = InitializeGrimoireEntry(spell);
+            retLibrary.grimiore = new GrimioreData[0];
         }
         else
         {
@@ -439,7 +437,7 @@ public static class MagicSystem
             retLibrary.grimiore = tmp;
         }
         else
-            UnityEngine.Debug.LogWarning("--- MagicSystem [AddSpellToGrimoire] : spell type "+spell.ToString()+" already exists in grimoire. will ignore.");
+            UnityEngine.Debug.LogWarning("--- MagicSystem [AddSpellToGrimoire] : spell type " + spell.ToString() + " already exists in grimoire. will ignore.");
 
         return retLibrary;
     }

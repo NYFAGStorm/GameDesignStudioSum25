@@ -253,6 +253,16 @@ public class PlotManager : MonoBehaviour
         return (uprootedTimer == 0f);
     }
 
+    /// <summary>
+    /// Called from item spawn manager upon detection of valid drop award conditions
+    /// </summary>
+    /// <param name="dropAward">xp amount</param>
+    public void DropAwardXP( int dropAward )
+    {
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        pcm.AwardXP(dropAward);
+    }
+
     void CheckCursor()
     {
         // ignore if not active
@@ -393,6 +403,8 @@ public class PlotManager : MonoBehaviour
 
             // PLAYER STATS:
             currentPlayer.playerData.stats.totalPlanted++;
+
+            pcm.AwardXP(PlayerData.XP_PLANTASEED);
         }
         else
         {
@@ -406,6 +418,8 @@ public class PlotManager : MonoBehaviour
 
             if (!ActionComplete(WORKLANDWINDOW, "WORKING..."))
                 return;
+
+            pcm.AwardXP(PlayerData.XP_WORKTHEPLOT);
         }
 
         switch (data.condition)
@@ -489,6 +503,9 @@ public class PlotManager : MonoBehaviour
         if (!ActionComplete(WATERWINDOW, "WATERING..."))
             return;
 
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        pcm.AwardXP(PlayerData.XP_WATERTHEPLOT);
+
         data.water = 1f;
     }
 
@@ -511,9 +528,6 @@ public class PlotManager : MonoBehaviour
         if (!ActionComplete(HARVESTWINDOW,"HARVESTING..."))
             return;
 
-        // PLAYER STATS:
-        currentPlayer.playerData.stats.totalHarvested++;
-
         if ( data.condition == PlotCondition.Growing )
         {
             // harvest if plant is 100% grown and not yet harvested
@@ -521,6 +535,12 @@ public class PlotManager : MonoBehaviour
                 return;
             if (!data.plant.isHarvested || data.plant.canReFruit)
             {
+                // PLAYER STATS:
+                currentPlayer.playerData.stats.totalHarvested++;
+
+                PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                pcm.AwardXP(PlayerData.XP_HARVESTPLANT);
+
                 data.plant.isHarvested = true;
                 plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // drop as loose item fruit
@@ -571,7 +591,7 @@ public class PlotManager : MonoBehaviour
                             loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
                             loose.inv.items[0].size = data.plant.growth;
                             loose.inv.items[0].quality = data.plant.quality;
-                            ism.SpawnItem(loose, gameObject.transform.position, target);
+                            ism.SpawnItem(loose, gameObject.transform.position, target, true);
                         }
                     }
                     // harvesting may drop seed
@@ -614,7 +634,7 @@ public class PlotManager : MonoBehaviour
                                 looseSeed.inv.items[0].size = 0f;
                                 looseSeed.inv.items[0].quality = 0f;
                                 target.x += RandomSystem.GaussianRandom01() - .5f;
-                                ism.SpawnItem(looseSeed, gameObject.transform.position, target);
+                                ism.SpawnItem(looseSeed, gameObject.transform.position, target, true);
                             }
                         }
                     }
@@ -643,6 +663,9 @@ public class PlotManager : MonoBehaviour
 
         if (!ActionComplete(UPROOTWINDOW, "DIGGING..."))
             return;
+
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        pcm.AwardXP(PlayerData.XP_DIGAHOLE);
 
         // remove any wild grasses
         if (gameObject.transform.Find("Plot Wild Grasses") != null)
@@ -689,7 +712,7 @@ public class PlotManager : MonoBehaviour
                     loose.inv.items[0].type = ItemType.Stalk;
                     loose.inv.items[0].name = "Stalk (" + data.plant.plantName + ")";
                 }
-                ism.SpawnItem(loose, gameObject.transform.position, target);
+                ism.SpawnItem(loose, gameObject.transform.position, target, true);
             }
         }
         // remove plant
@@ -715,7 +738,12 @@ public class PlotManager : MonoBehaviour
 
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         ItemData iData = pcm.GetPlayerCurrentItemSelection();
-        if (iData == null || iData.type != ItemType.Fruit)
+        if (pcm.playerData.level < 2)
+        {
+            actionLabel = "Plant Grafting LOCKED";
+            return;
+        }
+        else if (iData == null || iData.type != ItemType.Fruit)
         {
             actionLabel = "Need Fruit Selected";
             return;
@@ -751,7 +779,7 @@ public class PlotManager : MonoBehaviour
             LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
             // transfer properties of plant to item (revise item data)
             loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], fruit);
-            ism.SpawnItem(loose, gameObject.transform.position, target);
+            ism.SpawnItem(loose, gameObject.transform.position, target, true);
             // using data, remove from player inventory
             pcm.DeleteCurrentItemSelection();
         }
@@ -762,6 +790,8 @@ public class PlotManager : MonoBehaviour
             plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
             // using data, remove from player inventory
             pcm.DeleteCurrentItemSelection();
+            //
+            pcm.AwardXP(PlayerData.XP_GRAFTPLANT);
         }
     }
 

@@ -599,10 +599,15 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].npcMark = new Vector3(2f, 0f, -1.75f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
+        introBeats[beat].name = "pause to harvest";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = 1.5f;
+        beat++;
         introBeats[beat].name = "harvest plant";
         introBeats[beat].action = ScriptedBeatAction.PlotChange; // harvest
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        introBeats[beat].duration = 2f;
+        introBeats[beat].duration = .5f;
         introBeats[beat].islandPos.w = 1f; // <=1 harvested
         beat++;
         introBeats[beat].name = "flower drops";
@@ -1199,7 +1204,7 @@ public class PlayerIntroduction : MonoBehaviour
                     {
                         Vector3 dropVector = Vector3.zero;
                         dropVector.x = currentBeat.islandPos.x;
-                        ism.SpawnNewItem(it, eden.transform.position, eden.transform.position + dropVector);
+                        ism.SpawnNewItem(it, eden.transform.position, eden.transform.position + dropVector, true);
                         droppedItem = GameObject.FindFirstObjectByType<LooseItemManager>();
                         if (it == ItemType.Fruit || it == ItemType.Seed)
                         {
@@ -1381,6 +1386,7 @@ public class PlayerIntroduction : MonoBehaviour
                     introRunning = false;
                     TakeOverHUD(false);
                     Destroy(eden.gameObject, 10f);
+                    pcm.AwardXP(PlayerData.XP_COMPLETETUTORIAL);
                     break;
             }
             currentBeat.actionDone = true;

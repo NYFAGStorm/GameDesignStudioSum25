@@ -210,6 +210,7 @@ public class MagicManager : MonoBehaviour
                         cData.lifeTimestamp = tim.GetGlobalTimestamp(spellData.castDuration);
                     }
                     castMgr.AcquireNewCast(cData);
+                    pcm.AwardXP(PlayerData.XP_CASTMAGIC);
                     retBool = true;
                 }
                 else

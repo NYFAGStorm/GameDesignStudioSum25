@@ -44,6 +44,7 @@ public class DiscoverableElement : MonoBehaviour
     private float revealProgress;
     // TODO: set as client player once logged in
     // REVIEW: hold onto rewards and deliver to next logged in player?
+    // NOTE: consider each of these properties in this player data element an addition
     private PlayerData playerData = new PlayerData();
 
 
@@ -138,6 +139,7 @@ public class DiscoverableElement : MonoBehaviour
                 break;
             case RewardType.XP:
                 playerData.xp += rewardAmount;
+                // PlayerControlManager.AwardXP( PlayerData.XP_FINDCLICKABLE );
                 break;
             case RewardType.Arcana:
                 playerData.arcana += rewardAmount;

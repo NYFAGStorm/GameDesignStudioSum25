@@ -90,6 +90,12 @@ public class BackgroundManager : MonoBehaviour
     {
         cloudCover = cloudAmount;
         daylight = dLight;
+
+        // settle noisy near-zero values
+        if (cloudCover < 0.01f)
+            cloudCover = 0f;
+        if (daylight < 0.001f)
+            daylight = 0f;
     }
 
     void UpdateCloudCoverLighting()

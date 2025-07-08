@@ -150,6 +150,7 @@ public class TeleportManager : MonoBehaviour
         // materialize teleport subject
         PlayerControlManager pcm = teleportSubject.GetComponent<PlayerControlManager>();
         pcm.characterFrozen = false;
+        pcm.AwardXP(PlayerData.XP_USETELEPORTER);
         Renderer[] rends = teleportSubject.GetComponentsInChildren<Renderer>();
         foreach (Renderer r in rends)
         {

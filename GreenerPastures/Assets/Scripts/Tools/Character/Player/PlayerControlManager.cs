@@ -67,8 +67,12 @@ public class PlayerControlManager : MonoBehaviour
     private InventoryData playerInventory; // reference to player data inventory
     private int currentInventorySelection;
 
+    private float XPDisplayTimer;
+    private float levelUpDisplayTimer;
+
     private MultiGamepad padMgr;
 
+    private GreenerGameManager ggm;
     private CameraManager cam;
     private PlayerAnimManager pam;
     private MagicManager mm;
@@ -79,6 +83,8 @@ public class PlayerControlManager : MonoBehaviour
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
     const bool ALLOWPLAYERDATALOAD = true; // set false for testing only
+    const float XPDISPLAYTIME = 1f;
+    const float LEVELUPDISPLAYTIME = 4f;
 
 
     // REFACTOR: the entire validation and intialization happens when game manager called SetPlayerData()
@@ -183,6 +189,20 @@ public class PlayerControlManager : MonoBehaviour
         // PLAYER STATS:
         playerData.stats.totalGameTime += Time.deltaTime;
 
+        // run xp and levelup timers
+        if (XPDisplayTimer > 0f)
+        {
+            XPDisplayTimer -= Time.deltaTime;
+            if (XPDisplayTimer < 0f)
+                XPDisplayTimer = 0f;
+        }
+        if (levelUpDisplayTimer > 0f)
+        {
+            levelUpDisplayTimer -= Time.deltaTime;
+            if (levelUpDisplayTimer < 0f)
+                levelUpDisplayTimer = 0f;
+        }
+
         if (!freezeCharacterActions)
         {
             // check action input
@@ -226,6 +246,7 @@ public class PlayerControlManager : MonoBehaviour
                 // pick up loose item, transfer to inventory
                 playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
                 activeItem = null;
+                AwardXP(PlayerData.XP_PICKUPITEM);
             }
             return;
         }
@@ -248,7 +269,11 @@ public class PlayerControlManager : MonoBehaviour
             if (characterActions.actionB)
                 activePlot.WaterPlot();
             if (characterActions.actionC)
+            {
                 activePlot.HarvestPlant();
+                // when harvesting, auto-set inventory selection to last item
+                currentInventorySelection = playerInventory.maxSlots - 1;
+            }
             if (characterActions.actionD)
                 activePlot.UprootPlot();
             if (characterActions.graftPlant)
@@ -378,7 +403,13 @@ public class PlayerControlManager : MonoBehaviour
 
         // TODO: return confirm bool, this is where crashes occur in startup
 
-        // validate and initialize 
+        // validate and initialize
+        ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+        if (ggm == null)
+        {
+            Debug.LogError("--- PlayerControlManager [SetPlayerData] : no greener game manager found in scene. aborting.");
+            return;
+        }
         if (saveMgr == null)
             Start(); // REFACTOR: migrate bc this needs to happen every time
 
@@ -535,6 +566,48 @@ public class PlayerControlManager : MonoBehaviour
             // REVIEW: local position instead?
         }
         retBool = true;
+
+        return retBool;
+    }
+
+    /// <summary>
+    /// Awards this player a given amount of xp
+    /// </summary>
+    /// <param name="xpAmount">xp amount</param>
+    /// <returns>true if result is player level up, false if not</returns>
+    public bool AwardXP( int xpAmount )
+    {
+        bool retBool = false;
+
+        // validate
+        if (xpAmount <= 0)
+            return retBool;
+
+        retBool = PlayerSystem.WillPlayerLevelUp(playerData, xpAmount);
+        playerData = PlayerSystem.AwardPlayerXP(playerData, xpAmount);
+
+        if (retBool)
+        {
+            if (ggm != null)
+            {
+                string[] notifies = PlayerSystem.GetLevelUpNotifications(playerData.level);
+                for (int i = 0; i < notifies.Length; i++)
+                {
+                    ggm.AddNotification(notifies[i]);
+                }
+            }
+            else
+                Debug.LogWarning("--- PlayerControlManager [AwardXP] : no reference to game manager for notifications. will ignore.");
+        }
+
+        // PLAYER STATS:
+        playerData.stats.totalXPEarned += xpAmount;
+        if (retBool)
+            playerData.stats.totalLevelsEarned++;
+
+        XPDisplayTimer = XPDISPLAYTIME;
+        if (retBool)
+            levelUpDisplayTimer = LEVELUPDISPLAYTIME;
 
         return retBool;
     }
@@ -770,8 +843,9 @@ public class PlayerControlManager : MonoBehaviour
                 else
                     pos += Vector3.right * PROXIMITYRANGE;
                 pos.x += (RandomSystem.GaussianRandom01() * PROXIMITYRANGE) - (PROXIMITYRANGE / 2f);
-                ism.SpawnItem(lid, gameObject.transform.position, pos);
+                ism.SpawnItem(lid, gameObject.transform.position, pos, false);
             }
+            AwardXP(PlayerData.XP_DROPITEM);
         }
     }
 
@@ -875,7 +949,7 @@ public class PlayerControlManager : MonoBehaviour
         r.height = 0.05f * h;
         GUIStyle g = new GUIStyle(GUI.skin.label);
         g.alignment = TextAnchor.MiddleLeft;
-        g.fontSize = Mathf.RoundToInt(20f * (w / 1204f));
+        g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
         g.fontStyle = FontStyle.Bold;
         string s = "ARCANA: ";
         s += playerData.arcana.ToString();
@@ -912,11 +986,17 @@ public class PlayerControlManager : MonoBehaviour
 
         r.x += 0.0006f * w;
         r.y += 0.001f * h;
-        GUI.color = Color.black;
+        c = Color.black;
+        if (levelUpDisplayTimer > 0f)
+            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 2f) % 1f));
+        GUI.color = c;
         GUI.Label(r, s, g);
         r.x -= 0.0012f * w;
         r.y -= 0.002f * h;
-        GUI.color = Color.yellow;
+        c = Color.yellow;
+        if (levelUpDisplayTimer > 0f)
+            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 2f) % 1f));
+        GUI.color = c;
         GUI.Label(r, s, g);
         GUI.color = Color.white;
 
@@ -926,11 +1006,17 @@ public class PlayerControlManager : MonoBehaviour
 
         r.x += 0.0006f * w;
         r.y += 0.001f * h;
-        GUI.color = Color.black;
+        c = Color.black;
+        if (XPDisplayTimer > 0f)
+            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 3f) % 1f));
+        GUI.color = c;
         GUI.Label(r, s, g);
         r.x -= 0.0012f * w;
         r.y -= 0.002f * h;
-        GUI.color = Color.yellow;
+        c = Color.yellow;
+        if (XPDisplayTimer > 0f)
+            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 3f) % 1f));
+        GUI.color = c;
         GUI.Label(r, s, g);
         GUI.color = Color.white;
 
@@ -1000,7 +1086,7 @@ public class PlayerControlManager : MonoBehaviour
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);
             g.alignment = TextAnchor.MiddleCenter;
-            g.fontSize = Mathf.RoundToInt(14f * (w / 1204f));
+            g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
             s = playerName;
             
@@ -1016,6 +1102,34 @@ public class PlayerControlManager : MonoBehaviour
             c = Color.white;
             if (fadeName < 1f)
                 c.a = fadeName;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+        }
+
+        if (levelUpDisplayTimer > 0f)
+        {
+            // level up banner
+            r.x = 0.2f * w;
+            r.y = 0.225f * h;
+            r.y -= 0.1f * h * (1f - (levelUpDisplayTimer/LEVELUPDISPLAYTIME));
+            r.width = 0.6f * w;
+            r.height = 0.2f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(100f * (w / 1024f));
+            g.fontStyle = FontStyle.BoldAndItalic;
+            s = "LEVEL UP!";
+
+            r.x += 0.0024f * w;
+            r.y += 0.004f * h;
+            c = Color.black;
+            c.a = Mathf.Clamp01(levelUpDisplayTimer);
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.0048f * w;
+            r.y -= 0.008f * h;
+            c = Color.yellow;
+            c.a = Mathf.Clamp01(levelUpDisplayTimer);
             GUI.color = c;
             GUI.Label(r, s, g);
         }
@@ -1040,7 +1154,7 @@ public class PlayerControlManager : MonoBehaviour
         GUI.color = Color.white;
 
         g.alignment = TextAnchor.MiddleCenter;
-        g.fontSize = Mathf.RoundToInt( 22f * (w/1204f));
+        g.fontSize = Mathf.RoundToInt( 22f * (w/ 1024f));
         g.fontStyle = FontStyle.Bold;
         s = playerInventory.items[currentInventorySelection].name;
 

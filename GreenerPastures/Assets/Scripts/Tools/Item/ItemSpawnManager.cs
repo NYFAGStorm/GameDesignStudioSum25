@@ -9,6 +9,11 @@ public class ItemSpawnManager : MonoBehaviour
     // (seed on tilled plot for planting)
     // (stalk or plant on uprooted plot for trans-planting)
 
+    // NOTE: we may need remote players to utilize this local item spawn manager
+    // for the purposes of awarding player xp from drops, we need to 
+    // identify if this drop request is _not_ from local player
+    // this flag should be true if from remote player, compost bin, market, etc.
+
     public AnimationCurve dropCurve;
 
     private struct DroppedItem
@@ -17,6 +22,7 @@ public class ItemSpawnManager : MonoBehaviour
         public Vector3 spawnPoint;
         public Vector3 dropTarget;
         public float dropTimer;
+        public bool remoteDrop; // not dropped by local player (no xp awards)
     }
     private DroppedItem[] drops = new DroppedItem[0];
 
@@ -45,10 +51,11 @@ public class ItemSpawnManager : MonoBehaviour
         CheckDrops();
     }
 
-    void AddDrop( GameObject item, Vector3 start, Vector3 end )
+    void AddDrop( GameObject item, Vector3 start, Vector3 end, bool remoteDrop )
     {
         DroppedItem[] tmp = new DroppedItem[drops.Length + 1];
 
+        // NOTE: this is to keep arbitrary item drops from falling off local island
         // detect the closest island center and range (use tport nodes)
         Vector3 iCenter = Vector3.zero;
         float iRadius = 0f;
@@ -99,6 +106,7 @@ public class ItemSpawnManager : MonoBehaviour
         tmp[drops.Length].spawnPoint = start;
         tmp[drops.Length].dropTarget = end;
         tmp[drops.Length].dropTimer = DROPTIME;
+        tmp[drops.Length].remoteDrop = remoteDrop;
 
         drops = tmp;
     }
@@ -183,17 +191,20 @@ public class ItemSpawnManager : MonoBehaviour
     /// <param name="type">item type</param>
     /// <param name="spawnAt">spawn location</param>
     /// <param name="dropTo">drop target location</param>
-    public void SpawnNewItem( ItemType type, Vector3 spawnAt, Vector3 dropTo )
+    /// <param name="remoteDrop">is this dropped by anything other than the local player</param>
+    public void SpawnNewItem( ItemType type, Vector3 spawnAt, Vector3 dropTo, bool remoteDrop )
     {
-        SpawnItem(InventorySystem.CreateItem(type), spawnAt, dropTo);
+        SpawnItem(InventorySystem.CreateItem(type), spawnAt, dropTo, remoteDrop);
     }
 
     /// <summary>
     /// Spawns a loose item object from given loose item data
     /// </summary>
     /// <param name="item">loose item data</param>
-    /// <param name="location">position in world to put item</param>
-    public void SpawnItem( LooseItemData item, Vector3 spawnLocation, Vector3 dropLocation )
+    /// <param name="spawnLocation">position to begin the item drop</param>
+    /// <param name="dropLocation">target position for the item</param>
+    /// <param name="remoteDrop">is this dropped by anything other than the local player</param>
+    public void SpawnItem( LooseItemData item, Vector3 spawnLocation, Vector3 dropLocation, bool remoteDrop )
     {
         GameObject looseItem = GameObject.Instantiate((GameObject)Resources.Load("Loose Item"));
         looseItem.transform.position = spawnLocation + (Vector3.up * VERTICALORIGIN);
@@ -215,7 +226,7 @@ public class ItemSpawnManager : MonoBehaviour
         lim.frames[0] = GameObject.FindAnyObjectByType<ArtLibraryManager>().itemImages[d.artIndexBase];
 
         // handle drop animation
-        AddDrop(looseItem.gameObject, spawnLocation, dropLocation);
+        AddDrop(looseItem.gameObject, spawnLocation, dropLocation, remoteDrop);
     }
 
     bool CheckFertilizerDrop( int index )
@@ -231,6 +242,8 @@ public class ItemSpawnManager : MonoBehaviour
                 // soil quality improved ~.5 (0-1, gaussian random distribution)
                 plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + RandomSystem.GaussianRandom01());
                 retBool = true;
+                if (!drops[index].remoteDrop)
+                    plots[i].DropAwardXP(PlayerData.XP_FERTILIZEPLOT);
                 break;
             }
         }
@@ -252,7 +265,6 @@ public class ItemSpawnManager : MonoBehaviour
             if (dist < TARGETDETECTRADIUS && plots[i].data.condition == PlotCondition.Tilled)
             {
                 // create plant using the seed plant data
-                // REVIEW: how to configure proper plant prefab and art
                 GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 plantObj.transform.parent = plots[i].gameObject.transform;
                 plantObj.transform.position = plots[i].gameObject.transform.position;
@@ -264,6 +276,8 @@ public class ItemSpawnManager : MonoBehaviour
                 plots[i].data.plant.quality = 0f;
                 plots[i].data.condition = PlotCondition.Growing;
                 retBool = true;
+                if (!drops[index].remoteDrop)
+                    plots[i].DropAwardXP(PlayerData.XP_BROADCASTPLANT);
                 break;
             }
         }
@@ -307,6 +321,8 @@ public class ItemSpawnManager : MonoBehaviour
                 // NOTE: we have skipped improving soil quality
                 plots[i].data.condition = PlotCondition.Growing;
                 retBool = true;
+                if (!drops[index].remoteDrop)
+                    plots[i].DropAwardXP(PlayerData.XP_TRANSPLANT);
                 break;
             }
         }

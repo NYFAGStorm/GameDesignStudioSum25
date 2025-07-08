@@ -214,6 +214,13 @@ public class WeatherManager : MonoBehaviour
         }
         // set current weather
         SetStartWeather(fastFwdWeather);
+        // settle noisy near-zero values
+        if (windAmount < 0.01f)
+            windAmount = 0f;
+        if (cloudAmount < 0.01f)
+            cloudAmount = 0f;
+        if (rainAmount < 0.01f)
+            rainAmount = 0f;
         // reset global time progress
         globalTimeProgress = tim.GetGlobalTimeProgress();
         // set check timer

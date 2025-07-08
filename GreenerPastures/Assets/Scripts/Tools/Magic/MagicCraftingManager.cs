@@ -1203,6 +1203,8 @@ public class MagicCraftingManager : MonoBehaviour
                 pcm.playerData.magic.library = 
                     MagicSystem.AddChargeToSpellBook(gData.type, pcm.playerData.magic.library);
 
+                pcm.AwardXP(PlayerData.XP_CRAFTMAGIC);
+
                 // remove all recipe ingredient items from player inventory
                 RemoveAllIngredientsFromPlayer(gData);
                 // if player no longer has necessary ingredients available, un-solve puzzle

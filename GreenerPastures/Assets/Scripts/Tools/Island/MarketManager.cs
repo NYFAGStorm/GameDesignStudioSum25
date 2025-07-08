@@ -151,6 +151,8 @@ public class MarketManager : MonoBehaviour
                 if (menuItems[menuItemSelection].itemValue <= currentCustomer.playerData.gold)
                 {
                     currentCustomer.playerData.gold -= menuItems[menuItemSelection].itemValue;
+                    currentCustomer.AwardXP(PlayerData.XP_BUYFROMSHOP);
+
                     // try place in inventory, spawn to the side if fail
                     if (InventorySystem.InvHasSlot(currentCustomer.playerData.inventory))
                     {
@@ -184,7 +186,7 @@ public class MarketManager : MonoBehaviour
                             PlantType p = loose.inv.items[0].plant;
                             loose.inv.items[0].name += " (" + p.ToString() + ")";
                         }
-                        ism.SpawnItem(loose, pos, targ);
+                        ism.SpawnItem(loose, pos, targ, true);
                     }
                 }
                 else
@@ -248,6 +250,7 @@ public class MarketManager : MonoBehaviour
                         currentCustomer.DeleteCurrentItemSelection();
                         // PLAYER STATS:
                         currentCustomer.playerData.stats.totalGoldEarned += value;
+                        currentCustomer.AwardXP(PlayerData.XP_SELLTOSHOP);
                     }
                 }
             }

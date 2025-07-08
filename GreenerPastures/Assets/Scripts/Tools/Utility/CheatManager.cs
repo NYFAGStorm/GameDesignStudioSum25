@@ -279,7 +279,7 @@ public class CheatManager : MonoBehaviour
                     float facing = pcm.gameObject.transform.GetChild(0).GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
                     Vector3 pos = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject.transform.position;
                     Vector3 targ = pos + (facing * Vector3.right);
-                    ism.SpawnNewItem(ItemType.Fertilizer, pos, targ);
+                    ism.SpawnNewItem(ItemType.Fertilizer, pos, targ, true);
                 }
                 break;
             case 7:
@@ -294,7 +294,7 @@ public class CheatManager : MonoBehaviour
                     LooseItemData seed = InventorySystem.CreateItem(ItemType.Seed);
                     seed.inv.items[0].name = "Seed (Corn)";
                     seed.inv.items[0].plant = PlantType.Corn;
-                    ism.SpawnItem(seed, pos, targ);
+                    ism.SpawnItem(seed, pos, targ, true);
                 }
                 break;
             case 8:
@@ -350,7 +350,7 @@ public class CheatManager : MonoBehaviour
                     seed.inv.items[0] = InventorySystem.SetItemAsPlant(seed.inv.items[0],p);
                     seed.inv.items[0].name = "Seed ("+p.plantName+")";
                     seed.inv.items[0].plant = pt;
-                    ism.SpawnItem(seed, pos, targ);
+                    ism.SpawnItem(seed, pos, targ, true);
                 }
                 break;
             case 14:
