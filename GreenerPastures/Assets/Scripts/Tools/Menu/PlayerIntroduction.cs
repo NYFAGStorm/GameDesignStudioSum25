@@ -80,7 +80,6 @@ public class PlayerIntroduction : MonoBehaviour
 
     private bool canSkipIntro;
     private bool cancelIntro;
-    //private bool pauseIntro;
 
     private float introTimer;
 
@@ -901,7 +900,7 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "eden walks into market";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(19.5f, 0f, -22f);
+        introBeats[beat].npcMark = new Vector3(19.381f, 0f, -22f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "help message almanac";
@@ -916,25 +915,53 @@ public class PlayerIntroduction : MonoBehaviour
 
     void Update()
     {
-        /*
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            pauseIntro = !pauseIntro;
-            print("INTRO PAUSE [" + pauseIntro + "] beat (" + currentBeat + ")");
-        }
-        if (pauseIntro)
-            return;
-        */
-
         // handle intro dialog step
         if (cancelIntro)
         {
             cancelIntro = false;
             dialogPop = false;
-            // set cut-to-end beat index
-            currentBeatIndex = beatScriptEndIndex - 11;
-            currentBeat = introBeats[currentBeatIndex - 1];
-            currentBeat.transition = ScriptedBeatTransition.TimedDuration;
+            canSkipIntro = false;
+            switch (currentBeatIndex)
+            {
+                case < 10:
+                    pcm.playerData.island.x = 20f;
+                    pcm.playerData.island.y = 0f;
+                    pcm.playerData.island.z = -20f;
+                    pcm.playerData.island.w = 7f;
+                    TeleporterControl(true, "");
+                    currentBeatIndex = beatScriptEndIndex - 3;
+                    currentBeat = introBeats[currentBeatIndex];
+                    currentBeat.dialogLine = "Again, welcome and enjoy your time with us.";
+                    dialogPop = true;
+                    GameObject islandA = GameObject.Find("Island Alpha");
+                    islandA.transform.position = Vector3.zero;
+                    break;
+                case < 23:
+                    TeleporterControl(true, "");
+                    currentBeatIndex = beatScriptEndIndex - 3;
+                    currentBeat = introBeats[currentBeatIndex];
+                    currentBeat.dialogLine = "Again, welcome and enjoy your time with us.";
+                    dialogPop = true;
+                    islandA = GameObject.Find("Island Alpha");
+                    islandA.transform.position = Vector3.zero;
+                    break;
+                case < 27:
+                    TeleporterControl(true, "");
+                    // set cut-to-end beat index
+                    currentBeatIndex = beatScriptEndIndex - 5;
+                    currentBeat = introBeats[currentBeatIndex - 1];
+                    currentBeat.dialogLine = "Again, welcome and enjoy your time with us.";
+                    dialogPop = true;
+                    currentBeat.transition = ScriptedBeatTransition.TimedDuration;
+                    break;
+                case > 34:
+                    TeleporterControl(true, "");
+                    // set cut-to-end beat index
+                    currentBeatIndex = beatScriptEndIndex - 11;
+                    currentBeat = introBeats[currentBeatIndex - 1];
+                    currentBeat.transition = ScriptedBeatTransition.TimedDuration;
+                    break;
+            }
             beatTimeUp = false;
             beatTimer = DEFAULTINTROTIME;
             camMgr.allowPlayerControlCam = true;
@@ -1238,9 +1265,21 @@ public class PlayerIntroduction : MonoBehaviour
                     if (currentBeat.islandPos.w > 0f &&
                        currentBeat.islandPos.w <= 1f)
                     {
-                        pc = PlotCondition.Growing;
-                        managedPlot.data.plant.growth = 1f;
-                        managedPlot.data.plant.isHarvested = true;
+                        if (managedPlot.data.plant != null)
+                        {
+                            pc = PlotCondition.Growing;
+                            managedPlot.data.plant.growth = 1f;
+                            managedPlot.data.plant.isHarvested = true;
+                        }
+                        else
+                        {
+                            // eden miffed that player dug up plant
+                            currentBeat.action = ScriptedBeatAction.Dialog;
+                            currentBeat.transition = ScriptedBeatTransition.PlayerResponse;
+                            currentBeat.dialogLine = "... Well, I supposed you know what you're doing.";
+                            dialogPop = true;
+                            cancelIntro = true;
+                        }
                     }
                     // uprooted
                     if (currentBeat.islandPos.w > 1f &&
@@ -1288,14 +1327,25 @@ public class PlayerIntroduction : MonoBehaviour
                         case PlotCondition.Growing:
                             // grow baby grow
                             managedPlot.data.plant.vitality = 1f;
-                            // if harvested show stalk
-                            if (managedPlot.data.plant.isHarvested)
+                            if (managedPlot.plant != null)
                             {
-                                managedPlot.plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
-                                managedPlot.data.plant.growth = 1f;
-                                // FIXME: prevent grow image update
-                                managedPlot.plant.GetComponent<PlantManager>().ForceGrowthImage(managedPlot.data.plant);
-                                managedPlot.plant.GetComponent<PlantManager>().enabled = false;
+                                // if harvested show stalk
+                                if (managedPlot.data.plant.isHarvested)
+                                {
+                                    managedPlot.plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+                                    managedPlot.data.plant.growth = 1f;
+                                    managedPlot.plant.GetComponent<PlantManager>().ForceGrowthImage(managedPlot.data.plant);
+                                    managedPlot.plant.GetComponent<PlantManager>().enabled = false;
+                                }
+                            }
+                            else
+                            {
+                                // eden miffed that player dug up plant
+                                currentBeat.action = ScriptedBeatAction.Dialog;
+                                currentBeat.transition = ScriptedBeatTransition.PlayerResponse;
+                                currentBeat.dialogLine = "... Well, I supposed you know what you're doing.";
+                                dialogPop = true;
+                                cancelIntro = true;
                             }
                             break;
                         case PlotCondition.Uprooted:

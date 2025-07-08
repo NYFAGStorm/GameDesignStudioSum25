@@ -42,6 +42,8 @@ public class PlotManager : MonoBehaviour
     private float harvestDisplayTimer;
     private float harvestQualityValue;
 
+    private Renderer plotTexture;
+
     const float CURSORPULSEDURATION = 0.5f;
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
@@ -76,6 +78,19 @@ public class PlotManager : MonoBehaviour
         if ( cursor == null )
         {
             Debug.LogError("--- PlotManager [Start] : no cursor child found. aborting.");
+            enabled = false;
+        }
+        GameObject ground = gameObject.transform.Find("Ground").gameObject;
+        if ( ground == null )
+        {
+            Debug.LogError("--- PlotManager [Start] : no ground child found. aborting.");
+            enabled = false;
+        }
+        else
+            plotTexture = ground.GetComponent<Renderer>();
+        if ( plotTexture == null )
+        {
+            Debug.LogError("--- PlotManager [Start] : no ground child renderer found. aborting.");
             enabled = false;
         }
         // inititalize
@@ -120,6 +135,9 @@ public class PlotManager : MonoBehaviour
                 seasonValues.w = tim.GetAmountOfSeason(WorldSeason.Winter);
             }
         }
+
+        // update plot color
+        UpdatePlotColor();
 
         // update plot hazards
         // REVIEW: what hazards?
@@ -244,6 +262,20 @@ public class PlotManager : MonoBehaviour
         cursorTimer += Time.deltaTime;
         float pulse = 1f - ((cursorTimer % CURSORPULSEDURATION) * 0.9f);
         SetCursorHighlight(pulse);
+    }
+
+    void UpdatePlotColor()
+    {
+        float hue = 1f;
+        float sat = 1f;
+        float val = 1f;
+        // brown hue
+        hue = (38.1f/255f);
+        // soil level correlated with higher color saturation
+        sat = data.soil;
+        // water level correlated with lower color value
+        val = 1f - ((0.618f-0.381f) * data.water) - (0.381f * data.soil);
+        plotTexture.material.color = Color.HSVToRGB(hue, sat, val);
     }
 
     void UpdatePlotHazards()
@@ -376,7 +408,6 @@ public class PlotManager : MonoBehaviour
                 return;
         }
 
-        Renderer r = gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
         switch (data.condition)
         {
             case PlotCondition.Default:
@@ -390,20 +421,20 @@ public class PlotManager : MonoBehaviour
                 else
                     Destroy(grasses);
                 // change ground texture
-                if (r == null)
+                if (plotTexture == null)
                     Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
                 else
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
                 data.condition = PlotCondition.Dirt;
                 // soil quality improved
                 data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
                 break;
             case PlotCondition.Dirt:
                 // change ground texture
-                if (r == null)
+                if (plotTexture == null)
                     Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
                 else
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
                 data.condition = PlotCondition.Tilled;
                 // soil quality improved
                 data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
@@ -429,10 +460,10 @@ public class PlotManager : MonoBehaviour
                 break;
             case PlotCondition.Uprooted:
                 // change ground texture
-                if (r == null)
+                if (plotTexture == null)
                     Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
                 else
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
                 data.condition = PlotCondition.Dirt;
                 break;
             default:
@@ -613,12 +644,14 @@ public class PlotManager : MonoBehaviour
         if (!ActionComplete(UPROOTWINDOW, "DIGGING..."))
             return;
 
-        Renderer r = gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>();
+        // remove any wild grasses
+        if (gameObject.transform.Find("Plot Wild Grasses") != null)
+            Destroy(gameObject.transform.Find("Plot Wild Grasses").gameObject);
         // change ground texture
-        if (r == null)
+        if (plotTexture == null)
             Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
         else
-            r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
+            plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
         // player would collect stalk or full plant as inventory at this point if growth >50%
         // stalk if harvested, plant if not (data retains both isHarvested and growth)
         if (data.plant.growth > 0.5f || (data.plant.isHarvested && data.plant.canReFruit) )

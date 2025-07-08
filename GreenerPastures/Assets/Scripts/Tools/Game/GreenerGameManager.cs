@@ -16,6 +16,7 @@ public class GreenerGameManager : MonoBehaviour
     private ArtLibraryManager alm;
 
     private bool gameDataDistributed;
+    private bool distributionFailed;
     private bool shutdownDataCollected;
     private bool firstRunDetected;
 
@@ -111,10 +112,15 @@ public class GreenerGameManager : MonoBehaviour
                 //firstRunDetected = false;
             }
 
-            gameDataDistributed = DoGameDataDistribution();
+            if (!distributionFailed)
+                gameDataDistributed = DoGameDataDistribution();
 
             if (!gameDataDistributed)
-                Debug.LogWarning("--- GreenerGameManager [Update] : DoGameDataDistribution routine attempt failed. will ignore.");
+            {
+                Debug.LogWarning("--- GreenerGameManager [Update] : DoGameDataDistribution routine attempt failed. setting fail flag.");
+                distributionFailed = true;
+                enabled = false;
+            }
             else
             {
                 SignalToFastForwardFeatures();

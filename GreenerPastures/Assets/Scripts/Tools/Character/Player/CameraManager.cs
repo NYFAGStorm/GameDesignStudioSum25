@@ -269,10 +269,13 @@ public class CameraManager : MonoBehaviour
         GetFollowTarget();
         gameObject.transform.eulerAngles = savedRotation;
 
-        // rain vfx config (on)
-        rainBox.SetActive(true);
-        if (rainOn)
-            rainVFX.Play();
+        if (rainBox != null)
+        {
+            // rain vfx config (on)
+            rainBox.SetActive(true);
+            if (rainOn)
+                rainVFX.Play();
+        }
     }
 
     /// <summary>
@@ -286,9 +289,12 @@ public class CameraManager : MonoBehaviour
         mode = CameraMode.PanFollow;
         GetPanTarget();
 
-        // rain vfx config (off)
-        rainOn = rainVFX.isPlaying;
-        rainBox.SetActive(false);
+        if (rainBox != null)
+        {
+            // rain vfx config (off)
+            rainOn = rainVFX.isPlaying;
+            rainBox.SetActive(false);
+        }
     }
 
     public void SetWorldViewIntro()
