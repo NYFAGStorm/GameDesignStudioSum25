@@ -210,8 +210,13 @@ public class PlayerControlManager : MonoBehaviour
 
             // detect inventory selection input
             DetectInventorySelectionInput();
-            // check inventory selection drop
-            CheckInventorySelectionDrop();
+            // detect player is harveting plant and prioritize over item drop
+            if (activePlot == null || (activePlot != null && (activePlot.plant == null ||
+                 (activePlot.data.plant.isHarvested && !activePlot.data.plant.canReFruit))))
+            {
+                // check inventory selection drop
+                CheckInventorySelectionDrop();
+            }
         }
 
         if (characterFrozen)
@@ -269,11 +274,7 @@ public class PlayerControlManager : MonoBehaviour
             if (characterActions.actionB)
                 activePlot.WaterPlot();
             if (characterActions.actionC)
-            {
                 activePlot.HarvestPlant();
-                // when harvesting, auto-set inventory selection to last item
-                currentInventorySelection = playerInventory.maxSlots - 1;
-            }
             if (characterActions.actionD)
                 activePlot.UprootPlot();
             if (characterActions.graftPlant)
