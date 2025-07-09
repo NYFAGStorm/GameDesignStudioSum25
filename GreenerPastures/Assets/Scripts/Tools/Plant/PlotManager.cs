@@ -62,7 +62,7 @@ public class PlotManager : MonoBehaviour
     const float HARVESTDISPLAYDURATION = 1f;
     const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
 
-    const float MASTERPLANTPROGRESSRATE = 0.0027f;
+    const float MASTERPLANTPROGRESSRATE = 0.000618f;
 
 
     void Start()
@@ -185,6 +185,8 @@ public class PlotManager : MonoBehaviour
         // _approximate_ with cycles representing one minute
         // REVIEW: consider how cast effects (like summon water) are handled, interact?
 
+        //print("plot fast forward called - days ahead " + daysAhead + " ("+gameMinutes+" min) , time of day start " + timeOfDayStart);
+
         // NOTE: must start at current time (offset)
         float dayCycle = timeOfDayStart;
         float timeRate = MASTERPLANTPROGRESSRATE;
@@ -192,13 +194,23 @@ public class PlotManager : MonoBehaviour
         {
             // approximate minute cycles
             dayCycle += timeRate;
+
             // sun to be calculated (sine of dayprogress, clamp 01, offset +.25f, *2*PI)
             data.sun = Mathf.Clamp01(Mathf.Sin((dayCycle - .25f) * 2f * Mathf.PI));
+
+            //print("min " + i + " day cycle " + dayCycle + " sun = "+data.sun);
+
             // plant growth to be calculated (with resources * rate * time)
             if (data.plant.type != PlantType.Default)
             {
-                float resources = (Mathf.Clamp01(data.sun*4f) + data.water + data.soil) / 3f;
+                float sunValue = Mathf.Clamp01(data.sun * 4f);
+                if (data.plant.isDarkPlant)
+                    sunValue = 1f - sunValue;
+                // TODO: PLANT EFFECTS: DayNightPlant
+                float resources = (sunValue + data.water + data.soil) / 3f;
                 float vitalityDelta = (0.667f - resources) * -0.1f;
+                // TODO: properly update seasonal values minute-by-minute
+                vitalityDelta *= GetPlantSeasonalVitality();
                 data.plant.vitality = Mathf.Clamp01(data.plant.vitality + vitalityDelta);
                 float healthDelta = (0.5f - data.plant.vitality) + (0.5f - resources);
                 healthDelta *= -0.001f;

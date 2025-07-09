@@ -146,7 +146,7 @@ public class MarketManager : MonoBehaviour
             int maxMenuList = menuItems.Length - 1;
             if (currentCustomer.playerData.level < 2)
                 maxMenuList = 20;
-            menuItemSelection = Mathf.Clamp(menuItemSelection, 0, menuItems.Length - 1);
+            menuItemSelection = Mathf.Clamp(menuItemSelection, 0, maxMenuList);
             // set top of menu list
             if (menuItemSelection < topOfMenuList)
                 topOfMenuList = menuItemSelection;

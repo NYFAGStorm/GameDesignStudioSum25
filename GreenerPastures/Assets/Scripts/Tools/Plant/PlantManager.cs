@@ -5,8 +5,6 @@ public class PlantManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles a single plant object
 
-    // TODO: implement [ ] plant modifications to time manager's fast forward
-
     private float plantTimer;
     private Renderer plantImage;
     private PlotManager plot;
@@ -52,7 +50,6 @@ public class PlantManager : MonoBehaviour
                 // find resources amount as an average of sun, water and soil quality
                 // if even a little (25%) sun is available, this counts as 100% sun resource
                 float sunResource = Mathf.Clamp01(plot.data.sun * 4f);
-                // [ ] if this is a dark plant (grows in moonlight) invert sun
                 // REVIEW: when we have moon phases, adjust to moonlight intensity
                 if (plot.data.plant.isDarkPlant)
                     sunResource = Mathf.Clamp01(1f - sunResource);
@@ -62,7 +59,7 @@ public class PlantManager : MonoBehaviour
                 float resources = (sunResource + plot.data.water + plot.data.soil) / 3f;
                 // calculate vitality delta             
                 float vitalityDelta = (0.667f - resources) * -0.1f;
-                // [ ] adjust vitality for current season
+                // adjust vitality for current season
                 vitalityDelta *= plot.GetPlantSeasonalVitality();
                 // calculate current vitality
                 plot.data.plant.vitality = Mathf.Clamp01(plot.data.plant.vitality + vitalityDelta);
