@@ -76,6 +76,8 @@ public class MagicCraftingManager : MonoBehaviour
     private Vector3 padDragPos; // viewport space of held item
     private float padDragSpeed = 0.381f;
 
+    private Texture2D[] buttonTex;
+
     const float LIBRARYSTATETIMERMAX = 1f;
     const float CRAFTSTATETIMERMAX = 1f;
     const float PLAYERCHECKTIME = 1f;
@@ -118,6 +120,15 @@ public class MagicCraftingManager : MonoBehaviour
             heldItemShape = new bool[9]; // 3x3 grid makes a single shape
 
             InitializeItemShapeLibrary();
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -1186,6 +1197,12 @@ public class MagicCraftingManager : MonoBehaviour
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         if (craftState == CraftState.Grimoire)
             s = "TO MAGIC CAULDRON";
         else
@@ -1253,6 +1270,12 @@ public class MagicCraftingManager : MonoBehaviour
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = "RESET PUZZLE";
         if ( padMgr != null && padMgr.gamepads[0].isActive )
             s += "\n[X BUTTON]";
@@ -1286,6 +1309,12 @@ public class MagicCraftingManager : MonoBehaviour
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = "EXIT CRAFTING";
         if ( padMgr != null && padMgr.gamepads[0].isActive )
             s += "\n[BACK BUTTON]";

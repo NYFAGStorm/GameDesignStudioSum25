@@ -17,6 +17,8 @@ public class QuitOnEscape : MonoBehaviour
     private int padButtonSelection = -1;
     private int padMaxButton = 1;
 
+    private Texture2D[] buttonTex;
+
     const int FONTSIZEAT1024 = 36;
 
 
@@ -27,6 +29,15 @@ public class QuitOnEscape : MonoBehaviour
         // (then clean up below checks for padMgr existing)
         if (padMgr == null)
             Debug.LogWarning("--- QuitOnEscape [Start] : no pad manager found in scene. will ignore.");
+
+        // GUI Button Textures for build
+        if (!Application.isEditor)
+        {
+            buttonTex = new Texture2D[3];
+            buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+            buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+            buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+        }
     }
 
     void Update()
@@ -90,6 +101,14 @@ public class QuitOnEscape : MonoBehaviour
         if (padButtonSelection == 0)
             g.normal.textColor = Color.white;
         g.active.textColor = textColor;
+        // GUI Button Textures for build
+        if (!Application.isEditor)
+        {
+            buttonTex = new Texture2D[3];
+            buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+            buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+            buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+        }
         s = "QUIT";
 
         if (GUI.Button(r, s, g) ||

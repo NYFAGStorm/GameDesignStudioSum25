@@ -19,6 +19,8 @@ public class InGameAlmanac : MonoBehaviour
     private QuitOnEscape qoe;
     private InGameControls igc;
 
+    private Texture2D[] buttonTex;
+
     const int ENTRIESPERPAGE = 3;
 
 
@@ -47,6 +49,15 @@ public class InGameAlmanac : MonoBehaviour
             currentCategory = 0;
             currentEntry = 0;
             ConfigureEntryCount();
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -161,6 +172,12 @@ public class InGameAlmanac : MonoBehaviour
         g.normal.textColor = c;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.black;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         for (int i = 1; i < 10; i++)
         {
             if (i == (currentCategory+1))
@@ -235,6 +252,12 @@ public class InGameAlmanac : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
         g.fontStyle = FontStyle.Bold;
         g.alignment = TextAnchor.MiddleCenter;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = "UP";
         GUI.enabled = !(startingEntry[currentCategory] == currentEntry);
         if (GUI.Button(r,s,g))

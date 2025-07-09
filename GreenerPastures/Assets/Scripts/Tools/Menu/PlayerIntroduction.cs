@@ -102,6 +102,8 @@ public class PlayerIntroduction : MonoBehaviour
     public bool playerResponse;
     private int beatScriptEndIndex;
 
+    private Texture2D[] buttonTex;
+
     const float DEFAULTINTROTIME = 0.618f;
     const float PAUSETIME = 1f;
     const float LONGPAUSETIME = 2f;
@@ -120,6 +122,15 @@ public class PlayerIntroduction : MonoBehaviour
             ConfigureIntroBeats();
 
             ValidateIntroBeats();
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -1609,6 +1620,12 @@ public class PlayerIntroduction : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.yellow;
             g.active.textColor = Color.black;
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
             GUI.color = Color.white;
             s = "SKIP INTRO";
             if (GUI.Button(r, s, g))
@@ -1672,6 +1689,12 @@ public class PlayerIntroduction : MonoBehaviour
             g.normal.textColor = c;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
             s = "NEXT";
             GUI.color = Color.white;
             if (GUI.Button(r, s, g))
@@ -1843,6 +1866,12 @@ public class PlayerIntroduction : MonoBehaviour
         g.normal.textColor = Color.black;
         g.hover.textColor = Color.black;
         g.active.textColor = Color.yellow;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         GUI.color = Color.white;
         // model -/+
         s = "<";
@@ -1938,6 +1967,12 @@ public class PlayerIntroduction : MonoBehaviour
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = "ACCEPT";
         GUI.enabled = configValid;
         if (GUI.Button(r,s,g))

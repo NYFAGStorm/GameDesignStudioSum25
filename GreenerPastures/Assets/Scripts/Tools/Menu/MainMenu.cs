@@ -68,6 +68,8 @@ public class MainMenu : MonoBehaviour
     private string confirmPass;
     private string popupFeedback;
 
+    private Texture2D[] buttonTex;
+
     const float POPUPTIME = 1f;
     const int PLAYERPROFILEBUTTON = 1;
     const int GAMESELECTIONBUTTON = 2;
@@ -94,6 +96,15 @@ public class MainMenu : MonoBehaviour
             // set profile active based on data
             ConfigureMenuButtonsEnabled();
             popupCurve = AnimationCurve.EaseInOut(0f,0f,1f,1f);
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -321,6 +332,12 @@ public class MainMenu : MonoBehaviour
             g = new GUIStyle(GUI.skin.button);
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
             // Create / Login / Logout
             if (padButtonSelection == 0)
                 g.normal.textColor = Color.white;
@@ -439,6 +456,12 @@ public class MainMenu : MonoBehaviour
         g = new GUIStyle(GUI.skin.button);
         g.font = buttonFont;
         g.fontStyle = buttonFontStyle;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
 
         for ( int i=0; i<buttons.Length; i++)
         {

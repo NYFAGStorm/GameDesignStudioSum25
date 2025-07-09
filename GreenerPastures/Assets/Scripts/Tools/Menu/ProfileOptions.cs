@@ -43,6 +43,8 @@ public class ProfileOptions : MonoBehaviour
     private float popupProgress;
     private AnimationCurve popupCurve;
 
+    private Texture2D[] buttonTex;
+
     const float POPUPTIME = 1f;
     const float MICCHECKTIME = 1.5f;
 
@@ -72,6 +74,15 @@ public class ProfileOptions : MonoBehaviour
             //
             MicConfig();
             micCheckTimer = MICCHECKTIME;
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -213,6 +224,12 @@ public class ProfileOptions : MonoBehaviour
             // ok
             if (padButtonSelection == 0)
                 g.normal.textColor = Color.white;
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "OK";
             if (GUI.Button(r, s, g))
@@ -287,6 +304,12 @@ public class ProfileOptions : MonoBehaviour
             g.normal.textColor = Color.white;
         g.hover.textColor = Color.white;
         g.active.textColor = buttonFontColor;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         g.alignment = TextAnchor.MiddleCenter;
         g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
         GUI.color = Color.white;
@@ -352,6 +375,12 @@ public class ProfileOptions : MonoBehaviour
         if (padButtonSelection == 3)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = backButtonText;
 
         if (GUI.Button(r, s, g) || (padMgr != null &&

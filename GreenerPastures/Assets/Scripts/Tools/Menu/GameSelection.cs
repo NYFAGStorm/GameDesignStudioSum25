@@ -59,6 +59,8 @@ public class GameSelection : MonoBehaviour
     private float popupProgress;
     private AnimationCurve popupCurve;
 
+    private Texture2D[] buttonTex;
+
     const float POPUPTIME = 1f;
     const float FEEDBACKTIME = 4f;
     const float POLLINTERVAL = 1f;
@@ -94,6 +96,15 @@ public class GameSelection : MonoBehaviour
             pingPollTimer = POLLINTERVAL;
             // initialize host ping array
             hostPings = new MultiplayerHostPing[0];
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -364,6 +375,12 @@ public class GameSelection : MonoBehaviour
             g.active.textColor = buttonFontColor;
             if (padButtonSelection == 0)
                 g.normal.textColor = Color.white;
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "-";
             // allow less max players if new game or owner of game max is more than player length
@@ -471,6 +488,12 @@ public class GameSelection : MonoBehaviour
             g = new GUIStyle(GUI.skin.button);
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
             // UNLOAD / ACCEPT / CREATE
             if (padButtonSelection == 5)
                 g.normal.textColor = Color.white;
@@ -623,6 +646,12 @@ public class GameSelection : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(buttonFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         if (padButtonSelection == 0)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
@@ -672,6 +701,12 @@ public class GameSelection : MonoBehaviour
         if (padButtonSelection == 1)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = "Create Game";
 
         if (tinyPopup)
@@ -753,6 +788,12 @@ public class GameSelection : MonoBehaviour
                 if (padButtonSelection == (2 + i))
                     g.normal.textColor = Color.white;
                 g.active.textColor = buttonFontColor;
+                if (!Application.isEditor)
+                {
+                    g.normal.background = buttonTex[0];
+                    g.hover.background = buttonTex[1];
+                    g.active.background = buttonTex[2];
+                }
                 s = "[SAVED " + (i+1) + "] : " + list[i];
 
                 if (gameLoaded && saveMgr.IsGameCurrentlyLoaded())
@@ -858,6 +899,12 @@ public class GameSelection : MonoBehaviour
                 if (padButtonSelection == (2 + gamelistNum + i))
                     g.normal.textColor = Color.white;
                 g.active.textColor = buttonFontColor;
+                if (!Application.isEditor)
+                {
+                    g.normal.background = buttonTex[0];
+                    g.hover.background = buttonTex[1];
+                    g.active.background = buttonTex[2];
+                }
                 s = "[NET " + (i + 1) + "] : " + list[i];
 
                 GUI.enabled = MultiplayerSystem.CanProfileJoinGame(currentProfileID, hostPings[i]);
@@ -984,6 +1031,12 @@ public class GameSelection : MonoBehaviour
             r.height = 0.075f * h;
             g = new GUIStyle(GUI.skin.button);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
             s = "Accept";
             GUI.enabled = (popPlayerName != "");
             if (GUI.Button(r, s, g))
@@ -1032,6 +1085,12 @@ public class GameSelection : MonoBehaviour
         if (padButtonSelection == gamelistNum + 2)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = backButtonText;
 
         if (tinyPopup)

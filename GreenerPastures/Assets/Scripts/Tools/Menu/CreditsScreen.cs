@@ -55,6 +55,8 @@ public class CreditsScreen : MonoBehaviour
     private int maxPage;
     private float pageTimer;
 
+    private Texture2D[] buttonTex;
+
     const float CREDITPAGETIME = 5f;
 
 
@@ -81,6 +83,15 @@ public class CreditsScreen : MonoBehaviour
                     maxPage = credits[i].creditPage;
             }
             pageTimer = CREDITPAGETIME;
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -172,6 +183,12 @@ public class CreditsScreen : MonoBehaviour
         if (padButtonSelection == 0)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = backButtonText;
 
         if (GUI.Button(r, s, g) ||
