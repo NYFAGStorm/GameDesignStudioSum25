@@ -26,6 +26,8 @@ public static class PlayerSystem
         retPlayer.camMode = CameraManager.CameraMode.Follow;
         retPlayer.inventory = InventorySystem.InitializeInventory(5); // players have 5
         retPlayer.magic = MagicSystem.IntializeMagic();
+        retPlayer.almanac = new AlmanacDiscovery();
+        retPlayer.almanac.revealed = new bool[0];
         retPlayer.effects = new PlayerEffects[0];
 
         return retPlayer;

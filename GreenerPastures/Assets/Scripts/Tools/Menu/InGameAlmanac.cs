@@ -14,6 +14,8 @@ public class InGameAlmanac : MonoBehaviour
     private int[] startingEntry;
     private int[] entriesInCategory;
 
+    private bool updateAlmanac;
+
     private PlayerControlManager pcm;
     private MultiGamepad padMgr;
     private QuitOnEscape qoe;
@@ -45,10 +47,7 @@ public class InGameAlmanac : MonoBehaviour
         // initialize
         if (enabled)
         {
-            almanac = AlmanacSystem.InitializeAlmanac();
-            currentCategory = 0;
-            currentEntry = 0;
-            ConfigureEntryCount();
+            InitAlmanac();
 
             // GUI Button Textures for build
             if (!Application.isEditor)
@@ -59,6 +58,14 @@ public class InGameAlmanac : MonoBehaviour
                 buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
             }
         }
+    }
+
+    void InitAlmanac()
+    {
+        almanac = AlmanacSystem.InitializeAlmanac();
+        currentCategory = 0;
+        currentEntry = 0;
+        ConfigureEntryCount();
     }
 
     void ConfigureEntryCount()
@@ -92,6 +99,39 @@ public class InGameAlmanac : MonoBehaviour
         if (pcm == null)
             return;
 
+        if (updateAlmanac && pcm.playerData != null && 
+            pcm.playerData.almanac.revealed != null)
+        {
+            updateAlmanac = false;
+
+            InitAlmanac();
+
+            if (pcm.playerData.almanac.revealed.Length == 0)
+            {
+                // set almanac discovery data for new player
+                bool[] discoveredEntries = AlmanacSystem.GetAlmanacRevealedFlags(almanac);
+                pcm.playerData.almanac.revealed = discoveredEntries;
+            }
+            else
+            {
+                // fill almanac discovery data from returning player
+                bool[] discoveredEntries = pcm.playerData.almanac.revealed;
+                almanac = AlmanacSystem.SetAlmanacRevealedFlags(almanac, discoveredEntries);
+            }
+            // lorem the almanac hidden entries
+            int count = 0;
+            for (int i = 0; i < almanac.entries.Length; i++)
+            {
+                if (!almanac.entries[i].revealed)
+                {
+                    AlmanacEntry loremEntry = AlmanacSystem.GenerateLoremAlmanacEntry(almanac.entries[i]);
+                    almanac.entries[i] = loremEntry;
+                    count++;
+                }
+            }
+            print("almanac updated with " + count + " lorem-ized entries");
+        }
+
         if (igc.controlsDisplay)
         {
             showAlmanac = false;
@@ -110,9 +150,39 @@ public class InGameAlmanac : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Configures the local player control manager reference and triggers almanac data update
+    /// </summary>
+    /// <param name="pControlManager">player control manager</param>
     public void SetPlayerControlManager(PlayerControlManager pControlManager)
     {
         pcm = pControlManager;
+        updateAlmanac = true;
+    }
+
+    /// <summary>
+    /// Sets an entry in the Biomancer's Almanac to be revealed for the local player
+    /// </summary>
+    /// <param name="entryTitle">the entry title</param>
+    public void AlmanacReveal(string entryTitle)
+    {
+        int idx = AlmanacSystem.GetAlmanacEntryIndex(almanac, entryTitle);
+        if (pcm != null && pcm.playerData != null &&
+            pcm.playerData.almanac.revealed.Length > 0)
+            pcm.playerData.almanac.revealed[idx] = true;
+        updateAlmanac = true;
+    }
+
+    /// <summary>
+    /// Sets an entry in the Biomancer's Almanac to be revealed for the local player
+    /// </summary>
+    /// <param name="entryIndex">the entry index</param>
+    public void AlmanacReveal(int entryIndex)
+    {
+        if (pcm != null && pcm.playerData != null &&
+            pcm.playerData.almanac.revealed.Length > 0)
+            pcm.playerData.almanac.revealed[entryIndex] = true;
+        updateAlmanac = true;
     }
 
     void OnGUI()
@@ -204,6 +274,7 @@ public class InGameAlmanac : MonoBehaviour
         g.active.textColor = Color.black;
         for ( int n = 0; n < ENTRIESPERPAGE; n++ )
         {
+            AlmanacEntry displayEntry = almanac.entries[currentEntry + n];
             r.x = 0.175f * w;
             r.width = .6f * w;
             g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
@@ -211,13 +282,13 @@ public class InGameAlmanac : MonoBehaviour
             g.alignment = TextAnchor.MiddleLeft;
             g.wordWrap = false;
             // title
-            s = almanac.entries[currentEntry + n].title;
+            s = displayEntry.title;
             GUI.Label(r, s, g);
             // subtitle
             g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
             g.fontStyle = FontStyle.Italic;
             g.alignment = TextAnchor.MiddleRight;
-            s = almanac.entries[currentEntry + n].subtitle;
+            s = displayEntry.subtitle;
             GUI.Label(r, s, g);
             // description
             r.y += 0.06f * h;
@@ -226,7 +297,7 @@ public class InGameAlmanac : MonoBehaviour
             g.fontStyle = FontStyle.Normal;
             g.alignment = TextAnchor.UpperLeft;
             g.wordWrap = true;
-            s = almanac.entries[currentEntry + n].description;
+            s = displayEntry.description;
             GUI.Label(r, s, g);
             // details
             r.x += 0.01f * w;
@@ -234,11 +305,14 @@ public class InGameAlmanac : MonoBehaviour
             r.width = 0.1225f * w;
             g.fontSize = Mathf.RoundToInt(10f * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
-            for (int i = 0; i < almanac.entries[currentEntry + n].details.Length; i++)
+            if (displayEntry.details != null)
             {
-                s = almanac.entries[currentEntry + n].details[i];
-                GUI.Label(r, s, g);
-                r.x += 0.125f * w;
+                for (int i = 0; i < displayEntry.details.Length; i++)
+                {
+                    s = displayEntry.details[i];
+                    GUI.Label(r, s, g);
+                    r.x += 0.125f * w;
+                }
             }
             r.y += 0.05f * h;
         }

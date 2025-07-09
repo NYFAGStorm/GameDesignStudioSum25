@@ -61,6 +61,12 @@ public struct PlayerOptions
     public PlayerColor accentColor;
 }
 
+[System.Serializable]
+public struct AlmanacDiscovery
+{
+    public bool[] revealed;
+}
+
 // if there are discrete effects that can be applied to a player character
 // each effect can then apply separate rules in a modular way
 public enum PlayerEffects
@@ -94,6 +100,7 @@ public class PlayerData
     public CameraManager.CameraMode camMode;
     public InventoryData inventory;
     public MagicData magic;
+    public AlmanacDiscovery almanac;
     public PlayerEffects[] effects;
 
     // XP AWARD VALUES

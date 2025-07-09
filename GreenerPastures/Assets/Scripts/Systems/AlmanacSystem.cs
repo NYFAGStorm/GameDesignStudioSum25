@@ -21,6 +21,12 @@ public static class AlmanacSystem
     {
         string retString = "";
 
+        if (nonLorem == null || nonLorem.Length == 0)
+        {
+            UnityEngine.Debug.LogWarning("--- AlmanacSystem [ConvertToLorem] : input string invalid. will return empty string.");
+            return retString;
+        }
+
         string[] words = nonLorem.Split(char.Parse(" "));
         retString = GenerateLoremIpsum(words.Length);
 
@@ -83,6 +89,104 @@ public static class AlmanacSystem
         return retLorem;
     }
 
+    /// <summary>
+    /// Creates a new almanac entry replacing given entry with lorem ipsum if revealed is false
+    /// </summary>
+    /// <param name="entry">almanac entry data</param>
+    /// <returns>if revealed, returns original entry. otherwise, this returns almanac entry created to hide original with lorem ipsum</returns>
+    public static AlmanacEntry GenerateLoremAlmanacEntry(AlmanacEntry entry)
+    {
+        AlmanacEntry retEntry = entry;
+
+        if (retEntry.revealed)
+            return entry;
+
+        retEntry.title = ConvertToLorem(retEntry.title);
+        retEntry.icon = "GenesisTree"; // default hidden entry icon
+        retEntry.subtitle = ConvertToLorem(retEntry.subtitle);
+        retEntry.description = ConvertToLorem(retEntry.description);
+        if (retEntry.details != null)
+        {
+            for (int i = 0; i < retEntry.details.Length; i++)
+            {
+                retEntry.details[i] = ConvertToLorem(retEntry.details[i]);
+            }
+        }
+        else
+            retEntry.details = new string[0];
+
+        return retEntry;
+    }
+
+    /// <summary>
+    /// Returns the array of boolean values representing revealed entries from the given almanac data (for use as player data property, almanac)
+    /// </summary>
+    /// <param name="almanac">almanac data</param>
+    /// <returns>the array of booleans representing each entry revealed state</returns>
+    public static bool[] GetAlmanacRevealedFlags(AlmanacData almanac)
+    {
+        bool[] retBools = new bool[almanac.entries.Length];
+
+        for (int i = 0; i < almanac.entries.Length; i++)
+        {
+            retBools[i] = almanac.entries[i].revealed;
+        }
+
+        return retBools;
+    }
+
+    /// <summary>
+    /// Sets the almanac revealed flags for the given almanac data using the given array of boolean values
+    /// </summary>
+    /// <param name="almanac">almanac data</param>
+    /// <param name="revealed">array of boolean values (from player data)</param>
+    /// <returns>almanac data with revealed flags set per player data boolean array</returns>
+    public static AlmanacData SetAlmanacRevealedFlags( AlmanacData almanac, bool[] revealed )
+    {
+        AlmanacData retAlmanac = almanac;
+
+        if (almanac.entries.Length != revealed.Length)
+        {
+            UnityEngine.Debug.LogWarning("--- AlamanacSystem [SetAlmanacRevealedFlags] : mismatch length of reveal flag array and almanac entry array. will ignore.");
+            return retAlmanac;
+        }
+
+        for (int i = 0; i < retAlmanac.entries.Length; i++)
+        {
+            retAlmanac.entries[i].revealed = revealed[i];
+        }
+
+        return retAlmanac;
+    }
+
+    /// <summary>
+    /// Returns the entry index in the given almanac data that matches the given entry title
+    /// </summary>
+    /// <param name="almanac">almanac data</param>
+    /// <param name="entryTitle">almanac entry title</param>
+    /// <returns>entry index if found, -1 if not found</returns>
+    public static int GetAlmanacEntryIndex( AlmanacData almanac, string entryTitle )
+    {
+        int retInt = -1;
+
+        for (int i = 0; i < almanac.entries.Length; i++)
+        {
+            if (almanac.entries[i].title == entryTitle)
+            {
+                retInt = i;
+                break;
+            }
+        }
+        if (retInt == -1)
+            UnityEngine.Debug.LogWarning("--- AlmanacSystem [GetAlmanacEntryIndex] : no entry with title '" + entryTitle + "' found. will return -1.");
+
+        return retInt;
+    }
+
+    /// <summary>
+    /// Initializes the biomancer's almanac data, including default reveal flags
+    /// </summary>
+    /// <returns>initialized almanac data</returns>
     public static AlmanacData InitializeAlmanac()
     {
         AlmanacData retData = new AlmanacData();
@@ -120,6 +224,21 @@ public static class AlmanacSystem
             {
                 retData.entries[i].category = AlmanacCateogory.Lore;
                 // LORE
+                // (generic almanac entry format with optional fields for data)
+                // set revealed to false if this should be hidden
+                // use 'genesistree' as icon name for now, we need icons
+                if (i == 0)
+                {
+                    retData.entries[i].title = "The Sample Almanac Entry";
+                    retData.entries[i].revealed = true;
+                    retData.entries[i].icon = "GenesisTree";
+                    retData.entries[i].subtitle = "Every journey begins with a single step.";
+                    retData.entries[i].description = "Once upon a time, a squirrel found a nut in the tallest tree in the forest. The nuts was so marvelous he vowed to fetch it and become king of all squirrels. So, he climbed and climbed, and he was never seen again.";
+                    retData.entries[i].details = new string[3];
+                    retData.entries[i].details[0] = "Nut";
+                    retData.entries[i].details[1] = "Squirrel";
+                    retData.entries[i].details[2] = "Tree";
+                }
             }
             else if (i < peopleEntries)
             {
