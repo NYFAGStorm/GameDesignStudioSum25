@@ -51,6 +51,7 @@ public class MagicCraftingManager : MonoBehaviour
     private int currentGrimoireEntry;
     private bool currentEntryValid; // player has all ingredients in inventory
     private int selectedGrimoireRecipe;
+    private int topOfRecipeList;
 
     private int sizeOfCauldronGrid; // set this based on player level (max 5)
     private ItemType heldIngredient; // ingredient item currently dragging
@@ -403,6 +404,11 @@ public class MagicCraftingManager : MonoBehaviour
                     if (Input.GetKeyDown(pcm.downKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL < 0f))
                         currentGrimoireEntry++;
                     currentGrimoireEntry = Mathf.Clamp(currentGrimoireEntry, 0, pcm.playerData.magic.library.grimiore.Length - 1);
+                    // set top of recipe list
+                    if (currentGrimoireEntry < topOfRecipeList)
+                        topOfRecipeList = currentGrimoireEntry;
+                    if (currentGrimoireEntry > topOfRecipeList + 3)
+                        topOfRecipeList = currentGrimoireEntry - 3;
                 }
                 if (currentGrimoireEntry != -1)
                 {
@@ -753,6 +759,7 @@ public class MagicCraftingManager : MonoBehaviour
             g = new GUIStyle(GUI.skin.box);
             g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
+            g.padding = new RectOffset(0, 0, 30, 0);
             s = "THE GRIMOIRE";
             c = Color.white;
             GUI.color = c;
@@ -780,12 +787,16 @@ public class MagicCraftingManager : MonoBehaviour
             else
             {
                 r.x = 0.15f * w;
-                r.y = 0.1f * h;
+                r.y = 0.15f * h;
                 r.width = 0.7f * w;
-                r.height = 0.075f * h;
+                r.height = 0.065f * h;
                 g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
                 for ( int i = 0; i < pcm.playerData.magic.library.grimiore.Length; i++ )
                 {
+                    // display only four entries at a time
+                    if (i < topOfRecipeList || i > topOfRecipeList + 3)
+                        continue;
+                    // grimiore entry display
                     c = Color.gray;
                     if (i == currentGrimoireEntry)
                         c = Color.white;
@@ -823,6 +834,12 @@ public class MagicCraftingManager : MonoBehaviour
                     GUI.Label(r, s, g);
                     r.y += 0.05f * h;
                 }
+
+                r.y = 0.775f * h;
+                GUI.color = Color.black;
+                g.alignment = TextAnchor.MiddleCenter;
+                s = "Spell Recipe " + (currentGrimoireEntry+1) + " of " + pcm.playerData.magic.library.grimiore.Length;
+                GUI.Label(r, s, g);
             }
         }
 
