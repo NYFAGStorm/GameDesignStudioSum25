@@ -7,6 +7,11 @@ public class IslandManager : MonoBehaviour
 
     public IslandData[] islands;
 
+    private float propTimer;
+    private Renderer[] propRenderers = new Renderer[0];
+
+    const float PROPCHECKTIME = 5f;
+
 
     void Start()
     {
@@ -14,13 +19,35 @@ public class IslandManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-
+            propTimer = PROPCHECKTIME;
         }
     }
 
     void Update()
     {
+        // run prop check timer
+        if (propTimer > 0f)
+        {
+            propTimer -= Time.deltaTime;
+            if (propTimer < 0f)
+            {
+                propTimer = PROPCHECKTIME;
+                CheckProps();
+            }
+        }
+    }
 
+    void CheckProps()
+    {
+        // use ambient intensity to adjust color of props
+        float aIntensity = RenderSettings.ambientIntensity;
+        Color c = Color.white;
+        c *= Mathf.Clamp01(0.381f + (0.618f * aIntensity));
+        c.a = 1f;
+        for (int i = 0; i < propRenderers.Length; i++)
+        {
+            propRenderers[i].material.color = c;
+        }
     }
 
     /// <summary>
@@ -256,6 +283,21 @@ public class IslandManager : MonoBehaviour
             prop.transform.position = pos;
             // parent to island
             prop.transform.parent = islandObj.transform;
+            // store prop reneders for color adjustment
+            Renderer[] rends = prop.GetComponentsInChildren<Renderer>();
+            if (rends != null  && rends.Length > 0)
+            {
+                Renderer[] tmp = new Renderer[propRenderers.Length + rends.Length];
+                for (int n = 0; n < propRenderers.Length; n++)
+                {
+                    tmp[n] = propRenderers[n];
+                }
+                for (int n = 0; n < rends.Length; n++)
+                {
+                    tmp[propRenderers.Length + n] = rends[n];
+                }
+                propRenderers = tmp;
+            }
         }
         retBool = true;
 
