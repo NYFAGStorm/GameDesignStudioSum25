@@ -103,10 +103,9 @@ public class BackgroundManager : MonoBehaviour
             rot.y = RandomSystem.FlatRandom01() * 360f;
             cloudCarousel.transform.localEulerAngles = -rot;
             Vector3 pos = Vector3.zero;
-            pos.y = RandomSystem.FlatRandom01() * 100f;
-            pos.y -= 25f;
-            pos.z = 75f;
-            pos.z += RandomSystem.FlatRandom01() * 125f;
+            pos.y = RandomSystem.FlatRandom01() * 38.1f;
+            pos.z = 100f;
+            pos.z += RandomSystem.FlatRandom01() * 100f;
             cloudObject.transform.position = pos;
             Vector3 scl = Vector3.zero;
             scl.x = 10f;
@@ -160,13 +159,7 @@ public class BackgroundManager : MonoBehaviour
     {
         cloudCover = cloudAmount;
         daylight = dLight;
-
-        // settle noisy near-zero values
-        if (cloudCover < 0.01f)
-            cloudCover = 0f;
-        if (daylight < 0.001f)
-            daylight = 0f;
-
+        // display cloud cover in sky
         for (int i = 0; i < cloudRenderers.Length; i++)
         {
             Color c = Color.white;

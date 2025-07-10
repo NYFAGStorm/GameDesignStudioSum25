@@ -66,6 +66,20 @@ public class WeatherManager : MonoBehaviour
 
     void Update()
     {
+        // fix rounding error values in weather conditions
+        if (!GameSystem.IsZero(previousWeather) && !GameSystem.IsZero(targetWeather) &&
+            GameSystem.PositionDistance(previousWeather,targetWeather) < 0.1f)
+        {
+            previousWeather = targetWeather;
+            Debug.Log("-- near zero difference in weather conditions --");
+            if (GameSystem.PositionDistance(new PositionData(),targetWeather) < 0.1f)
+            {
+                previousWeather = new PositionData();
+                targetWeather = new PositionData();
+                Debug.Log("-- near zero overall weather conditions fixed --");
+            }
+        }
+
         // run weather timer
         if (weatherTimer > 0f)
         {

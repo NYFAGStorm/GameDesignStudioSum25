@@ -154,6 +154,11 @@ public class MagicCraftingManager : MonoBehaviour
                 case ItemType.Default:
                     shapeLibrary[i].pieces[4] = true;
                     break;
+                /*
+                 * TEMP - must make all ingredients 'seed' shape for now
+                 * in order to implement 2x2 grid for level 1 players
+                 * recipes needed, ingredients needed, shapes needed
+                 * PUZZLE DESIGN NEEDED (blocking)
                 case ItemType.Fertilizer:
                     shapeLibrary[i].pieces[4] = true;
                     shapeLibrary[i].pieces[6] = true;
@@ -187,6 +192,7 @@ public class MagicCraftingManager : MonoBehaviour
                     shapeLibrary[i].pieces[3] = true;
                     shapeLibrary[i].pieces[4] = true;
                     break;
+                */
             }
         }
     }
@@ -258,11 +264,9 @@ public class MagicCraftingManager : MonoBehaviour
                     libraryState = LibraryState.Activating;
                     libraryStateTimer = LIBRARYSTATETIMERMAX;
                     // configure cauldron grid size
-                    // REVIEW: based on player level (start 2x2, goes up one per 10 levels?)
-                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((pcm.playerData.level / 10f) - .5f);
+                    // REVIEW: based on player level (start 2x2, goes up one per 5 levels?)
+                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((pcm.playerData.level / 5f) - .5f);
                     sizeOfCauldronGrid = Mathf.Clamp(sizeOfCauldronGrid, 2, 5);
-                    // TODO: remove this temp testing
-                    sizeOfCauldronGrid = 3;
                     cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
                 }
             }

@@ -840,14 +840,14 @@ public class PlotManager : MonoBehaviour
             float progress = 1f - (harvestDisplayTimer / HARVESTDISPLAYDURATION);
             float fade = Mathf.Clamp01( (1f - progress) * 3f);
 
-            r.x = (disp.x - 0.05f) * w;
+            r.x = (disp.x - 0.2f) * w;
             r.y = (disp.y - 0.05f) * h;
-            r.y -= (0.355f + (progress * 0.025f)) * h;
-            r.width = 0.1f * w;
+            r.y -= (0.255f + (progress * 0.025f)) * h;
+            r.width = 0.4f * w;
             r.height = 0.15f * h;
 
-            g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
-            s = "Harvested\n"+plotPlantName+"\n";
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            s = "Harvested "+plotPlantName+"\n";
             s += "Quality: " + (harvestQualityValue * 100f).ToString("00.0") + "%";
             c = Color.yellow;
             c.a = fade;
@@ -857,7 +857,7 @@ public class PlotManager : MonoBehaviour
             GUI.Label(r, s, g);
         }
 
-        if (!actionProgressDisplay)
+        if (harvestDisplayTimer == 0f && !actionProgressDisplay)
         {
             r.x = (disp.x - 0.05f) * w;
             r.y = disp.y * h;
@@ -969,7 +969,7 @@ public class PlotManager : MonoBehaviour
             }
         }
 
-        if (!actionProgressDisplay)
+        if (harvestDisplayTimer > 0f || !actionProgressDisplay)
             return;
 
         r.x = (disp.x - 0.05f) * w;

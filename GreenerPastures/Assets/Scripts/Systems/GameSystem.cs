@@ -241,4 +241,41 @@ public static class GameSystem
 
         return retPos;
     }
+
+    /// <summary>
+    /// Returns true if two given position data are the same (including w)
+    /// </summary>
+    /// <param name="a">position data a</param>
+    /// <param name="b">position data b</param>
+    /// <returns>true if all values match, false if not</returns>
+    public static bool Equals(PositionData a, PositionData b)
+    {
+        return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+    }
+
+    /// <summary>
+    /// Returns true if the given position data equals zero in all values (including w)
+    /// </summary>
+    /// <param name="pos">position data</param>
+    /// <returns>true if all values are zero, false if not</returns>
+    public static bool IsZero(PositionData pos)
+    {
+        return pos.x == 0f && pos.y == 0f && pos.z == 0f && pos.w == 0f;
+    }
+
+    /// <summary>
+    /// Returns a position data structure with all values zero (including w)
+    /// </summary>
+    /// <returns>position data of zero</returns>
+    public static PositionData Zero()
+    {
+        PositionData retPos = new PositionData();
+
+        retPos.x = 0f;
+        retPos.y = 0f;
+        retPos.z = 0f;
+        retPos.w = 0f;
+
+        return retPos;
+    }
 }
