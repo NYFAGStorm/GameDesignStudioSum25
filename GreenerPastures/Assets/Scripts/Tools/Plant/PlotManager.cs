@@ -238,7 +238,7 @@ public class PlotManager : MonoBehaviour
             // water drains to be calculated (rate * time)
             data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * timeRate));
         }
-        if (data.plant.type != PlantType.Default)
+        if (plant != null)
         {
             // plant image set
             plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);

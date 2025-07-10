@@ -97,7 +97,7 @@ public class PlantManager : MonoBehaviour
         if (plantImage == null)
             plantImage = transform.Find("Plant Image").gameObject.GetComponent<Renderer>();
         Grow(plantData);
-        if (plantData.isHarvested)
+        if (plantData.isHarvested && !plantData.canReFruit)
             plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
     }
 
