@@ -68,6 +68,8 @@ public class InGameControls : MonoBehaviour
 
     public void SetPlayerControlManager( PlayerControlManager pControlManager )
     {
+        if (pcm != null)
+            return;
         pcm = pControlManager;
     }
 

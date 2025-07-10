@@ -15,6 +15,7 @@ public class InGameAlmanac : MonoBehaviour
     private int[] entriesInCategory;
 
     private bool updateAlmanac;
+    private int revealedEntryIndex = -1;
 
     private PlayerControlManager pcm;
     private MultiGamepad padMgr;
@@ -72,7 +73,7 @@ public class InGameAlmanac : MonoBehaviour
     {
         startingEntry = new int[9];
         entriesInCategory = new int[9];
-        entriesInCategory[0] = -1; // REVIEW: ...
+        entriesInCategory[0] = -1;
         int entryCount = 0;
         int categoryCount = 0;
         bool newCategory = true;
@@ -129,7 +130,15 @@ public class InGameAlmanac : MonoBehaviour
                     count++;
                 }
             }
-            print("almanac updated with " + count + " lorem-ized entries");
+            // notify player of newly revealed entry
+            if (revealedEntryIndex > -1)
+            {
+                GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                if (ggm != null)
+                    ggm.AddNotification("Almanac entry REVEALED\nin category "+almanac.entries[revealedEntryIndex].category.ToString()+"\n'" + almanac.entries[revealedEntryIndex].title +"'");
+                revealedEntryIndex = -1;
+
+            }
         }
 
         if (igc.controlsDisplay)
@@ -156,6 +165,8 @@ public class InGameAlmanac : MonoBehaviour
     /// <param name="pControlManager">player control manager</param>
     public void SetPlayerControlManager(PlayerControlManager pControlManager)
     {
+        if (pcm != null)
+            return;
         pcm = pControlManager;
         updateAlmanac = true;
     }
@@ -169,8 +180,11 @@ public class InGameAlmanac : MonoBehaviour
         int idx = AlmanacSystem.GetAlmanacEntryIndex(almanac, entryTitle);
         if (pcm != null && pcm.playerData != null &&
             pcm.playerData.almanac.revealed.Length > 0)
+        {
             pcm.playerData.almanac.revealed[idx] = true;
-        updateAlmanac = true;
+            updateAlmanac = true;
+            revealedEntryIndex = idx;
+        }
     }
 
     /// <summary>
@@ -181,8 +195,11 @@ public class InGameAlmanac : MonoBehaviour
     {
         if (pcm != null && pcm.playerData != null &&
             pcm.playerData.almanac.revealed.Length > 0)
+        {
             pcm.playerData.almanac.revealed[entryIndex] = true;
-        updateAlmanac = true;
+            updateAlmanac = true;
+            revealedEntryIndex = entryIndex;
+        }
     }
 
     void OnGUI()
@@ -202,7 +219,7 @@ public class InGameAlmanac : MonoBehaviour
         GUIStyle g = new GUIStyle(GUI.skin.box);
         g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
         g.fontStyle = FontStyle.Bold;
-        g.padding = new RectOffset(0, 0, 30, 0);
+        g.padding = new RectOffset(0, 0, 20, 0);
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.white;
         g.active.textColor = Color.white;
@@ -265,7 +282,7 @@ public class InGameAlmanac : MonoBehaviour
 
         // CATEGORY ENTRIES
         r.x = 0.175f * w;
-        r.y = 0.275f * h;
+        r.y = 0.25f * h;
         r.width = .6f * w;
         r.height = 0.05f * w;
         g = new GUIStyle(GUI.skin.label);
@@ -275,7 +292,9 @@ public class InGameAlmanac : MonoBehaviour
         for ( int n = 0; n < ENTRIESPERPAGE; n++ )
         {
             AlmanacEntry displayEntry = almanac.entries[currentEntry + n];
+            // TODO: icon display
             r.x = 0.175f * w;
+            r.height = 0.05f * w;
             r.width = .6f * w;
             g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
             g.fontStyle = FontStyle.BoldAndItalic;
@@ -292,7 +311,7 @@ public class InGameAlmanac : MonoBehaviour
             GUI.Label(r, s, g);
             // description
             r.y += 0.06f * h;
-            r.height = 0.05f * w;
+            r.height = 0.04f * w;
             g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
             g.fontStyle = FontStyle.Normal;
             g.alignment = TextAnchor.UpperLeft;
@@ -301,10 +320,12 @@ public class InGameAlmanac : MonoBehaviour
             GUI.Label(r, s, g);
             // details
             r.x += 0.01f * w;
-            r.y += 0.05f * h;
+            r.y += 0.075f * h;
             r.width = 0.1225f * w;
+            r.height = 0.05f * h;
             g.fontSize = Mathf.RoundToInt(10f * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
             if (displayEntry.details != null)
             {
                 for (int i = 0; i < displayEntry.details.Length; i++)
@@ -314,7 +335,7 @@ public class InGameAlmanac : MonoBehaviour
                     r.x += 0.125f * w;
                 }
             }
-            r.y += 0.05f * h;
+            r.y += 0.0325f * h;
         }
 
         // NAVIGATION BUTTONS (up and down)
@@ -346,8 +367,26 @@ public class InGameAlmanac : MonoBehaviour
         {
             currentEntry++;
         }
+        GUI.enabled = true;
+
         currentEntry = Mathf.Clamp(currentEntry, 
             startingEntry[currentCategory], 
             startingEntry[currentCategory] + entriesInCategory[currentCategory]-1);
+
+        // NAV LABEL
+        r.x = 0.3f * w;
+        r.y = 0.755f * h;
+        r.width = 0.4f * w;
+        r.height = 0.1f * h;
+        g = new GUIStyle(GUI.skin.label);
+        g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+        g.fontStyle = FontStyle.Bold;
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.white;
+        g.alignment = TextAnchor.MiddleCenter;
+        GUI.color = Color.white;
+        s = "Almanac entries " + (currentEntry + 1 - startingEntry[currentCategory]) + "-" + (currentEntry + 1 - startingEntry[currentCategory] + ENTRIESPERPAGE) + " of " + (entriesInCategory[currentCategory] + ENTRIESPERPAGE);
+        GUI.Label(r, s, g);
     }
 }

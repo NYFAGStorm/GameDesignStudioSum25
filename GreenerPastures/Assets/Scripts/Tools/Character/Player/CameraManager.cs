@@ -253,10 +253,14 @@ public class CameraManager : MonoBehaviour
     /// <param name="player">player control manager reference</param>
     public void SetPlayer(PlayerControlManager player)
     {
+        if (pcm != null)
+            return;
+
         playerObject = player.gameObject;
         pcm = player;
 
-        cc = UnityEngine.Object.FindFirstObjectByType<CameraClip>();
+        // camera clip config
+        cc = GameObject.FindFirstObjectByType<CameraClip>();
         cc.ConnectPlayer(playerObject.transform);
     }
 

@@ -2,6 +2,10 @@
 
 public static class AlmanacSystem
 {
+    /// <summary>
+    /// Returns initialized almanac data
+    /// </summary>
+    /// <returns>initialized almanac data</returns>
     public static AlmanacEntry InitializeEntry()
     {
         AlmanacEntry retEntry = new AlmanacEntry();
@@ -17,28 +21,64 @@ public static class AlmanacSystem
         return retEntry;
     }
 
-    public static string ConvertToLorem(string nonLorem)
+    /// <summary>
+    /// Returns a string of randomly generated lorem ipsum with the same word count as the given string
+    /// </summary>
+    /// <param name="nonLorem">non-lorem string</param>
+    /// <returns>lorem ipsum string</returns>
+    public static string ConvertToRandomLorem(string nonLorem)
     {
         string retString = "";
 
         if (nonLorem == null || nonLorem.Length == 0)
         {
-            UnityEngine.Debug.LogWarning("--- AlmanacSystem [ConvertToLorem] : input string invalid. will return empty string.");
+            UnityEngine.Debug.LogWarning("--- AlmanacSystem [ConvertToRandomLorem] : input string invalid. will return empty string.");
             return retString;
         }
 
         string[] words = nonLorem.Split(char.Parse(" "));
-        retString = GenerateLoremIpsum(words.Length);
+        retString = GenerateLoremIpsum(words.Length, "");
 
         return retString;
     }
 
-    // REVIEW: this is generating random lorem, procedural lorem instead?
-    // procedural lorem would have to be based on the original string
+    /// <summary>
+    /// Returns a string of procedurally generated lorem ipsum with the same word count as the given string
+    /// </summary>
+    /// <param name="nonLorem">non-lorem string</param>
+    /// <returns>lorem ipsum string</returns>
+    public static string ConvertToProceduralLorem(string nonLorem)
+    {
+        string retString = "";
 
-    public static string GenerateLoremIpsum(int loremLength)
+        if (nonLorem == null || nonLorem.Length == 0)
+        {
+            UnityEngine.Debug.LogWarning("--- AlmanacSystem [ConvertToProceduralLorem] : input string invalid. will return empty string.");
+            return retString;
+        }
+
+        retString = GenerateLoremIpsum(0, nonLorem);
+
+        return retString;
+    }
+
+    /// <summary>
+    /// Returns a string of procedurally or randomly generated lorem ipsum with the given number of words and adding reasonable commas, periods and capitalization
+    /// </summary>
+    /// <param name="loremWords">number of lorem words to generate randomly (ignored if procedural)</param>
+    /// <param name="proceduralSeed">non-lorem string to used as word count and seed for procedural lorem (will ignore if empty)</param>
+    /// <returns>a string of lorem ipsum text in the given word count</returns>
+    public static string GenerateLoremIpsum(int loremWords, string proceduralSeed)
     {
         string retLorem = "";
+
+        bool performProcedural = (proceduralSeed != ""); // override random result
+        string[] wordsProcedural = new string[0];
+        if (performProcedural)
+        {
+            wordsProcedural = proceduralSeed.Split(char.Parse(" "));
+            loremWords = wordsProcedural.Length;
+        }
 
         int total = 68;
         int basePeriodInterval = 20;
@@ -56,15 +96,71 @@ public static class AlmanacSystem
 
         int commaInterval = 1;
         int periodInterval = 1;
-        for (int i = 0; i < loremLength; i++)
+
+        for (int i = 0; i < loremWords; i++)
         {
-            int idx = UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * (float)total);
-            if (i < loremLength - 4 && commaInterval > baseCommaInterval + ((baseCommaInterval * RandomSystem.FlatRandom01() * variance) - baseCommaInterval / 2f))
+            float variationA = 0f;
+            float variationB = 0f;
+            float variationC = 0f;
+
+            int index = loremWords + i;
+            index %= proceduralSeed.Length - 1;
+            if (performProcedural)
+            {
+                // make three floats
+                for (int n = 0; n < 3; n++)
+                {
+                    float result = 0f;
+                    int factor = 1;
+                    index += i * n;
+                    index %= proceduralSeed.Length - 1;
+                    // generate digits
+                    for (int t = 0; t < 7; t++)
+                    {
+                        int d = (int)proceduralSeed[index] / (n+1); // letters to numbers
+                        d += i + n + t;
+                        result += d * factor;
+                        factor *= 10;
+                        index += d;
+                        index %= proceduralSeed.Length - 1;
+                    }
+                    // normalize to 0-1
+                    while (result > 1f)
+                    {
+                        result *= 0.1f;
+                    }
+                    // record result
+                    if (n == 0)
+                        variationA = result;
+                    else if (n == 1)
+                        variationB = result;
+                    else
+                        variationC = result;
+                }
+                // shuffle up
+                for (int e = 0; e < loremWords - i; e++)
+                {
+                    float tmp = variationA;
+                    variationA = variationB;
+                    variationB = variationC;
+                    variationC = tmp;
+                }
+                //UnityEngine.Debug.Log("variations A: "+variationA+" ,B: "+variationB+" ,C: "+variationC);
+            }
+            else
+            {
+                variationA = RandomSystem.FlatRandom01();
+                variationB = RandomSystem.FlatRandom01();
+                variationC = RandomSystem.FlatRandom01();
+            }
+
+            int idx = UnityEngine.Mathf.RoundToInt(variationA * (float)total);
+            if (i < loremWords - 4 && commaInterval > baseCommaInterval + ((baseCommaInterval * variationB * variance) - baseCommaInterval / 2f))
             {
                 retLorem += words[idx] + ", ";
                 commaInterval = 0;
             }
-            else if (i < loremLength - 2 && periodInterval > basePeriodInterval + ((basePeriodInterval * RandomSystem.FlatRandom01() * variance) - basePeriodInterval / 2f))
+            else if (i < loremWords - 2 && periodInterval > basePeriodInterval + ((basePeriodInterval * variationC * variance) - basePeriodInterval / 2f))
             {
                 retLorem += words[idx] + ". ";
                 periodInterval = 0;
@@ -101,15 +197,15 @@ public static class AlmanacSystem
         if (retEntry.revealed)
             return entry;
 
-        retEntry.title = ConvertToLorem(retEntry.title);
+        retEntry.title = ConvertToProceduralLorem(retEntry.title).TrimEnd(char.Parse("."));
         retEntry.icon = "GenesisTree"; // default hidden entry icon
-        retEntry.subtitle = ConvertToLorem(retEntry.subtitle);
-        retEntry.description = ConvertToLorem(retEntry.description);
+        retEntry.subtitle = ConvertToProceduralLorem(retEntry.subtitle);
+        retEntry.description = ConvertToProceduralLorem(retEntry.description);
         if (retEntry.details != null)
         {
             for (int i = 0; i < retEntry.details.Length; i++)
             {
-                retEntry.details[i] = ConvertToLorem(retEntry.details[i]);
+                retEntry.details[i] = ConvertToProceduralLorem(retEntry.details[i]).TrimEnd(char.Parse("."));
             }
         }
         else
@@ -224,16 +320,16 @@ public static class AlmanacSystem
             {
                 retData.entries[i].category = AlmanacCateogory.Lore;
                 // LORE
-                // (generic almanac entry format with optional fields for data)
-                // set revealed to false if this should be hidden
-                // use 'genesistree' as icon name for now, we need icons
                 if (i == 0)
                 {
+                    // (generic almanac entry format with optional fields for data)
+                    // set revealed to false if this should be hidden
+                    // use 'genesistree' as icon name for now, we need icons
                     retData.entries[i].title = "The Sample Almanac Entry";
-                    retData.entries[i].revealed = true;
+                    retData.entries[i].revealed = false;
                     retData.entries[i].icon = "GenesisTree";
                     retData.entries[i].subtitle = "Every journey begins with a single step.";
-                    retData.entries[i].description = "Once upon a time, a squirrel found a nut in the tallest tree in the forest. The nuts was so marvelous he vowed to fetch it and become king of all squirrels. So, he climbed and climbed, and he was never seen again.";
+                    retData.entries[i].description = "Once upon a time, a squirrel found a nut in the tallest tree in the forest. This nut was so marvelous he vowed to fetch it and become king of all squirrels. So, he climbed and climbed, and he was never seen again.";
                     retData.entries[i].details = new string[3];
                     retData.entries[i].details[0] = "Nut";
                     retData.entries[i].details[1] = "Squirrel";
@@ -281,19 +377,22 @@ public static class AlmanacSystem
                 // SECRETS
             }
 
-            // temp lorem entries (will use lorem to hide entries)
-            int rnd = 1 + UnityEngine.Mathf.RoundToInt( RandomSystem.FlatRandom01() * 3 );
-            retData.entries[i].title = GenerateLoremIpsum(rnd).TrimEnd(char.Parse("."));
-            rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 6);
-            retData.entries[i].subtitle = GenerateLoremIpsum(rnd);
-            rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 28);
-            retData.entries[i].description = GenerateLoremIpsum(rnd);
-            rnd = 1 +UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 4);
-            retData.entries[i].details = new string[rnd];
-            for (int n = 0; n < retData.entries[i].details.Length; n++)
+            if (i > 0 && (!retData.entries[i].revealed || retData.entries[i].title == ""))
             {
-                rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 3);
-                retData.entries[i].details[n] = GenerateLoremIpsum(rnd).TrimEnd(char.Parse("."));
+                // temp lorem entries for debug (will use lorem to hide entries)
+                int rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 3);
+                retData.entries[i].title = GenerateLoremIpsum(rnd, "").TrimEnd(char.Parse("."));
+                rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 6);
+                retData.entries[i].subtitle = GenerateLoremIpsum(rnd, "");
+                rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 28);
+                retData.entries[i].description = GenerateLoremIpsum(rnd, "");
+                rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 4);
+                retData.entries[i].details = new string[rnd];
+                for (int n = 0; n < retData.entries[i].details.Length; n++)
+                {
+                    rnd = 1 + UnityEngine.Mathf.RoundToInt(RandomSystem.FlatRandom01() * 3);
+                    retData.entries[i].details[n] = GenerateLoremIpsum(rnd, "").TrimEnd(char.Parse("."));
+                }
             }
         }
 

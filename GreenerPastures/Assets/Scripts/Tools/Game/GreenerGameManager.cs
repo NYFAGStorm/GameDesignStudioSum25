@@ -30,7 +30,7 @@ public class GreenerGameManager : MonoBehaviour
     private int notificationToRemove = -1; // remove only one per tick
 
     const float HOSTPINGINTERVAL = 1f;
-    const float NOTIFICATIONHOLDTIME = 5f;
+    const float NOTIFICATIONHOLDTIME = 6.18f;
 
 
     void Awake()

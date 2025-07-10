@@ -255,6 +255,8 @@ public class MarketManager : MonoBehaviour
                             topOfMenuList = i;
                             if (topOfMenuList > menuItems.Length - MENUITEMSINLIST)
                                 topOfMenuList = menuItems.Length - MENUITEMSINLIST;
+                            if (currentCustomer.playerData.level < 2 && topOfMenuList > 20 - MENUITEMSINLIST)
+                                topOfMenuList = 20 - MENUITEMSINLIST;
                             break;
                         }
                     }

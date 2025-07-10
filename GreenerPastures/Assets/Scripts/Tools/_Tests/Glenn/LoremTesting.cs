@@ -20,7 +20,7 @@ public class LoremTesting : MonoBehaviour
     {
         if (goLorem)
         {
-            playString = AlmanacSystem.ConvertToLorem(playString);
+            playString = AlmanacSystem.ConvertToProceduralLorem(playString);
             goLorem = false;
         }
     }
