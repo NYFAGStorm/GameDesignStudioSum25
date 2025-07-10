@@ -10,14 +10,13 @@ public struct TPortNodeConfig
     public PositionData cameraPosition;
 }
 
-public enum StructureType  // REVIEW:
+public enum StructureType
 {
     Default,
     WizardTower,
     WizardInterior,
     MarketShop,
-    MarketShopInterior,
-    CompostBin
+    MarketShopInterior
 }
 
 public enum StructureEffect
@@ -38,6 +37,43 @@ public class StructureData
     public StructureEffect[] effects;
 }
 
+public enum PropType
+{
+    Default,
+    RockA,
+    RockB,
+    RockC,
+    BushA,
+    BushB,
+    BushC,
+    CompostBin,
+    Mailbox,
+    LampPostA,
+    LampPostB,
+    BannerA,
+    BannerB,
+    FlagA,
+    FlagB
+}
+
+public enum PropEffect
+{
+    Default,
+    EffectA,
+    EffectB,
+    EffectC,
+    EffectD
+}
+
+[System.Serializable]
+public class PropData
+{
+    public string name;
+    public PropType type;
+    public PositionData location; // local space to island parent
+    public PropEffect[] effects;
+}
+
 // if there are discrete effects that can be applied to an island
 // each effect can then apply separate rules in a modular way
 public enum IslandEffect
@@ -56,5 +92,6 @@ public class IslandData
     public PositionData location; // w = scale of island
     public TPortNodeConfig[] tports;
     public StructureData[] structures;
+    public PropData[] props;
     public IslandEffect[] effects;
 }

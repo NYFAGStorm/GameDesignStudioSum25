@@ -74,11 +74,14 @@ public class IslandManager : MonoBehaviour
             if (structureFolderObject != null)
                 islandObj.transform.parent = structureFolderObject.transform;
             // configure teleport nodes
-            if (!ConfigureTPortNodes(islands[i], islandObj))
+            if (!ConfigureTPortNodes(islands[i], islandObj) && islands[i].tports != null && islands[i].tports.Length > 0)
                 Debug.LogWarning("--- IslandManager [ConfigureIslands] : failed to configure teleport nodes on island '" + islandObj.name + "'. will ignore.");
             // configure structures
-            if (!ConfigureStructures(islands[i], islandObj))
+            if (!ConfigureStructures(islands[i], islandObj) && islands[i].structures != null && islands[i].structures.Length > 0)
                 Debug.LogWarning("--- IslandManager [ConfigureIslands] : failed to configure structures on island '" + islandObj.name + "'. will ignore.");
+            // configure props
+            if (!ConfigureProps(islands[i], islandObj) && islands[i].props != null && islands[i].props.Length > 0)
+                Debug.LogWarning("--- IslandManager [ConfigureIslands] : failed to configure props on island '" + islandObj.name + "'. will ignore.");
         }
         retBool = true; // REVIEW: should acquire failed state of configuration rountines?
 
@@ -154,12 +157,12 @@ public class IslandManager : MonoBehaviour
                 case StructureType.MarketShop:
                     prefabName = "Market Shop";
                     break;
-                case StructureType.CompostBin:
-                    prefabName = "Compost Bin";
-                    break;
                 default:
                     break;
             }
+            // invalid prefab type
+            if (prefabName == "")
+                return retBool;
             // load structure prefab
             GameObject structure = GameObject.Instantiate((GameObject)Resources.Load(prefabName));
             structure.name = "Structure " + sData.name;
@@ -172,6 +175,87 @@ public class IslandManager : MonoBehaviour
             structure.transform.position = pos;
             // parent to island
             structure.transform.parent = islandObj.transform;
+        }
+        retBool = true;
+
+        return retBool;
+    }
+
+    bool ConfigureProps(IslandData island, GameObject islandObj)
+    {
+        bool retBool = false;
+
+        if (island.props == null || island.props.Length == 0)
+            return retBool;
+
+        for (int i = 0; i < island.props.Length; i++)
+        {
+            PropData pData = island.props[i];
+            // prop type determines resources load name
+            string prefabName = "";
+            switch (pData.type)
+            {
+                case PropType.Default:
+                    // we should never be here
+                    break;
+                case PropType.RockA:
+                    prefabName = "Rock A";
+                    break;
+                case PropType.RockB:
+                    prefabName = "Rock B";
+                    break;
+                case PropType.RockC:
+                    prefabName = "Rock C";
+                    break;
+                case PropType.BushA:
+                    prefabName = "Bush A";
+                    break;
+                case PropType.BushB:
+                    prefabName = "Bush B";
+                    break;
+                case PropType.BushC:
+                    prefabName = "Bush C";
+                    break;
+                case PropType.CompostBin:
+                    prefabName = "Compost Bin";
+                    break;
+                case PropType.Mailbox:
+                    prefabName = "Mail Box";
+                    break;
+                case PropType.LampPostA:
+                    prefabName = "Lamp Post A";
+                    break;
+                case PropType.LampPostB:
+                    prefabName = "Lamp Post B";
+                    break;
+                case PropType.BannerA:
+                    prefabName = "Banner A";
+                    break;
+                case PropType.BannerB:
+                    prefabName = "Banner B";
+                    break;
+                case PropType.FlagA:
+                    prefabName = "Flag A";
+                    break;
+                case PropType.FlagB:
+                    prefabName = "Flag B";
+                    break;
+            }            
+            // invalid prefab type
+            if (prefabName == "")
+                return retBool;
+            // load prop prefab
+            GameObject prop = GameObject.Instantiate((GameObject)Resources.Load(prefabName));
+            prop.name = "Prop " + pData.name;
+            // position prop
+            Vector3 pos = Vector3.zero;
+            pos.x = pData.location.x;
+            pos.y = pData.location.y;
+            pos.z = pData.location.z;
+            pos += islandObj.transform.position;
+            prop.transform.position = pos;
+            // parent to island
+            prop.transform.parent = islandObj.transform;
         }
         retBool = true;
 

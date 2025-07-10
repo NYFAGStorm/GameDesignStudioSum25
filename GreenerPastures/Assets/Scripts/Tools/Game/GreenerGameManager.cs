@@ -681,22 +681,28 @@ public class GreenerGameManager : MonoBehaviour
         pos.z = -4f;
         pos.w = 0f;
         game.islands[0].tports[2] = IslandSystem.InitializeTeleportNode("testTPort", 0, pos);
-        game.islands[0].structures = new StructureData[3];
+        game.islands[0].structures = new StructureData[2];
         pos.x = 1f;
         pos.y = 1f;
         pos.z = 2f;
         pos.w = 0f;
-        game.islands[0].structures[0] = IslandSystem.InitialzieStructure("wiz tower", StructureType.WizardTower, pos);
+        game.islands[0].structures[0] = IslandSystem.InitializeStructure("wiz tower", StructureType.WizardTower, pos);
         pos.x = 0f;
         pos.y = -2f;
         pos.z = 0f;
         pos.w = 0f;
-        game.islands[0].structures[1] = IslandSystem.InitialzieStructure("tower interior", StructureType.WizardInterior, pos);
+        game.islands[0].structures[1] = IslandSystem.InitializeStructure("tower interior", StructureType.WizardInterior, pos);
+        game.islands[0].props = new PropData[2];
         pos.x = -3f;
         pos.y = 0f;
         pos.z = -2f;
         pos.w = 0f;
-        game.islands[0].structures[2] = IslandSystem.InitialzieStructure("compost bin", StructureType.CompostBin, pos);
+        game.islands[0].props[0] = IslandSystem.InitializeProp("compost bin", PropType.CompostBin, pos);
+        pos.x = 2f;
+        pos.y = 0f;
+        pos.z = -5f;
+        pos.w = 0f;
+        game.islands[0].props[1] = IslandSystem.InitializeProp("mail box", PropType.Mailbox, pos);
 
         game.islands[1].tports = new TPortNodeConfig[1];
         pos.x = -4f;
@@ -709,7 +715,7 @@ public class GreenerGameManager : MonoBehaviour
         pos.y = 0.5f;
         pos.z = -2f;
         pos.w = 0f;
-        game.islands[1].structures[0] = IslandSystem.InitialzieStructure("market", StructureType.MarketShop, pos);
+        game.islands[1].structures[0] = IslandSystem.InitializeStructure("market", StructureType.MarketShop, pos);
 
         if (noisyLogging)
             Debug.Log("--- GreenerGameManager [FirstIslandData] : first island data established.");

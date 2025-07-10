@@ -206,6 +206,38 @@ public static class GameSystem
     }
 
     /// <summary>
+    /// Returns a unity engine vector3 structure from given position data
+    /// </summary>
+    /// <param name="pos">position data</param>
+    /// <returns>vector3</returns>
+    public static UnityEngine.Vector3 GetVector( PositionData pos )
+    {
+        UnityEngine.Vector3 retVec = UnityEngine.Vector3.zero;
+
+        retVec.x = pos.x;
+        retVec.y = pos.y;
+        retVec.z = pos.z;
+
+        return retVec;
+    }
+
+    /// <summary>
+    /// Returns position data structure from given unity engine vector3
+    /// </summary>
+    /// <param name="vector">vector3</param>
+    /// <returns>position data</returns>
+    public static PositionData GetPositionData( UnityEngine.Vector3 vector )
+    {
+        PositionData retPos = new PositionData();
+
+        retPos.x = vector.x;
+        retPos.y = vector.y;
+        retPos.z = vector.z;
+
+        return retPos;
+    }
+
+    /// <summary>
     /// Returns the distance between given position data points
     /// </summary>
     /// <param name="a">position data point A</param>

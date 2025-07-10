@@ -16,6 +16,7 @@ public class IslandSystem
         retIsland.location = islandLocation; // w = island scale
         retIsland.tports = new TPortNodeConfig[0];
         retIsland.structures = new StructureData[0];
+        retIsland.props = new PropData[0];
         retIsland.effects = new IslandEffect[0];
 
         return retIsland;
@@ -121,7 +122,7 @@ public class IslandSystem
     /// <param name="structureType">structure type</param>
     /// <param name="structureLocation">structure location (relative to island center)</param>
     /// <returns>initialized structure data</returns>
-    public static StructureData InitialzieStructure( string structureName, StructureType structureType, PositionData structureLocation )
+    public static StructureData InitializeStructure( string structureName, StructureType structureType, PositionData structureLocation )
     {
         StructureData retStructure = new StructureData();
 
@@ -189,6 +190,85 @@ public class IslandSystem
             }
         }
         retIsland.structures = tmp;
+
+        return retIsland;
+    }
+
+    /// <summary>
+    /// Creates new island prop data with given name, type and location relative to island center
+    /// </summary>
+    /// <param name="propName">prop name</param>
+    /// <param name="propType">prop type</param>
+    /// <param name="propLocation">prop location</param>
+    /// <returns>initialized prop data</returns>
+    public static PropData InitializeProp( string propName, PropType propType, PositionData propLocation )
+    {
+        PropData retProp = new PropData();
+
+        retProp.name = propName;
+        retProp.type = propType;
+        retProp.location = propLocation;
+        retProp.effects = new PropEffect[0];
+
+        return retProp;
+    }
+
+    /// <summary>
+    /// Adds a given prop to a given island
+    /// </summary>
+    /// <param name="island">island data</param>
+    /// <param name="prop">prop data</param>
+    /// <returns>island data with prop added</returns>
+    public static IslandData AddPropToIsland( IslandData island, PropData prop )
+    {
+        IslandData retIsland = island;
+
+        // add prop
+        PropData[] tmp = new PropData[retIsland.props.Length + 1];
+        for (int i = 0; i < retIsland.props.Length; i++)
+        {
+            tmp[i] = retIsland.props[i];
+        }
+        tmp[retIsland.props.Length] = prop;
+        retIsland.props = tmp;
+
+        return retIsland;
+    }
+
+    /// <summary>
+    /// Removes a given prop from a given island
+    /// </summary>
+    /// <param name="island">island data</param>
+    /// <param name="prop">prop data</param>
+    /// <returns>island data with prop removed, if it existed</returns>
+    public static IslandData RemovePropFromIsland( IslandData island, PropData prop )
+    {
+        IslandData retIsland = island;
+
+        // validate prop exists
+        bool found = false;
+        for (int i = 0; i < retIsland.props.Length; i++)
+        {
+            if (retIsland.props[i] == prop)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return retIsland;
+        // remove prop
+        PropData[] tmp = new PropData[retIsland.props.Length - 1];
+        int count = 0;
+        for (int i = 0; i < retIsland.props.Length; i++)
+        {
+            if (retIsland.props[i] != prop)
+            {
+                tmp[count] = retIsland.props[i];
+                count++;
+            }
+        }
+        retIsland.props = tmp;
 
         return retIsland;
     }
@@ -379,5 +459,99 @@ public class IslandSystem
         retStructure.effects = tmp;
 
         return retStructure;
+    }
+
+    /// <summary>
+    /// Returns true if given prop includes given prop effect type
+    /// </summary>
+    /// <param name="prop">prop data</param>
+    /// <param name="effect">prop effect type</param>
+    /// <returns>true if prop effect exists on this prop, false if not</returns>
+    public static bool PropHasEffect( PropData prop, PropEffect effect )
+    {
+        bool retBool = false;
+
+        for (int i = 0; i < prop.effects.Length; i++)
+        {
+            if (prop.effects[i] == effect)
+            {
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    /// <summary>
+    /// Adds a given prop effect type to a given prop, if it doesn't already exist
+    /// </summary>
+    /// <param name="prop">prop data</param>
+    /// <param name="effect">prop effect type</param>
+    /// <returns>prop data with effect added, if it didn't already exist</returns>
+    public static PropData AddPropEffect( PropData prop, PropEffect effect )
+    {
+        PropData retProp = prop;
+
+        // validate effect does not exist
+        bool found = false;
+        for (int i = 0; i < retProp.effects.Length; i++)
+        {
+            if (retProp.effects[i] == effect)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            return retProp;
+        // add effect
+        PropEffect[] tmp = new PropEffect[retProp.effects.Length + 1];
+        for (int i = 0; i < retProp.effects.Length; i++)
+        {
+            tmp[i] = retProp.effects[i];
+        }
+        tmp[retProp.effects.Length] = effect;
+        retProp.effects = tmp;
+
+        return retProp;
+    }
+
+    /// <summary>
+    /// Removes a given prop effect type from a given prop, if it exists on it
+    /// </summary>
+    /// <param name="prop">prop data</param>
+    /// <param name="effect">prop effect type</param>
+    /// <returns>prop data with prop effect removed, if it existed</returns>
+    public static PropData RemovePropEffect( PropData prop, PropEffect effect )
+    {
+        PropData retProp = prop;
+
+        // validate effect exists
+        bool found = false;
+        for (int i = 0; i < retProp.effects.Length; i++)
+        {
+            if (retProp.effects[i] == effect)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return retProp;
+        // remove effect
+        PropEffect[] tmp = new PropEffect[retProp.effects.Length + 1];
+        int count = 0;
+        for (int i = 0; i < retProp.effects.Length; i++)
+        {
+            if (retProp.effects[i] != effect)
+            {
+                tmp[count] = retProp.effects[i];
+                count++;
+            }
+        }
+        retProp.effects = tmp;
+
+        return retProp;
     }
 }

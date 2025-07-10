@@ -34,7 +34,7 @@ public class SaveLoadManager : MonoBehaviour
     const string GAMESPATH = "/Games/";
     const string GAMEFILEPREFIX = "GreenerGame-";
     const string GAMEFILESUFFIX = ".dat";
-    const string VERSIONNUMBERSTRING = "07.09.0261.b";
+    const string VERSIONNUMBERSTRING = "07.10.0268.b";
 
     void Awake()
     {
