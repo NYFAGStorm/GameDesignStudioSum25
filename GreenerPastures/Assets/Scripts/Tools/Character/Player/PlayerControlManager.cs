@@ -549,16 +549,16 @@ public class PlayerControlManager : MonoBehaviour
                     // default
                     break;
                 case PlotCondition.Dirt:
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                    r.material.mainTexture = (Texture2D)Resources.Load("Plot_Dirt");
                     break;
                 case PlotCondition.Tilled:
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                    r.material.mainTexture = (Texture2D)Resources.Load("Plot_Tilled");
                     break;
                 case PlotCondition.Growing:
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                    r.material.mainTexture = (Texture2D)Resources.Load("Plot_Tilled");
                     break;
                 case PlotCondition.Uprooted:
-                    r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
+                    r.material.mainTexture = (Texture2D)Resources.Load("Plot_Uprooted");
                     break;
                 default:
                     break;

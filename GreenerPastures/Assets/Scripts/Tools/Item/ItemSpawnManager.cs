@@ -317,7 +317,7 @@ public class ItemSpawnManager : MonoBehaviour
                 plots[i].data.plant.quality = iData.quality;
                 plots[i].data.plant.isHarvested = (iData.type == ItemType.Stalk || (iData.type == ItemType.Plant && plant.canReFruit));
                 plots[i].gameObject.transform.Find("Ground").gameObject.GetComponent<Renderer>().material.mainTexture = 
-                    (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                    (Texture2D)Resources.Load("Plot_Tilled");
                 // NOTE: we have skipped improving soil quality
                 plots[i].data.condition = PlotCondition.Growing;
                 retBool = true;

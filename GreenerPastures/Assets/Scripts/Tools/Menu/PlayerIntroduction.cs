@@ -1334,11 +1334,11 @@ public class PlayerIntroduction : MonoBehaviour
                             if (grass != null)
                                 Destroy(grass);
                             if (r != null)
-                                r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                                r.material.mainTexture = (Texture2D)Resources.Load("Plot_Dirt");
                             break;
                         case PlotCondition.Tilled:
                             if (r != null)
-                                r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                                r.material.mainTexture = (Texture2D)Resources.Load("Plot_Tilled");
                             break;
                         case PlotCondition.Growing:
                             // grow baby grow
@@ -1366,7 +1366,7 @@ public class PlayerIntroduction : MonoBehaviour
                             break;
                         case PlotCondition.Uprooted:
                             if (r != null)
-                                r.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
+                                r.material.mainTexture = (Texture2D)Resources.Load("Plot_Uprooted");
                             break;
                     }
                     managedPlot.data.water = Mathf.Clamp01(managedPlot.data.water + water);

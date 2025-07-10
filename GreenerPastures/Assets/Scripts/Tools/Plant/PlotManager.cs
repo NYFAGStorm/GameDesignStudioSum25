@@ -40,6 +40,7 @@ public class PlotManager : MonoBehaviour
     private float actionCompleteTimer;
 
     private float harvestDisplayTimer;
+    private string plotPlantName;
     private float harvestQualityValue;
 
     private Renderer plotTexture;
@@ -59,7 +60,7 @@ public class PlotManager : MonoBehaviour
     const float GRAFTWINDOW = 3f;
     // 
     const float ACTIONCOMPLETEDURATION = 0.5f;
-    const float HARVESTDISPLAYDURATION = 1f;
+    const float HARVESTDISPLAYDURATION = 2f;
     const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
 
     const float MASTERPLANTPROGRESSRATE = 0.000618f;
@@ -116,12 +117,17 @@ public class PlotManager : MonoBehaviour
                 data.sun = Mathf.Clamp01(Mathf.Sin((tim.dayProgress - .25f) * 2f * Mathf.PI));
                 // water drain
                 data.water = Mathf.Clamp01(data.water - (WATERDRAINRATE * 0.0027f * PLOTCHECKINTERVAL));
-                // water drain faster if plant, based on plant growth
                 if (plant != null)
-                    data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * MASTERPLANTPROGRESSRATE * PLOTCHECKINTERVAL));
-                // soil degrade, if plant exists
-                if (plant != null)
-                    data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * MASTERPLANTPROGRESSRATE * PLOTCHECKINTERVAL));
+                {
+                    // set plant name
+                    plotPlantName = data.plant.plantName;
+                    // water drain faster if plant, based on plant growth
+                    if (plant != null)
+                        data.water = Mathf.Clamp01(data.water - (data.plant.growth * WATERDRAINWITHPLANTRATE * MASTERPLANTPROGRESSRATE * PLOTCHECKINTERVAL));
+                    // soil degrade, if plant exists
+                    if (plant != null)
+                        data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * MASTERPLANTPROGRESSRATE * PLOTCHECKINTERVAL));
+                }
                 // PLOT EFFECTS:
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.SummonWaterI))
                     data.water = 1f;
@@ -450,7 +456,7 @@ public class PlotManager : MonoBehaviour
                 if (plotTexture == null)
                     Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
                 else
-                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("Plot_Dirt");
                 data.condition = PlotCondition.Dirt;
                 // soil quality improved
                 data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
@@ -460,7 +466,7 @@ public class PlotManager : MonoBehaviour
                 if (plotTexture == null)
                     Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
                 else
-                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Tilled");
+                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("Plot_Tilled");
                 data.condition = PlotCondition.Tilled;
                 // soil quality improved
                 data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
@@ -489,7 +495,7 @@ public class PlotManager : MonoBehaviour
                 if (plotTexture == null)
                     Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
                 else
-                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Dirt");
+                    plotTexture.material.mainTexture = (Texture2D)Resources.Load("Plot_Dirt");
                 data.condition = PlotCondition.Dirt;
                 break;
             default:
@@ -686,7 +692,7 @@ public class PlotManager : MonoBehaviour
         if (plotTexture == null)
             Debug.LogWarning("--- PlotManager [WorkLand] : " + gameObject.name + " unable to accees ground renderer. will ignore.");
         else
-            plotTexture.material.mainTexture = (Texture2D)Resources.Load("ProtoPlot_Uprooted");
+            plotTexture.material.mainTexture = (Texture2D)Resources.Load("Plot_Uprooted");
         // player would collect stalk or full plant as inventory at this point if growth >50%
         // stalk if harvested, plant if not (data retains both isHarvested and growth)
         if (data.plant.growth > 0.5f || (data.plant.isHarvested && data.plant.canReFruit) )
@@ -731,6 +737,7 @@ public class PlotManager : MonoBehaviour
         Destroy(plant);
         data.plant = PlantSystem.InitializePlant(PlantType.Default);
         data.condition = PlotCondition.Uprooted;
+        plotPlantName = "";
         uprootedTimer = UPROOTEDPLOTPAUSE; // disallow plant drop in hole for a short time
     }
 
@@ -799,6 +806,7 @@ public class PlotManager : MonoBehaviour
         {
             // graft succeeded, delete fruit from player inventory, change stalk
             data.plant = newPlant;
+            plotPlantName = newPlant.plantName;
             plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
             // using data, remove from player inventory
             pcm.DeleteCurrentItemSelection();
@@ -833,13 +841,14 @@ public class PlotManager : MonoBehaviour
             float fade = Mathf.Clamp01( (1f - progress) * 3f);
 
             r.x = (disp.x - 0.05f) * w;
-            r.y = disp.y * h;
+            r.y = (disp.y - 0.05f) * h;
             r.y -= (0.355f + (progress * 0.025f)) * h;
             r.width = 0.1f * w;
-            r.height = 0.075f * h;
+            r.height = 0.15f * h;
 
             g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
-            s = "Quality: " + (harvestQualityValue * 100f).ToString("00.0") + "%";
+            s = "Harvested\n"+plotPlantName+"\n";
+            s += "Quality: " + (harvestQualityValue * 100f).ToString("00.0") + "%";
             c = Color.yellow;
             c.a = fade;
             GUI.color = c;
@@ -857,7 +866,7 @@ public class PlotManager : MonoBehaviour
             if (plant == null)
                 r.height = 0.08f * h;
             else
-                r.height = 0.15f * h;
+                r.height = 0.175f * h;
 
             // display stats background
             c = Color.gray;
@@ -872,7 +881,7 @@ public class PlotManager : MonoBehaviour
             if (plant == null)
                 r.y -= 0.025f * h;
             else
-                r.y -= 0.05f * h;
+                r.y -= 0.0625f * h;
             g.fontSize = Mathf.RoundToInt(10f * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
             g.alignment = TextAnchor.MiddleLeft;
@@ -885,6 +894,16 @@ public class PlotManager : MonoBehaviour
             GUI.color = Color.black;
             r.x += 0.0005f * w;
             r.y += 0.001f * h;
+
+            if (plant != null)
+            {
+                //g.alignment = TextAnchor.MiddleCenter;
+                s = plotPlantName;
+                GUI.Label(r, s, g);
+                r.y += 0.025f * h;
+
+                //g.alignment = TextAnchor.MiddleLeft;
+            }
 
             s = "Sun      : " + (data.sun * 100f).ToString("00.0") + "%";
             GUI.Label(r, s, g);
@@ -912,10 +931,20 @@ public class PlotManager : MonoBehaviour
             if (plant == null)
                 r.y -= 0.05f * h;
             else
-                r.y -= 0.1f * h;
+                r.y -= 0.125f * h;
             GUI.color = Color.white;
             r.x -= 0.001f * w;
             r.y -= 0.002f * h;
+
+            if (plant != null)
+            {
+                //g.alignment = TextAnchor.MiddleCenter;
+                s = plotPlantName;
+                GUI.Label(r, s, g);
+                r.y += 0.025f * h;
+
+                //g.alignment = TextAnchor.MiddleLeft;
+            }
 
             s = "Sun      : " + (data.sun * 100f).ToString("00.0") + "%";
             GUI.Label(r, s, g);
