@@ -68,11 +68,11 @@ public class WeatherManager : MonoBehaviour
     {
         // fix rounding error values in weather conditions
         if (!GameSystem.IsZero(previousWeather) && !GameSystem.IsZero(targetWeather) &&
-            GameSystem.PositionDistance(previousWeather,targetWeather) < 0.1f)
+            GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
         {
             previousWeather = targetWeather;
             Debug.Log("-- near zero difference in weather conditions --");
-            if (GameSystem.PositionDistance(new PositionData(),targetWeather) < 0.1f)
+            if (GameSystem.PositionDistance(new PositionData(), targetWeather) < 0.1f)
             {
                 previousWeather = new PositionData();
                 targetWeather = new PositionData();
@@ -200,6 +200,15 @@ public class WeatherManager : MonoBehaviour
         previousWeather.y = weatherConditions.y;
         previousWeather.z = weatherConditions.z;
         previousWeather.w = weatherConditions.w;
+
+        // catch near-zero weather conditions
+        if (previousWeather.x < 0.01f)
+            previousWeather.x = 0f;
+        if (previousWeather.z < 0.01f)
+            previousWeather.z = 0f;
+        if (previousWeather.w < 0.01f)
+            previousWeather.w = 0f;
+
         targetWeather = previousWeather;
         weatherTimer = 0.0618f;
     }
