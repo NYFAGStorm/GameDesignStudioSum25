@@ -51,9 +51,7 @@ public enum PropType
     LampPostA,
     LampPostB,
     BannerA,
-    BannerB,
-    FlagA,
-    FlagB
+    BannerB
 }
 
 public enum PropEffect

@@ -261,11 +261,7 @@ public class IslandManager : MonoBehaviour
                 case PropType.BannerB:
                     prefabName = "Banner B";
                     break;
-                case PropType.FlagA:
-                    prefabName = "Flag A";
-                    break;
-                case PropType.FlagB:
-                    prefabName = "Flag B";
+                default:
                     break;
             }            
             // invalid prefab type
