@@ -692,7 +692,7 @@ public class GreenerGameManager : MonoBehaviour
         pos.z = 0f;
         pos.w = 0f;
         game.islands[0].structures[1] = IslandSystem.InitializeStructure("tower interior", StructureType.WizardInterior, pos);
-        game.islands[0].props = new PropData[2];
+        game.islands[0].props = new PropData[6];
         pos.x = -3f;
         pos.y = 0f;
         pos.z = -2f;
@@ -703,6 +703,27 @@ public class GreenerGameManager : MonoBehaviour
         pos.z = -5f;
         pos.w = 0f;
         game.islands[0].props[1] = IslandSystem.InitializeProp("mail box", PropType.Mailbox, pos);
+        pos.x = -2f;
+        pos.y = 0f;
+        pos.z = 3f;
+        pos.w = 0f;
+        game.islands[0].props[2] = IslandSystem.InitializeProp("bush A", PropType.BushA, pos);
+        pos.x = 4f;
+        pos.y = 0f;
+        pos.z = 1f;
+        pos.w = 0f;
+        game.islands[0].props[3] = IslandSystem.InitializeProp("rock C", PropType.RockC, pos);
+        pos.x = -1f;
+        pos.y = 0f;
+        pos.z = -3f;
+        pos.w = 0f;
+        game.islands[0].props[4] = IslandSystem.InitializeProp("lamp post B", PropType.LampPostB, pos);
+        pos.x = 5f;
+        pos.y = 0f;
+        pos.z = -2f;
+        pos.w = 0f;
+        game.islands[0].props[5] = IslandSystem.InitializeProp("banner B", PropType.BannerB, pos);
+
 
         game.islands[1].tports = new TPortNodeConfig[1];
         pos.x = -4f;
@@ -716,6 +737,23 @@ public class GreenerGameManager : MonoBehaviour
         pos.z = -2f;
         pos.w = 0f;
         game.islands[1].structures[0] = IslandSystem.InitializeStructure("market", StructureType.MarketShop, pos);
+        game.islands[1].props = new PropData[3];
+        pos.x = -1.5f;
+        pos.y = 0f;
+        pos.z = -1f;
+        pos.w = 0f;
+        game.islands[1].props[0] = IslandSystem.InitializeProp("lamp post A", PropType.LampPostA, pos);
+        pos.x = 4f;
+        pos.y = 0f;
+        pos.z = 1f;
+        pos.w = 0f;
+        game.islands[1].props[1] = IslandSystem.InitializeProp("bush B", PropType.BushB, pos);
+        pos.x = -4f;
+        pos.y = 0f;
+        pos.z = -3f;
+        pos.w = 0f;
+        game.islands[1].props[2] = IslandSystem.InitializeProp("rock A", PropType.RockA, pos);
+
 
         if (noisyLogging)
             Debug.Log("--- GreenerGameManager [FirstIslandData] : first island data established.");

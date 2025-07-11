@@ -46,7 +46,38 @@ public class IslandManager : MonoBehaviour
         c.a = 1f;
         for (int i = 0; i < propRenderers.Length; i++)
         {
-            propRenderers[i].material.color = c;
+            // only change color on props without light
+            if (propRenderers[i].gameObject.transform.parent.GetComponentInChildren<Light>() == null)
+                propRenderers[i].material.color = c;
+            // if this prop has a 2-color layered shader, change colors
+            // ...find player who owns the island, see their options, get colors
+            if (propRenderers[i].material.shader.name == "Unlit/Two Layer Composite")
+            {
+                GameObject islandObj = propRenderers[i].gameObject.transform.parent.parent.gameObject;
+                Vector3 pos = islandObj.transform.position;
+                GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                if (ggm != null)
+                {
+                    PlayerData[] playerData = ggm.game.players;
+                    for (int n = 0; n < playerData.Length; n++)
+                    {
+                        // playerData[n].playerIsland
+
+                        if (GameSystem.GetVector(ggm.game.islands[playerData[n].playerIsland].location) == pos)
+                        {
+                            Color m = PlayerSystem.GetPlayerColor(playerData[n].options.mainColor);
+                            m *= Mathf.Clamp01(0.381f + (0.618f * aIntensity));
+                            m.a = 1f;
+                            Color a = PlayerSystem.GetPlayerColor(playerData[n].options.accentColor);
+                            a *= Mathf.Clamp01(0.381f + (0.618f * aIntensity));
+                            a.a = 1f;
+                            propRenderers[i].material.SetColor("_Color", m);
+                            propRenderers[i].material.SetColor("_AltCol", a);
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -68,6 +99,7 @@ public class IslandManager : MonoBehaviour
         islands = islandData;
         if (!ConfigureIslands())
             Debug.LogWarning("--- IslandManager [SetIslandData] : unable to configure islands. will ignore.");
+        propTimer = 0.618f;
     }
 
     bool ConfigureIslands()
