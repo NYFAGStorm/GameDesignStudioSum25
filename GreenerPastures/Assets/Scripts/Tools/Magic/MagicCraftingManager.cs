@@ -138,11 +138,17 @@ public class MagicCraftingManager : MonoBehaviour
         if (slm != null && slm.itemShapes != null && 
             slm.itemShapes.Length > 0)
         {
-            shapeLibrary = slm.GetShapeLibrary();
-            return;
+            /*
+            * TEMP - must make all ingredients 'seed' shape for now
+            * in order to implement 2x2 grid for level 1 players
+            * recipes needed, ingredients needed, shapes needed
+            * PUZZLE DESIGN NEEDED (blocking)
+            */
+            //shapeLibrary = slm.GetShapeLibrary();
+            //return;
         }
 
-        Debug.LogWarning("--- MagicCraftingManager [InitializeItemShapeLibrary] : no shape library manager found in scene or shape invalid data. will use temple shape library.");
+        //Debug.LogWarning("--- MagicCraftingManager [InitializeItemShapeLibrary] : no shape library manager found in scene or shape invalid data. will use temple shape library.");
 
         shapeLibrary = new ShapeLibraryManager.ItemTypeShape[TOTALITEMSHAPETYPES];
 
@@ -155,10 +161,6 @@ public class MagicCraftingManager : MonoBehaviour
                     shapeLibrary[i].pieces[4] = true;
                     break;
                 /*
-                 * TEMP - must make all ingredients 'seed' shape for now
-                 * in order to implement 2x2 grid for level 1 players
-                 * recipes needed, ingredients needed, shapes needed
-                 * PUZZLE DESIGN NEEDED (blocking)
                 case ItemType.Fertilizer:
                     shapeLibrary[i].pieces[4] = true;
                     shapeLibrary[i].pieces[6] = true;
@@ -193,6 +195,9 @@ public class MagicCraftingManager : MonoBehaviour
                     shapeLibrary[i].pieces[4] = true;
                     break;
                 */
+                default:
+                    shapeLibrary[i].pieces[4] = true;
+                    break;
             }
         }
     }

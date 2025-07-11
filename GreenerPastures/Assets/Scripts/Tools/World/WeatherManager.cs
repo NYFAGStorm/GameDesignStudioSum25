@@ -208,6 +208,8 @@ public class WeatherManager : MonoBehaviour
             previousWeather.z = 0f;
         if (previousWeather.w < 0.01f)
             previousWeather.w = 0f;
+        if (!GameSystem.IsZero(previousWeather) && GameSystem.PositionDistance(previousWeather, GameSystem.Zero()) < 0.1f)
+            previousWeather = GameSystem.Zero();
 
         targetWeather = previousWeather;
         weatherTimer = 0.0618f;
