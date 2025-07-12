@@ -301,13 +301,6 @@ public class ItemSpawnManager : MonoBehaviour
                 GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 plantObj.transform.parent = plots[i].gameObject.transform;
                 plantObj.transform.position = plots[i].gameObject.transform.position;
-                // configure proper plant prefab and art
-                Texture2D t;
-                if (iData.type == ItemType.Stalk)
-                    t = (Texture2D)Resources.Load("ProtoPlant_Stalk");
-                else
-                    t = (Texture2D)Resources.Load("ProtoPlant04");
-                plantObj.GetComponentInChildren<Renderer>().material.mainTexture = t;
                 plots[i].plant = plantObj;
                 PlantData plant = PlantSystem.InitializePlant(iData.plant);
                 plots[i].data.plant = plant;
@@ -320,6 +313,8 @@ public class ItemSpawnManager : MonoBehaviour
                     (Texture2D)Resources.Load("Plot_Tilled");
                 // NOTE: we have skipped improving soil quality
                 plots[i].data.condition = PlotCondition.Growing;
+                // configure proper plant art
+                plantObj.GetComponent<PlantManager>().ForceGrowthImage(plots[i].data.plant);
                 retBool = true;
                 if (!drops[index].remoteDrop)
                     plots[i].DropAwardXP(PlayerData.XP_TRANSPLANT);

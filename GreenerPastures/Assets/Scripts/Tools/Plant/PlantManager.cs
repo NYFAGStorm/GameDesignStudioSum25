@@ -97,8 +97,6 @@ public class PlantManager : MonoBehaviour
         if (plantImage == null)
             plantImage = transform.Find("Plant Image").gameObject.GetComponent<Renderer>();
         Grow(plantData);
-        if (plantData.isHarvested && !plantData.canReFruit)
-            plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
     }
 
     void Grow( PlantData pData )
@@ -107,22 +105,85 @@ public class PlantManager : MonoBehaviour
         // if a re-fruiting plant, and has harvested, keep image near top end
         if (pData.canReFruit && pData.isHarvested)
             growNumber = Mathf.Clamp(growNumber, 3, 4);
+
+        string plantTextureName = "";
+        
         switch (growNumber)
         {
             case 0:
                 break;
             case 1:
-                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant01"); ;
+                plantTextureName = "Seedling";
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant01");
                 break;
             case 2:
-                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant02"); ;
+                plantTextureName = "Shoot_";
+                plantTextureName += GetPlantShootSize(pData.type);
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant02");
                 break;
             case 3:
-                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant03"); ;
+                plantTextureName = "Bulb_";
+                plantTextureName += pData.rarity.ToString() + "_";
+                plantTextureName += pData.type.ToString();
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant03");
                 break;
             case 4:
-                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant04"); ;
+                plantTextureName = "Fruit_";
+                plantTextureName += pData.rarity.ToString() + "_";
+                plantTextureName += pData.type.ToString();
+                plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant04");
                 break;
         }
+        if (pData.isHarvested && !pData.canReFruit)
+        {
+            plantTextureName = "Stalk_";
+            plantTextureName += pData.rarity.ToString() + "_";
+            plantTextureName += pData.type.ToString();
+            plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
+        }
+
+        // set plant texture
+        //print("[SET PLANT TEX] : plant texture name = '" + plantTextureName + "'");
+        if (pData.rarity == PlantRarity.Common && plantTextureName != "")
+            plantImage.material.mainTexture = (Texture2D)Resources.Load(plantTextureName);
+    }
+
+    string GetPlantShootSize( PlantType plantType )
+    {
+        // TODO: unique plants
+        string retString = "Short";
+
+        if (plantType == PlantType.Rose ||
+            plantType == PlantType.Apple ||
+            plantType == PlantType.Orange ||
+            plantType == PlantType.Lemon ||
+            plantType == PlantType.Magnolia ||
+            plantType == PlantType.Chrystalia ||
+            plantType == PlantType.Underbloom ||
+            plantType == PlantType.GoldenApple ||
+            plantType == PlantType.Mysteria ||
+            plantType == PlantType.Nightshade ||
+            plantType == PlantType.CrystalRose ||
+            plantType == PlantType.Yarrow ||
+            plantType == PlantType.WinterRose ||
+            plantType == PlantType.FleurDeLis ||
+            plantType == PlantType.BlastApple ||
+            plantType == PlantType.PixiePlumeria ||
+            plantType == PlantType.SplatBerry)
+            retString = "Medium";
+
+        if (plantType == PlantType.Corn ||
+            plantType == PlantType.Tomato ||
+            plantType == PlantType.Sunflower ||
+            plantType == PlantType.Snowgrace ||
+            plantType == PlantType.Popcorn ||
+            plantType == PlantType.EclipseFlower ||
+            plantType == PlantType.Hollowbloom ||
+            plantType == PlantType.Banana ||
+            plantType == PlantType.Coconut ||
+            plantType == PlantType.Tropicus)
+            retString = "Tall";
+
+        return retString;
     }
 }

@@ -560,7 +560,6 @@ public class PlotManager : MonoBehaviour
                 pcm.AwardXP(PlayerData.XP_HARVESTPLANT);
 
                 data.plant.isHarvested = true;
-                plant.transform.Find("Plant Image").GetComponent<Renderer>().material.mainTexture = (Texture2D)Resources.Load("ProtoPlant_Stalk");
                 // drop as loose item fruit
                 ItemSpawnManager ism = GameObject.FindAnyObjectByType<ItemSpawnManager>();
                 // attempt place all in player inventory first, drop as loose if no empty slot                
@@ -663,6 +662,8 @@ public class PlotManager : MonoBehaviour
                 // plants that can re-fruit reset growth to 20%
                 if (data.plant.canReFruit)
                     data.plant.growth = .2f;
+                // set proper plant art
+                plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
             }
         }
     }
