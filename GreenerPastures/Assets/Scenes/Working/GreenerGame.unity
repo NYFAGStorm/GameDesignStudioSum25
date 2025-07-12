@@ -298,7 +298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioMgrName: AudioMgr Music Tracks
-  soundName: Wholesome
+  soundName: Menu Loop
   triggerDelay: 0.1
   soundObject: {fileID: 0}
   minDistance: 1
