@@ -305,7 +305,7 @@ MonoBehaviour:
     creditPos:
       serializedVersion: 2
       x: 0
-      y: 0.3
+      y: 0.25
       width: 1
       height: 0.09
     creditAlign: 2
@@ -314,7 +314,7 @@ MonoBehaviour:
     creditPos:
       serializedVersion: 2
       x: 0
-      y: 0.4
+      y: 0.3
       width: 1
       height: 0.09
     creditAlign: 2
@@ -323,7 +323,34 @@ MonoBehaviour:
     creditPos:
       serializedVersion: 2
       x: 0
+      y: 0.35
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: '"Wholesome" Kevin MacLeod (incompetech.com)'
+    creditPage: 1
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.45
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: 'Licensed under Creative Commons: By Attribution 4.0 License'
+    creditPage: 1
+    creditPos:
+      serializedVersion: 2
+      x: 0
       y: 0.5
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: http://creativecommons.org/licenses/by/4.0/
+    creditPage: 1
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.55
       width: 1
       height: 0.09
     creditAlign: 2
@@ -336,10 +363,118 @@ MonoBehaviour:
       width: 1
       height: 0.09
     creditAlign: 2
+  - creditText: '"Evening" Kevin MacLeod (incompetech.com)'
+    creditPage: 2
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.25
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: 'Licensed under Creative Commons: By Attribution 4.0 License'
+    creditPage: 2
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.3
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: http://creativecommons.org/licenses/by/4.0/
+    creditPage: 2
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.35
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: '"Midnight Tale" Kevin MacLeod (incompetech.com)'
+    creditPage: 2
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.45
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: 'Licensed under Creative Commons: By Attribution 4.0 License'
+    creditPage: 2
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.5
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: http://creativecommons.org/licenses/by/4.0/
+    creditPage: 2
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.55
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: New York Film Academy | 3D Game Design | Summer 2025
+    creditPage: 2
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.7
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: '"Morning" Kevin MacLeod (incompetech.com)'
+    creditPage: 3
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.25
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: 'Licensed under Creative Commons: By Attribution 4.0 License'
+    creditPage: 3
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.3
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: http://creativecommons.org/licenses/by/4.0/
+    creditPage: 3
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.35
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: Thank you for playing
+    creditPage: 3
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.5
+      width: 1
+      height: 0.09
+    creditAlign: 2
+  - creditText: New York Film Academy | 3D Game Design | Summer 2025
+    creditPage: 3
+    creditPos:
+      serializedVersion: 2
+      x: 0
+      y: 0.7
+      width: 1
+      height: 0.09
+    creditAlign: 2
   creditFont: {fileID: 0}
   creditsFontStyle: 0
   creditFontColor: {r: 0.2356, g: 0.62, b: 0.28685337, a: 1}
-  creditFontSizeAt1024: 36
+  creditFontSizeAt1024: 30
   backButtonText: BACK
   backButton:
     serializedVersion: 2

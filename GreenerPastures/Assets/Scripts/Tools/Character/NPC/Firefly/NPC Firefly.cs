@@ -138,5 +138,8 @@ public class NPCFirefly : MonoBehaviour
         m.x -= ZIPFACTOR * (gameObject.transform.position.x-moveTarget.x) * (1f - agitation);
         m.y -= ZIPFACTOR * (gameObject.transform.position.y-moveTarget.y) * (1f - agitation);
         moveVector = m;
+
+        // weigh down agitation
+        agitation = Mathf.Clamp01(agitation - (agitationWeight * Time.deltaTime));
     }
 }

@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: 315054324}
   - component: {fileID: 315054323}
   m_Layer: 0
-  m_Name: AudioMgr Menus
+  m_Name: AudioMgr Music Tracks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -272,15 +272,56 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - name: Menu Loop
-    clip: {fileID: 8300000, guid: 0253433723c664a8ead335f574ac4c37, type: 3}
+    clip: {fileID: 8300000, guid: c30fee060c423e84fb68a2350f1c8bdb, type: 3}
     type: 3
     delay: 0
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
     pitchVariance: 0
-    volume: 0.2
+    volume: 0.25
     volumeVariance: 0
+  - name: Morning
+    clip: {fileID: 8300000, guid: 97041f018462c2b44b2e3d138dacba42, type: 3}
+    type: 3
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.25
+    volumeVariance: 0
+  - name: Wholesome
+    clip: {fileID: 8300000, guid: 159ef7d56c8b9db4eaac0435e0d64477, type: 3}
+    type: 3
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.25
+    volumeVariance: 0
+  - name: Evening
+    clip: {fileID: 8300000, guid: 0a93944e232924e45bed4cdd6084744d, type: 3}
+    type: 3
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.25
+    volumeVariance: 0
+  - name: Midnight Tale
+    clip: {fileID: 8300000, guid: 3fb60ffa0b0c1ed4c8ea2e33e6aded20, type: 3}
+    type: 3
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.25
+    volumeVariance: 0
+  musicCrossFadeTime: 3.81
 --- !u!1 &435026381
 GameObject:
   m_ObjectHideFlags: 0
@@ -917,7 +958,7 @@ GameObject:
   - component: {fileID: 1651088193}
   - component: {fileID: 1651088194}
   m_Layer: 0
-  m_Name: Menu Loop Trigger
+  m_Name: Menu Music Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -932,7 +973,7 @@ Transform:
   m_GameObject: {fileID: 1651088192}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.036947392, y: 0.03723741, z: -0.3396049}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -950,7 +991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa4a08e0a6ddf364190e0e7b066c9601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioMgrName: AudioMgr Menus
+  audioMgrName: AudioMgr Music Tracks
   soundName: Menu Loop
   triggerDelay: 0.01
   soundObject: {fileID: 0}

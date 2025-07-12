@@ -41,12 +41,15 @@ public class AudioManager : MonoBehaviour
     }
     [Tooltip("The list of sounds to use in your game.")]
     public Audio[] sounds;
+    [Tooltip("This is the number of seconds that music loops will automatically cross fade when triggered.")]
+    public float musicCrossFadeTime = 2f;
     
     public struct APlay
     {
         public AudioSource source;
         public int soundIndex;
         public float playTimer; // delay to play, or loop
+        public float crossFadeTimer; // time during crossfade
         public GameObject externalObj; // use this game object to play in 3D space
     }
     public APlay[] plays = new APlay[0];
@@ -57,10 +60,17 @@ public class AudioManager : MonoBehaviour
     private int musicCrossA = -1;
     private int musicCrossB = -1;
 
+    const float MINIMUMCROSSFADETIME = 1f;
+
 
     void Start()
     {
         // validate
+        if (musicCrossFadeTime < MINIMUMCROSSFADETIME)
+        {
+            Debug.LogWarning("--- AudioManager [Start] : music cross fade time is configured less than "+ MINIMUMCROSSFADETIME + ". will set to " + MINIMUMCROSSFADETIME + "s.");
+            musicCrossFadeTime = MINIMUMCROSSFADETIME;
+        }
         // initialize
         plays = new APlay[0];
         // fix any blank pitch or volume properties to defaults
@@ -79,7 +89,7 @@ public class AudioManager : MonoBehaviour
         // handle crossfades
         if ( musicCrossfading )
         {
-            if ( plays[musicCrossB].playTimer == 0f )
+            if ( plays[musicCrossB].crossFadeTimer == 0f )
             {
                 plays[musicCrossA].source.volume = 0f;
                 plays[musicCrossB].source.volume = 1f * sounds[plays[musicCrossB].soundIndex].volume;
@@ -91,7 +101,7 @@ public class AudioManager : MonoBehaviour
             }
             else
             {
-                musicCrossProgress = 1f - (plays[musicCrossB].playTimer / musicFadeTimeTotal);
+                musicCrossProgress = 1f - (plays[musicCrossB].crossFadeTimer / musicFadeTimeTotal);
                 plays[musicCrossA].source.volume = (1f - musicCrossProgress) * sounds[plays[musicCrossA].soundIndex].volume;
                 plays[musicCrossB].source.volume = musicCrossProgress * sounds[plays[musicCrossB].soundIndex].volume;
             }
@@ -144,6 +154,8 @@ public class AudioManager : MonoBehaviour
         APlay newPlay = new APlay();
         newPlay.soundIndex = soundIndex;
         newPlay.playTimer = sounds[soundIndex].delay;
+        if (sounds[soundIndex].type == AType.MusicLoop)
+            newPlay.crossFadeTimer = musicCrossFadeTime;
         if (sounds[soundIndex].maxDelay > sounds[soundIndex].delay)
             newPlay.playTimer += Random.Range(0f, (sounds[soundIndex].maxDelay - sounds[soundIndex].delay));
         if (newPlay.playTimer == 0f)
@@ -217,7 +229,7 @@ public class AudioManager : MonoBehaviour
                 {
                     musicCrossfading = true;
                     musicCrossProgress = 0f;
-                    musicFadeTimeTotal = plays[playIdx].playTimer;
+                    musicFadeTimeTotal = plays[playIdx].crossFadeTimer;
                     musicCrossB = playIdx;
                     plays[playIdx].source.volume = 0f;
                     plays[playIdx].source.Play();
@@ -294,7 +306,14 @@ public class AudioManager : MonoBehaviour
         // handle plays
         for ( int i=0; i<plays.Length; i++ )
         {
-            // run timer
+            // run crossfade timer
+            if (plays[i].playTimer == 0f && plays[i].crossFadeTimer > 0f)
+            {
+                plays[i].crossFadeTimer -= Time.deltaTime;
+                if (plays[i].crossFadeTimer < 0f)
+                    plays[i].crossFadeTimer = 0f;
+            }
+            // run play timer
             if (plays[i].playTimer > 0f)
                 plays[i].playTimer -= Time.deltaTime;
             if (plays[i].playTimer < 0f)

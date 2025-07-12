@@ -43,6 +43,9 @@ public class TimeManager : MonoBehaviour
     private WeatherManager wm;
     private BackgroundManager bm;
 
+    private AudioTrigger musicTrigger;
+    private string[] songList;
+
     private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
 
     const float ABSOLUTEMINIMUMFLOAT = -999999999999999f; // used for timestamp difference
@@ -103,6 +106,12 @@ public class TimeManager : MonoBehaviour
             Debug.LogError("--- TimeManager [Start] : no background manager found in scene. aborting.");
             enabled = false;
         }
+        musicTrigger = GameObject.FindFirstObjectByType<AudioTrigger>();
+        if (musicTrigger == null)
+        {
+            Debug.LogWarning("--- TimeManager [Start] : no music audio trigger found in scene. will ignore.");
+            //enabled = false;
+        }
         // initialize
         if (enabled)
         {
@@ -111,6 +120,12 @@ public class TimeManager : MonoBehaviour
             dayOfMonth = 1;
             monthOfYear = WorldMonth.Mar;
             season = WorldSeason.Spring;
+            // game world music
+            songList = new string[4];
+            songList[0] = "Morning";
+            songList[1] = "Wholesome";
+            songList[2] = "Evening";
+            songList[3] = "Midnight Tale";
         }
     }
 
@@ -178,6 +193,8 @@ public class TimeManager : MonoBehaviour
 
         UpdateGlobalTimeProgres(seasonProgress);
         annualProgress = seasonProgress;
+
+        UpdateSong(dayProgress);
     }
 
     void UpdateAmbientLighting()
@@ -223,6 +240,30 @@ public class TimeManager : MonoBehaviour
         // TODO: also add game data total game time
         // REVIEW: is seasonProgess (annualProgress) irrelevant if we take real time - seed?
         globalTimeProgress = gameSeedTime + (long)(seasonProgress * (WORLDTIMEMULTIPLIER * cheatTimeScale));
+    }
+
+    void UpdateSong( float dayProg )
+    {
+        if (musicTrigger == null)
+            return;
+
+        string currentSong = musicTrigger.soundName;
+        string nextSong = currentSong;
+
+        if (dayProg > .2f)
+            nextSong = songList[0];
+        if (dayProg > .381f)
+            nextSong = songList[1];
+        if (dayProg > .618f)
+            nextSong = songList[2];
+        if (dayProg > .8f || dayProg < .2f)
+            nextSong = songList[3];
+
+        if (nextSong == currentSong)
+            return;
+
+        musicTrigger.soundName = nextSong;
+        musicTrigger.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -371,6 +412,8 @@ public class TimeManager : MonoBehaviour
         wm.SetStartWeather(startWeather);
 
         UpdateAmbientLighting();
+
+
     }
 
     /// <summary>

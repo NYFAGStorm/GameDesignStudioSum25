@@ -249,7 +249,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1918643798}
+  - {fileID: 1060070556}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &434720076
@@ -690,6 +690,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edae5d2d49b64c642bc39e601032ac08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1060070555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1060070556}
+  - component: {fileID: 1060070557}
+  m_Layer: 0
+  m_Name: Menu Music Trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1060070556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1060070555}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 390892438}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1060070557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1060070555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa4a08e0a6ddf364190e0e7b066c9601, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMgrName: AudioMgr Music Tracks
+  soundName: Menu Loop
+  triggerDelay: 0.01
+  soundObject: {fileID: 0}
+  minDistance: 1
+  maxDistance: 10
+  resetOnTrigger: 0
 --- !u!1 &1132981744
 GameObject:
   m_ObjectHideFlags: 0
@@ -917,57 +968,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edae5d2d49b64c642bc39e601032ac08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1918643797
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1918643798}
-  - component: {fileID: 1918643799}
-  m_Layer: 0
-  m_Name: Menu Loop Trigger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1918643798
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1918643797}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.036947392, y: 0.03723741, z: -0.3396049}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 390892438}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1918643799
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1918643797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa4a08e0a6ddf364190e0e7b066c9601, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioMgrName: AudioMgr Menus
-  soundName: Menu Loop
-  triggerDelay: 0
-  soundObject: {fileID: 0}
-  minDistance: 1
-  maxDistance: 10
-  resetOnTrigger: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
