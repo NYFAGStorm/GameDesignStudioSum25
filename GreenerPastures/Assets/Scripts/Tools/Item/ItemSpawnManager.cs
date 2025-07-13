@@ -144,25 +144,28 @@ public class ItemSpawnManager : MonoBehaviour
                         drops[i].dropItem.transform.position = land;
 
                     // drop item affects
-                    LooseItemManager looseD = drops[i].dropItem.GetComponent<LooseItemManager>();
-                    // fertilizer dropped in uprooted plot
-                    if (looseD.looseItem.inv.items[0].type == ItemType.Fertilizer)
-                    {
-                        if (CheckFertilizerDrop(i))
-                            looseD.looseItem.deleteMe = true;
-                    }
-                    // seed dropped in empty tilled plot
-                    if (looseD.looseItem.inv.items[0].type == ItemType.Seed)
-                    {
-                        if (CheckSeedDrop(i, looseD.looseItem.inv.items[0].plant))
-                            looseD.looseItem.deleteMe = true;
-                    }
-                    // stalk or plant dropped in uprooted plot
-                    if (looseD.looseItem.inv.items[0].type == ItemType.Stalk ||
-                        looseD.looseItem.inv.items[0].type == ItemType.Plant)
-                    {
-                        if (CheckPlantDrop(i, looseD.looseItem.inv.items[0]))
-                            looseD.looseItem.deleteMe = true;
+                    if (drops[i].dropItem != null)
+                    { 
+                        LooseItemManager looseD = drops[i].dropItem.GetComponent<LooseItemManager>();
+                        // fertilizer dropped in uprooted plot
+                        if (looseD.looseItem.inv.items[0].type == ItemType.Fertilizer)
+                        {
+                            if (CheckFertilizerDrop(i))
+                                looseD.looseItem.deleteMe = true;
+                        }
+                        // seed dropped in empty tilled plot
+                        if (looseD.looseItem.inv.items[0].type == ItemType.Seed)
+                        {
+                            if (CheckSeedDrop(i, looseD.looseItem.inv.items[0].plant))
+                                looseD.looseItem.deleteMe = true;
+                        }
+                        // stalk or plant dropped in uprooted plot
+                        if (looseD.looseItem.inv.items[0].type == ItemType.Stalk ||
+                            looseD.looseItem.inv.items[0].type == ItemType.Plant)
+                        {
+                            if (CheckPlantDrop(i, looseD.looseItem.inv.items[0]))
+                                looseD.looseItem.deleteMe = true;
+                        }
                     }
 
                     RemoveDrop(i);

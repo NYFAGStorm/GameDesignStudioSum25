@@ -144,7 +144,9 @@ public class PlantManager : MonoBehaviour
 
         // set plant texture
         //print("[SET PLANT TEX] : plant texture name = '" + plantTextureName + "'");
-        if (pData.rarity == PlantRarity.Common && plantTextureName != "")
+        if (plantTextureName != "" &&
+            (pData.rarity == PlantRarity.Common || 
+            pData.rarity == PlantRarity.Uncommon))
             plantImage.material.mainTexture = (Texture2D)Resources.Load(plantTextureName);
     }
 
