@@ -468,11 +468,11 @@ public class MagicCraftingManager : MonoBehaviour
                     padItemSelection = Mathf.Clamp(padItemSelection,0, grim.ingredients.Length - 1);
                     // use only for drag-and-drop of items (a button hold and release)
                     if (!padDragOn && 
-                        !isAmongPlacedPieces(grim.ingredients[padItemSelection]) &&
+                        !isAmongPlacedPieces(grim.ingredients[padItemSelection].item) &&
                         padMgr.gPadDown[0].aButton)
                     {
                         padDragOn = true;
-                        heldIngredient = grim.ingredients[padItemSelection];
+                        heldIngredient = grim.ingredients[padItemSelection].item;
                         heldItemShape = shapeLibrary[(int)heldIngredient].pieces;
                         // set padDragPos to center of this inventory space
                         padDragPos = Vector3.zero;
@@ -516,7 +516,7 @@ public class MagicCraftingManager : MonoBehaviour
 
         for ( int i = 0; i < entry.ingredients.Length; i++ )
         {
-            ItemType iType = entry.ingredients[i];
+            ItemType iType = entry.ingredients[i].item;
             bool found = false;
             for ( int n = 0; n < pcm.playerData.inventory.items.Length; n++ )
             {
@@ -540,7 +540,7 @@ public class MagicCraftingManager : MonoBehaviour
     {
         for (int i = 0; i < entry.ingredients.Length; i++)
         {
-            ItemType iType = entry.ingredients[i];
+            ItemType iType = entry.ingredients[i].item;
             pcm.playerData.inventory = InventorySystem.RemoveFromInventory(pcm.playerData.inventory, iType);
         }
     }
@@ -924,7 +924,7 @@ public class MagicCraftingManager : MonoBehaviour
                 int itemIndex = ConvertViewportSpaceToInventory(mouseClickPos);
                 if (itemIndex > -1)
                 {
-                    ItemType iType = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[itemIndex];
+                    ItemType iType = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[itemIndex].item;
                     heldIngredient = iType;
                     heldItemShape = shapeLibrary[(int)iType].pieces;
                 }
@@ -951,13 +951,13 @@ public class MagicCraftingManager : MonoBehaviour
                     if (mouseClickPos != Vector3.zero)
                     {
                         if (r.Contains(mouseClickPos))
-                            heldIngredient = grim.ingredients[i];
+                            heldIngredient = grim.ingredients[i].item;
                     }
-                    t = alm.itemImages[alm.GetArtData(grim.ingredients[i]).artIndexBase];
-                    if (heldIngredient == grim.ingredients[i])
+                    t = alm.itemImages[alm.GetArtData(grim.ingredients[i].item, grim.ingredients[i].plant).artIndexBase];
+                    if (heldIngredient == grim.ingredients[i].item)
                         c *= 0.381f; // gray out icon if held and dragging to cauldron
                     GUI.color = c;
-                    if (!isAmongPlacedPieces(grim.ingredients[i]))
+                    if (!isAmongPlacedPieces(grim.ingredients[i].item))
                         GUI.DrawTexture(r, t); // skip if ingredient is place in grid
                     c = Color.white;
                     // re-adjust larger
@@ -1006,7 +1006,7 @@ public class MagicCraftingManager : MonoBehaviour
                             r.y += 0.005f * w;
                             r.width -= (0.01f * w);
                             r.height -= (0.01f * w);
-                            t = alm.itemImages[alm.GetArtData(placedIngredients[i].type).artIndexBase];
+                            t = alm.itemImages[alm.GetArtData(placedIngredients[i].type,PlantType.Default).artIndexBase];
                             GUI.color = c;
                             GUI.DrawTexture(r, t);
                             c = Color.white;
@@ -1100,7 +1100,7 @@ public class MagicCraftingManager : MonoBehaviour
                         GUI.DrawTexture(r, t);
 
                         // item icon
-                        t = alm.itemImages[alm.GetArtData(heldIngredient).artIndexBase];
+                        t = alm.itemImages[alm.GetArtData(heldIngredient,PlantType.Default).artIndexBase];
                         c = Color.white;
                         GUI.color = c;
                         GUI.DrawTexture(r, t);

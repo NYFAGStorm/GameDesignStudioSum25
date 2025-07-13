@@ -45,7 +45,6 @@ public class ArtLibraryManager : MonoBehaviour
             itemImages = new Texture2D[0];
 
             InitializeGeneralItemArt();
-
             InitializePlantArt();
         }
     }
@@ -55,6 +54,7 @@ public class ArtLibraryManager : MonoBehaviour
         
     }
 
+    /*
     /// <summary>
     /// Gets art and animation data by item type (uses item type as name)
     /// </summary>
@@ -86,6 +86,7 @@ public class ArtLibraryManager : MonoBehaviour
 
         return retData;
     }
+    */
 
     /// <summary>
     /// Gets art and animation data by item type (uses item type as name) and plant type
@@ -110,10 +111,23 @@ public class ArtLibraryManager : MonoBehaviour
                 break;
             }
         }
+        // if not found particular plant type item, get default type
         if (!found)
         {
-            // TEMP: suppressed this warning until we have art for plant types?
-            //Debug.LogWarning("--- ArtLibraryManager [GetArtData] : no data found for item type " + itemType.ToString() + " and plant type " + plantType.ToString() + ". will return null data.");
+            for (int i = 0; i < itemArtData.images.Length; i++)
+            {
+                if (itemArtData.images[i].type == itemType &&
+                    itemArtData.images[i].plant == PlantType.Default)
+                {
+                    found = true;
+                    index = i;
+                    break;
+                }
+            }
+        }
+        if (!found)
+        {
+            Debug.LogWarning("--- ArtLibraryManager [GetArtData] : no data found for item type " + itemType.ToString() + " and plant type " + plantType.ToString() + ". will return null data.");
             return retData;
         }
 
@@ -165,6 +179,7 @@ public class ArtLibraryManager : MonoBehaviour
             prevLength = itemArtData.images.Length;
             indexExtent = itemArtData.images[itemArtData.images.Length - 1].artIndexBase +
                 itemArtData.images[itemArtData.images.Length - 1].artAnimLength;
+            indexExtent++;
         }
         for (int i = 0; i < data.Length; i++)
         {
@@ -238,7 +253,7 @@ public class ArtLibraryManager : MonoBehaviour
     {
         // PLANT ITEMS
         ArtData[] newArtData =
-            new ArtData[COMMONPLANTS + UNCOMMONPLANTS]; //+ RAREPLANTS + SPECIALPLANTS + UNIQUEPLANTS];
+            new ArtData[3 * (COMMONPLANTS + UNCOMMONPLANTS)]; //+ RAREPLANTS + SPECIALPLANTS + UNIQUEPLANTS)];
 
         string itemName;
         string plant;
@@ -246,57 +261,97 @@ public class ArtLibraryManager : MonoBehaviour
 
         // common
         string rarity = "Common";
-        for (int i = 0; i < COMMONPLANTS; i++)
+        int min = 0;
+        int max = COMMONPLANTS;
+        for (int i = min; i < max; i++)
         {
-            idx = i;
-            plant = ((PlantType)idx+1).ToString(); // skip 'default' type
+            idx = i * 3;
+            plant = ((PlantType)i + 1).ToString(); // skip 'default' type
             itemName = "Item_" + rarity + "_" + plant;
-            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(idx + 1), idx);
+            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(i + 1), idx);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Stalk_" + rarity + "_" + plant;
+            newArtData[idx + 1] = ConfigItemArtData(plant, ItemType.Stalk, (PlantType)(i + 1), idx + 1);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Plant_" + rarity + "_" + plant;
+            newArtData[idx + 2] = ConfigItemArtData(plant, ItemType.Plant, (PlantType)(i + 1), idx + 2);
             AddToImages((Texture2D)Resources.Load(itemName));
         }
 
         // uncommon
         rarity = "Uncommon";
-        for (int i = 0; i < UNCOMMONPLANTS; i++)
+        min += COMMONPLANTS;
+        max += UNCOMMONPLANTS;
+        for (int i = min; i < max; i++)
         {
-            idx = i + COMMONPLANTS;
-            plant = ((PlantType)idx+1).ToString();
+            idx = (i * 3);
+            plant = ((PlantType)i + 1).ToString();
             itemName = "Item_" + rarity + "_" + plant;
-            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(idx + 1), idx);
+            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(i + 1), idx);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Stalk_" + rarity + "_" + plant;
+            newArtData[idx + 1] = ConfigItemArtData(plant, ItemType.Stalk, (PlantType)(i + 1), idx + 1);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Plant_" + rarity + "_" + plant;
+            newArtData[idx + 2] = ConfigItemArtData(plant, ItemType.Plant, (PlantType)(i + 1), idx + 2);
             AddToImages((Texture2D)Resources.Load(itemName));
         }
 
         /*
         // rare
         rarity = "Rare";
-        for (int i = 0; i < RAREPLANTS; i++)
+        min += UNCOMMONPLANTS;
+        max += RAREPLANTS;
+        for (int i = min; i < max; i++)
         {
-            idx = i + COMMONPLANTS + UNCOMMONPLANTS;
-            plant = ((PlantType)idx+1).ToString();
+            idx = (i * 3);
+            plant = ((PlantType)i + 1).ToString();
             itemName = "Item_" + rarity + "_" + plant;
-            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(idx + 1), idx);
+            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(i + 1), idx);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Stalk_" + rarity + "_" + plant;
+            newArtData[idx + 1] = ConfigItemArtData(plant, ItemType.Stalk, (PlantType)(i + 1), idx + 1);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Plant_" + rarity + "_" + plant;
+            newArtData[idx + 2] = ConfigItemArtData(plant, ItemType.Plant, (PlantType)(i + 1), idx + 2);
             AddToImages((Texture2D)Resources.Load(itemName));
         }
 
         // special
         rarity = "Special";
-        for (int i = 0; i < SPECIALPLANTS; i++)
+        min += RAREPLANTS;
+        max += SPECIALPLANTS;
+        for (int i = min; i < max; i++)
         {
-            idx = i + COMMONPLANTS + UNCOMMONPLANTS + RAREPLANTS;
-            plant = ((PlantType)idx+1).ToString();
+            idx = (i * 3);
+            plant = ((PlantType)i + 1).ToString();
             itemName = "Item_" + rarity + "_" + plant;
-            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(idx + 1), idx);
+            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(i + 1), idx);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Stalk_" + rarity + "_" + plant;
+            newArtData[idx + 1] = ConfigItemArtData(plant, ItemType.Stalk, (PlantType)(i + 1), idx + 1);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Plant_" + rarity + "_" + plant;
+            newArtData[idx + 2] = ConfigItemArtData(plant, ItemType.Plant, (PlantType)(i + 1), idx + 2);
             AddToImages((Texture2D)Resources.Load(itemName));
         }
 
         // unique
-        rarity = "Unique"; 
-        for (int i = 0; i < UNIQUEPLANTS; i++)
+        rarity = "Unique";
+        min += SPECIALPLANTS;
+        max += UNIQUEPLANTS;
+        for (int i = min; i < max; i++)
         {
-            idx = i + COMMONPLANTS + UNCOMMONPLANTS + RAREPLANTS + SPECIALPLANTS;
-            plant = ((PlantType)idx+1).ToString();
+            idx = (i * 3);
+            plant = ((PlantType)i + 1).ToString();
             itemName = "Item_" + rarity + "_" + plant;
-            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(idx + 1), idx);
+            newArtData[idx] = ConfigItemArtData(plant, ItemType.Fruit, (PlantType)(i + 1), idx);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Stalk_" + rarity + "_" + plant;
+            newArtData[idx + 1] = ConfigItemArtData(plant, ItemType.Stalk, (PlantType)(i + 1), idx + 1);
+            AddToImages((Texture2D)Resources.Load(itemName));
+            itemName = "Plant_" + rarity + "_" + plant;
+            newArtData[idx + 2] = ConfigItemArtData(plant, ItemType.Plant, (PlantType)(i + 1), idx + 2);
             AddToImages((Texture2D)Resources.Load(itemName));
         }
         */

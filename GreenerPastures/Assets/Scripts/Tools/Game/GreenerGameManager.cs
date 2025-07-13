@@ -544,13 +544,10 @@ public class GreenerGameManager : MonoBehaviour
                         lim.transform.parent = itemsObjFolder.transform;
                     // name appropriately
                     lim.gameObject.name = "Loose Item " + lim.looseItem.inv.items[0].name;
-                    // get art (first try from plant type)
+                    // get art
                     ArtData aData = new ArtData();
                     lim.frames = new Texture2D[1];
-                    if (lim.looseItem.inv.items[0].plant != PlantType.Default)
-                        aData = alm.GetArtData(lim.looseItem.inv.items[0].type, lim.looseItem.inv.items[0].plant);
-                    if (aData.type == ItemType.Default)
-                        aData = alm.GetArtData(lim.looseItem.inv.items[0].type);
+                    aData = alm.GetArtData(lim.looseItem.inv.items[0].type, lim.looseItem.inv.items[0].plant);
                     lim.frames[0] = alm.itemImages[aData.artIndexBase];
                 }
             }

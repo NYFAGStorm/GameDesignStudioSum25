@@ -303,11 +303,32 @@ public static class MagicSystem
         retEntry.name = spell.ToString(); // to be configured
         retEntry.description = "";
         retEntry.type = spell;
-        retEntry.ingredients = new ItemType[0];
+        retEntry.ingredients = new IngredientData[0];
 
         retEntry = ConfigureGrimoireEntry(retEntry);
 
         return retEntry;
+    }
+
+    static IngredientData InitializeIngredient( ItemType iType, PlantType pType )
+    {
+        IngredientData retIngredient = new IngredientData();
+
+        string plant = "";
+        if ((iType == ItemType.Seed || iType == ItemType.Plant ||
+            iType == ItemType.Stalk || iType == ItemType.Fruit) && pType == PlantType.Default)
+            plant = "Any";
+        else
+        {
+            PlantData pData = PlantSystem.InitializePlant(pType);
+            plant = pData.plantName;
+        }
+        // REVIEW: need to do the same 'name getting' for items?
+        retIngredient.name = iType.ToString() + "(" + plant + ")";
+        retIngredient.item = iType;
+        retIngredient.plant = pType;
+
+        return retIngredient;
     }
 
     static GrimioreData ConfigureGrimoireEntry( GrimioreData entry )
@@ -325,69 +346,69 @@ public static class MagicSystem
             case SpellType.FastGrowI:
                 retSpell.name = "Fast Grow I";
                 retSpell.description = "Plants grow faster for one day. (5%)";
-                retSpell.ingredients = new ItemType[2];
-                retSpell.ingredients[0] = ItemType.Fertilizer;
-                retSpell.ingredients[1] = ItemType.Stalk;
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
                 break;
             case SpellType.SummonWaterI:
                 retSpell.name = "Summon Water I";
                 retSpell.description = "Waters a 2x2 area that stays hydrated for one day.";
-                retSpell.ingredients = new ItemType[2];
-                retSpell.ingredients[0] = ItemType.Seed;
-                retSpell.ingredients[1] = ItemType.Fruit;
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Fruit, PlantType.Default);
                 break;
             case SpellType.BlessI:
                 retSpell.name = "Bless I";
                 retSpell.description = "Make plants immune to all hazards for one day.";
-                retSpell.ingredients = new ItemType[3];
-                retSpell.ingredients[0] = ItemType.Fertilizer;
-                retSpell.ingredients[1] = ItemType.Stalk;
-                retSpell.ingredients[2] = ItemType.Seed;
+                retSpell.ingredients = new IngredientData[3];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             case SpellType.MalnutritionI:
                 retSpell.name = "Malnutrition I";
                 retSpell.description = "Plants grow speed decreases for 1 day. (10%)";
-                retSpell.ingredients = new ItemType[3];
-                retSpell.ingredients[0] = ItemType.Stalk;
-                retSpell.ingredients[1] = ItemType.Rock;
-                retSpell.ingredients[2] = ItemType.Seed;
+                retSpell.ingredients = new IngredientData[3];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Rock, PlantType.Default);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             case SpellType.ProsperousI:
                 retSpell.name = "Prosperous I";
                 retSpell.description = "Have a chance of harvesting x2 from each plant. (10%)";
-                retSpell.ingredients = new ItemType[4];
-                retSpell.ingredients[0] = ItemType.Fruit;
-                retSpell.ingredients[1] = ItemType.Seed;
-                retSpell.ingredients[2] = ItemType.Seed;
-                retSpell.ingredients[3] = ItemType.Seed;
+                retSpell.ingredients = new IngredientData[4];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fruit, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                retSpell.ingredients[3] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             case SpellType.LesionI:
                 retSpell.name = "Lesion I";
                 retSpell.description = "Curse plots and decrease harvest quality. (-5%)";
-                retSpell.ingredients = new ItemType[4];
-                retSpell.ingredients[0] = ItemType.Fertilizer;
-                retSpell.ingredients[1] = ItemType.Stalk;
-                retSpell.ingredients[2] = ItemType.Stalk;
-                retSpell.ingredients[3] = ItemType.Seed;
+                retSpell.ingredients = new IngredientData[4];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
+                retSpell.ingredients[3] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             case SpellType.EclipseI:
                 retSpell.name = "Eclipse I";
                 retSpell.description = "Obscure sunlight from plots for 1 day.";
-                retSpell.ingredients = new ItemType[4];
-                retSpell.ingredients[0] = ItemType.Rock;
-                retSpell.ingredients[1] = ItemType.Stalk;
-                retSpell.ingredients[2] = ItemType.Seed;
-                retSpell.ingredients[3] = ItemType.Seed;
+                retSpell.ingredients = new IngredientData[4];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Rock, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                retSpell.ingredients[3] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             case SpellType.GoldenThumbI:
                 retSpell.name = "Golden Thumb I";
                 retSpell.description = "Bless plots and increase harvest quality. (10%)";
-                retSpell.ingredients = new ItemType[5];
-                retSpell.ingredients[0] = ItemType.Fertilizer;
-                retSpell.ingredients[1] = ItemType.Seed;
-                retSpell.ingredients[2] = ItemType.Seed;
-                retSpell.ingredients[3] = ItemType.Seed;
-                retSpell.ingredients[4] = ItemType.Seed;
+                retSpell.ingredients = new IngredientData[5];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                retSpell.ingredients[3] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                retSpell.ingredients[4] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             default:
                 UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureGrimoireEntry] : spell type undefined. will ignore.");

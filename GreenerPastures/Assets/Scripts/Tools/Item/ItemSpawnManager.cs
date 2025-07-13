@@ -222,11 +222,8 @@ public class ItemSpawnManager : MonoBehaviour
         // if plant, attempt find specific plant type first (get default type item if failed)
         // TODO: clean this up
         ArtData d = new ArtData();
-        if (item.inv.items[0].plant != PlantType.Default)
-            d = GameObject.FindAnyObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type, item.inv.items[0].plant);
-        if ( d.type == ItemType.Default )
-            d = GameObject.FindAnyObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type);
-        lim.frames[0] = GameObject.FindAnyObjectByType<ArtLibraryManager>().itemImages[d.artIndexBase];
+        d = GameObject.FindFirstObjectByType<ArtLibraryManager>().GetArtData(item.inv.items[0].type, item.inv.items[0].plant);
+        lim.frames[0] = GameObject.FindFirstObjectByType<ArtLibraryManager>().itemImages[d.artIndexBase];
 
         // handle drop animation
         AddDrop(looseItem.gameObject, spawnLocation, dropLocation, remoteDrop);

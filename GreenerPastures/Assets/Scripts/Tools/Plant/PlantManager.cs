@@ -128,7 +128,7 @@ public class PlantManager : MonoBehaviour
                 plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant03");
                 break;
             case 4:
-                plantTextureName = "Fruit_";
+                plantTextureName = "Plant_";
                 plantTextureName += pData.rarity.ToString() + "_";
                 plantTextureName += pData.type.ToString();
                 plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant04");

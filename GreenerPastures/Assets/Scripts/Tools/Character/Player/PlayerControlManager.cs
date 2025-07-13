@@ -167,14 +167,14 @@ public class PlayerControlManager : MonoBehaviour
                 playerData.magic.library.grimiore[0].name = "Fast Grow I";
                 playerData.magic.library.grimiore[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
                 playerData.magic.library.grimiore[0].description = "Plants grow faster for one day. (5%)";
-                playerData.magic.library.grimiore[0].ingredients = new ItemType[2];
-                playerData.magic.library.grimiore[0].ingredients[0] = ItemType.Fertilizer;
-                playerData.magic.library.grimiore[0].ingredients[1] = ItemType.Stalk;
+                playerData.magic.library.grimiore[0].ingredients = new IngredientData[2];
+                playerData.magic.library.grimiore[0].ingredients[0].item = ItemType.Fertilizer;
+                playerData.magic.library.grimiore[0].ingredients[1].item = ItemType.Stalk;
                 playerData.magic.library.grimiore[1].name = "Summon Water I";
                 playerData.magic.library.grimiore[1].description = "Waters a 2x2 area that stays hydrated for one day.";
-                playerData.magic.library.grimiore[1].ingredients = new ItemType[2];
-                playerData.magic.library.grimiore[1].ingredients[0] = ItemType.Seed;
-                playerData.magic.library.grimiore[1].ingredients[1] = ItemType.Fruit;
+                playerData.magic.library.grimiore[1].ingredients = new IngredientData[2];
+                playerData.magic.library.grimiore[1].ingredients[0].item = ItemType.Seed;
+                playerData.magic.library.grimiore[1].ingredients[1].item = ItemType.Fruit;
 
                 playerName = "Test Player";
             }
@@ -923,7 +923,7 @@ public class PlayerControlManager : MonoBehaviour
                     r.width -= (0.01f * w);
                     r.height -= (0.01f * w);
                     // draw inventory item
-                    t = alm.itemImages[alm.GetArtData(playerInventory.items[i].type).artIndexBase];
+                    t = alm.itemImages[alm.GetArtData(playerInventory.items[i].type, playerInventory.items[i].plant).artIndexBase];
                     GUI.DrawTexture(r, t);
                     // re-adjust larger again
                     r.x -= 0.005f * w;

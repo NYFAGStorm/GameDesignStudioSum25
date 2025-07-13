@@ -114,10 +114,7 @@ public class LooseItemManager : MonoBehaviour
         // refer to art library to configure image list and anim properties
         ArtLibraryManager alm = GameObject.FindFirstObjectByType<ArtLibraryManager>();
         ArtData artData = new ArtData();
-        if (plant != PlantType.Default)
-            artData = alm.GetArtData(itemType, plant);
-        if (itemType == ItemType.Default)
-            artData = alm.GetArtData(itemType);
+        artData = alm.GetArtData(itemType, plant);
         frames = alm.GetImageList(artData);
         if (artData.type == ItemType.Default)
             Debug.LogWarning("--- LooseItemManager [ConfigureItem] : no art data found on art library manager. will ignore.");

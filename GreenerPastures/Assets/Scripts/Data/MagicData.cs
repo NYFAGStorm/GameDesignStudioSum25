@@ -18,6 +18,7 @@
 //    the spell charge is crafted and stored in the spell book, and the items disappear
 
 // as we develop, continue to add statistics to keep regarding magic
+
 [System.Serializable]
 public class MagicStats
 {
@@ -42,14 +43,23 @@ public enum SpellType
     GoldenThumbI
 }
 
-// a grimiore holds a player's list of learned spells available to make charges
+// spell recipe ingredients may include any item type, and if plant, any plant variety
+[System.Serializable]
+public class IngredientData
+{
+    public string name;
+    public ItemType item;
+    public PlantType plant;
+}
+
+// a grimiore holds a player's list of learned spell recipes available to make charges
 [System.Serializable]
 public class GrimioreData
 {
     public string name;
     public string description;
     public SpellType type;
-    public ItemType[] ingredients; // REVIEW: only need one item of each ingredient?
+    public IngredientData[] ingredients;
 }
 
 // spell books hold the spell charges a player has crafted and are available to cast
