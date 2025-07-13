@@ -48,36 +48,42 @@ MonoBehaviour:
     images:
     - name: Fertilier
       type: 1
+      plant: 0
       artIndexBase: 0
       artAnimLength: 0
       animFrameTime: 0
       animLoop: 0
     - name: Seed
       type: 2
+      plant: 0
       artIndexBase: 1
       artAnimLength: 0
       animFrameTime: 0
       animLoop: 0
     - name: Plant
       type: 3
+      plant: 0
       artIndexBase: 2
       artAnimLength: 0
       animFrameTime: 0
       animLoop: 0
     - name: Stalk
       type: 4
+      plant: 0
       artIndexBase: 3
       artAnimLength: 0
       animFrameTime: 0
       animLoop: 0
     - name: Fruit
       type: 5
+      plant: 0
       artIndexBase: 4
       artAnimLength: 0
       animFrameTime: 0
       animLoop: 0
     - name: Rock
       type: 6
+      plant: 0
       artIndexBase: 5
       artAnimLength: 0
       animFrameTime: 0
@@ -88,4 +94,4 @@ MonoBehaviour:
   - {fileID: 2800000, guid: c2e570914c963164f93b9ce73669cdfb, type: 3}
   - {fileID: 2800000, guid: 08831e7a6a4f6674da577da53f18b0ab, type: 3}
   - {fileID: 2800000, guid: 9a78d891fe93b7f46802afec429da1f5, type: 3}
-  - {fileID: 2800000, guid: e24812a97bc33da49933647c14f8c5b7, type: 3}
+  - {fileID: 2800000, guid: e3693b0e23b2e8e448dcc03395817d80, type: 3}

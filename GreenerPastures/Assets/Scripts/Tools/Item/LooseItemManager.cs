@@ -59,7 +59,7 @@ public class LooseItemManager : MonoBehaviour
         if (looseItem.flipped)
             flip.x = -1f;
         itemRenderer.material.SetTextureScale("_MainTex", flip);
-        // TEST: if we have multi-layer composite shader, flip all layers
+        // if we have multi-layer composite shader, flip all layers
         if (itemRenderer.material.shader.name == "Unlit/Two Layer Composite" ||
             itemRenderer.material.shader.name == "Unlit/Three Layer Composite")
             itemRenderer.material.SetTextureScale("_AltTex", flip);
@@ -107,13 +107,20 @@ public class LooseItemManager : MonoBehaviour
     /// Configures a new item object data and art, by item type
     /// </summary>
     /// <param name="itemType">item type</param>
-    public void ConfigureItem( ItemType itemType )
+    /// <param name="plant">plant type or default</param>
+    public void ConfigureItem( ItemType itemType, PlantType plant )
     {
         looseItem = InventorySystem.CreateItem(itemType);
         // refer to art library to configure image list and anim properties
-        ArtLibraryManager alm = GameObject.FindAnyObjectByType<ArtLibraryManager>();
-        ArtData artData = alm.GetArtData(itemType);
+        ArtLibraryManager alm = GameObject.FindFirstObjectByType<ArtLibraryManager>();
+        ArtData artData = new ArtData();
+        if (plant != PlantType.Default)
+            artData = alm.GetArtData(itemType, plant);
+        if (itemType == ItemType.Default)
+            artData = alm.GetArtData(itemType);
         frames = alm.GetImageList(artData);
+        if (artData.type == ItemType.Default)
+            Debug.LogWarning("--- LooseItemManager [ConfigureItem] : no art data found on art library manager. will ignore.");
         itemRenderer.material.mainTexture = frames[0];
         frameTime = artData.animFrameTime;
         animOnce = !artData.animLoop;
@@ -123,9 +130,10 @@ public class LooseItemManager : MonoBehaviour
     /// Configures an item based on an item instance that existed in inventory (dropped)
     /// </summary>
     /// <param name="itemInstance">item data</param>
-    public void ConfigureItem( ItemData itemInstance )
+    /// <param name="plant">plant type or default</param>
+    public void ConfigureItem( ItemData itemInstance, PlantType plant )
     {
-        ConfigureItem(itemInstance.type);
+        ConfigureItem(itemInstance.type, plant);
         // use item instance
         looseItem.inv.items[0] = itemInstance;
     }

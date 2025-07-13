@@ -548,9 +548,7 @@ public class GreenerGameManager : MonoBehaviour
                     ArtData aData = new ArtData();
                     lim.frames = new Texture2D[1];
                     if (lim.looseItem.inv.items[0].plant != PlantType.Default)
-                    {
                         aData = alm.GetArtData(lim.looseItem.inv.items[0].type, lim.looseItem.inv.items[0].plant);
-                    }
                     if (aData.type == ItemType.Default)
                         aData = alm.GetArtData(lim.looseItem.inv.items[0].type);
                     lim.frames[0] = alm.itemImages[aData.artIndexBase];

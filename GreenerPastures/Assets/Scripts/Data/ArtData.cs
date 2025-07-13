@@ -1,5 +1,7 @@
 // REVIEW: necessary namespaces
 
+// REFACTOR: entire art library system needs a re-design and refactor
+
 // REVIEW: if animation holds are needed, make an animation frame data, use array
 // REVIEW: perhaps a dedicated set of data and images should be used for items
 

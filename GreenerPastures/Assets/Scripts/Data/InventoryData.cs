@@ -1,6 +1,6 @@
 // REVIEW: necessary namespaces
 
-// REVIEW: using 'seed', 'plant', 'stalk' and 'fruit'; relying on plant type property
+// using 'seed', 'plant', 'stalk', 'fruit' and relying on plant type property
 public enum ItemType
 {
     Default,
