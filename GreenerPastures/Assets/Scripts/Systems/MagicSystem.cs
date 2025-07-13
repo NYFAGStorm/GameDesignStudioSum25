@@ -324,7 +324,7 @@ public static class MagicSystem
             plant = pData.plantName;
         }
         // REVIEW: need to do the same 'name getting' for items?
-        retIngredient.name = iType.ToString() + "(" + plant + ")";
+        retIngredient.name = iType.ToString() + " (" + plant + ")";
         retIngredient.item = iType;
         retIngredient.plant = pType;
 

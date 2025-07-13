@@ -21,13 +21,13 @@ public class MagicCraftingManager : MonoBehaviour
         Exiting         // leaving crafting
     }
 
-    public struct ItemPiece
+    public struct IngredientPiece
     {
-        public ItemType type;
+        public IngredientData ingredient;
         public Vector3 pos;
     }
 
-    public struct ItemTypeShape
+    public struct IngredientTypeShape
     {
         public bool[] pieces;
     }
@@ -53,16 +53,21 @@ public class MagicCraftingManager : MonoBehaviour
     private int selectedGrimoireRecipe;
     private int topOfRecipeList;
 
+    private InventoryData cauldronInventory; // ingredients from player inventory as grimoire recipe
+
     private int sizeOfCauldronGrid; // set this based on player level (max 5)
-    private ItemType heldIngredient; // ingredient item currently dragging
+    private IngredientData heldIngredient; // ingredient item currently dragging
     private Vector3 heldPosition; // viewport position of current ingredient
-    private bool[] heldItemShape; // 3x3 grid defining the shape of the held item
-    private ItemPiece[] placedIngredients; // to draw placed ingredient pieces on grid
+    private bool[] heldIngredientShape; // 3x3 grid defining the shape of the held ingredient
+    private IngredientPiece[] placedIngredients; // to draw placed ingredient pieces on grid
     private bool[] cauldronGridFilled; // 2 dimensional array (row, col) if spaces taken
     private bool craftingSolved; // has the player solved the crafting puzzle?
 
-    private ShapeLibraryManager.ItemTypeShape[] shapeLibrary; // all item types described as 3x3 shapes
-    // NOTE: the index for this array is the enum reference number of the item type
+    // all ingredient types described as 3x3 shapes
+    private ShapeLibraryManager.IngredientShapeType[] shapeLibrary;
+    //private ShapeLibraryManager slm;
+    // REVIE: no longer true, REFACTOR this whole thing due to ingredient data holding item and plant types
+    // NOTE: the index for this array is the enum reference number of the ingredient type
 
     private PlayerControlManager pcm;
     private PlayerControlManager leaving; // used in deactivation
@@ -71,8 +76,8 @@ public class MagicCraftingManager : MonoBehaviour
 
     private MultiGamepad padMgr;
     // a button down to turn on padDragOn, with padDragOn true detect a button unpressed to turn off
-    private int padItemSelection = -1;
-    private bool padDragOn; // is the player currently dragging an item with gamepad?
+    private int padIngredientSelection = -1;
+    private bool padDragOn; // is the player currently dragging an ingredient with gamepad?
     private Vector3 padDragPos; // viewport space of held item
     private float padDragSpeed = 0.381f;
 
@@ -83,13 +88,19 @@ public class MagicCraftingManager : MonoBehaviour
     const float PLAYERCHECKTIME = 1f;
     const float PROXIMITYCHECKRADIUS = 0.381f;
 
-    const int TOTALITEMSHAPETYPES = 6;
+    const int TOTALINGREDIENTSHAPETYPES = 6;
 
 
     void Start()
     {
         // validate
         // TODO: validate for grimoire and cauldron background images
+        //slm = GameObject.FindFirstObjectByType<ShapeLibraryManager>();
+        //if (slm == null)
+        //{
+        //    Debug.LogError("--- MagicCraftingManager [Start] : no shape library manager found in scene. aborting.");
+        //    enabled = false;
+        //}
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if ( padMgr == null )
         {
@@ -114,12 +125,14 @@ public class MagicCraftingManager : MonoBehaviour
             currentGrimoireEntry = -1;
             selectedGrimoireRecipe = -1;
 
-            placedIngredients = new ItemPiece[0];
+            heldIngredient = new IngredientData();
+
+            placedIngredients = new IngredientPiece[0];
 
             // to be set based on item shape data
-            heldItemShape = new bool[9]; // 3x3 grid makes a single shape
+            heldIngredientShape = new bool[9]; // 3x3 grid makes a single shape
 
-            InitializeItemShapeLibrary();
+            InitializeIngredientShapeLibrary();
 
             // GUI Button Textures for build
             if (!Application.isEditor)
@@ -132,11 +145,11 @@ public class MagicCraftingManager : MonoBehaviour
         }
     }
 
-    void InitializeItemShapeLibrary()
+    void InitializeIngredientShapeLibrary()
     {
         ShapeLibraryManager slm = GameObject.FindFirstObjectByType<ShapeLibraryManager>();
-        if (slm != null && slm.itemShapes != null && 
-            slm.itemShapes.Length > 0)
+        if (slm != null && slm.ingredientShapes != null && 
+            slm.ingredientShapes.Length > 0)
         {
             /*
             * TEMP - must make all ingredients 'seed' shape for now
@@ -148,19 +161,19 @@ public class MagicCraftingManager : MonoBehaviour
             //return;
         }
 
-        //Debug.LogWarning("--- MagicCraftingManager [InitializeItemShapeLibrary] : no shape library manager found in scene or shape invalid data. will use temple shape library.");
+        //Debug.LogWarning("--- MagicCraftingManager [InitializeIngredientShapeLibrary] : no shape library manager found in scene or shape invalid data. will use temp shape library.");
 
-        shapeLibrary = new ShapeLibraryManager.ItemTypeShape[TOTALITEMSHAPETYPES];
+        shapeLibrary = new ShapeLibraryManager.IngredientShapeType[TOTALINGREDIENTSHAPETYPES];
 
         for ( int i = 0; i < shapeLibrary.Length; i++ )
         {
+            shapeLibrary[i].plant = PlantType.Default;
             shapeLibrary[i].pieces = new bool[9];
             switch( (ItemType)i )
             {
                 case ItemType.Default:
                     shapeLibrary[i].pieces[4] = true;
                     break;
-                /*
                 case ItemType.Fertilizer:
                     shapeLibrary[i].pieces[4] = true;
                     shapeLibrary[i].pieces[6] = true;
@@ -194,12 +207,28 @@ public class MagicCraftingManager : MonoBehaviour
                     shapeLibrary[i].pieces[3] = true;
                     shapeLibrary[i].pieces[4] = true;
                     break;
-                */
                 default:
                     shapeLibrary[i].pieces[4] = true;
                     break;
             }
         }
+    }
+
+    bool[] GetShape( ItemType itype )
+    {
+        bool[] retShape = new bool[9];
+
+        for (int i = 0; i < shapeLibrary.Length; i++)
+        {
+            if ( shapeLibrary[i].item == itype )
+            {
+                print("found shape for type "+itype);
+                retShape = shapeLibrary[i].pieces;
+                break;
+            }
+        }
+
+        return retShape;
     }
 
     void Update()
@@ -269,8 +298,8 @@ public class MagicCraftingManager : MonoBehaviour
                     libraryState = LibraryState.Activating;
                     libraryStateTimer = LIBRARYSTATETIMERMAX;
                     // configure cauldron grid size
-                    // REVIEW: based on player level (start 2x2, goes up one per 5 levels?)
-                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((pcm.playerData.level / 5f) - .5f);
+                    // REVIEW: based on player level (start 2x2, goes up one per 3 levels?)
+                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((pcm.playerData.level / 3f) - .5f);
                     sizeOfCauldronGrid = Mathf.Clamp(sizeOfCauldronGrid, 2, 5);
                     cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
                 }
@@ -438,13 +467,21 @@ public class MagicCraftingManager : MonoBehaviour
                         break;
                     // allow player to make selection of recipe to craft in cauldron state
                     if (Input.GetKeyDown(pcm.actionAKey) || (padMgr != null && padMgr.gPadDown[0].aButton))
+                    {
                         selectedGrimoireRecipe = currentGrimoireEntry;
+                        // fill cauldron inventory with first-found items matching grimoire recipe
+                        FillCauldronInventory(pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe]);
+                    }
                 }
                 if (selectedGrimoireRecipe != -1)
                 {
                     // allow player to cancel selection of recipe
                     if (Input.GetKeyDown(pcm.actionBKey) || (padMgr != null && padMgr.gPadDown[0].bButton))
+                    {
                         selectedGrimoireRecipe = -1;
+                        // clear cauldron inventory
+                        ClearCauldronInventory();
+                    }
                 }
                 break;
             case CraftState.Cauldron:
@@ -455,28 +492,31 @@ public class MagicCraftingManager : MonoBehaviour
                     // shoulder buttons to select ingredient inventory
                     if (padMgr.gPadDown[0].LBump)
                     {
-                        padItemSelection--;
-                        if (padItemSelection < 0)
-                            padItemSelection = grim.ingredients.Length - 1;
+                        padIngredientSelection--;
+                        if (padIngredientSelection < 0)
+                            padIngredientSelection = grim.ingredients.Length - 1;
                     }
                     if (padMgr.gPadDown[0].RBump)
                     {
-                        padItemSelection++;
-                        if (padItemSelection > grim.ingredients.Length - 1)
-                            padItemSelection = 0;
+                        padIngredientSelection++;
+                        if (padIngredientSelection > grim.ingredients.Length - 1)
+                            padIngredientSelection = 0;
                     }
-                    padItemSelection = Mathf.Clamp(padItemSelection,0, grim.ingredients.Length - 1);
-                    // use only for drag-and-drop of items (a button hold and release)
+                    padIngredientSelection = Mathf.Clamp(padIngredientSelection,0, grim.ingredients.Length - 1);
+                    // use only for drag-and-drop of ingredients (a button hold and release)
                     if (!padDragOn && 
-                        !isAmongPlacedPieces(grim.ingredients[padItemSelection].item) &&
+                        !isAmongPlacedPieces(grim.ingredients[padIngredientSelection]) &&
                         padMgr.gPadDown[0].aButton)
                     {
                         padDragOn = true;
-                        heldIngredient = grim.ingredients[padItemSelection].item;
-                        heldItemShape = shapeLibrary[(int)heldIngredient].pieces;
+                        // REFACTOR: use cauldron inventory not grimoire recipe
+                        heldIngredient.name = cauldronInventory.items[padIngredientSelection].name; //grim.ingredients[padIngredientSelection].name;
+                        heldIngredient.item = cauldronInventory.items[padIngredientSelection].type; //grim.ingredients[padIngredientSelection].item;
+                        heldIngredient.plant = cauldronInventory.items[padIngredientSelection].plant; //grim.ingredients[padIngredientSelection].plant;
+                        heldIngredientShape = GetShape(heldIngredient.item); //slm.GetIngredientShape(heldIngredient.item, heldIngredient.plant);
                         // set padDragPos to center of this inventory space
                         padDragPos = Vector3.zero;
-                        padDragPos.x = 0.15f + (padItemSelection * 0.075f);
+                        padDragPos.x = 0.15f + (padIngredientSelection * 0.075f);
                         padDragPos.y = 0.675f;
                         padDragPos.x += (0.075f * 0.5f);
                         padDragPos.y += 0.075f;
@@ -514,16 +554,23 @@ public class MagicCraftingManager : MonoBehaviour
     {
         bool retBool = true;
 
+        // in all entry ingredients, if default plant, any type; otherwise specific item needed
         for ( int i = 0; i < entry.ingredients.Length; i++ )
         {
-            ItemType iType = entry.ingredients[i].item;
             bool found = false;
-            for ( int n = 0; n < pcm.playerData.inventory.items.Length; n++ )
+
+            if (entry.ingredients[i].plant == PlantType.Default)
+                found = InventorySystem.InvHasItemOfType(pcm.playerData.inventory, entry.ingredients[i].item);
+            else
             {
-                if (pcm.playerData.inventory.items[n].type == iType)
+                for (int n = 0; n < pcm.playerData.inventory.items.Length; n++)
                 {
-                    found = true;
-                    break;
+                    if (entry.ingredients[i].item == pcm.playerData.inventory.items[n].type && 
+                        entry.ingredients[i].plant == pcm.playerData.inventory.items[n].plant)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
             }
             if (!found)
@@ -540,14 +587,62 @@ public class MagicCraftingManager : MonoBehaviour
     {
         for (int i = 0; i < entry.ingredients.Length; i++)
         {
-            ItemType iType = entry.ingredients[i].item;
-            pcm.playerData.inventory = InventorySystem.RemoveFromInventory(pcm.playerData.inventory, iType);
+            // remove specific item and plant type if entry plant not default
+            if (entry.ingredients[i].plant != PlantType.Default)
+                pcm.playerData.inventory = InventorySystem.RemoveFromInventory(pcm.playerData.inventory, entry.ingredients[i].item);
+            else
+            {
+                ItemData ingredientItem = null;
+                for (int n = 0; n < pcm.playerData.inventory.items.Length; n++)
+                {
+                    if (entry.ingredients[i].item == pcm.playerData.inventory.items[n].type &&
+                       entry.ingredients[i].plant == pcm.playerData.inventory.items[n].plant)
+                    {
+                        ingredientItem = pcm.playerData.inventory.items[n];
+                        break;
+                    }
+                }
+                if (ingredientItem != null)
+                    pcm.playerData.inventory = InventorySystem.RemoveItemFromInventory(pcm.playerData.inventory, ingredientItem);
+            }
         }
     }
 
-    void AddPlacedPiece( ItemType type, Vector3 pos, bool centerPiece )
+    void FillCauldronInventory( GrimioreData recipe )
     {
-        ItemPiece[] tmp = new ItemPiece[placedIngredients.Length + 1];
+        if (cauldronInventory == null || cauldronInventory.items.Length == 0)
+            cauldronInventory = InventorySystem.InitializeInventory(recipe.ingredients.Length);
+        // fill inventory with first-found matching ingredients from player inventory
+        for (int i = 0; i < recipe.ingredients.Length; i++)
+        {
+            bool found = false;
+
+            for (int n = 0; n < pcm.playerData.inventory.items.Length; n++)
+            {
+                if ((recipe.ingredients[i].plant == PlantType.Default && 
+                    recipe.ingredients[i].item == pcm.playerData.inventory.items[n].type) ||
+                    (recipe.ingredients[i].item == pcm.playerData.inventory.items[n].type &&
+                    recipe.ingredients[i].plant == pcm.playerData.inventory.items[n].plant))
+                {
+                    ItemData foundIngredient = pcm.playerData.inventory.items[n];
+                    cauldronInventory = InventorySystem.AddToInventory(cauldronInventory, foundIngredient);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                Debug.LogWarning("--- MagicCraftingManager [FillCauldronInventory] : missing recipe ingredient '" + recipe.ingredients[i].name + "'. will ignore.");
+        }
+    }
+
+    void ClearCauldronInventory()
+    {
+        cauldronInventory = null;
+    }
+
+    void AddPlacedPiece( IngredientData ingredient, Vector3 pos, bool centerPiece )
+    {
+        IngredientPiece[] tmp = new IngredientPiece[placedIngredients.Length + 1];
 
         // convert pos to snapped at center of grid position
         int oRow = 0;
@@ -562,8 +657,10 @@ public class MagicCraftingManager : MonoBehaviour
             {
                 tmp[i] = placedIngredients[i];
             }
-            tmp[placedIngredients.Length] = new ItemPiece();
-            tmp[placedIngredients.Length].type = type;
+            tmp[placedIngredients.Length] = new IngredientPiece();
+            tmp[placedIngredients.Length].ingredient.name = ingredient.name;
+            tmp[placedIngredients.Length].ingredient.item = ingredient.item;
+            tmp[placedIngredients.Length].ingredient.plant = ingredient.plant;
             tmp[placedIngredients.Length].pos = pos;
 
             placedIngredients = tmp;
@@ -585,13 +682,15 @@ public class MagicCraftingManager : MonoBehaviour
         return retVec;
     }
 
-    bool isAmongPlacedPieces( ItemType type )
+    bool isAmongPlacedPieces( IngredientData ingredient )
     {
         bool retBool = false;
 
         for (int i = 0; i < placedIngredients.Length; i++)
         {
-            if (placedIngredients[i].type == type)
+            if (placedIngredients[i].ingredient.name == ingredient.name &&
+                placedIngredients[i].ingredient.item == ingredient.item &&
+                placedIngredients[i].ingredient.plant == ingredient.plant)
             {
                 retBool = true;
                 break;
@@ -606,7 +705,8 @@ public class MagicCraftingManager : MonoBehaviour
         // set invalid by default
         int retInvSlot = -1;
 
-        int sizeOfInv = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients.Length;
+        int sizeOfInv = cauldronInventory.maxSlots;
+            //pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients.Length;
 
         float ratioToX = ((float)Screen.width / (float)Screen.height);
         float leftX = 0.15f;
@@ -625,7 +725,7 @@ public class MagicCraftingManager : MonoBehaviour
 
     void ClearPlacedPieces()
     {
-        placedIngredients = new ItemPiece[0];
+        placedIngredients = new IngredientPiece[0];
     }
 
     void ConvertViewportSpaceToGrid( Vector3 viewport, out int row, out int col )
@@ -847,7 +947,7 @@ public class MagicCraftingManager : MonoBehaviour
                     s = "";
                     for (int n = 0; n < grim.ingredients.Length; n++)
                     {
-                        s += grim.ingredients[n].ToString();
+                        s += grim.ingredients[n].name;
                         if (n < grim.ingredients.Length - 1)
                             s += ", ";
                     }
@@ -902,7 +1002,7 @@ public class MagicCraftingManager : MonoBehaviour
             s = "";
             for (int i = 0; i < grim.ingredients.Length; i++)
             {
-                s += grim.ingredients[i].ToString();
+                s += grim.ingredients[i].name;
                 if (i < grim.ingredients.Length - 1)
                     s += ", ";
                 c = Color.white;
@@ -911,8 +1011,9 @@ public class MagicCraftingManager : MonoBehaviour
             GUI.Label(r, s, g);
 
             Vector3 mouseClickPos = Vector3.zero;
+            // REVIEW: okay to just set held ingredient to item == default and re-use?
             // acquire held item from mouse position and click
-            if (heldIngredient == ItemType.Default && Input.GetMouseButtonDown(0))
+            if (heldIngredient.item == ItemType.Default && Input.GetMouseButtonDown(0))
             {
                 mouseClickPos = Input.mousePosition;
                 // convert mouse position pixels to viewport space
@@ -921,12 +1022,23 @@ public class MagicCraftingManager : MonoBehaviour
                 mouseClickPos.y = 1f - mouseClickPos.y; // invert y
 
                 // grab items from inventory slot spaces
-                int itemIndex = ConvertViewportSpaceToInventory(mouseClickPos);
-                if (itemIndex > -1)
+                int ingredientIndex = ConvertViewportSpaceToInventory(mouseClickPos);
+                if (ingredientIndex > -1)
                 {
-                    ItemType iType = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[itemIndex].item;
-                    heldIngredient = iType;
-                    heldItemShape = shapeLibrary[(int)iType].pieces;
+                    print("clicked on ingredient index " + ingredientIndex + ", '" + cauldronInventory.items[ingredientIndex].name + "'");
+                    print(" ... with item: " + cauldronInventory.items[ingredientIndex].type.ToString() + " and plant: " + cauldronInventory.items[ingredientIndex].plant.ToString() );
+
+                    heldIngredient.name = cauldronInventory.items[ingredientIndex].name;
+                    heldIngredient.item = cauldronInventory.items[ingredientIndex].type;
+                    heldIngredient.plant = cauldronInventory.items[ingredientIndex].plant;
+
+                    //print("clicked on ingredient index "+ingredientIndex+", '" + pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[ingredientIndex].name + "'");
+                    //print(" ... with item: " + pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[ingredientIndex].item + " and plant: " + pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[ingredientIndex].plant );
+                    //heldIngredient.name = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[ingredientIndex].name;
+                    //heldIngredient.item = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[ingredientIndex].item;
+                    //heldIngredient.plant = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients[ingredientIndex].plant;
+
+                    heldIngredientShape = GetShape(heldIngredient.item); //slm.GetIngredientShape(heldIngredient.item, heldIngredient.plant);
                 }
             }
 
@@ -951,13 +1063,13 @@ public class MagicCraftingManager : MonoBehaviour
                     if (mouseClickPos != Vector3.zero)
                     {
                         if (r.Contains(mouseClickPos))
-                            heldIngredient = grim.ingredients[i].item;
+                            heldIngredient = grim.ingredients[i];
                     }
                     t = alm.itemImages[alm.GetArtData(grim.ingredients[i].item, grim.ingredients[i].plant).artIndexBase];
-                    if (heldIngredient == grim.ingredients[i].item)
+                    if (heldIngredient == grim.ingredients[i])
                         c *= 0.381f; // gray out icon if held and dragging to cauldron
                     GUI.color = c;
-                    if (!isAmongPlacedPieces(grim.ingredients[i].item))
+                    if (!isAmongPlacedPieces(grim.ingredients[i]))
                         GUI.DrawTexture(r, t); // skip if ingredient is place in grid
                     c = Color.white;
                     // re-adjust larger
@@ -969,7 +1081,7 @@ public class MagicCraftingManager : MonoBehaviour
                 // inventory slot frame
                 t = (Texture2D)Resources.Load("Plot_Cursor");
                 if (padMgr != null && padMgr.gamepads[0].isActive 
-                    && padItemSelection == i)
+                    && padIngredientSelection == i)
                     c = Color.yellow;
                 GUI.color = c;
                 GUI.DrawTexture(r, t);
@@ -986,12 +1098,12 @@ public class MagicCraftingManager : MonoBehaviour
             {
                 for (int i = 0; i < placedIngredients.Length; i++)
                 {
-                    bool[] thisItemShape = shapeLibrary[(int)placedIngredients[i].type].pieces;
+                    bool[] thisIngredientShape = GetShape(placedIngredients[i].ingredient.item); //slm.GetIngredientShape(placedIngredients[i].ingredient.item, placedIngredients[i].ingredient.plant);
                     int offsetX = -1;
                     int offsetY = -1;
                     for (int n=0; n<9; n++)
                     {
-                        if (thisItemShape[n])
+                        if (thisIngredientShape[n])
                         {
                             Vector3 shapePart = placedIngredients[i].pos;
                             shapePart.x += offsetX * 0.075f;
@@ -1006,7 +1118,7 @@ public class MagicCraftingManager : MonoBehaviour
                             r.y += 0.005f * w;
                             r.width -= (0.01f * w);
                             r.height -= (0.01f * w);
-                            t = alm.itemImages[alm.GetArtData(placedIngredients[i].type,PlantType.Default).artIndexBase];
+                            t = alm.itemImages[alm.GetArtData(placedIngredients[i].ingredient.item, placedIngredients[i].ingredient.plant).artIndexBase];
                             GUI.color = c;
                             GUI.DrawTexture(r, t);
                             c = Color.white;
@@ -1052,7 +1164,7 @@ public class MagicCraftingManager : MonoBehaviour
             }
 
             // drag and drop item
-            if ( heldIngredient != ItemType.Default )
+            if ( heldIngredient.item != ItemType.Default )
             {
                 if ( padMgr == null || !padMgr.gamepads[0].isActive )
                 {
@@ -1081,7 +1193,7 @@ public class MagicCraftingManager : MonoBehaviour
                 {
                     float offsetX = shapeX * 0.075f;
                     float offsetY = shapeY * 0.075f * (w / h);
-                    if (heldItemShape[i])
+                    if (heldIngredientShape[i])
                     {
                         r.x = heldPosition.x - (0.075f * 0.5f);
                         r.y = heldPosition.y - (0.075f * 0.5f * (w / h));
@@ -1100,7 +1212,7 @@ public class MagicCraftingManager : MonoBehaviour
                         GUI.DrawTexture(r, t);
 
                         // item icon
-                        t = alm.itemImages[alm.GetArtData(heldIngredient,PlantType.Default).artIndexBase];
+                        t = alm.itemImages[alm.GetArtData(heldIngredient.item, heldIngredient.plant).artIndexBase];
                         c = Color.white;
                         GUI.color = c;
                         GUI.DrawTexture(r, t);
@@ -1116,7 +1228,7 @@ public class MagicCraftingManager : MonoBehaviour
         }
 
         // detect mouse release held item or gamepad a button release
-        if (heldIngredient != ItemType.Default && (
+        if (heldIngredient.item != ItemType.Default && (
             ( (padMgr == null || !padMgr.gamepads[0].isActive) && Input.GetMouseButtonUp(0) ) || 
             ( padMgr != null && padMgr.gamepads[0].isActive && !padMgr.gamepads[0].aButton ) ) )
         {
@@ -1126,7 +1238,7 @@ public class MagicCraftingManager : MonoBehaviour
             int offsetY = -1;
             for ( int i = 0; i < 9; i++ )
             {
-                if (heldItemShape[i])
+                if (heldIngredientShape[i])
                 {
                     Vector3 shapeCheckPos = heldPosition;
                     shapeCheckPos.x += offsetX * 0.075f;
@@ -1152,8 +1264,9 @@ public class MagicCraftingManager : MonoBehaviour
                 offsetY = -1;
                 for ( int i = 0; i < 9; i++ )
                 {
-                    if (heldItemShape[i])
+                    if (heldIngredientShape[i])
                     {
+                        print("held ingredient shape "+i+".");
                         Vector3 shapeCheckPos = heldPosition;
                         shapeCheckPos.x += offsetX * 0.075f;
                         shapeCheckPos.y += offsetY * 0.075f * (w/h);
@@ -1168,9 +1281,10 @@ public class MagicCraftingManager : MonoBehaviour
                     }
                 }
                 // clear held item
-                heldIngredient = ItemType.Default;
+                heldIngredient.item = ItemType.Default;
+                heldIngredient.plant = PlantType.Default;
                 heldPosition = Vector3.zero;
-                heldItemShape = new bool[9];
+                heldIngredientShape = new bool[9];
                 // handle gamepad control
                 if (padMgr != null && padMgr.gamepads[0].isActive)
                     padDragOn = false;
@@ -1181,9 +1295,10 @@ public class MagicCraftingManager : MonoBehaviour
             else
             {
                 // if not valid space on grid, reset to inventory
-                heldIngredient = ItemType.Default;
+                heldIngredient.item = ItemType.Default;
+                heldIngredient.plant = PlantType.Default;
                 heldPosition = Vector3.zero;
-                heldItemShape = new bool[9];
+                heldIngredientShape = new bool[9];
                 // handle gamepad control
                 if ( padMgr != null && padMgr.gamepads[0].isActive )
                     padDragOn = false;
@@ -1255,9 +1370,10 @@ public class MagicCraftingManager : MonoBehaviour
                 {
                     currentEntryValid = false;
                     // reset craft interface due to lack of ingredients
-                    heldIngredient = ItemType.Default;
+                    heldIngredient.item = ItemType.Default;
+                    heldIngredient.plant = PlantType.Default;
                     heldPosition = Vector3.zero;
-                    heldItemShape = new bool[9];
+                    heldIngredientShape = new bool[9];
                     ClearPlacedPieces();
                     ClearCauldronGrid();
                     craftingSolved = false; // disallow another spell charge
@@ -1296,9 +1412,10 @@ public class MagicCraftingManager : MonoBehaviour
             (GUI.enabled && padMgr != null && padMgr.gamepads[0].isActive && 
                 padMgr.gPadDown[0].xButton)))
         {
-            heldIngredient = ItemType.Default;
+            heldIngredient.item = ItemType.Default;
+            heldIngredient.plant = PlantType.Default;
             heldPosition = Vector3.zero;
-            heldItemShape = new bool[9];
+            heldIngredientShape = new bool[9];
             ClearPlacedPieces();
             ClearCauldronGrid();
             craftingSolved = false;

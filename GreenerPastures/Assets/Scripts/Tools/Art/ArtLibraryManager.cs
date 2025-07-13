@@ -259,6 +259,8 @@ public class ArtLibraryManager : MonoBehaviour
         string plant;
         int idx;
 
+        // REFACTOR: single function maybe?
+
         // common
         string rarity = "Common";
         int min = 0;
