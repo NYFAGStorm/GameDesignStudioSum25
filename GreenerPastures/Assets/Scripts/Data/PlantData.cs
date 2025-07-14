@@ -1,6 +1,8 @@
 // REVIEW: necessary namespaces
 
 // if there are classes of plants that follow separate rules
+using static System.Net.Mime.MediaTypeNames;
+
 public enum PlantType
 {
     Default,
