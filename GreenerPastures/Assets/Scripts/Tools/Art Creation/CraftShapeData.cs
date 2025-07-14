@@ -11,17 +11,8 @@ public class CraftShape : ScriptableObject
 {
     public ItemType itemType;
     public PlantType plantType;
-    public PlantStage plantStage;
     public Texture2D ingredientImage;
     public bool[] craftingGridShape = new bool[9];
-}
-
-public enum PlantStage
-{
-    Seed,
-    Stalk,
-    Plant,
-    Fruit
 }
 
 // Custom inspector
@@ -37,14 +28,12 @@ public class CraftingShapeEditor : Editor
             // Create serialized properties
             SerializedProperty iType = serializedObject.FindProperty("itemType");
             SerializedProperty pType = serializedObject.FindProperty("plantType");
-            SerializedProperty pStage = serializedObject.FindProperty("plantStage");
             SerializedProperty artImage = serializedObject.FindProperty("ingredientImage");
             SerializedProperty boolGrid = serializedObject.FindProperty("craftingGridShape");
 
             // Draw first four properties
             EditorGUILayout.PropertyField(iType);
             EditorGUILayout.PropertyField(pType);
-            EditorGUILayout.PropertyField(pStage);
             EditorGUILayout.ObjectField(artImage);
             
             // Create boolean grid with header
