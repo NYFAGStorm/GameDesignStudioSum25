@@ -50,11 +50,11 @@ Material:
     - _LineArt:
         m_Texture: {fileID: 2800000, guid: 29dfff4d71c3c464abf6987c32fc0487, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: b9c338130707f7c498d6d1a1c6ef586b, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
