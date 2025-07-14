@@ -372,9 +372,9 @@ MonoBehaviour:
   titleText: GREENER PASTURES
   title:
     serializedVersion: 2
-    x: 0.05
+    x: 0.025
     y: 0.1
-    width: 0.9
+    width: 0.95
     height: 0.2
   titleFont: {fileID: 0}
   titleFontStyle: 1
