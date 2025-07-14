@@ -1193,6 +1193,7 @@ public class PlayerIntroduction : MonoBehaviour
                     // item type
                     // using data in islandPos
                     ItemType it = ItemType.Seed;
+                    PlantType pt = PlantType.Corn;
                     // .seed
                     if( currentBeat.islandPos.w <= -1f)
                         it = ItemType.Seed;
@@ -1215,7 +1216,12 @@ public class PlayerIntroduction : MonoBehaviour
                     {
                         Vector3 dropVector = Vector3.zero;
                         dropVector.x = currentBeat.islandPos.x;
-                        ism.SpawnNewItem(it, eden.transform.position, eden.transform.position + dropVector, true);
+                        ItemData lItemData = InventorySystem.InitializeItem(it);
+                        PlantData plantData = PlantSystem.InitializePlant(PlantType.Corn);
+                        lItemData = InventorySystem.SetItemAsPlant(lItemData, plantData);
+                        LooseItemData lim = InventorySystem.CreateItem(it);
+                        lim.inv.items[0] = lItemData;
+                        ism.SpawnItem(lim, eden.transform.position, eden.transform.position + dropVector, true);
                         droppedItem = GameObject.FindFirstObjectByType<LooseItemManager>();
                         if (it == ItemType.Fruit || it == ItemType.Seed)
                         {
