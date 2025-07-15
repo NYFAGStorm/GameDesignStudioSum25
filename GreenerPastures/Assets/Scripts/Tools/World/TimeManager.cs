@@ -20,6 +20,8 @@ public class TimeManager : MonoBehaviour
     public Light sunLight;
     public Light moonLight;
 
+    public float moonPhase; // 1 = full, 0 = new (light level only)
+
     // TODO: migrate temperature to weather manager
     public float baseTemperature;
     public float currentTempC;
@@ -53,6 +55,7 @@ public class TimeManager : MonoBehaviour
     const float SUNLIGHTINTENSITY = 1f;
     const float MOONLIGHTINTENSITY = 0.1f;
     const float MAXCLOUDAMBIENTLIGHTMULTIPLIER = 0.1f;
+    const float MINAMBIENTLIGHTLEVEL = 0.0381f;
     const float WORLDTIMEMULTIPLIER = 60f; // default time rate
     const float BASETEMPERATURE = 20f; // C
     const float TEMPERATUREVARIANCE = 10f;
@@ -199,6 +202,12 @@ public class TimeManager : MonoBehaviour
 
     void UpdateAmbientLighting()
     {
+        // moon phase light intensity
+        // mid-month = full moon, start/end month = new moon
+        moonPhase = Mathf.Sin(((dayOfMonth + dayProgress) / (float)30) * Mathf.PI);
+        if (moonPhase < 0.001f)
+            moonPhase = 0f;
+        float moonPhaseLight = (MOONLIGHTINTENSITY * moonPhase);
         // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
         if (dayProgress > .3f && dayProgress < .7f)
         {
@@ -208,21 +217,20 @@ public class TimeManager : MonoBehaviour
         else if (dayProgress < .2f || dayProgress > .8f)
         {
             sunLight.intensity = 0f;
-            moonLight.intensity = MOONLIGHTINTENSITY;
+            moonLight.intensity = moonPhaseLight;
         }
         if (dayProgress > 0.2f && dayProgress < 0.3f)
         {
             // dawn fade
             sunLight.intensity = (dayProgress - 0.2f) * 10f * SUNLIGHTINTENSITY;
-            moonLight.intensity = MOONLIGHTINTENSITY - ((dayProgress - 0.2f) * 10f * MOONLIGHTINTENSITY);
+            moonLight.intensity = moonPhaseLight - ((dayProgress - 0.2f) * 10f * moonPhaseLight);
         }
         if (dayProgress > 0.7f && dayProgress < 0.8f)
         {
             // dusk fade
             sunLight.intensity = SUNLIGHTINTENSITY - ((dayProgress - 0.7f) * 10f * SUNLIGHTINTENSITY);
-            moonLight.intensity = ((dayProgress - 0.7f) * 10f * MOONLIGHTINTENSITY);
+            moonLight.intensity = ((dayProgress - 0.7f) * 10f * moonPhaseLight);
         }
-        // TODO: re-implement weather lighting results
         // get cloud cover from weather manager
         float clouds = wm.cloudAmount;
         // signal background manager of cloud cover (fog, etc.)
@@ -231,8 +239,11 @@ public class TimeManager : MonoBehaviour
         float cloudLightMult = 1f - (clouds * (1f-MAXCLOUDAMBIENTLIGHTMULTIPLIER));
         // adjust sun (and moonlight) for cloud cover
         sunLight.intensity *= cloudLightMult;
-        float moonAdjust = MOONLIGHTINTENSITY; //MOONLIGHTINTENSITY * cloudLightMult;
+        float moonAdjust = moonLight.intensity * cloudLightMult;
         RenderSettings.ambientIntensity = moonAdjust + (sunLight.intensity * (1f - moonAdjust));
+        // ambient lighting floor
+        if (RenderSettings.ambientIntensity < MINAMBIENTLIGHTLEVEL)
+            RenderSettings.ambientIntensity = MINAMBIENTLIGHTLEVEL;
     }
 
     void UpdateGlobalTimeProgres( float seasonProgress )
