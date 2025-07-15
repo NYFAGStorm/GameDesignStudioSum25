@@ -47,15 +47,28 @@ public class PlantManager : MonoBehaviour
                 // temp
                 float progress = ( PLANTCHECKINTERVAL / PLANTSTAGEDURATION );
 
+                TimeManager tm = GameObject.FindFirstObjectByType<TimeManager>();
+                float moonPhaseLight = 1f;
+                if (tm != null)
+                    moonPhaseLight = tm.moonPhase;
+
                 // find resources amount as an average of sun, water and soil quality
                 // if even a little (25%) sun is available, this counts as 100% sun resource
                 float sunResource = Mathf.Clamp01(plot.data.sun * 4f);
-                // REVIEW: when we have moon phases, adjust to moonlight intensity
                 if (plot.data.plant.isDarkPlant)
+                {
                     sunResource = Mathf.Clamp01(1f - sunResource);
+                    // adjust to moonlight intensity due to moon phases
+                    sunResource *= moonPhaseLight;
+                }
                 // PLANT EFFECTS:
                 if (PlantSystem.PlantHasEffect(plot.data.plant, PlantEffect.DayNightPlant))
+                {
                     sunResource = 1f;
+                    // if night, adjust to moonlight intensity due to moon phases
+                    if (plot.data.sun == 0f)
+                        sunResource *= moonPhaseLight;
+                }
                 float resources = (sunResource + plot.data.water + plot.data.soil) / 3f;
                 // calculate vitality delta             
                 float vitalityDelta = (0.667f - resources) * -0.1f;
