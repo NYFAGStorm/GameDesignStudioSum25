@@ -101,13 +101,11 @@ public class QuitOnEscape : MonoBehaviour
         if (padButtonSelection == 0)
             g.normal.textColor = Color.white;
         g.active.textColor = textColor;
-        // GUI Button Textures for build
         if (!Application.isEditor)
         {
-            buttonTex = new Texture2D[3];
-            buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
-            buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
-            buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
         }
         s = "QUIT";
 
