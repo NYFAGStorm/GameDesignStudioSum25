@@ -93,7 +93,7 @@ public class MenuLayerManager : MonoBehaviour
             verticalMovement = animCurve.Evaluate(currentAnimProgress) * -60f;
         }
 
-        // apply vert(ical movement to layers
+        // apply vertical movement to layers
         for (int i = 0; i < layers.Length; i++)
         {
             Vector3 pos = layers[i].layerObj.transform.localPosition;
@@ -137,6 +137,7 @@ public class MenuLayerManager : MonoBehaviour
             {
                 fadeType = CinematicFade.FadeWhite;
                 fadingDownFromColor = true;
+                pauseTimer = 0.618f;
                 fadeTimer = FADETIME;
             }
         }
