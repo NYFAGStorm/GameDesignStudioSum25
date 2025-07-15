@@ -1322,11 +1322,23 @@ public class PlayerIntroduction : MonoBehaviour
                     if (currentBeat.islandPos.w > 3f &&
                        currentBeat.islandPos.w <= 4f)
                     {
-                        pc = PlotCondition.Growing;
-                        if (managedPlot.data.plant.growth < 5f)
-                            grow = 0.618f;
+                        if (managedPlot.plant != null)
+                        {
+                            pc = PlotCondition.Growing;
+                            if (managedPlot.data.plant.growth < 5f)
+                                grow = 0.618f;
+                            else
+                                grow = 0.9f;
+                        }
                         else
-                            grow = 0.9f;
+                        {
+                            if (managedPlot.data.condition == PlotCondition.Dirt)
+                                pc = PlotCondition.Dirt;
+                            else if (managedPlot.data.condition == PlotCondition.Tilled)
+                                pc = PlotCondition.Tilled;
+                            else if (managedPlot.data.condition == PlotCondition.Uprooted)
+                                pc = PlotCondition.Uprooted;
+                        }
                     }
                     // use managed plot
                     managedPlot.data.condition = pc;
@@ -1366,6 +1378,7 @@ public class PlayerIntroduction : MonoBehaviour
                                 currentBeat.action = ScriptedBeatAction.Dialog;
                                 currentBeat.transition = ScriptedBeatTransition.PlayerResponse;
                                 currentBeat.dialogLine = "... Well, I supposed you know what you're doing.";
+                                beatTimer = 2f;
                                 dialogPop = true;
                                 cancelIntro = true;
                             }
