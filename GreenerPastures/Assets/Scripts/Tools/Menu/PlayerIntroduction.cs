@@ -123,9 +123,9 @@ public class PlayerIntroduction : MonoBehaviour
 
             ValidateIntroBeats();
 
-            // GUI Button Textures for build
             if (!Application.isEditor)
             {
+                // GUI Button Textures for build
                 buttonTex = new Texture2D[3];
                 buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
                 buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
@@ -1193,7 +1193,6 @@ public class PlayerIntroduction : MonoBehaviour
                     // item type
                     // using data in islandPos
                     ItemType it = ItemType.Seed;
-                    PlantType pt = PlantType.Corn;
                     // .seed
                     if( currentBeat.islandPos.w <= -1f)
                         it = ItemType.Seed;

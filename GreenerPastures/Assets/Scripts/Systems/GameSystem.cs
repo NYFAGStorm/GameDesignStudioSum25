@@ -310,4 +310,43 @@ public static class GameSystem
 
         return retPos;
     }
+
+    /// <summary>
+    /// Returns a color clamped between 0 and 1, after multiplying all four channels by given factor
+    /// </summary>
+    /// <param name="color">color</param>
+    /// <param name="multiple">color multiplier</param>
+    /// <returns>clamped color after multiplier applied</returns>
+    public static UnityEngine.Color ColorClamp(UnityEngine.Color color, float multiple)
+    {
+        UnityEngine.Color retColor = color;
+
+        retColor.r *= UnityEngine.Mathf.Clamp01(multiple);
+        retColor.g *= UnityEngine.Mathf.Clamp01(multiple);
+        retColor.b *= UnityEngine.Mathf.Clamp01(multiple);
+        retColor.a *= UnityEngine.Mathf.Clamp01(multiple);
+
+        return retColor;
+    }
+
+    /// <summary>
+    /// Returns a color clamped between 0 and 1, after multiplying all four channels by given factors
+    /// </summary>
+    /// <param name="color">color</param>
+    /// <param name="r">red multiplier</param>
+    /// <param name="g">green multiplier</param>
+    /// <param name="b">blue multiplier</param>
+    /// <param name="a">alpha multiplier</param>
+    /// <returns>clamped color after multipliers applied</returns>
+    public static UnityEngine.Color ColorClamp(UnityEngine.Color color, float r, float g, float b, float a)
+    {
+        UnityEngine.Color retColor = color;
+
+        retColor.r *= UnityEngine.Mathf.Clamp01(r);
+        retColor.g *= UnityEngine.Mathf.Clamp01(g);
+        retColor.b *= UnityEngine.Mathf.Clamp01(b);
+        retColor.a *= UnityEngine.Mathf.Clamp01(a);
+
+        return retColor;
+    }
 }

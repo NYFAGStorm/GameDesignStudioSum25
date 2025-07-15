@@ -1,4 +1,4 @@
-///*
+#if UNITY_EDITOR
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -55,8 +55,8 @@ public class CraftingShapeEditor : Editor
         }
         catch (Exception e) 
         {
-            //Debug.Log(e);
+            Debug.Log(e); // using variable to clear warnings from console log
         }
     }
 }
-//*/
+#endif

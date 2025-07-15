@@ -75,13 +75,18 @@ public class ProfileOptions : MonoBehaviour
             MicConfig();
             micCheckTimer = MICCHECKTIME;
 
-            // GUI Button Textures for build
             if (!Application.isEditor)
             {
+                // GUI Button Textures for build
                 buttonTex = new Texture2D[3];
                 buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
                 buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
                 buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+
+                // GUI Colors for build
+                Color greener = GameSystem.ColorClamp(Color.green, 1f, 0.7f, 1.381f, 1f);
+                titleFontColor = greener;
+                buttonFontColor = greener;
             }
         }
     }
