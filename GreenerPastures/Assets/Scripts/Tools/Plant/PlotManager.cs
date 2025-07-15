@@ -31,11 +31,16 @@ public class PlotManager : MonoBehaviour
     private float uprootedTimer;
 
     private CurrentAction action;
+    private CurrentAction previous; // to prevent switching action and cheat progress taps
     private bool actionDirty; // complete, not yet cleared
     private bool actionClear; // no action pressed
     private bool actionProgressDisplay;
     private float actionProgress;
     private float actionLimit;
+    // step progress forward on tap, or hold wait for progress step
+    private float actionProgressStep; // amount to step forward (either tap or timed hold)
+    private float actionStepTimer; // duration between steps if holding action
+    private float actionDrainTimer; // time before progress is draining (reset if tap or hold)
     private string actionLabel;
     private float actionCompleteTimer;
 
@@ -45,7 +50,7 @@ public class PlotManager : MonoBehaviour
 
     private Renderer plotTexture;
 
-    const float CURSORPULSEDURATION = 0.5f;
+    const float CURSORPULSEDURATION = 0.618f;
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
     const float WATERDRAINWITHPLANTRATE = 0.1f;
@@ -58,8 +63,12 @@ public class PlotManager : MonoBehaviour
     const float HARVESTWINDOW = 1.5f;
     const float UPROOTWINDOW = 2.5f;
     const float GRAFTWINDOW = 3f;
+    //
+    const float ACTIONHOLDSTEPINTERVAL = .25f;
+    const float ACTIONPROGRESSDRAINRATE = 0.1f;
+    const float ACTIONDRAINDELAYDURATION = 1f;
     // 
-    const float ACTIONCOMPLETEDURATION = 0.5f;
+    const float ACTIONCOMPLETEDURATION = 0.618f;
     const float HARVESTDISPLAYDURATION = 2f;
     const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
 
@@ -104,7 +113,40 @@ public class PlotManager : MonoBehaviour
 
     void Update()
     {
+        if (!cursorActive)
+        {
+            actionProgress = 0f;
+            ActionClear();
+        }
+
         CheckCursor();
+
+        // run action timers
+        if (actionProgress > 0f)
+        {
+            if (actionDrainTimer > 0f)
+            {
+                actionDrainTimer -= Time.deltaTime;
+                if (actionDrainTimer < 0f)
+                    actionDrainTimer = 0f;
+            }
+            else
+            {
+                actionProgress -= ACTIONPROGRESSDRAINRATE * Time.deltaTime;
+                if (actionProgress < 0f)
+                {
+                    // clear action
+                    actionClear = true;
+                    actionProgress = 0f;
+                    actionLimit = 5f;
+                    action = CurrentAction.None;
+                    // disable action display
+                    actionCompleteTimer = 0f;
+                    actionLabel = "";
+                    actionProgressDisplay = false;
+                }
+            }
+        }
 
         // run plot timer
         if ( plotTimer > 0f )
@@ -158,6 +200,8 @@ public class PlotManager : MonoBehaviour
                 actionCompleteTimer = 0f;
                 actionLabel = "";
                 actionProgressDisplay = false;
+                // reset action progress for next plot action
+                actionProgress = 0f;
             }
         }
 
@@ -364,25 +408,52 @@ public class PlotManager : MonoBehaviour
     {
         actionDirty = false;
         actionClear = true;
-        actionProgress = 0f;
+        //actionProgress = 0f; // allowing a tap to reserve progress (cleared if plot inactive)
         actionLimit = 5f;
         action = CurrentAction.None;
+
+        actionStepTimer = 0f; // not holding and waiting for next progress step, allow next tap
     }
 
     bool ActionComplete( float limit, string label )
     {
         bool retBool = false;
 
+        if (action != previous)
+            actionProgress = 0f;
+
+        if (actionCompleteTimer > 0f)
+            return retBool;
+
         actionProgressDisplay = true;
         actionLimit = limit;
         actionLabel = label;
-        actionProgress += Time.deltaTime;
-        if (actionProgress >= actionLimit)
+
+        // press to step forward progress and hold to wait to progress step
+        previous = action;
+        // run step timer
+        if (actionStepTimer > 0f)
         {
+            actionStepTimer -= Time.deltaTime;
+            return retBool;
+        }
+        // progress step
+        actionProgressStep = 1f / (actionLimit / ACTIONHOLDSTEPINTERVAL);
+        actionProgress += actionProgressStep;
+        actionStepTimer = ACTIONHOLDSTEPINTERVAL;
+        actionDrainTimer = ACTIONDRAINDELAYDURATION;
+        // detect completion
+        if (actionProgress >= 1f)
+        {
+            actionProgress = 0f;
             actionCompleteTimer = ACTIONCOMPLETEDURATION;
             actionDirty = true;
             actionClear = false;
             action = CurrentAction.None;
+            //
+            actionStepTimer = 0f;
+            actionDrainTimer = 0f;
+            //
             retBool = true;
         }
 
@@ -409,6 +480,7 @@ public class PlotManager : MonoBehaviour
                 iData.type != ItemType.Seed))
             {
                 actionLabel = "Need Seed Selected";
+                actionProgress = 0f;
                 return;
             }
 
@@ -516,6 +588,7 @@ public class PlotManager : MonoBehaviour
 
         if (action != CurrentAction.Watering && action != CurrentAction.None)
             return;
+
         action = CurrentAction.Watering;
 
         if (!ActionComplete(WATERWINDOW, "WATERING..."))
@@ -541,6 +614,7 @@ public class PlotManager : MonoBehaviour
 
         if (action != CurrentAction.Harvesting && action != CurrentAction.None)
             return;
+
         action = CurrentAction.Harvesting;
 
         if (!ActionComplete(HARVESTWINDOW,"HARVESTING..."))
@@ -678,6 +752,7 @@ public class PlotManager : MonoBehaviour
 
         if (action != CurrentAction.Uprooting && action != CurrentAction.None)
             return;
+
         action = CurrentAction.Uprooting;
 
         if (!ActionComplete(UPROOTWINDOW, "DIGGING..."))
@@ -758,19 +833,23 @@ public class PlotManager : MonoBehaviour
 
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         ItemData iData = pcm.GetPlayerCurrentItemSelection();
+
         if (pcm.playerData.level < 2)
         {
             actionLabel = "Plant Grafting LOCKED";
+            actionProgress = 0f;
             return;
         }
         else if (iData == null || iData.type != ItemType.Fruit)
         {
             actionLabel = "Need Fruit Selected";
+            actionProgress = 0f;
             return;
         }
         else if (iData.plant == data.plant.type)
         {
             actionLabel = "Need Different Fruit";
+            actionProgress = 0f;
             return;
         }
         action = CurrentAction.Grafting;
@@ -1030,7 +1109,8 @@ public class PlotManager : MonoBehaviour
         r.width -= 0.01238f * w;
         r.height -= 0.02f * h;
         // scale for progress
-        r.width = (actionProgress / actionLimit) * r.width;
+        if (actionCompleteTimer == 0f)
+            r.width = actionProgress * r.width;
 
         GUI.DrawTexture(r, t);
     }
