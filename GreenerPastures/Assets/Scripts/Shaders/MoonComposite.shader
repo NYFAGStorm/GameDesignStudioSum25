@@ -98,9 +98,33 @@ Shader "Unlit/Moon Composite"
             {
                 // store moon image
                 fixed4 moon = tex2D(_MainTex, i.uv);
-                // left shadow cutout
+
+                float edgeProgress;
+                float midProgress;
+                if ( _MoonPhase < .25 )
+                {
+                    edgeProgress = 2 * _MoonPhase;
+                    midProgress = 0;
+                }
+                else if ( _MoonPhase >= .75 )
+                {
+                    edgeProgress = 2 * (_MoonPhase - .5);
+                    midProgress = 1;
+                }
+                if ( _MoonPhase >= .25 && _MoonPhase < .5 )
+                {
+                    midProgress = 2 * (_MoonPhase - .25);
+                    edgeProgress = .5;
+                }
+                else if ( _MoonPhase >= .5 && _MoonPhase < .75 )
+                {  
+                    midProgress = 2 * _MoonPhase;
+                    edgeProgress = .5;
+                }
+
+                // left edge shadow cutout
                 if (_MoonPhase < .5)
-                    i.uv = scaleLeft(i.uv, 1/clamp(((1-_MoonPhase)-.5)*2,0,1));
+                    i.uv = scaleLeft(i.uv, 1/clamp(((1-edgeProgress)-.5)*2,0,1));
                 // sample fill texture
                 fixed4 shadow = tex2D(_Shadow, i.uv);
                 fixed4 col = tex2D(_MainTex, i.uv);
@@ -108,13 +132,32 @@ Shader "Unlit/Moon Composite"
                 col = col * shadow;
                 // cut shadow with fill
                 shadow.a = col.a;
-
                 // store left shadow
-                fixed4 leftShadow = shadow;
+                fixed4 leftEdgeShadow = shadow;
 
-                // right shadow cutout
+                // right mid shadow cutout
+                shadow = tex2D(_Shadow, i.uv);
+                col = tex2D(_MainTex, i.uv);
+                // apply shadow color 
+                col = col * shadow;
+                // cut shadow with fill
+                shadow.a = col.a;
+                // store right shadow
+                fixed4 rightMidShadow = shadow;
+
+                // left mid shadow cutout
+                shadow = tex2D(_Shadow, i.uv);
+                col = tex2D(_MainTex, i.uv);
+                // apply shadow color 
+                col = col * shadow;
+                // cut shadow with fill
+                shadow.a = col.a;
+                // store left shadow
+                fixed4 leftMidShadow = shadow;
+
+                // right edge shadow cutout
                 if (_MoonPhase >= .5)
-                    i.uv = scaleRight(i.uv, 1/clamp(((_MoonPhase-.5)*2),0,1));
+                    i.uv = scaleRight(i.uv, 1/clamp(((edgeProgress-.5)*2),0,1));
                 // sample fill texture
                 shadow = tex2D(_Shadow, i.uv);
                 col = tex2D(_MainTex, i.uv);
@@ -122,12 +165,13 @@ Shader "Unlit/Moon Composite"
                 col = col * shadow;
                 // cut shadow with fill
                 shadow.a = col.a;
+                fixed4 rightEdgeShadow = shadow;
 
-                fixed4 rightShadow = shadow;
+                // TODO: compose shadow mid and edge elements
                 if (_MoonPhase >= .5)
-                    shadow = rightShadow;
+                    shadow = rightEdgeShadow;
                 else
-                    shadow = leftShadow;
+                    shadow = leftEdgeShadow;
 
                 // TODO: take inverse alpha of moon and inverse alpha of shadow
                 // ... make cresent shadow, same progression
