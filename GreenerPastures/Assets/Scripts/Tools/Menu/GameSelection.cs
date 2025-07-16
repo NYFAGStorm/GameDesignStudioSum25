@@ -1,10 +1,43 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Fusion;
+using Fusion.Sockets;
 
 public class GameSelection : MonoBehaviour
 {
     // Author: Glenn Storm
+    // Author: Gustavo Rojas Flores (multiplayer block at top)
     // This handles the game selection screen
+
+    //
+    // --- FOR MULTIPLAYER: ---
+    // Here are two big pieces to work with, right here at the top:
+    //
+    private string hostsCode; // what a host sends to friends on discord
+    //
+    void GenerateHostCode()
+    {
+        //
+        // go for it
+        //
+        hostsCode = "send this code to your friend";
+    }
+    //
+    // This game selection screen will provide a button for the host to get a code
+    // This game selection screen will provide a button to enter a friend code
+    // ... the remoteFriendsCode is now on MainMenu.cs (I got it there for you)
+    //
+    // A host just gets a code for now, and sends it to friends via discord
+    // A remote client user will use the code as a 'valid game' to select for now
+    //
+    // Both players will simply go to main menu and his the Play button
+    // 
+    // The host is playing a game as normal (they have loaded data) they own it
+    // The remote client user is actually joining when they hit play on the menu
+    //
+    // MainMenu.cs will have a similar space for you like this to find what you need
+    // (please ASK QUESTIONS when you need to, comment your code and keep it clean, thank you)
+    //
 
     public string titleText;
     public Rect title;
@@ -60,6 +93,11 @@ public class GameSelection : MonoBehaviour
     private AnimationCurve popupCurve;
 
     private Texture2D[] buttonTex;
+
+    // multiplayer support (already managed, see above)
+    private bool hostCodeGenerated;
+    private bool friendCodeEntered; // will be ready on MainMenu.cs
+    //
 
     const float POPUPTIME = 1f;
     const float FEEDBACKTIME = 4f;
@@ -542,6 +580,14 @@ public class GameSelection : MonoBehaviour
                 }
                 else if (saveMgr.IsRemoteClient())
                 {
+                    //
+                    hostsCode = "";
+                    saveMgr.StoreHostCode("");
+                    hostCodeGenerated = false;
+                    saveMgr.StoreRemoteFriendCode("");
+                    friendCodeEntered = false;
+                    //
+
                     currentNet = new MultiplayerHostPing(); // empty
                     popPlayerName = "";
                     saveMgr.SetIsRemoteClient(false);
@@ -561,6 +607,14 @@ public class GameSelection : MonoBehaviour
                 }
                 else
                 {
+                    //
+                    hostsCode = "";
+                    saveMgr.StoreHostCode("");
+                    hostCodeGenerated = false;
+                    saveMgr.StoreRemoteFriendCode("");
+                    friendCodeEntered = false;
+                    //
+
                     // save current and clear current
                     saveMgr.SaveGameData(saveMgr.GetCurrentGameData().gameKey);
                     saveMgr.ClearCurrentGameData();
@@ -850,6 +904,101 @@ public class GameSelection : MonoBehaviour
             }
         }
 
+        // multiplayer support
+        // show text field
+        // show two buttons
+        // 'get friend code' and 'enter friend code'
+        // use text field to copy generated code or enter friend code
+        // (already managed, see top of script)
+        r.x = 0.5125f * w;
+        r.y = 0.4f * h;
+        r.width = 0.45f * w;
+        r.height = 0.07f * h;
+        g = new GUIStyle(GUI.skin.label);
+        g.font = buttonFont;
+        g.fontStyle = FontStyle.Normal;
+        g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
+        g.alignment = TextAnchor.LowerCenter;
+        g.normal.textColor = buttonFontColor;
+        g.hover.textColor = buttonFontColor;
+        g.active.textColor = buttonFontColor;
+        s = "Multiplayer Codes:";
+        if (hostCodeGenerated)
+            s = "Send this code to friends, go hit PLAY!";
+        else if (friendCodeEntered)
+            s = "Your friend code is entered, go hit PLAY!";
+        GUI.Label(r, s, g);
+        //
+        r.y += 0.07f * h;
+        g = new GUIStyle(GUI.skin.textField);
+        g.font = buttonFont;
+        g.fontStyle = FontStyle.Normal;
+        g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
+        g.alignment = TextAnchor.MiddleCenter;
+        g.normal.textColor = buttonFontColor;
+        if (padButtonSelection == (2 + gamelistNum + 0))
+            g.normal.textColor = Color.white;
+        g.active.textColor = buttonFontColor;
+        hostsCode = GUI.TextField(r, hostsCode, g);
+        // TODO: parse code for detection of valid game selection
+        //
+        r.y += 0.1f * h;
+        r.height = 0.07f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.font = buttonFont;
+        g.fontStyle = FontStyle.Normal;
+        g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
+        g.alignment = TextAnchor.MiddleCenter;
+        g.normal.textColor = buttonFontColor;
+        if (padButtonSelection == (2 + gamelistNum + 0))
+            g.normal.textColor = Color.white;
+        g.active.textColor = buttonFontColor;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
+        s = "Get A Friend Code (to HOST a game)";
+        GUI.enabled = (gameLoaded);
+        if (tinyPopup)
+            GUI.enabled = false;
+        if (GUI.Button(r, s, g) ||
+            (padButtonSelection == (2 + gamelistNum + 0) && padMgr.gPadDown[0].aButton))
+        {
+            GenerateHostCode();
+            saveMgr.StoreHostCode(hostsCode);
+            saveMgr.StoreRemoteFriendCode("");
+            hostCodeGenerated = saveMgr.GetHostCode() != "";
+            selectionFeedback = "host code generated";
+            feedbackTimer = FEEDBACKTIME;
+        }
+        GUI.enabled = true;
+        //
+        r.y += 0.1f * h;
+        g.normal.textColor = buttonFontColor;
+        if (padButtonSelection == (2 + gamelistNum + 0))
+            g.normal.textColor = Color.white;
+        g.active.textColor = buttonFontColor;
+        s = "Submit A Friend Code (to JOIN a game)";
+        GUI.enabled = (!gameLoaded && hostsCode != "");
+        if (tinyPopup)
+            GUI.enabled = false;
+        if (GUI.Button(r, s, g) ||
+            (padButtonSelection == (2 + gamelistNum + 1) && padMgr.gPadDown[0].aButton))
+        {
+            tinyPopup = true; // enter player character name
+            saveMgr.StoreHostCode("");
+            saveMgr.StoreRemoteFriendCode(hostsCode);
+            friendCodeEntered = saveMgr.GetRemoteFriendCode() != "";
+            if (friendCodeEntered)
+                selectionFeedback = "friend code entered";
+            else
+                selectionFeedback = "friend code invalid";
+            feedbackTimer = FEEDBACKTIME;
+        }
+        GUI.enabled = true;
+        /*
         // remote game column
         // associated games on network
         int remotelistNum = hostPings.Length;
@@ -990,6 +1139,7 @@ public class GameSelection : MonoBehaviour
                 r.y += 0.075f * h;
             }
         }
+        */
 
         // selection feedback
         r.x = 0.2f * w;
@@ -1047,6 +1197,27 @@ public class GameSelection : MonoBehaviour
             GUI.enabled = (popPlayerName != "");
             if (GUI.Button(r, s, g))
             {
+                // TEMP (fake valid game)
+                currentNet.gameKey = "[0]-ReadyToJoin";
+                currentNet.profiles = new string[1];
+                currentNet.profiles[0] = saveMgr.GetCurrentProfile().profileID;
+                currentNet.options = new GameOptionsData();
+                currentNet.options.maxPlayers = 2;
+                //
+                int idx = currentNet.gameKey.IndexOf("]-");
+                popGameName = currentNet.gameKey.Substring(idx + 2);
+                popMaxPlayers = currentNet.options.maxPlayers;
+                popAllowCheats = currentNet.options.allowCheats;
+                popAllowHazards = currentNet.options.allowHazards;
+                popAllowCurses = currentNet.options.allowCurses;
+                saveMgr.SetIsRemoteClient(true);
+                saveMgr.SetHostPing(currentNet, popPlayerName);
+                tinyPopup = false;
+                selectionFeedback = "net game selected";
+                feedbackTimer = FEEDBACKTIME;
+                //
+
+                /*
                 // hold hostPing data to allow main menu "play" to join
                 int idx = currentNet.gameKey.IndexOf("]-");
                 popGameName = currentNet.gameKey.Substring(idx + 2);
@@ -1059,6 +1230,7 @@ public class GameSelection : MonoBehaviour
                 tinyPopup = false;
                 selectionFeedback = "net game selected";
                 feedbackTimer = FEEDBACKTIME;
+                */
             }
 
             r.x = 0.525f * w;

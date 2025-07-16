@@ -1,11 +1,42 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Fusion;
+using Fusion.Sockets;
 
 [AddComponentMenu("NYFA Studio/Interface/MainMenu")]
 public class MainMenu : MonoBehaviour
 {
     // Author: Glenn Storm
+    // Author: Gustavo Rojas Flores (multiplayer block at top)
     // This handles the main menu
+
+    //
+    // --- FOR MULTIPLAYER: ---
+    // Here are two big pieces to work with, right here at the top:
+    //
+    private string remoteFriendsCode; // again, this was acquired in GameSelection.cs
+    // 
+    void JoinHostsGame()
+    {
+        if (!isPlanningToJoin)
+            return;
+        print("the remote friend code is already here, it is : '" + remoteFriendsCode + "'");
+        print("... and this player character will be named '" + saveMgr.GetJoiningPlayerName() + "'. Have Fun!");
+        //
+        // go for it
+        //
+        // NOTE: right now, this will enter the game scene, but with no game data (that's okay for now)
+        // let's just connect with your function here, and get this handshake done, and we'll do game data next, ok?
+        // (see GitHub issue ticket #32, please)
+        // Q: will this have a callback (like 'denied code') that I can handle for you?
+    }
+    //
+    // GameSelection.cs has a longer description of what you need to see (go read)
+    // (please ASK QUESTIONS when you need to, comment your code and keep it clean, thank you)
+    // 
+    // as soon as I see code that connects, ...
+    // ... we can clean this up and work on replication in game (the next step)
+    // 
 
     public enum ButtonAction
     {
@@ -68,6 +99,12 @@ public class MainMenu : MonoBehaviour
     private string confirmPass;
     private string popupFeedback;
 
+    // additional multiplayer support, 'can just as easily get this in-game
+    private bool isPlanningToBeHost;
+    private bool isPlanningToJoin;
+    private string codeHostSentViaDiscordToFriend; // (btw)
+    // (already managed)
+
     private Texture2D[] buttonTex;
 
     const float POPUPTIME = 1f;
@@ -96,6 +133,15 @@ public class MainMenu : MonoBehaviour
             // set profile active based on data
             ConfigureMenuButtonsEnabled();
             popupCurve = AnimationCurve.EaseInOut(0f,0f,1f,1f);
+
+            //
+            // multiplayer data acquisition
+            remoteFriendsCode = saveMgr.GetRemoteFriendCode();
+            codeHostSentViaDiscordToFriend = saveMgr.GetHostCode();
+            isPlanningToBeHost = saveMgr.IsPlanningToBeHost();
+            isPlanningToJoin = saveMgr.IsPlanningToJoin();
+            // (already managed - you may use in work above)
+            //
 
             if (!Application.isEditor)
             {
@@ -155,7 +201,12 @@ public class MainMenu : MonoBehaviour
         {
             sceneSwitchTimer -= Time.deltaTime;
             if ( sceneSwitchTimer < .1f )
+            {
+                // multiplayer support (already managed)
+                JoinHostsGame();
+                //
                 SceneManager.LoadScene(sceneSwitchName);
+            }
         }
 
         if ( profilePopup )

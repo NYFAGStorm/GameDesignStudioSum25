@@ -28,6 +28,11 @@ public class SaveLoadManager : MonoBehaviour
 
     private string persistentPath;
 
+    // for use with multiplayer pieces seen on MainMenu and GameSelection
+    private string hostCodeProvided; // any data here means this player is host-ready
+    private string remoteFriendCode; // any data here means code entered, ready to join
+    // (already managed, see MainMenu and GameSelection)
+
     const string COMPANYNAME = "NYFA Game Design"; // already in persistent
     const string PRODUCTNAME = "Greener Pastures"; // already in persistent
     const string ROSTERFILE = "/GreenerRoster.dat";
@@ -80,8 +85,47 @@ public class SaveLoadManager : MonoBehaviour
         {
             profile = null;
             game = null;
+
+            // REVIEW: why was this necessary?
+            hostCodeProvided = "";
+            remoteFriendCode = "";
+            //
         }
     }
+
+    //
+    // for multiplayer support (already managed)
+    public bool IsPlanningToBeHost()
+    {
+        return hostCodeProvided != "";
+    }
+
+    public bool IsPlanningToJoin()
+    {
+        return remoteFriendCode != "";
+    }
+
+    public void StoreHostCode( string hostCode )
+    {
+        hostCodeProvided = hostCode;
+    }
+
+    public string GetHostCode()
+    {
+        return hostCodeProvided;
+    }
+
+    public void StoreRemoteFriendCode( string friendCode )
+    {
+        remoteFriendCode = friendCode;
+    }
+
+    public string GetRemoteFriendCode()
+    {
+        return remoteFriendCode;
+    }
+    // (already managed, see MainMenu and GameSelection)
+    //
 
     void Update()
     {
