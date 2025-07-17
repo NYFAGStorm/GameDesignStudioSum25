@@ -248,8 +248,7 @@ public class PlayerControlManager : MonoBehaviour
                     Debug.LogWarning("--- PlayerControlManager [Update] : trying to take empty loose item. will ignore.");
                     return;
                 }
-                // pick up loose item, transfer to inventory
-                playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
+                HandlePlayerTakeItem();
                 activeItem = null;
                 AwardXP(PlayerData.XP_PICKUPITEM);
             }
@@ -632,6 +631,21 @@ public class PlayerControlManager : MonoBehaviour
         if (currentInventorySelection >= playerInventory.items.Length)
             return;
         playerInventory = InventorySystem.RemoveItemFromInventory(playerInventory, playerInventory.items[currentInventorySelection]);
+    }
+
+    void HandlePlayerTakeItem()
+    {
+        // if active item is special and meant to perform an action upon 'take', detect
+        // (gold piece, gold pouch, letter, package)
+        if (activeItem.looseItem.inv.items[0].type == ItemType.GoldPiece)
+        {
+            Destroy(activeItem.gameObject);
+            playerData.gold++;
+            return;
+        }
+
+        // pick up loose item, transfer to inventory
+        playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
     }
 
     /// <summary>

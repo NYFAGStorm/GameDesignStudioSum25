@@ -11,7 +11,7 @@ public class ArtLibraryManager : MonoBehaviour
     public ArtLibraryData itemArtData;
     public Texture2D[] itemImages;
 
-    const int GENERALITEMS = 6;
+    const int GENERALITEMS = 7;
     const int COMMONPLANTS = 10;
     const int UNCOMMONPLANTS = 11;
     const int RAREPLANTS = 10;
@@ -244,6 +244,11 @@ public class ArtLibraryManager : MonoBehaviour
         // rock
         itemName = "Rock";
         newArtData[5] = ConfigItemArtData(itemName, ItemType.Rock, PlantType.Default, 5);
+        AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+
+        // gold coin
+        itemName = "Gold Coin";
+        newArtData[6] = ConfigItemArtData(itemName, ItemType.GoldPiece, PlantType.Default, 6);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
 
         AddToArtData(newArtData);
