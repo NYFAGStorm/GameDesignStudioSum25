@@ -12,7 +12,9 @@ public enum ItemType
     Rock,
     GoldCoin,
     GoldSack,
-    Package // REVIEW: 
+    Package,
+    Letter,
+    Coupon // REVIEW: 
 }
 
 // if there are discrete effects that can be applied to an item

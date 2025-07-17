@@ -70,6 +70,12 @@ public class PlayerControlManager : MonoBehaviour
     private float XPDisplayTimer;
     private float levelUpDisplayTimer;
 
+    private bool letterPopup;
+    private bool letterPopsDown;
+    private string letterMessage;
+    private float letterPopupTimer;
+    private AnimationCurve letterPopupCurve;
+
     private MultiGamepad padMgr;
 
     private GreenerGameManager ggm;
@@ -85,6 +91,7 @@ public class PlayerControlManager : MonoBehaviour
     const bool ALLOWPLAYERDATALOAD = true; // set false for testing only
     const float XPDISPLAYTIME = 1f;
     const float LEVELUPDISPLAYTIME = 4f;
+    const float LETTERPOPUPTIME = 1f;
 
 
     // REFACTOR: the entire validation and intialization happens when game manager called SetPlayerData()
@@ -139,6 +146,8 @@ public class PlayerControlManager : MonoBehaviour
             cam.SetPlayer(this);
             GameObject.FindFirstObjectByType<InGameControls>().SetPlayerControlManager(this);
             GameObject.FindFirstObjectByType<InGameAlmanac>().SetPlayerControlManager(this);
+
+            letterPopupCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
             if (saveMgr == null || !ALLOWPLAYERDATALOAD)
             {
@@ -201,6 +210,21 @@ public class PlayerControlManager : MonoBehaviour
             levelUpDisplayTimer -= Time.deltaTime;
             if (levelUpDisplayTimer < 0f)
                 levelUpDisplayTimer = 0f;
+        }
+        // run letter popup timer
+        if (letterPopupTimer > 0f)
+        {
+            letterPopupTimer -= Time.deltaTime;
+            if (letterPopupTimer < 0f)
+            {
+                letterPopupTimer = 0f;
+                if (letterPopsDown)
+                {
+                    letterPopsDown = false;
+                    letterMessage = "";
+                    letterPopup = false;
+                }
+            }
         }
 
         if (!freezeCharacterActions)
@@ -639,23 +663,32 @@ public class PlayerControlManager : MonoBehaviour
 
         // before normal loose item pickup, check if active item type is special ...
         // ... and meant to perform an action upon 'take', detect andd handle by type
-        // (gold coin, gold sack, package, letter)
+        // (gold coin, gold sack, package, letter, coupon), destroyed upon handling
         bool skipPickup = false;
         bool unpackLooseItem = false;
         switch (activeItem.looseItem.inv.items[0].type)
         {
             case ItemType.GoldCoin:
                 playerData.gold++;
-                playerData.stats.totalGoldEarned++; // REVIEW: is this technically 'earned gold'?
-                Destroy(activeItem.gameObject);
+                // REVIEW: is this technically 'earned gold'?
+                playerData.stats.totalGoldEarned++;
                 skipPickup = true;
                 break;
-            case ItemType.GoldSack :
+            case ItemType.GoldSack:
                 unpackLooseItem = true;
                 skipPickup = true;
                 break;
             case ItemType.Package:
                 unpackLooseItem = true;
+                skipPickup = true;
+                break;
+            case ItemType.Letter:
+                characterFrozen = true;
+                freezeCharacterActions = true;
+                letterPopup = true;
+                letterMessage = "We Love You,\n\nYou are appreciated and recognized. You have more to offer this world. Please create and share. Do good, stay safe, be well, and take care.\n\nLove, Eden\n\nP.S. - Remember to pay the tax man at the end of the month";
+                letterPopupTimer = LETTERPOPUPTIME;
+                // REVIEW: actually destroy letter?
                 skipPickup = true;
                 break;
         }
@@ -681,10 +714,12 @@ public class PlayerControlManager : MonoBehaviour
             }
             else
                 Debug.LogWarning("--- PlayerControlManager [HandlePlayerTakeItem] : active item type '" + activeItem.looseItem.inv.items[0].type + "' does not contain items to unpack. will ignore.");
-            Destroy(activeItem.gameObject);
         }
         if (skipPickup)
+        {
+            Destroy(activeItem.gameObject);
             return retBool;
+        }
 
         // pick up loose item, transfer to inventory
         playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
@@ -1129,7 +1164,7 @@ public class PlayerControlManager : MonoBehaviour
         GUI.color = Color.white;
 
         // player name tag
-        if (!hidePlayerNameTag && playerName != "")
+        if (!letterPopup && !hidePlayerNameTag && playerName != "")
         {
             float distToCam = Vector3.Distance(Camera.main.transform.position, gameObject.transform.position);
             float fadeName = Mathf.Clamp01( (distToCam - 2f) );
@@ -1164,6 +1199,60 @@ public class PlayerControlManager : MonoBehaviour
                 c.a = fadeName;
             GUI.color = c;
             GUI.Label(r, s, g);
+        }
+
+        if (letterPopup)
+        {
+            float progress = letterPopupCurve.Evaluate(letterPopupTimer/LETTERPOPUPTIME);
+            if (letterPopsDown)
+                progress = 1f - progress;
+
+            // centered and square, based on height
+            r.x = (0.5f * w) - ((0.9f * h) / 2f);
+            r.y = 0.1f * h;
+            r.y += (0.9f * progress) * h;
+            r.width = 0.9f * h; // square
+            r.height = 0.9f * h;
+
+            // letter image
+            t = (Texture2D)Resources.Load("Popup_Open Letter");
+            GUI.color = Color.white;
+            GUI.DrawTexture(r, t);
+
+            // letter text
+            r.x += 0.0575f * w;
+            r.y += 0.13f * h;
+            r.width = 0.29f * w;
+            r.height -= 0.2f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.font = (Font)Resources.Load("BRUSHSCI");
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.alignment = TextAnchor.UpperLeft;
+            g.wordWrap = true;
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            s = letterMessage;
+            GUI.Label(r, s, g);
+
+            // confirm button
+            r.x = 0.45f * w;
+            r.y = h - (0.1f * h);
+            r.width = 0.1f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.white;
+            s = "OK";
+            if (letterPopupTimer == 0f && GUI.Button(r,s,g))
+            {
+                characterFrozen = false;
+                freezeCharacterActions = false;
+                letterPopupTimer = LETTERPOPUPTIME;
+                letterPopsDown = true;
+            }
         }
 
         if (levelUpDisplayTimer > 0f)
@@ -1213,6 +1302,7 @@ public class PlayerControlManager : MonoBehaviour
         GUI.DrawTexture(r, t);
         GUI.color = Color.white;
 
+        g = new GUIStyle(GUI.skin.label);
         g.alignment = TextAnchor.MiddleCenter;
         g.fontSize = Mathf.RoundToInt( 22f * (w/ 1024f));
         g.fontStyle = FontStyle.Bold;

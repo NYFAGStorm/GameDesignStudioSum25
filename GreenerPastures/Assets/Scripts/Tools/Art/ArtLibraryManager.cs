@@ -11,7 +11,7 @@ public class ArtLibraryManager : MonoBehaviour
     public ArtLibraryData itemArtData;
     public Texture2D[] itemImages;
 
-    const int GENERALITEMS = 9;
+    const int GENERALITEMS = 11;
     const int COMMONPLANTS = 10;
     const int UNCOMMONPLANTS = 11;
     const int RAREPLANTS = 10;
@@ -221,44 +221,65 @@ public class ArtLibraryManager : MonoBehaviour
         ArtData[] newArtData = new ArtData[GENERALITEMS];
 
         string itemName = "";
+        int idx = 0;
 
         // fertilizer
         itemName = "Fertilizer";
-        newArtData[0] = ConfigItemArtData(itemName, ItemType.Fertilizer, PlantType.Default, 0);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Fertilizer, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
 
         // default plant items (no actual art available)
         itemName = "Seed";
-        newArtData[1] = ConfigItemArtData(itemName, ItemType.Seed, PlantType.Default, 1);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Seed, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
         itemName = "Plant";
-        newArtData[2] = ConfigItemArtData(itemName, ItemType.Plant, PlantType.Default, 2);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Plant, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
         itemName = "Stalk";
-        newArtData[3] = ConfigItemArtData(itemName, ItemType.Stalk, PlantType.Default, 3);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Stalk, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
         itemName = "Fruit";
-        newArtData[4] = ConfigItemArtData(itemName, ItemType.Fruit, PlantType.Default, 4);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Fruit, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
 
         // rock
         itemName = "Rock";
-        newArtData[5] = ConfigItemArtData(itemName, ItemType.Rock, PlantType.Default, 5);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Rock, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
 
         // gold coin
         itemName = "Gold Coin";
-        newArtData[6] = ConfigItemArtData(itemName, ItemType.GoldCoin, PlantType.Default, 6);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.GoldCoin, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
         // gold sack
         itemName = "Gold Sack";
-        newArtData[7] = ConfigItemArtData(itemName, ItemType.GoldSack, PlantType.Default, 7);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.GoldSack, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
 
         // package
         itemName = "Package";
-        newArtData[8] = ConfigItemArtData(itemName, ItemType.Package, PlantType.Default, 8);
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Package, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
+
+        // letter
+        itemName = "Letter";
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Letter, PlantType.Default, idx);
+        AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
+        // coupon
+        itemName = "Coupon";
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Coupon, PlantType.Default, idx);
+        AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
 
         AddToArtData(newArtData);
     }
