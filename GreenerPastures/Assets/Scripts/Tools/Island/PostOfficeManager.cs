@@ -17,6 +17,16 @@ public class PostOfficeManager : MonoBehaviour
     private GreenerGameManager ggm;
     private bool mailboxesFound;
 
+    private struct ScheduledMessages
+    {
+        public int day;
+        public WorldMonth month;
+        public string sender;
+        public string message;
+    }
+    private ScheduledMessages[] timedMessages;
+    private int latestDailyDelivery;
+
 
     void Start()
     {
@@ -30,7 +40,7 @@ public class PostOfficeManager : MonoBehaviour
         // initialze
         if (enabled)
         {
-
+            InitializeTimedMessages();
         }
     }
 
@@ -71,6 +81,42 @@ public class PostOfficeManager : MonoBehaviour
         }
     }
 
+    void InitializeTimedMessages()
+    {
+        timedMessages = new ScheduledMessages[5];
+        int idx = 0;
+
+        timedMessages[idx].day = 1;
+        timedMessages[idx].month = WorldMonth.Mar;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "We're so happy you're here!\n\nEveryone enjoys seeing a new Biomancer's island on the horizon.\n\nRemember you can use dark plants like Moonflower to grow more during the night time.\n\nLove, Eden";
+        idx++;
+
+        timedMessages[idx].day = 2;
+        timedMessages[idx].month = WorldMonth.Mar;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Each new day brings us joy, and you're a part of that now.\n\nRemember you can always use spells to water plants or grow them faster.\n\nLevel up and use the magic table in your tower.\n\nLove, Eden";
+        idx++;
+
+        timedMessages[idx].day = 3;
+        timedMessages[idx].month = WorldMonth.Mar;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Hello Good Friend,\n\nIf your trees and other re-fruiting plants, here's a tip:\n\nDig up the whole plant and drop in fertilizer, then drop the plant back in the renourished soil.'Hope that helps!\n\nLove, Eden";
+        idx++;
+
+        timedMessages[idx].day = 4;
+        timedMessages[idx].month = WorldMonth.Mar;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "You Are Loved,\n\nYou are appreciated and recognized. You have more to offer the world. Please create and share. Be well, do good, have fun and take care.\n\nLove, Eden\n\nP.S. - Remember to pay the tax man at the end of the month.";
+        idx++;
+
+        timedMessages[idx].day = 5;
+        timedMessages[idx].month = WorldMonth.Mar;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Biomancer Friend,\n\nMay the sun and rain bless your garden and grow your magic for the Genesis Tree.\n\nKeep in mind the our market has new sale items when you level up and their items change every season.\n\nLove, Eden";
+        idx++;
+    }
+
     void Update()
     {
         if (!mailboxesFound && ggm.isGameDataDistributed())
@@ -83,6 +129,31 @@ public class PostOfficeManager : MonoBehaviour
     public void UpdateMailboxes()
     {
         mailboxesFound = false;
+    }
+
+    /// <summary>
+    /// Triggers post office timed messages to be sent to players
+    /// </summary>
+    public void DailyDelivery( int day, WorldMonth month )
+    {
+        if (day <= latestDailyDelivery)
+            return;
+
+        for (int i = 0; i < timedMessages.Length; i++)
+        {
+            if (timedMessages[i].day == day && timedMessages[i].month == month)
+            {
+                // send message in a letter to all players
+                for (int n = 0; n < ggm.game.players.Length; n++)
+                {
+                    string pName = ggm.game.players[n].playerName;
+                    SendLetter(timedMessages[i].sender, pName, timedMessages[i].message);
+                }
+            }
+        }
+        latestDailyDelivery = day;
+
+        return;
     }
 
     int GetPlayerAddress( string playerName )

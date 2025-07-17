@@ -204,19 +204,41 @@ public class InGameAlmanac : MonoBehaviour
 
     void OnGUI()
     {
-        if (pcm == null || !showAlmanac)
+        if (pcm == null || igc.controlsDisplay)
             return;
 
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;
 
+        GUIStyle g = new GUIStyle(GUI.skin.box);
+
+        string s = "";
+
+        if (!showAlmanac)
+        {
+            r.x = 0.85f * w;
+            r.y = 0.05f * h;
+            r.width = 0.15f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.white;
+            s = "BIOMANCER'S\nALMANAC [\\]";
+            GUI.Label(r, s, g);
+            return;
+        }
+
         r.x = 0.1f * w;
         r.y = 0.15f * h;
         r.width = 0.8f * w;
         r.height = 0.7f * h;
 
-        GUIStyle g = new GUIStyle(GUI.skin.box);
+        g = new GUIStyle(GUI.skin.box);
         g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
         g.fontStyle = FontStyle.Bold;
         g.padding = new RectOffset(0, 0, 20, 0);
@@ -224,7 +246,7 @@ public class InGameAlmanac : MonoBehaviour
         g.hover.textColor = Color.white;
         g.active.textColor = Color.white;
 
-        string s = "BIOMANCER'S ALMANAC";
+        s = "BIOMANCER'S ALMANAC";
 
         Color c = Color.white;
 

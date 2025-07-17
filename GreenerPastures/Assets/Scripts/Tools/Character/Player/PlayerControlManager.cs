@@ -1252,7 +1252,7 @@ public class PlayerControlManager : MonoBehaviour
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.button);
             g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
-            g.normal.textColor = Color.black;
+            g.normal.textColor = Color.white;
             g.hover.textColor = Color.yellow;
             g.active.textColor = Color.white;
             s = "OK";

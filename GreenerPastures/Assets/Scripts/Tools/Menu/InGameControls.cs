@@ -162,13 +162,14 @@ public class InGameControls : MonoBehaviour
 
         if (!controlsDisplay)
         {
-            r.x = 0.025f * w;
+            r.x = 0.01f * w;
             r.y = 0.05f * h;
             r.width = 0.15f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);
             g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.white;

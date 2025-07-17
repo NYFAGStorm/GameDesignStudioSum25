@@ -48,6 +48,8 @@ public class TimeManager : MonoBehaviour
     private AudioTrigger musicTrigger;
     private string[] songList;
 
+    private bool dailyDelivery;
+
     private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
 
     const float ABSOLUTEMINIMUMFLOAT = -999999999999999f; // used for timestamp difference
@@ -198,6 +200,11 @@ public class TimeManager : MonoBehaviour
         annualProgress = seasonProgress;
 
         UpdateSong(dayProgress);
+
+        if (dayProgress > .618f && dayProgress < .62f)
+            UpdatePostOffice();
+        else
+            dailyDelivery = false;
     }
 
     void UpdateAmbientLighting()
@@ -265,7 +272,7 @@ public class TimeManager : MonoBehaviour
             nextSong = songList[0];
         if (dayProg > .381f)
             nextSong = songList[1];
-        if (dayProg > .618f)
+        if (dayProg > .667f)
             nextSong = songList[2];
         if (dayProg > .8f || dayProg < .2f)
             nextSong = songList[3];
@@ -275,6 +282,19 @@ public class TimeManager : MonoBehaviour
 
         musicTrigger.soundName = nextSong;
         musicTrigger.gameObject.SetActive(true);
+    }
+
+    void UpdatePostOffice()
+    {
+        if (dailyDelivery)
+            return;
+
+        PostOfficeManager pom = GameObject.FindFirstObjectByType<PostOfficeManager>();
+        if (pom != null)
+        {
+            pom.DailyDelivery(dayOfMonth, monthOfYear);
+            dailyDelivery = true;
+        }
     }
 
     /// <summary>

@@ -181,9 +181,9 @@ public class MagicCraftingManager : MonoBehaviour
                         shapeLibrary[i].item = ItemType.Fertilizer;
                         shapeLibrary[i].plant = PlantType.Default;
                         shapeLibrary[i].pieces[4] = true;
-                        shapeLibrary[i].pieces[6] = true;
-                        shapeLibrary[i].pieces[7] = true;
-                        shapeLibrary[i].pieces[8] = true;
+                        //shapeLibrary[i].pieces[6] = true;
+                        //shapeLibrary[i].pieces[7] = true;
+                        //shapeLibrary[i].pieces[8] = true;
                         break;
                     case ItemType.Seed:
                         shapeLibrary[i].item = ItemType.Seed;
