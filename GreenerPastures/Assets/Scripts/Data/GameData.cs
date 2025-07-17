@@ -39,4 +39,5 @@ public class GameData
     public IslandData[] islands; // floating islands and structures
     public LooseItemData[] looseItems; // loose items
     public CastData[] casts; // spell casts
+    public PlayerMessage[] messages; // post office messages
 }

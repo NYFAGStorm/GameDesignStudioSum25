@@ -67,6 +67,16 @@ public struct AlmanacDiscovery
     public bool[] revealed;
 }
 
+[System.Serializable]
+public class PlayerMessage
+{
+    public string recipientProfileID;
+    public float messageID;
+    public string sender;
+    public string recipient;
+    public string message;
+}
+
 // if there are discrete effects that can be applied to a player character
 // each effect can then apply separate rules in a modular way
 public enum PlayerEffects

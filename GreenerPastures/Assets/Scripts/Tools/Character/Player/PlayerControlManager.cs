@@ -84,6 +84,7 @@ public class PlayerControlManager : MonoBehaviour
     private MagicManager mm;
     private ArtLibraryManager alm;
     private TimeManager tim;
+    private PostOfficeManager pom;
     private SaveLoadManager saveMgr;
 
     const float PROXIMITYRANGE = 0.381f;
@@ -91,7 +92,7 @@ public class PlayerControlManager : MonoBehaviour
     const bool ALLOWPLAYERDATALOAD = true; // set false for testing only
     const float XPDISPLAYTIME = 1f;
     const float LEVELUPDISPLAYTIME = 4f;
-    const float LETTERPOPUPTIME = 1f;
+    const float LETTERPOPUPTIME = 0.618f;
 
 
     // REFACTOR: the entire validation and intialization happens when game manager called SetPlayerData()
@@ -131,6 +132,12 @@ public class PlayerControlManager : MonoBehaviour
         if (tim == null)
         {
             Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no time manager found in scene. aborting.");
+            enabled = false;
+        }
+        pom = GameObject.FindFirstObjectByType<PostOfficeManager>();
+        if ( pom == null )
+        {
+            Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no post office manager found in scene. aborting.");
             enabled = false;
         }
         saveMgr = GameObject.FindAnyObjectByType<SaveLoadManager>();
@@ -220,6 +227,8 @@ public class PlayerControlManager : MonoBehaviour
                 letterPopupTimer = 0f;
                 if (letterPopsDown)
                 {
+                    characterFrozen = false;
+                    freezeCharacterActions = false;
                     letterPopsDown = false;
                     letterMessage = "";
                     letterPopup = false;
@@ -686,7 +695,8 @@ public class PlayerControlManager : MonoBehaviour
                 characterFrozen = true;
                 freezeCharacterActions = true;
                 letterPopup = true;
-                letterMessage = "We Love You,\n\nYou are appreciated and recognized. You have more to offer this world. Please create and share. Do good, stay safe, be well, and take care.\n\nLove, Eden\n\nP.S. - Remember to pay the tax man at the end of the month";
+                // use quality property as message id for post office
+                letterMessage = pom.GetLetterMessage(activeItem.looseItem.inv.items[0].quality);
                 letterPopupTimer = LETTERPOPUPTIME;
                 // REVIEW: actually destroy letter?
                 skipPickup = true;
@@ -1248,8 +1258,6 @@ public class PlayerControlManager : MonoBehaviour
             s = "OK";
             if (letterPopupTimer == 0f && GUI.Button(r,s,g))
             {
-                characterFrozen = false;
-                freezeCharacterActions = false;
                 letterPopupTimer = LETTERPOPUPTIME;
                 letterPopsDown = true;
             }

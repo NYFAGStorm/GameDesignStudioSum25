@@ -19,6 +19,7 @@ public static class GameSystem
         retGame.players = new PlayerData[0];
         retGame.options = InitializeGameOptions();
         retGame.casts = new CastData[0];
+        retGame.messages = new PlayerMessage[0];
 
         return retGame;
     }
@@ -203,6 +204,32 @@ public static class GameSystem
         }
 
         return retPlayer;
+    }
+
+    /// <summary>
+    /// Returns the profile ID of the user playing as given player name in given game
+    /// </summary>
+    /// <param name="game">game data</param>
+    /// <param name="playerName">player name</param>
+    /// <returns>user profile ID</returns>
+    public static string GetProfileIDOfPlayer(GameData game, string playerName)
+    {
+        string retString = "";
+
+        bool found = false;
+        for (int i = 0; i < game.players.Length; i++)
+        {
+            if (game.players[i].playerName == playerName)
+            {
+                retString = game.players[i].profileID;
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            UnityEngine.Debug.LogWarning("--- GameSystem [GetProfileIDOfPlayer] : no player found of name '" + playerName + "'. will return empty string.");
+
+        return retString;
     }
 
     /// <summary>

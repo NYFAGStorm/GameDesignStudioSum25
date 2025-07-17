@@ -93,6 +93,15 @@ public class GreenerGameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns value of game data distributed
+    /// </summary>
+    /// <returns>true if game data has been distributed, false if not</returns>
+    public bool isGameDataDistributed()
+    {
+        return gameDataDistributed;
+    }
+
     void Update()
     {
         // handle game data distribution
@@ -105,6 +114,7 @@ public class GreenerGameManager : MonoBehaviour
                 FirstIslandData();
                 FirstLooseItemData();
                 FirstCastData();
+                FirstMessageData();
                 FirstPlayerData();
                 game.state = GameState.Established;
                 if (noisyLogging)
@@ -300,6 +310,11 @@ public class GreenerGameManager : MonoBehaviour
             retBool = false;
         else if (noisyLogging)
             Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : cast data distributed.");
+        // message
+        if (!DistributeMessageData())
+            retBool = false;
+        else if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [DoGameDataDistribution] : message data distributed.");
         // player
         if (!DistributePlayerData())
             retBool = false;
@@ -345,6 +360,11 @@ public class GreenerGameManager : MonoBehaviour
             validShutdown = false;
         else if (noisyLogging && game.casts != null)
             Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : " + game.casts.Length + " casts collected.");
+        // messages
+        if (!CollectMessageData())
+            validShutdown = false;
+        else if (noisyLogging && game.messages != null)
+            Debug.Log("--- GreenerGameManager [DoShutDownGameDataCollection] : " + game.messages.Length + " messages collected.");
         // player
         if (!CollectPlayerData())
             validShutdown = false;
@@ -427,6 +447,20 @@ public class GreenerGameManager : MonoBehaviour
             retBool = true;
         }
         
+        return retBool;
+    }
+
+    bool CollectMessageData()
+    {
+        bool retBool = false;
+
+        PostOfficeManager pom = GameObject.FindFirstObjectByType<PostOfficeManager>();
+        if (pom != null)
+        {
+            game.messages = pom.GetPlayerMessages();
+            retBool = true;
+        }
+
         return retBool;
     }
 
@@ -569,6 +603,20 @@ public class GreenerGameManager : MonoBehaviour
         if (cm != null)
         {
             cm.SetCastData(game.casts);
+            retBool = true;
+        }
+
+        return retBool;
+    }
+
+    bool DistributeMessageData()
+    {
+        bool retBool = false;
+
+        PostOfficeManager pom = GameObject.FindFirstObjectByType<PostOfficeManager>();
+        if (pom != null)
+        {
+            pom.SetPlayerMessages(game.messages);
             retBool = true;
         }
 
@@ -776,6 +824,18 @@ public class GreenerGameManager : MonoBehaviour
 
         if (noisyLogging)
             Debug.Log("--- GreenerGameManager [FirstCastData] : first cast data established.");
+    }
+
+    void FirstMessageData()
+    {
+        if (game.messages != null && game.messages.Length > 0)
+            return;
+
+        // REVIEW: necesary?
+        game.messages = new PlayerMessage[0];
+
+        if (noisyLogging)
+            Debug.Log("--- GreenerGameManager [FirstMessageData] : first message data established.");
     }
 
     void FirstPlayerData()
