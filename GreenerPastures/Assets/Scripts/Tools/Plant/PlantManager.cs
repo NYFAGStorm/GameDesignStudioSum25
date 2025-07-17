@@ -159,7 +159,8 @@ public class PlantManager : MonoBehaviour
         //print("[SET PLANT TEX] : plant texture name = '" + plantTextureName + "'");
         if (plantTextureName != "" &&
             (pData.rarity == PlantRarity.Common || 
-            pData.rarity == PlantRarity.Uncommon))
+            pData.rarity == PlantRarity.Uncommon ||
+            pData.rarity == PlantRarity.Rare))
             plantImage.material.mainTexture = (Texture2D)Resources.Load(plantTextureName);
     }
 
@@ -176,9 +177,7 @@ public class PlantManager : MonoBehaviour
             plantType == PlantType.Chrystalia ||
             plantType == PlantType.Underbloom ||
             plantType == PlantType.GoldenApple ||
-            plantType == PlantType.Mysteria ||
             plantType == PlantType.Nightshade ||
-            plantType == PlantType.CrystalRose ||
             plantType == PlantType.Yarrow ||
             plantType == PlantType.WinterRose ||
             plantType == PlantType.FleurDeLis ||
@@ -193,9 +192,10 @@ public class PlantManager : MonoBehaviour
             plantType == PlantType.Snowgrace ||
             plantType == PlantType.Popcorn ||
             plantType == PlantType.EclipseFlower ||
-            plantType == PlantType.Hollowbloom ||
             plantType == PlantType.Banana ||
             plantType == PlantType.Coconut ||
+            plantType == PlantType.Mysteria ||
+            plantType == PlantType.CrystalRose ||
             plantType == PlantType.Tropicus)
             retString = "Tall";
 

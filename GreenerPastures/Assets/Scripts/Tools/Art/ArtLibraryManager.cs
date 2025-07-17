@@ -11,7 +11,7 @@ public class ArtLibraryManager : MonoBehaviour
     public ArtLibraryData itemArtData;
     public Texture2D[] itemImages;
 
-    const int GENERALITEMS = 7;
+    const int GENERALITEMS = 9;
     const int COMMONPLANTS = 10;
     const int UNCOMMONPLANTS = 11;
     const int RAREPLANTS = 10;
@@ -248,7 +248,16 @@ public class ArtLibraryManager : MonoBehaviour
 
         // gold coin
         itemName = "Gold Coin";
-        newArtData[6] = ConfigItemArtData(itemName, ItemType.GoldPiece, PlantType.Default, 6);
+        newArtData[6] = ConfigItemArtData(itemName, ItemType.GoldCoin, PlantType.Default, 6);
+        AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        // gold sack
+        itemName = "Gold Sack";
+        newArtData[7] = ConfigItemArtData(itemName, ItemType.GoldSack, PlantType.Default, 7);
+        AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+
+        // package
+        itemName = "Package";
+        newArtData[8] = ConfigItemArtData(itemName, ItemType.Package, PlantType.Default, 8);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
 
         AddToArtData(newArtData);
@@ -258,7 +267,7 @@ public class ArtLibraryManager : MonoBehaviour
     {
         // PLANT ITEMS
         ArtData[] newArtData =
-            new ArtData[3 * (COMMONPLANTS + UNCOMMONPLANTS)]; //+ RAREPLANTS + SPECIALPLANTS + UNIQUEPLANTS)];
+            new ArtData[3 * (COMMONPLANTS + UNCOMMONPLANTS + RAREPLANTS)]; // + SPECIALPLANTS + UNIQUEPLANTS)];
 
         string itemName;
         string plant;
@@ -304,7 +313,6 @@ public class ArtLibraryManager : MonoBehaviour
             AddToImages((Texture2D)Resources.Load(itemName));
         }
 
-        /*
         // rare
         rarity = "Rare";
         min += UNCOMMONPLANTS;
@@ -324,6 +332,7 @@ public class ArtLibraryManager : MonoBehaviour
             AddToImages((Texture2D)Resources.Load(itemName));
         }
 
+        /*
         // special
         rarity = "Special";
         min += RAREPLANTS;

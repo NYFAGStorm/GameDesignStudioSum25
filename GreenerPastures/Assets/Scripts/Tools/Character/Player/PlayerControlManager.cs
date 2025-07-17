@@ -248,9 +248,9 @@ public class PlayerControlManager : MonoBehaviour
                     Debug.LogWarning("--- PlayerControlManager [Update] : trying to take empty loose item. will ignore.");
                     return;
                 }
-                HandlePlayerTakeItem();
+                if (HandlePlayerTakeItem())
+                    AwardXP(PlayerData.XP_PICKUPITEM);
                 activeItem = null;
-                AwardXP(PlayerData.XP_PICKUPITEM);
             }
             return;
         }
@@ -633,19 +633,64 @@ public class PlayerControlManager : MonoBehaviour
         playerInventory = InventorySystem.RemoveItemFromInventory(playerInventory, playerInventory.items[currentInventorySelection]);
     }
 
-    void HandlePlayerTakeItem()
+    bool HandlePlayerTakeItem()
     {
-        // if active item is special and meant to perform an action upon 'take', detect
-        // (gold piece, gold pouch, letter, package)
-        if (activeItem.looseItem.inv.items[0].type == ItemType.GoldPiece)
+        bool retBool = false;
+
+        // before normal loose item pickup, check if active item type is special ...
+        // ... and meant to perform an action upon 'take', detect andd handle by type
+        // (gold coin, gold sack, package, letter)
+        bool skipPickup = false;
+        bool unpackLooseItem = false;
+        switch (activeItem.looseItem.inv.items[0].type)
         {
-            Destroy(activeItem.gameObject);
-            playerData.gold++;
-            return;
+            case ItemType.GoldCoin:
+                playerData.gold++;
+                playerData.stats.totalGoldEarned++; // REVIEW: is this technically 'earned gold'?
+                Destroy(activeItem.gameObject);
+                skipPickup = true;
+                break;
+            case ItemType.GoldSack :
+                unpackLooseItem = true;
+                skipPickup = true;
+                break;
+            case ItemType.Package:
+                unpackLooseItem = true;
+                skipPickup = true;
+                break;
         }
+        if (unpackLooseItem)
+        {
+            // because all loose items are technically mobile inventory, ...
+            // .. just 'unpack' other inventory items and spawn them
+            if (activeItem.looseItem.inv.items.Length > 1)
+            {
+                ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+                Vector3 pos = activeItem.gameObject.transform.position;
+                pos += Vector3.down * 0.25f;
+                for (int i = 1; i < activeItem.looseItem.inv.items.Length; i++)
+                {
+                    Vector3 targ = pos;
+                    // spread out target pos
+                    targ.x += (1f * (1f - RandomSystem.GaussianRandom01())) - 0.5f; 
+                    targ.z += (.5f * (1f - RandomSystem.GaussianRandom01())) - 0.25f;
+                    LooseItemData liData = InventorySystem.CreateItem(activeItem.looseItem.inv.items[i].type);
+                    liData.inv.items[0] = activeItem.looseItem.inv.items[i];
+                    ism.SpawnItem(liData, pos, targ, true);
+                }
+            }
+            else
+                Debug.LogWarning("--- PlayerControlManager [HandlePlayerTakeItem] : active item type '" + activeItem.looseItem.inv.items[0].type + "' does not contain items to unpack. will ignore.");
+            Destroy(activeItem.gameObject);
+        }
+        if (skipPickup)
+            return retBool;
 
         // pick up loose item, transfer to inventory
         playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
+        retBool = true;
+
+        return retBool;
     }
 
     /// <summary>

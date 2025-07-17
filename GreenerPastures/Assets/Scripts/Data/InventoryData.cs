@@ -10,7 +10,9 @@ public enum ItemType
     Stalk,
     Fruit,
     Rock,
-    GoldPiece // REVIEW: 
+    GoldCoin,
+    GoldSack,
+    Package // REVIEW: 
 }
 
 // if there are discrete effects that can be applied to an item
