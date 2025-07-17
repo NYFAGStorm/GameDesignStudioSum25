@@ -691,6 +691,7 @@ public class MagicCraftingManager : MonoBehaviour
             }
             tmp[placedIngredients.Length] = new IngredientPiece();
             tmp[placedIngredients.Length].ingredient = new IngredientData();
+            tmp[placedIngredients.Length].cauldronInventoryIndex = piece.cauldronInventoryIndex;
             tmp[placedIngredients.Length].ingredient.name = piece.ingredient.name;
             tmp[placedIngredients.Length].ingredient.item = piece.ingredient.item;
             tmp[placedIngredients.Length].ingredient.plant = piece.ingredient.plant;
@@ -1096,8 +1097,10 @@ public class MagicCraftingManager : MonoBehaviour
                     if (heldIngredient.cauldronInventoryIndex == i)
                         c *= 0.381f; // gray out icon if held and dragging to cauldron
                     GUI.color = c;
-                    if (!isAmongPlacedPieces(i))
+                    if (placedIngredients == null || placedIngredients.Length == 0 || !isAmongPlacedPieces(i))
                         GUI.DrawTexture(r, t); // skip if ingredient is placed in grid
+                    else
+                        print("will not draw cauldron item index "+i+" is among placed pieces : "+ isAmongPlacedPieces(i));
                     c = Color.white;
                     // re-adjust larger
                     r.x -= 0.005f * w;
