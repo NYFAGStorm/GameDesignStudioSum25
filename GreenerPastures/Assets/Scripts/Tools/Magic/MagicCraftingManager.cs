@@ -88,7 +88,7 @@ public class MagicCraftingManager : MonoBehaviour
     const float PLAYERCHECKTIME = 1f;
     const float PROXIMITYCHECKRADIUS = 0.381f;
 
-    const int TOTALINGREDIENTSHAPETYPES = 6;
+    const int TOTALINGREDIENTSHAPETYPES = 170;
 
 
     void Start()
@@ -165,7 +165,7 @@ public class MagicCraftingManager : MonoBehaviour
 
         shapeLibrary = new ShapeLibraryManager.IngredientShapeType[TOTALINGREDIENTSHAPETYPES + 2];
 
-        for ( int i = 0; i < shapeLibrary.Length; i++ )
+        for (int i = 0; i < shapeLibrary.Length; i++)
         {
             shapeLibrary[i].pieces = new bool[9];
             if (i < 6)
@@ -229,25 +229,23 @@ public class MagicCraftingManager : MonoBehaviour
                         break;
                 }
             }
-            else
-            {
-                if (i == 6)
-                {
-                    shapeLibrary[i].item = ItemType.Fruit;
-                    shapeLibrary[i].plant = PlantType.Rose;
-                    shapeLibrary[i].pieces[1] = true;
-                    //shapeLibrary[i].pieces[3] = true;
-                    shapeLibrary[i].pieces[4] = true;
-                    //shapeLibrary[i].pieces[5] = true;
-                    //shapeLibrary[i].pieces[7] = true;
-                }
-                else
-                {
-                    shapeLibrary[i].item = ItemType.Seed;
-                    shapeLibrary[i].plant = PlantType.Corn;
-                    shapeLibrary[i].pieces[4] = true;
-                }
-            }
+        }
+        for (int i=0; i < 40; i++)
+        {
+            int idx = 6 + (i * 4);
+            PlantType pt = (PlantType)i;
+            shapeLibrary[idx].item = ItemType.Seed;
+            shapeLibrary[idx].plant = pt;
+            shapeLibrary[idx].pieces[4] = true;
+            shapeLibrary[idx + 1].item = ItemType.Stalk;
+            shapeLibrary[idx + 1].plant = pt;
+            shapeLibrary[idx + 1].pieces[4] = true;
+            shapeLibrary[idx + 2].item = ItemType.Fruit;
+            shapeLibrary[idx + 2].plant = pt;
+            shapeLibrary[idx + 2].pieces[4] = true;
+            shapeLibrary[idx + 3].item = ItemType.Plant;
+            shapeLibrary[idx + 3].plant = pt;
+            shapeLibrary[idx + 3].pieces[4] = true;
         }
     }
 
