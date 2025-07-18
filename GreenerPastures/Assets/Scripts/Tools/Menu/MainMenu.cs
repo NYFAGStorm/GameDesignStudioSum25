@@ -1,7 +1,8 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
+//using System.Diagnostics; caused annoying conflict with Debug.Log and doesn't seem to be used for anything in here
 using Fusion;
 using Fusion.Sockets;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [AddComponentMenu("NYFA Studio/Interface/MainMenu")]
 public class MainMenu : MonoBehaviour
@@ -16,27 +17,30 @@ public class MainMenu : MonoBehaviour
     //
     private string remoteFriendsCode; // again, this was acquired in GameSelection.cs
     // 
-    void JoinHostsGame()
+    private void JoinHostsGame()
     {
-        if (!isPlanningToJoin)
-            return;
         print("the remote friend code is already here, it is : '" + remoteFriendsCode + "'");
         print("... and this player character will be named '" + saveMgr.GetJoiningPlayerName() + "'. Have Fun!");
-        //
-        // go for it
-        //
+
+        fusionMgr.StartMultiplayerGame(GameMode.Client, remoteFriendsCode);
+
         // NOTE: right now, this will enter the game scene, but with no game data (that's okay for now)
         // let's just connect with your function here, and get this handshake done, and we'll do game data next, ok?
         // (see GitHub issue ticket #32, please)
+
         // Q: will this have a callback (like 'denied code') that I can handle for you?
+        // A: FusionManager has several callbacks related to server disconnection, the one that would handle a room code being denied is OnShutdown()
+        // If the room code doesn't exist then the code will be ShutdownReason.GameNotFound
+        // go here and scroll down to ShutdownReason https://doc-api.photonengine.com/en/fusion/current/namespace_fusion.html#a17fef9dd2263890ba6250d6e448ee1ac
     }
-    //
-    // GameSelection.cs has a longer description of what you need to see (go read)
-    // (please ASK QUESTIONS when you need to, comment your code and keep it clean, thank you)
-    // 
-    // as soon as I see code that connects, ...
-    // ... we can clean this up and work on replication in game (the next step)
-    // 
+
+    private void HostGame()
+    {
+        print("the host code is already here, it is : '" + saveMgr.GetHostCode() + "'");
+        print("... and this player character will be named '" + saveMgr.GetJoiningPlayerName() + "'. Have Fun!");
+
+        fusionMgr.StartMultiplayerGame(GameMode.Host, saveMgr.GetHostCode());
+    }
 
     public enum ButtonAction
     {
@@ -99,6 +103,8 @@ public class MainMenu : MonoBehaviour
     private string confirmPass;
     private string popupFeedback;
 
+    private FusionManager fusionMgr;
+
     // additional multiplayer support, 'can just as easily get this in-game
     private bool isPlanningToBeHost;
     private bool isPlanningToJoin;
@@ -125,6 +131,12 @@ public class MainMenu : MonoBehaviour
         if (padMgr == null)
         {
             Debug.LogError("--- MainMenu [Start] : no pad manager found in scene. aborting.");
+            enabled = false;
+        }
+        fusionMgr = GameObject.FindFirstObjectByType<FusionManager>();
+        if (fusionMgr == null)
+        {
+            Debug.LogError("--- MainMenu [Start] : no Fusion manager found in scene. aborting.");
             enabled = false;
         }
         // initialize
@@ -203,7 +215,8 @@ public class MainMenu : MonoBehaviour
             if ( sceneSwitchTimer < .1f )
             {
                 // multiplayer support (already managed)
-                JoinHostsGame();
+                if (isPlanningToBeHost) HostGame();
+                if (isPlanningToJoin) JoinHostsGame();
                 //
                 SceneManager.LoadScene(sceneSwitchName);
             }

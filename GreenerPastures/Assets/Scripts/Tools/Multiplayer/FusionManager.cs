@@ -15,7 +15,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     private NetworkRunner Runner;
 
     // Use GameMode.Host and GameMode.Client to determine join type
-    async void StartMultiplayerGame(GameMode mode, string code)
+    public async void StartMultiplayerGame(GameMode mode, string code)
     {
         Runner = gameObject.AddComponent<NetworkRunner>();
         Runner.ProvideInput = true;
@@ -65,7 +65,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadStart(NetworkRunner runner) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-    public void OnShutdown(NetworkRunner runner, ShutdownReason exit) { }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason exit) {}
     public void OnConnectedToServer(NetworkRunner runner) { }
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
