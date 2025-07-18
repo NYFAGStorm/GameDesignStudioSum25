@@ -415,6 +415,24 @@ public class GreenerGameManager : MonoBehaviour
         if (shutdownDataCollected)
             return;
 
+        // detect mid-intro quit, configure player island settings appropriately
+        if (game.players[0].island.w < 7f)
+        {
+            game.players[0].island.w = 7f;
+            if (game.players[0].island.x > 10f && game.players[0].island.z < -10f)
+            {
+                // market hub island
+                game.players[0].island.x = 20f;
+                game.players[0].island.z = -20f;
+            }
+            else
+            {
+                // player's starting island
+                game.players[0].island.x = 0f;
+                game.players[0].island.z = 0f;
+            }
+        }
+
         bool validShutdown = true;
 
         // world
