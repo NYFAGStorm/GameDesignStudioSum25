@@ -29,8 +29,11 @@ public class GreenerGameManager : MonoBehaviour
     private float[] notificationTimers;
     private int notificationToRemove = -1; // remove only one per tick
 
+    private float goldFairHelpPauseTimer;
+
     const float HOSTPINGINTERVAL = 1f;
     const float NOTIFICATIONHOLDTIME = 6.18f;
+    const float GOLDFAIRYHELPPAUSE = 360f;
 
 
     void Awake()
@@ -193,6 +196,80 @@ public class GreenerGameManager : MonoBehaviour
                 hostPingData = MultiplayerSystem.FormHostPing(game);
                 // _this_ ping is ready to broadcast to clients running greener pastures
                 PingAsHost();
+            }
+        }
+
+        // run gold fair help pause timer
+        if (goldFairHelpPauseTimer > 0f)
+        {
+            goldFairHelpPauseTimer -= Time.deltaTime;
+            if (goldFairHelpPauseTimer < 0f)
+                goldFairHelpPauseTimer = 0f;
+        }
+        else
+        {
+            // detect player out of economy (send gold fairy)
+            for (int i = 0; i < game.players.Length; i++)
+            {
+                // TODO: keep this in line with market prices (need to be able to buy seed)
+                int minimumGold = 3;
+                // players have no gold (not enough to keep going)
+                if (game.players[i].gold >= minimumGold)
+                    continue;
+                // player has no inventory items of value (seed or fruit items)
+                if (InventorySystem.InvHasItemOfType(game.players[i].inventory, ItemType.Seed))
+                    continue;
+                if (InventorySystem.InvHasItemOfType(game.players[i].inventory, ItemType.Fruit))
+                    continue;
+                // player farm has no plants (none that bring gold)
+                float islandRange = 7f * game.islands[game.players[i].playerIsland].location.w;
+                Vector3 islandPos = GameSystem.GetVector(game.islands[game.players[i].playerIsland].location);
+                PlotManager[] playerPlots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+                bool foundPlant = false;
+                for (int n = 0; n < playerPlots.Length; n++)
+                {
+                    Vector3 plotPos = playerPlots[n].gameObject.transform.position;
+                    if (Vector3.Distance(plotPos, islandPos) < islandRange)
+                    {
+                        if (playerPlots[n].plant != null &&
+                            (playerPlots[n].data.plant.growth < 1f || 
+                            !playerPlots[n].data.plant.isHarvested ||
+                            playerPlots[n].data.plant.canReFruit))
+                        {
+                            foundPlant = true;
+                            break;
+                        }
+                    }
+                }
+                if (foundPlant)
+                    continue;
+                // player island has no items of value (seed or fruit items)
+                LooseItemManager[] looseItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+                bool foundItem = false;
+                for (int n = 0; n < looseItems.Length; n++)
+                {
+                    if (looseItems[n].looseItem.inv.items[0].type == ItemType.Seed ||
+                        looseItems[n].looseItem.inv.items[0].type == ItemType.Fruit ||
+                        looseItems[n].looseItem.inv.items[0].type == ItemType.GoldCoin ||
+                        looseItems[n].looseItem.inv.items[0].type == ItemType.GoldSack ||
+                        looseItems[n].looseItem.inv.items[0].type == ItemType.Package)
+                    {
+                        Vector3 itemPos = looseItems[n].gameObject.transform.position;
+                        if (Vector3.Distance(itemPos, islandPos) < islandRange)
+                        {
+                            foundItem = true;
+                            break;
+                        }
+                    }
+                }
+                if (!foundItem)
+                {
+                    // player is out of economy (send gold fairy)
+                    GameObject fairy = GameObject.Instantiate((GameObject)Resources.Load("NPC Gold Fairy"));
+                    fairy.GetComponent<NPCGoldFairy>().ActivateFairy(game.players[i].playerIsland, minimumGold + Mathf.RoundToInt(RandomSystem.GaussianRandom01() * 5));
+                    Debug.Log("--- GreenerGameManager [Update] : player detected stuck (no gold, no plants, no items). sending gold fairy.");
+                    goldFairHelpPauseTimer = GOLDFAIRYHELPPAUSE;
+                }
             }
         }
     }
