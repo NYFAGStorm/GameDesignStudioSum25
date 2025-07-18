@@ -210,10 +210,11 @@ public class TimeManager : MonoBehaviour
     void UpdateAmbientLighting()
     {
         // moon phase light intensity
-        // mid-month = full moon, start/end month = new moon
+        // mid-month = new moon, start/end month = full moon
         moonPhase = Mathf.Sin(((dayOfMonth + dayProgress) / (float)30) * Mathf.PI);
         if (moonPhase < 0.001f)
             moonPhase = 0f;
+        moonPhase = 1f - moonPhase; // makes 15th new moon, 30th full moon
         float moonPhaseLight = (MOONLIGHTINTENSITY * moonPhase);
         // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
         if (dayProgress > .3f && dayProgress < .7f)
