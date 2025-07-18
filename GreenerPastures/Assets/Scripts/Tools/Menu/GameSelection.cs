@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Fusion;
 using Fusion.Sockets;
+using System;
 
 public class GameSelection : MonoBehaviour
 {
@@ -15,13 +16,20 @@ public class GameSelection : MonoBehaviour
     //
     private string hostsCode; // what a host sends to friends on discord
     //
+
     void GenerateHostCode()
     {
-        //
-        // go for it
-        //
-        hostsCode = "send this code to your friend";
+        // Clear hostsCode
+        hostsCode = "";
+
+        // Generates an 8 letter code containing random capital letters
+        for (int digit = 0; digit < 8; digit++)
+        {
+            // Select a random capital letter from A to Z and add it to the end of hostsCode
+            hostsCode = hostsCode + (char)(65 + UnityEngine.Random.Range(0, 26));
+        }
     }
+
     //
     // This game selection screen will provide a button for the host to get a code
     // This game selection screen will provide a button to enter a friend code
