@@ -193,33 +193,33 @@ public class MagicCraftingManager : MonoBehaviour
                     case ItemType.Plant:
                         shapeLibrary[i].item = ItemType.Plant;
                         shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[0] = true;
-                        shapeLibrary[i].pieces[1] = true;
-                        shapeLibrary[i].pieces[2] = true;
+                        //shapeLibrary[i].pieces[0] = true;
+                        //shapeLibrary[i].pieces[1] = true;
+                        //shapeLibrary[i].pieces[2] = true;
                         shapeLibrary[i].pieces[4] = true;
-                        shapeLibrary[i].pieces[7] = true;
+                        //shapeLibrary[i].pieces[7] = true;
                         break;
                     case ItemType.Stalk:
                         shapeLibrary[i].item = ItemType.Stalk;
                         shapeLibrary[i].plant = PlantType.Default;
                         shapeLibrary[i].pieces[4] = true;
-                        shapeLibrary[i].pieces[7] = true;
+                        //shapeLibrary[i].pieces[7] = true;
                         break;
                     case ItemType.Fruit:
                         shapeLibrary[i].item = ItemType.Fruit;
                         shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[1] = true;
-                        shapeLibrary[i].pieces[3] = true;
+                        //shapeLibrary[i].pieces[1] = true;
+                        //shapeLibrary[i].pieces[3] = true;
                         shapeLibrary[i].pieces[4] = true;
-                        shapeLibrary[i].pieces[5] = true;
-                        shapeLibrary[i].pieces[7] = true;
+                        //shapeLibrary[i].pieces[5] = true;
+                        //shapeLibrary[i].pieces[7] = true;
                         break;
                     case ItemType.Rock:
                         shapeLibrary[i].item = ItemType.Rock;
                         shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[0] = true;
-                        shapeLibrary[i].pieces[1] = true;
-                        shapeLibrary[i].pieces[3] = true;
+                        //shapeLibrary[i].pieces[0] = true;
+                        //shapeLibrary[i].pieces[1] = true;
+                        //shapeLibrary[i].pieces[3] = true;
                         shapeLibrary[i].pieces[4] = true;
                         break;
                     default:
