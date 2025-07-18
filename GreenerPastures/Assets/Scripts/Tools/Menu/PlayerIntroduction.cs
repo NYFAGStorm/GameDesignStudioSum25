@@ -193,6 +193,7 @@ public class PlayerIntroduction : MonoBehaviour
                 clouds[i].material.SetTextureScale("_MainTex", new Vector2(cloudFlip, 1f));
             }
         }
+        Destroy(introCloudParent, 10f);
     }
 
     void InitializeCharacterTextures()

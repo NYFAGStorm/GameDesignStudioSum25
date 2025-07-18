@@ -8,16 +8,16 @@ public class CameraManager : MonoBehaviour
     public enum CameraMode
     {
         Default,
-        Follow,
         Hold,
         PanFollow,
         CloseUp,
         Medium,
+        Follow,
         Long,
         World
     }
 
-    public CameraMode mode;
+    public CameraMode mode = CameraMode.Follow;
     public Vector3 cameraTargetPosition;
     public Vector3 cameraTargetRotation;
 
@@ -36,6 +36,8 @@ public class CameraManager : MonoBehaviour
     private float cameraMoveDuration;
     private Vector3 savedPostion;
     private Vector3 savedRotation;
+
+    private Vector3 persistentFollowTarget;
 
     private AnimationCurve easeCurve; // basic ease-in-out curve
 
@@ -82,9 +84,9 @@ public class CameraManager : MonoBehaviour
                 // ensure unparented
                 gameObject.transform.parent = null;
                 // start paused
-                SetDefaultTimers();
-                mode = CameraMode.Hold;
+                mode = CameraMode.Follow;
                 modeAfterHold = CameraMode.Follow;
+                modeAfterMove = CameraMode.Follow;
                 SavePosAndRot();
                 // config curve
                 easeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -162,61 +164,61 @@ public class CameraManager : MonoBehaviour
         offsetRotations = new PositionData[8];
 
         // DEFAULT
-        offsetPositions[0].x = 0f;
-        offsetPositions[0].y = 2.5f;
-        offsetPositions[0].z = -5f;
-        offsetRotations[0].x = 20f;
-        offsetRotations[0].y = 0f;
-        offsetRotations[0].z = 0f;
+        offsetPositions[(int)CameraMode.Default].x = 0f;
+        offsetPositions[(int)CameraMode.Default].y = 2.5f;
+        offsetPositions[(int)CameraMode.Default].z = -5f;
+        offsetRotations[(int)CameraMode.Default].x = 20f;
+        offsetRotations[(int)CameraMode.Default].y = 0f;
+        offsetRotations[(int)CameraMode.Default].z = 0f;
         // FOLLOW
-        offsetPositions[1].x = 0f;
-        offsetPositions[1].y = 2.5f;
-        offsetPositions[1].z = -5f;
-        offsetRotations[1].x = 20f;
-        offsetRotations[1].y = 0f;
-        offsetRotations[1].z = 0f;
+        offsetPositions[(int)CameraMode.Follow].x = 0f;
+        offsetPositions[(int)CameraMode.Follow].y = 2.5f;
+        offsetPositions[(int)CameraMode.Follow].z = -5f;
+        offsetRotations[(int)CameraMode.Follow].x = 20f;
+        offsetRotations[(int)CameraMode.Follow].y = 0f;
+        offsetRotations[(int)CameraMode.Follow].z = 0f;
         // HOLD
-        offsetPositions[2].x = 0f;
-        offsetPositions[2].y = 2.5f;
-        offsetPositions[2].z = -5f;
-        offsetRotations[2].x = 20f;
-        offsetRotations[2].y = 0f;
-        offsetRotations[2].z = 0f;
+        offsetPositions[(int)CameraMode.Hold].x = 0f;
+        offsetPositions[(int)CameraMode.Hold].y = 2.5f;
+        offsetPositions[(int)CameraMode.Hold].z = -5f;
+        offsetRotations[(int)CameraMode.Hold].x = 20f;
+        offsetRotations[(int)CameraMode.Hold].y = 0f;
+        offsetRotations[(int)CameraMode.Hold].z = 0f;
         // PANFOLLOW
-        offsetPositions[3].x = 0f;
-        offsetPositions[3].y = 2.5f;
-        offsetPositions[3].z = -5f;
-        offsetRotations[3].x = 20f;
-        offsetRotations[3].y = 0f;
-        offsetRotations[3].z = 0f;
+        offsetPositions[(int)CameraMode.PanFollow].x = 0f;
+        offsetPositions[(int)CameraMode.PanFollow].y = 2.5f;
+        offsetPositions[(int)CameraMode.PanFollow].z = -5f;
+        offsetRotations[(int)CameraMode.PanFollow].x = 20f;
+        offsetRotations[(int)CameraMode.PanFollow].y = 0f;
+        offsetRotations[(int)CameraMode.PanFollow].z = 0f;
         // CLOSEUP
-        offsetPositions[4].x = 0f;
-        offsetPositions[4].y = 1f;
-        offsetPositions[4].z = -1f;
-        offsetRotations[4].x = 18f;
-        offsetRotations[4].y = 0f;
-        offsetRotations[4].z = 0f;
+        offsetPositions[(int)CameraMode.CloseUp].x = 0f;
+        offsetPositions[(int)CameraMode.CloseUp].y = 1f;
+        offsetPositions[(int)CameraMode.CloseUp].z = -1f;
+        offsetRotations[(int)CameraMode.CloseUp].x = 18f;
+        offsetRotations[(int)CameraMode.CloseUp].y = 0f;
+        offsetRotations[(int)CameraMode.CloseUp].z = 0f;
         // MEDIUM
-        offsetPositions[5].x = 0f;
-        offsetPositions[5].y = 1.75f;
-        offsetPositions[5].z = -3f;
-        offsetRotations[5].x = 20f;
-        offsetRotations[5].y = 0f;
-        offsetRotations[5].z = 0f;
+        offsetPositions[(int)CameraMode.Medium].x = 0f;
+        offsetPositions[(int)CameraMode.Medium].y = 1.75f;
+        offsetPositions[(int)CameraMode.Medium].z = -3f;
+        offsetRotations[(int)CameraMode.Medium].x = 20f;
+        offsetRotations[(int)CameraMode.Medium].y = 0f;
+        offsetRotations[(int)CameraMode.Medium].z = 0f;
         // LONG
-        offsetPositions[6].x = 0f;
-        offsetPositions[6].y = 7.5f;
-        offsetPositions[6].z = -15f;
-        offsetRotations[6].x = 22f;
-        offsetRotations[6].y = 0f;
-        offsetRotations[6].z = 0f;
+        offsetPositions[(int)CameraMode.Long].x = 0f;
+        offsetPositions[(int)CameraMode.Long].y = 7.5f;
+        offsetPositions[(int)CameraMode.Long].z = -15f;
+        offsetRotations[(int)CameraMode.Long].x = 22f;
+        offsetRotations[(int)CameraMode.Long].y = 0f;
+        offsetRotations[(int)CameraMode.Long].z = 0f;
         // WORLD
-        offsetPositions[7].x = 0f;
-        offsetPositions[7].y = 20f;
-        offsetPositions[7].z = -45f;
-        offsetRotations[7].x = 30f;
-        offsetRotations[7].y = 0f;
-        offsetRotations[7].z = 0f;
+        offsetPositions[(int)CameraMode.World].x = 0f;
+        offsetPositions[(int)CameraMode.World].y = 20f;
+        offsetPositions[(int)CameraMode.World].z = -45f;
+        offsetRotations[(int)CameraMode.World].x = 30f;
+        offsetRotations[(int)CameraMode.World].y = 0f;
+        offsetRotations[(int)CameraMode.World].z = 0f;
     }
 
     Vector3 GetPosOffset( CameraMode mode )
@@ -313,7 +315,7 @@ public class CameraManager : MonoBehaviour
         cameraPauseTimer = 1f;
         cameraMoveTimer = INTROMOVEDURATION;
         cameraMoveDuration = cameraMoveTimer;
-        cameraTargetPosition = introPos + GetPosOffset(CameraMode.CloseUp);
+        cameraTargetPosition = GetPosOffset(CameraMode.CloseUp);
         cameraTargetRotation = GetRotOffset(CameraMode.CloseUp);
         modeAfterMove = CameraMode.Default;
     }
@@ -347,7 +349,17 @@ public class CameraManager : MonoBehaviour
     {
         cameraTargetPosition = GetPosOffset(mode);
         cameraTargetPosition += playerObject.transform.position;
+        persistentFollowTarget = playerObject.transform.position;
         cameraTargetRotation = GetRotOffset(mode);
+    }
+
+    Vector3 GetFollowDelta()
+    {
+        if (playerObject == null)
+            return Vector3.zero;
+        Vector3 retDelta = playerObject.transform.position - persistentFollowTarget;
+        persistentFollowTarget = playerObject.transform.position;
+        return retDelta;
     }
 
     void GetPanTarget()
@@ -397,56 +409,12 @@ public class CameraManager : MonoBehaviour
         if (pcm == null)
             return;
 
-        // detect player cam controls
-        if (allowPlayerControlCam && 
-            (mode == CameraMode.Follow || mode > CameraMode.PanFollow) && 
-            cameraPauseTimer == 0f && cameraMoveTimer == 0f)
-        {
-            int camModeChange = 0;
-            camModeChange += (int)Input.mouseScrollDelta.y;
-            // gamepad controls (dpad up and down)
-            if (padMgr != null && padMgr.gamepads[0].isActive)
-            {
-                if (padMgr.gPadDown[0].DpadUp)
-                    camModeChange = 1;
-                else if (padMgr.gPadDown[0].DpadDown)
-                    camModeChange = -1;
-            }
-            if (camModeChange != 0)
-            {
-                if (mode == CameraMode.Follow)
-                    modeAfterHold = CameraMode.CloseUp;
-                else
-                    modeAfterHold -= camModeChange;
-                if (modeAfterHold == CameraMode.PanFollow)
-                    modeAfterHold = CameraMode.Follow;
-                if (modeAfterHold > CameraMode.World)
-                    modeAfterHold = CameraMode.World;
-                else
-                {
-                    SavePosAndRot();
-                    // use modeAfterHold for target acquisition
-                    mode = modeAfterHold;
-                    GetFollowTarget();
-                    SetDefaultTimers();
-                    mode = CameraMode.Hold;
-                    modeAfterMove = modeAfterHold; // stay there
-                }
-            }
-        }
-
-        if (mode == CameraMode.Follow)
-        {
-            GetFollowTarget();
-            // follow move camera
-            PerformMove();
-            // reset move timer
-            cameraMoveTimer = 0f;
-            return;
-        }
-
         if (mode == CameraMode.Hold)
         {
+            // update target by follow
+            cameraTargetPosition += GetFollowDelta();
+            // follow anyway
+            gameObject.transform.position += GetFollowDelta();
             // run pause timer
             if (cameraPauseTimer > 0f)
             {
@@ -463,7 +431,7 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        if ( mode == CameraMode.PanFollow )
+        if (mode == CameraMode.PanFollow)
         {
             GetPanTarget();
             // pan move camera
@@ -476,12 +444,24 @@ public class CameraManager : MonoBehaviour
         // run move timer
         if (cameraMoveTimer > 0f)
         {
+            // update target by follow
+            cameraTargetPosition += GetFollowDelta();
+            // follow anyway
+            gameObject.transform.position += GetFollowDelta();
+            // run timer
             cameraMoveTimer -= Time.deltaTime;
             if (cameraMoveTimer < 0f)
                 cameraMoveTimer = 0f;
         }
         else
         {
+            if (mode == CameraMode.Follow)
+            {
+                GetFollowTarget();
+                // follow move camera
+                PerformMove();
+            }
+
             // at end of cinematic moves, allow follow behavior
             // (close up and medium only)
             if (mode == CameraMode.CloseUp || mode == CameraMode.Medium)
@@ -489,6 +469,41 @@ public class CameraManager : MonoBehaviour
                 GetFollowTarget();
                 // follow move camera
                 PerformMove();
+            }
+
+            // detect player cam controls
+            if (allowPlayerControlCam && mode > CameraMode.PanFollow &&
+                cameraPauseTimer == 0f)
+            {
+                int camModeChange = 0;
+                camModeChange += (int)Input.mouseScrollDelta.y;
+                // gamepad controls (dpad up and down)
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                {
+                    if (padMgr.gPadDown[0].DpadUp)
+                        camModeChange = 1;
+                    else if (padMgr.gPadDown[0].DpadDown)
+                        camModeChange = -1;
+                }
+                if (camModeChange != 0)
+                {
+                    modeAfterHold = mode - camModeChange;
+                    // clamp to valid cam modes
+                    if (modeAfterHold < CameraMode.CloseUp)
+                        modeAfterHold = CameraMode.CloseUp;
+                    if (modeAfterHold > CameraMode.World)
+                        modeAfterHold = CameraMode.World;
+                    else
+                    {
+                        SavePosAndRot();
+                        // use modeAfterHold for target acquisition
+                        mode = modeAfterHold;
+                        GetFollowTarget();
+                        SetDefaultTimers();
+                        mode = CameraMode.Hold;
+                        modeAfterMove = modeAfterHold; // stay there
+                    }
+                }
             }
             return;
         }
