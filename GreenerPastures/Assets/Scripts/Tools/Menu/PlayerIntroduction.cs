@@ -116,6 +116,8 @@ public class PlayerIntroduction : MonoBehaviour
         // initialize
         if (enabled)
         {
+            InitializeIntroClouds();
+
             InitializeCharacterTextures();
             InitializeCharacterColors();
 
@@ -173,6 +175,24 @@ public class PlayerIntroduction : MonoBehaviour
         }
         if ( beatScriptEndIndex == 0)
             Debug.LogWarning("--- PlayerIntroduction [ValidateIntroBeats] : no final beat with 'end intro' configured. this will cause errors at runtime.");
+    }
+
+    void InitializeIntroClouds()
+    {
+        GameObject introCloudParent = GameObject.Find("Intro Clouds");
+        if (introCloudParent != null)
+        {
+            Renderer[] clouds = introCloudParent.transform.GetComponentsInChildren<Renderer>();
+            for (int i = 0; i < clouds.Length; i++)
+            {
+                int cloudRand = Mathf.RoundToInt( (float)RandomSystem.WeightedRandom01() * 10f);
+                float cloudFlip = 1f;
+                if (RandomSystem.FlatRandom01() < 0.5f)
+                    cloudFlip = -1f;
+                clouds[i].material.mainTexture = (Texture2D)Resources.Load("clouds"+cloudRand.ToString("00"));
+                clouds[i].material.SetTextureScale("_MainTex", new Vector2(cloudFlip, 1f));
+            }
+        }
     }
 
     void InitializeCharacterTextures()
