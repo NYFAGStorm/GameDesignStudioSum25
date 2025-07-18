@@ -38,6 +38,7 @@ public class PlayerControlManager : MonoBehaviour
         public bool castMagic;
         public bool graftPlant;
     }
+    // NOTE: not included are the number keys used to quick-select inventory slot
 
     public KeyCode upKey = KeyCode.W;
     public KeyCode downKey = KeyCode.S;
@@ -927,6 +928,22 @@ public class PlayerControlManager : MonoBehaviour
             currentInventorySelection++;
             if (currentInventorySelection > playerInventory.maxSlots - 1)
                 currentInventorySelection = 0;
+        }
+        // override with keyboard number keys (quick select)
+        if (!Input.anyKeyDown)
+            return;
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+                currentInventorySelection = 0;
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+                currentInventorySelection = 1;
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+                currentInventorySelection = 2;
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+                currentInventorySelection = 3;
+            if (Input.GetKeyDown(KeyCode.Alpha5))
+                currentInventorySelection = 4;
         }
     }
 
