@@ -1,46 +1,36 @@
-//using System.Diagnostics; caused annoying conflict with Debug.Log and doesn't seem to be used for anything in here
-using Fusion;
-using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Fusion;
+using Fusion.Sockets;
 
 [AddComponentMenu("NYFA Studio/Interface/MainMenu")]
 public class MainMenu : MonoBehaviour
 {
     // Author: Glenn Storm
-    // Author: Gustavo Rojas Flores (multiplayer block at top)
+    // Author: Gustavo Rojas Flores
     // This handles the main menu
 
     //
-    // --- FOR MULTIPLAYER: ---
-    // Here are two big pieces to work with, right here at the top:
-    //
-    private string remoteFriendsCode; // again, this was acquired in GameSelection.cs
-    // 
-    private void JoinHostsGame()
+    private string remoteFriendsCode; 
+    void JoinHostsGame()
     {
-        print("the remote friend code is already here, it is : '" + remoteFriendsCode + "'");
-        print("... and this player character will be named '" + saveMgr.GetJoiningPlayerName() + "'. Have Fun!");
-
+        // client
         fusionMgr.StartMultiplayerGame(GameMode.Client, remoteFriendsCode);
 
-        // NOTE: right now, this will enter the game scene, but with no game data (that's okay for now)
-        // let's just connect with your function here, and get this handshake done, and we'll do game data next, ok?
-        // (see GitHub issue ticket #32, please)
-
         // Q: will this have a callback (like 'denied code') that I can handle for you?
-        // A: FusionManager has several callbacks related to server disconnection, the one that would handle a room code being denied is OnShutdown()
-        // If the room code doesn't exist then the code will be ShutdownReason.GameNotFound
-        // go here and scroll down to ShutdownReason https://doc-api.photonengine.com/en/fusion/current/namespace_fusion.html#a17fef9dd2263890ba6250d6e448ee1ac
-    }
+        //  A: FusionManager has several callbacks related to server disconnection, the one that would handle a room code being denied is OnShutdown()
+        //  If the room code doesn't exist then the code will be ShutdownReason.GameNotFound
+        //  go here and scroll down to ShutdownReason
+        //  https://doc-api.photonengine.com/en/fusion/current/namespace_fusion.html#a17fef9dd2263890ba6250d6e448ee1ac
 
+        // the question was more like, if I need to do anything in this script to help you, lmk
+    } 
     private void HostGame()
     {
-        print("the host code is already here, it is : '" + saveMgr.GetHostCode() + "'");
-        print("... and this player character will be named '" + saveMgr.GetJoiningPlayerName() + "'. Have Fun!");
-
+        // host
         fusionMgr.StartMultiplayerGame(GameMode.Host, saveMgr.GetHostCode());
     }
+    //
 
     public enum ButtonAction
     {
@@ -105,11 +95,11 @@ public class MainMenu : MonoBehaviour
 
     private FusionManager fusionMgr;
 
-    // additional multiplayer support, 'can just as easily get this in-game
+    // additional multiplayer support
     private bool isPlanningToBeHost;
     private bool isPlanningToJoin;
     private string codeHostSentViaDiscordToFriend; // (btw)
-    // (already managed)
+    //
 
     private Texture2D[] buttonTex;
 
@@ -147,12 +137,10 @@ public class MainMenu : MonoBehaviour
             popupCurve = AnimationCurve.EaseInOut(0f,0f,1f,1f);
 
             //
-            // multiplayer data acquisition
             remoteFriendsCode = saveMgr.GetRemoteFriendCode();
             codeHostSentViaDiscordToFriend = saveMgr.GetHostCode();
             isPlanningToBeHost = saveMgr.IsPlanningToBeHost();
             isPlanningToJoin = saveMgr.IsPlanningToJoin();
-            // (already managed - you may use in work above)
             //
 
             if (!Application.isEditor)
@@ -214,9 +202,11 @@ public class MainMenu : MonoBehaviour
             sceneSwitchTimer -= Time.deltaTime;
             if ( sceneSwitchTimer < .1f )
             {
-                // multiplayer support (already managed)
-                if (isPlanningToBeHost) HostGame();
-                if (isPlanningToJoin) JoinHostsGame();
+                // multiplayer support
+                if (isPlanningToBeHost)
+                    HostGame();
+                if (isPlanningToJoin)
+                    JoinHostsGame();
                 //
                 SceneManager.LoadScene(sceneSwitchName);
             }

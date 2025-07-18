@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Fusion;
 using Fusion.Sockets;
-using System;
 
 public class GameSelection : MonoBehaviour
 {
@@ -11,12 +10,7 @@ public class GameSelection : MonoBehaviour
     // This handles the game selection screen
 
     //
-    // --- FOR MULTIPLAYER: ---
-    // Here are two big pieces to work with, right here at the top:
-    //
     private string hostsCode; // what a host sends to friends on discord
-    //
-
     void GenerateHostCode()
     {
         // Clear hostsCode
@@ -29,6 +23,7 @@ public class GameSelection : MonoBehaviour
             hostsCode = hostsCode + (char)(65 + UnityEngine.Random.Range(0, 26));
         }
     }
+    //
 
     //
     // This game selection screen will provide a button for the host to get a code
@@ -102,7 +97,7 @@ public class GameSelection : MonoBehaviour
 
     private Texture2D[] buttonTex;
 
-    // multiplayer support (already managed, see above)
+    // multiplayer support
     private bool hostCodeGenerated;
     private bool friendCodeEntered; // will be ready on MainMenu.cs
     //
@@ -1006,6 +1001,7 @@ public class GameSelection : MonoBehaviour
             feedbackTimer = FEEDBACKTIME;
         }
         GUI.enabled = true;
+
         /*
         // remote game column
         // associated games on network
