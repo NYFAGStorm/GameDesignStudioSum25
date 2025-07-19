@@ -215,8 +215,10 @@ public class InGameAlmanac : MonoBehaviour
 
         string s = "";
 
-        if (!showAlmanac && !pcm.hidePlayerHUD)
+        if (!showAlmanac)
         {
+            if (pcm.hidePlayerHUD)
+                return;
             r.x = 0.85f * w;
             r.y = 0.05f * h;
             r.width = 0.15f * w;

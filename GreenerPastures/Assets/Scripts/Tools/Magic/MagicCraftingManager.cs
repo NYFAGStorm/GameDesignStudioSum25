@@ -1006,8 +1006,6 @@ public class MagicCraftingManager : MonoBehaviour
                     GUI.color = c;
                     if (placedIngredients == null || placedIngredients.Length == 0 || !isAmongPlacedPieces(i))
                         GUI.DrawTexture(r, t); // skip if ingredient is placed in grid
-                    else
-                        print("will not draw cauldron item index "+i+" is among placed pieces : "+ isAmongPlacedPieces(i));
                     c = Color.white;
                     // re-adjust larger
                     r.x -= 0.005f * w;

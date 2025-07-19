@@ -21,33 +21,10 @@ public class ShapeLibraryManager : MonoBehaviour
     void Start()
     {
         // validate
-        // TODO: validate only one shape per combination of item and plant
         // initialize
         if (enabled)
         {
             InitializeShapeLibrary();
-
-            /*
-            if ( ingredientShapes == null || ingredientShapes.Length == 0 )
-            {
-                // REVIEW:
-                // temp - create a shape library entry for every
-                // default item type and every plant type
-                int numOfTypes = System.Enum.GetNames(typeof(ItemType)).Length +
-                    System.Enum.GetNames(typeof(PlantType)).Length;
-                ingredientShapes = new IngredientShapeType[numOfTypes];
-                for (int i = 0; i < numOfTypes; i++)
-                {
-                    int itemCount = System.Enum.GetNames(typeof(ItemType)).Length;
-                    if (i < itemCount)
-                        ingredientShapes[i].item = ((ItemType)i);
-                    else
-                        ingredientShapes[i].plant = ((PlantType)i-itemCount);
-                    ingredientShapes[i].pieces = new bool[9];
-                    ingredientShapes[i].pieces[4] = true; // center square on
-                }
-            }
-            */
         }
     }
 
@@ -100,6 +77,8 @@ public class ShapeLibraryManager : MonoBehaviour
     {
         ingredientShapes = new ShapeLibraryManager.IngredientShapeType[TOTALINGREDIENTSHAPETYPES + 2];
 
+        // DEFAULT LEGACY SHAPE LIBRARY
+        // FIXME: only need first 6 for default plant types
         for (int i = 0; i < ingredientShapes.Length; i++)
         {
             ingredientShapes[i].pieces = new bool[9];
@@ -165,6 +144,7 @@ public class ShapeLibraryManager : MonoBehaviour
                 }
             }
         }
+        // 
         for (int i = 0; i < 40; i++)
         {
             int idx = 6 + (i * 4);
@@ -172,15 +152,31 @@ public class ShapeLibraryManager : MonoBehaviour
             ingredientShapes[idx].item = ItemType.Seed;
             ingredientShapes[idx].plant = pt;
             ingredientShapes[idx].pieces[4] = true;
+
             ingredientShapes[idx + 1].item = ItemType.Stalk;
             ingredientShapes[idx + 1].plant = pt;
-            ingredientShapes[idx + 1].pieces[4] = true;
+            ingredientShapes[idx + 1].pieces = GetCustomShape(ItemType.Stalk, pt);
             ingredientShapes[idx + 2].item = ItemType.Fruit;
             ingredientShapes[idx + 2].plant = pt;
-            ingredientShapes[idx + 2].pieces[4] = true;
+            ingredientShapes[idx + 2].pieces = GetCustomShape(ItemType.Fruit, pt);
             ingredientShapes[idx + 3].item = ItemType.Plant;
             ingredientShapes[idx + 3].plant = pt;
-            ingredientShapes[idx + 3].pieces[4] = true;
+            ingredientShapes[idx + 3].pieces = GetCustomShape(ItemType.Plant, pt);
         }
+    }
+
+    bool[] GetCustomShape( ItemType iType, PlantType pType )
+    {
+        bool[] retBool = new bool[9];
+        retBool[4] = true;
+        // seed shape by default, otherwise provided here
+
+        // COMMON
+        // UNCOMMON
+        // RARE
+        // SPECIAL
+        // UNIQUE
+
+        return retBool;
     }
 }
