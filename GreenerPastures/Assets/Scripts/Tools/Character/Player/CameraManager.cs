@@ -48,7 +48,7 @@ public class CameraManager : MonoBehaviour
     private ParticleSystem rainVFX;
     private bool rainOn;
 
-    const float CAMERAPAUSEDURATION = 0.381f;
+    const float CAMERAPAUSEDURATION = 0.0618f;
     const float CAMERAMOVEDURATION = 0.618f;
     const float GLIDEMULTIPLIER = 0.0381f;
     const float PANCRANETARGETVERTICALOFFSET = 0.618f;

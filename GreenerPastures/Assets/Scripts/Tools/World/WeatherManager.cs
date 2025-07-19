@@ -76,7 +76,6 @@ public class WeatherManager : MonoBehaviour
             {
                 previousWeather = new PositionData();
                 targetWeather = new PositionData();
-                Debug.Log("-- near zero overall weather conditions fixed --");
             }
         }
 

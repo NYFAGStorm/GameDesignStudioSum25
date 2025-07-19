@@ -27,7 +27,7 @@ public class TimeManager : MonoBehaviour
     public float currentTempC;
     public float currentTempF;
     public float dayProgress;
-    public int dayOfMonth;
+    public int dayOfMonth = 1;
     public WorldMonth monthOfYear;
     public WorldSeason season;
     public float annualProgress;
