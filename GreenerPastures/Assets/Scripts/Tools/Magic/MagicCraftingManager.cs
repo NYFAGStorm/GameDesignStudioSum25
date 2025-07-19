@@ -88,8 +88,6 @@ public class MagicCraftingManager : MonoBehaviour
     const float PLAYERCHECKTIME = 1f;
     const float PROXIMITYCHECKRADIUS = 0.381f;
 
-    const int TOTALINGREDIENTSHAPETYPES = 170;
-
 
     void Start()
     {
@@ -151,102 +149,11 @@ public class MagicCraftingManager : MonoBehaviour
         if (slm != null && slm.ingredientShapes != null && 
             slm.ingredientShapes.Length > 0)
         {
-            /*
-            * TEMP - must make all ingredients 'seed' shape for now
-            * in order to implement 2x2 grid for level 1 players
-            * recipes needed, ingredients needed, shapes needed
-            * PUZZLE DESIGN NEEDED (blocking)
-            */
-            //shapeLibrary = slm.GetShapeLibrary();
-            //return;
+            shapeLibrary = slm.GetShapeLibrary();
+            return;
         }
-
-        //Debug.LogWarning("--- MagicCraftingManager [InitializeIngredientShapeLibrary] : no shape library manager found in scene or shape invalid data. will use temp shape library.");
-
-        shapeLibrary = new ShapeLibraryManager.IngredientShapeType[TOTALINGREDIENTSHAPETYPES + 2];
-
-        for (int i = 0; i < shapeLibrary.Length; i++)
-        {
-            shapeLibrary[i].pieces = new bool[9];
-            if (i < 6)
-            {
-                switch ((ItemType)i)
-                {
-                    case ItemType.Default:
-                        shapeLibrary[i].item = ItemType.Default;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[4] = true;
-                        break;
-                    case ItemType.Fertilizer:
-                        shapeLibrary[i].item = ItemType.Fertilizer;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[4] = true;
-                        //shapeLibrary[i].pieces[6] = true;
-                        //shapeLibrary[i].pieces[7] = true;
-                        //shapeLibrary[i].pieces[8] = true;
-                        break;
-                    case ItemType.Seed:
-                        shapeLibrary[i].item = ItemType.Seed;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[4] = true;
-                        break;
-                    case ItemType.Plant:
-                        shapeLibrary[i].item = ItemType.Plant;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        //shapeLibrary[i].pieces[0] = true;
-                        //shapeLibrary[i].pieces[1] = true;
-                        //shapeLibrary[i].pieces[2] = true;
-                        shapeLibrary[i].pieces[4] = true;
-                        //shapeLibrary[i].pieces[7] = true;
-                        break;
-                    case ItemType.Stalk:
-                        shapeLibrary[i].item = ItemType.Stalk;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[4] = true;
-                        //shapeLibrary[i].pieces[7] = true;
-                        break;
-                    case ItemType.Fruit:
-                        shapeLibrary[i].item = ItemType.Fruit;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        //shapeLibrary[i].pieces[1] = true;
-                        //shapeLibrary[i].pieces[3] = true;
-                        shapeLibrary[i].pieces[4] = true;
-                        //shapeLibrary[i].pieces[5] = true;
-                        //shapeLibrary[i].pieces[7] = true;
-                        break;
-                    case ItemType.Rock:
-                        shapeLibrary[i].item = ItemType.Rock;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        //shapeLibrary[i].pieces[0] = true;
-                        //shapeLibrary[i].pieces[1] = true;
-                        //shapeLibrary[i].pieces[3] = true;
-                        shapeLibrary[i].pieces[4] = true;
-                        break;
-                    default:
-                        shapeLibrary[i].item = ItemType.Default;
-                        shapeLibrary[i].plant = PlantType.Default;
-                        shapeLibrary[i].pieces[4] = true;
-                        break;
-                }
-            }
-        }
-        for (int i=0; i < 40; i++)
-        {
-            int idx = 6 + (i * 4);
-            PlantType pt = (PlantType)i;
-            shapeLibrary[idx].item = ItemType.Seed;
-            shapeLibrary[idx].plant = pt;
-            shapeLibrary[idx].pieces[4] = true;
-            shapeLibrary[idx + 1].item = ItemType.Stalk;
-            shapeLibrary[idx + 1].plant = pt;
-            shapeLibrary[idx + 1].pieces[4] = true;
-            shapeLibrary[idx + 2].item = ItemType.Fruit;
-            shapeLibrary[idx + 2].plant = pt;
-            shapeLibrary[idx + 2].pieces[4] = true;
-            shapeLibrary[idx + 3].item = ItemType.Plant;
-            shapeLibrary[idx + 3].plant = pt;
-            shapeLibrary[idx + 3].pieces[4] = true;
-        }
+        else
+            Debug.LogWarning("--- MagicCraftingManager [InitializeIngredientShapeLibrary] : no shape library manager found in scene or shape invalid data. will use temp shape library.");
     }
 
     bool[] GetShape( ItemType itype, PlantType pType )
