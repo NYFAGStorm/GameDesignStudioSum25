@@ -21,6 +21,7 @@ public class TimeManager : MonoBehaviour
     public Light moonLight;
 
     public float moonPhase; // 1 = full, 0 = new (light level only)
+    public Renderer moonRenderer;
 
     // TODO: migrate temperature to weather manager
     public float baseTemperature;
@@ -96,6 +97,12 @@ public class TimeManager : MonoBehaviour
             if ( seasonalTiltGimble == null || sunLight == null || moonLight == null )
             {
                 Debug.LogError("--- TimeManager [Start] : gimble or sun or moon lights misconfigured. aborting.");
+                enabled = false;
+            }
+            moonRenderer = moonLight.gameObject.transform.GetComponentInChildren<Renderer>();
+            if (moonRenderer == null)
+            {
+                Debug.LogError("--- TimeManager [Start] : moon object and renderer not found on moon light. aborting.");
                 enabled = false;
             }
         }
@@ -215,6 +222,10 @@ public class TimeManager : MonoBehaviour
         if (moonPhase < 0.001f)
             moonPhase = 0f;
         moonPhase = 1f - moonPhase; // makes 15th new moon, 30th full moon
+        moonRenderer.material.SetFloat("_MoonPhase", moonPhase);
+        Color moonColor = Color.white;
+        moonColor.a = Mathf.Clamp01(1f - (sunLight.intensity * 2f));
+        moonRenderer.material.color = moonColor;
         float moonPhaseLight = (MOONLIGHTINTENSITY * moonPhase);
         // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)
         if (dayProgress > .3f && dayProgress < .7f)
