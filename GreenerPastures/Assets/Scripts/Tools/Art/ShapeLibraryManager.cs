@@ -172,7 +172,323 @@ public class ShapeLibraryManager : MonoBehaviour
         // seed shape by default, otherwise provided here
 
         // COMMON
+        if (pType == PlantType.Corn)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[0] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Tomato)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Carrot)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Poppy)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Rose)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Sunflower)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Moonflower)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Apple)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    retBool[6] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Orange)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Lemon)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
         // UNCOMMON
+        if (pType == PlantType.Lotus)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Marigold)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Magnolia)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Myosotis)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    retBool[6] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Chrystalia)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Pumpkin)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    retBool[6] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Underbloom)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.WaterLily)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Snowgrace)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.Popcorn)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
+        if (pType == PlantType.EclipseFlower)
+        {
+            switch (iType)
+            {
+                case ItemType.Fruit:
+                    retBool[3] = true;
+                    retBool[4] = true;
+                    break;
+                case ItemType.Stalk:
+                    retBool[0] = true;
+                    retBool[1] = true;
+                    retBool[4] = true;
+                    break;
+            }
+        }
         // RARE
         // SPECIAL
         // UNIQUE
