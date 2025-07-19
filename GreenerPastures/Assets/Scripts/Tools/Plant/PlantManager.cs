@@ -160,7 +160,8 @@ public class PlantManager : MonoBehaviour
         if (plantTextureName != "" &&
             (pData.rarity == PlantRarity.Common || 
             pData.rarity == PlantRarity.Uncommon ||
-            pData.rarity == PlantRarity.Rare))
+            pData.rarity == PlantRarity.Rare ||
+            pData.rarity == PlantRarity.Special))
             plantImage.material.mainTexture = (Texture2D)Resources.Load(plantTextureName);
     }
 
