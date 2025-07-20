@@ -185,7 +185,7 @@ public class PlayerIntroduction : MonoBehaviour
             Renderer[] clouds = introCloudParent.transform.GetComponentsInChildren<Renderer>();
             for (int i = 0; i < clouds.Length; i++)
             {
-                int cloudRand = Mathf.RoundToInt( (float)RandomSystem.WeightedRandom01() * 10f);
+                int cloudRand = Mathf.RoundToInt( (float)RandomSystem.WeightedRandom01() * 10f) + 1;
                 float cloudFlip = 1f;
                 if (RandomSystem.FlatRandom01() < 0.5f)
                     cloudFlip = -1f;

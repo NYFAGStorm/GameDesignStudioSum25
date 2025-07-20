@@ -224,7 +224,7 @@ public class TimeManager : MonoBehaviour
         moonPhase = 1f - moonPhase; // makes 15th new moon, 30th full moon
         moonRenderer.material.SetFloat("_MoonPhase", moonPhase);
         Color moonColor = Color.white;
-        moonColor.a = Mathf.Clamp01(1f - (sunLight.intensity * 2f));
+        moonColor.a = Mathf.Clamp01(1f - (sunLight.intensity * 3.81f));
         moonRenderer.material.color = moonColor;
         float moonPhaseLight = (MOONLIGHTINTENSITY * moonPhase);
         // fade sun and moon lights at dawn and dusk (0.75f day progress = dusk, 0.25f = dawn)

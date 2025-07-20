@@ -320,7 +320,8 @@ public class MarketManager : MonoBehaviour
             int value = 0;
             topOfMenuList = 0;
             menuItemSelection = -1;
-            int maxMenuList = maxMenuListPerLevel[currentCustomer.playerData.level];
+            // NOTE: this is here until leveling tweaked
+            int maxMenuList = Mathf.Clamp(maxMenuListPerLevel[currentCustomer.playerData.level],0,9);
             if (iData != null)
             {
                 // cannot sell fertilizer (or 'default' type item)

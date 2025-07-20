@@ -101,7 +101,7 @@ public class PostOfficeManager : MonoBehaviour
         timedMessages[idx].day = 3;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
-        timedMessages[idx].message = "Hello Good Friend,\n\nIf your trees and other re-fruiting plants, here's a tip:\n\nDig up the whole plant and drop in fertilizer, then drop the plant back in the renourished soil.'Hope that helps!\n\nLove, Eden";
+        timedMessages[idx].message = "Hello Good Friend,\n\nIf your trees and other re-fruiting plants are growing slowly, here's a tip:\n\nDig up the whole plant and drop in fertilizer, then drop the plant back in the renourished soil.'Hope that helps!\n\nLove, Eden";
         idx++;
 
         timedMessages[idx].day = 4;
