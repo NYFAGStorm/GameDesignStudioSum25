@@ -108,6 +108,20 @@ public class PlotManager : MonoBehaviour
         {
             cursor.enabled = false;
             plotTimer = 0.1f;
+            // wild plots change grasses texture
+            GameObject grasses = gameObject.transform.Find("Plot Wild Grasses").gameObject;
+            if (grasses != null)
+            {
+                Renderer r = grasses.GetComponentInChildren<Renderer>();
+                if (r != null)
+                {
+                    int rand = Mathf.RoundToInt(RandomSystem.FlatRandom01() * 3f);
+                    rand = Mathf.Clamp(rand, 1, 3);
+                    r.material.mainTexture = (Texture2D)Resources.Load("Plot_Wild"+rand);
+                    if (RandomSystem.FlatRandom01() < .5f)
+                        r.material.SetTextureScale("_MainTex", new Vector2(-1, 1));
+                }
+            }
         }
     }
 
