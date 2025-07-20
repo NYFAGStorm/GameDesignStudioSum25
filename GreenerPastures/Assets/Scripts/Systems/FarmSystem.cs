@@ -70,6 +70,10 @@ public static class FarmSystem
     {
         PlotData retPlot = plot;
 
+        // validate
+        if (plot.plotEffects.Length == 0)
+            return plot;
+
         int count = 0;
         bool found = false;
         PlotEffect[] tmp = new PlotEffect[plot.plotEffects.Length - 1];

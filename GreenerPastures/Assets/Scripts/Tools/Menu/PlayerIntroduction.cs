@@ -1202,13 +1202,13 @@ public class PlayerIntroduction : MonoBehaviour
                     if (currentBeat.islandPos.w >= 0f)
                         vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
                     else
-                        vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX_LocalMagic"));
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Cast Magic"));
                     vfxPos.x = currentBeat.islandPos.x;
                     vfxPos.z = currentBeat.islandPos.z;
                     vfx.transform.position = vfxPos;
                     if (vfx.GetComponentInChildren<SpriteRenderer>()!= null)
                         vfx.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
-                    Destroy(vfx, 1f);
+                    Destroy(vfx, 3.81f);
                     break;
                 case ScriptedBeatAction.ItemSpawn:
                     // item type
@@ -1716,7 +1716,7 @@ public class PlayerIntroduction : MonoBehaviour
             s = currentBeat.dialogLine;
             GUI.color = Color.white;
             GUI.Label(r, s, g);
-            // next button
+            // ok button
             r.x = 0.86f * w;
             r.y = 0.3125f * h;
             r.width = 0.1f * w;
@@ -1734,7 +1734,7 @@ public class PlayerIntroduction : MonoBehaviour
                 g.hover.background = buttonTex[1];
                 g.active.background = buttonTex[2];
             }
-            s = "NEXT";
+            s = "OK";
             GUI.color = Color.white;
             if (GUI.Button(r, s, g))
             {

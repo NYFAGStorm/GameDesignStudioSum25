@@ -229,7 +229,7 @@ public class MarketManager : MonoBehaviour
             }
             int maxMenuList = menuItems.Length - 1;
             //if (currentCustomer.playerData.level < 2)
-                maxMenuList = maxMenuListPerLevel[currentCustomer.playerData.level]; // 20
+                maxMenuList = maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level,0,9)]; // 20
             menuItemSelection = Mathf.Clamp(menuItemSelection, 0, maxMenuList);
             // set top of menu list
             if (menuItemSelection < topOfMenuList)
@@ -321,7 +321,7 @@ public class MarketManager : MonoBehaviour
             topOfMenuList = 0;
             menuItemSelection = -1;
             // NOTE: this is here until leveling tweaked
-            int maxMenuList = Mathf.Clamp(maxMenuListPerLevel[currentCustomer.playerData.level],0,9);
+            int maxMenuList = maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level,0,9)];
             if (iData != null)
             {
                 // cannot sell fertilizer (or 'default' type item)
@@ -377,6 +377,98 @@ public class MarketManager : MonoBehaviour
                     marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
             }
         }
+    }
+
+    /// <summary>
+    /// Returns the market buy price of given item type and give plant type
+    /// </summary>
+    /// <param name="iType">item type</param>
+    /// <param name="pType">plant type</param>
+    /// <returns>market price</returns>
+    public int GetMarketBuyPrice( ItemType iType, PlantType pType )
+    {
+        int retInt = 0;
+
+        if (iType == ItemType.Default)
+            return retInt;
+
+        bool found = false;
+
+        for (int i = 0; i < menuItems.Length; i++)
+        {
+            if (menuItems[i].itemType == iType && menuItems[i].plantIndex == (int)pType )
+            {
+                retInt = menuItems[i].buyItemValue;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            Debug.LogWarning("--- MarketManager [GetMarketBuyPrice] : sell price not found for item '" + iType + "' and plant type '" + pType + "'. will return value of zero.");
+
+        return retInt;
+    }
+
+    /// <summary>
+    /// Returns market sell value of given item type and given plant type (does not factor in quality, see GetFinalMarketSellPrice).
+    /// </summary>
+    /// <param name="iType">item type</param>
+    /// <param name="pType">plant type</param>
+    /// <returns>market sell value</returns>
+    public int GetMarketSellValue( ItemType iType, PlantType pType )
+    {
+        int retInt = 0;
+
+        if (iType == ItemType.Default)
+            return retInt;
+
+        bool found = false;
+
+        for (int i = 0; i < menuItems.Length; i++)
+        {
+            if (menuItems[i].itemType == iType && menuItems[i].plantIndex == (int)pType)
+            {
+                retInt = menuItems[i].sellItemValue;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            Debug.LogWarning("--- MarketManager [GetMarketSellValue] : sell price not found for item '" + iType + "' and plant type '" + pType + "'. will return value of zero.");
+
+        return retInt;
+    }
+
+    /// <summary>
+    /// Returns final sell value of given specific item data taking factors like quality into account
+    /// </summary>
+    /// <param name="item">specific item data</param>
+    /// <returns>final sell value, or zero if not found on menu</returns>
+    public int GetFinalMarketSellValue( ItemData item )
+    {
+        if (item == null || item.type == ItemType.Default)
+            return 0;
+
+        return GetAdjustedSellValue(item, GetMarketSellValue(item.type, item.plant));
+    }
+
+    int GetAdjustedSellValue( ItemData item, int baseValue )
+    {
+        int retInt = baseValue;
+
+        if (item == null || item.type == ItemType.Default)
+            return retInt;
+
+        // REVIEW: amount of quality ding
+        float qualityReduction = 1f - item.quality;
+        // quality factor
+        int qualityDing = Mathf.RoundToInt(baseValue * qualityReduction);
+        retInt -= qualityDing;
+        // TODO: other factors
+
+        return retInt;
     }
 
     void InitializeMenu()

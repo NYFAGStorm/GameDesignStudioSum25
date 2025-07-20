@@ -131,6 +131,7 @@ public class NPCGoldFairy : MonoBehaviour
         Vector3 rand = Random.onUnitSphere;
         rand *= 38.1f;
         rand.y = Mathf.Abs(rand.y);
+        rand.z = -38.1f; // behind player
         pos += rand;
         gameObject.transform.position = pos;
         startLocation = pos;

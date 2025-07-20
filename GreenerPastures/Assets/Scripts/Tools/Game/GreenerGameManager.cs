@@ -363,6 +363,19 @@ public class GreenerGameManager : MonoBehaviour
         GameObject.FindFirstObjectByType<TimeManager>().FastForwardFeatures();
     }
 
+    public void FastForwardPlayerSpellbookCooldowns( float daysAhead )
+    {
+        for (int i = 0; i < game.players.Length; i++)
+        {
+            for (int n = 0; n < game.players[i].magic.library.spellBook.Length; n++)
+            {
+                game.players[i].magic.library.spellBook[n].cooldown -= (daysAhead * 60f * 24f);
+                if (game.players[i].magic.library.spellBook[n].cooldown <= 0f)
+                    game.players[i].magic.library.spellBook[n].cooldown = 0.381f; // allow magic manager to handle appropriately
+            }
+        }
+    }
+
     bool DoGameDataDistribution()
     {
         bool retBool = true;

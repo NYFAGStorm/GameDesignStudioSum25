@@ -2636,7 +2636,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8266917805975550733, guid: 377ac51901b691845be02c105e99b044, type: 3}
       propertyPath: m_Name
-      value: VFX_LocalMagic
+      value: VFX Local Magic
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

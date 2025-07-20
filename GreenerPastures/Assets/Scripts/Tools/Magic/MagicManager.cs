@@ -209,6 +209,10 @@ public class MagicManager : MonoBehaviour
                         spellData.cooldownTimestamp = tim.GetGlobalTimestamp(spellData.cooldownDuration);
                         cData.lifeTimestamp = tim.GetGlobalTimestamp(spellData.castDuration);
                     }
+                    GameObject castVFX = GameObject.Instantiate((GameObject)Resources.Load("VFX Cast Magic"));
+                    castVFX.name = "VFX Cast Magic";
+                    castVFX.transform.position = gameObject.transform.position; // centered on player
+                    Destroy(castVFX, 3.81f);
                     castMgr.AcquireNewCast(cData);
                     pcm.AwardXP(PlayerData.XP_CASTMAGIC);
                     retBool = true;

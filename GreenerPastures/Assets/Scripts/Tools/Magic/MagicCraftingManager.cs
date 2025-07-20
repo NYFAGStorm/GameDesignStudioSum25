@@ -855,7 +855,8 @@ public class MagicCraftingManager : MonoBehaviour
                     if (i < topOfRecipeList || i > topOfRecipeList + 3)
                         continue;
                     // grimiore entry display
-                    c = Color.gray;
+                    c = Color.green;
+                    c *= 0.381f;
                     if (i == currentGrimoireEntry)
                         c = Color.white;
                     if (i == currentGrimoireEntry && !currentEntryValid)
@@ -1247,7 +1248,7 @@ public class MagicCraftingManager : MonoBehaviour
         GUI.color = c;
 
         // cauldron or crafting button
-        r.x = 0.15f * w;
+        r.x = 0.05f * w;
         r.y = 0.9f * h;
         r.width = 0.2f * w;
         r.height = 0.075f * h;
@@ -1323,7 +1324,7 @@ public class MagicCraftingManager : MonoBehaviour
         GUI.enabled = true;
 
         // reset crafting puzzle button
-        r.x = 0.4f * w;
+        r.x = 0.2875f * w;
         r.y = 0.9f * h;
         r.width = 0.2f * w;
         r.height = 0.075f * h;
@@ -1364,8 +1365,55 @@ public class MagicCraftingManager : MonoBehaviour
         }
         GUI.enabled = true;
 
+        // return to grimoire button
+        // (pad y button)
+        r.x = 0.5125f * w;
+        r.y = 0.9f * h;
+        r.width = 0.2f * w;
+        r.height = 0.075f * h;
+        g = new GUIStyle(GUI.skin.button);
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
+        else
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
+        g.active.textColor = Color.white;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
+        s = "BACK TO GRIMOIRE";
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            s += "\n[Y BUTTON]";
+
+        if (craftState == CraftState.Cauldron && 
+            ( GUI.Button(r, s, g) ||
+            (padMgr != null && padMgr.gamepads[0].isActive &&
+                padMgr.gPadDown[0].yButton)))
+        {
+            heldIngredient.cauldronInventoryIndex = -1;
+            heldIngredient.ingredient.name = "";
+            heldIngredient.ingredient.item = ItemType.Default;
+            heldIngredient.ingredient.plant = PlantType.Default;
+            heldPosition = Vector3.zero;
+            heldIngredientShape = new bool[9];
+            ClearPlacedPieces();
+            ClearCauldronGrid();
+            craftingSolved = false;
+            // to grimoire
+            ClearCauldronInventory();
+            selectedGrimoireRecipe = -1;
+            currentGrimoireEntry = -1;
+            craftState = CraftState.Grimoire;
+            craftStateTimer = CRAFTSTATETIMERMAX;
+            fadingOverlay = true;
+        }
+
         // cancel / exit crafting button
-        r.x = 0.65f * w;
+        r.x = 0.75f * w;
         r.y = 0.9f * h;
         r.width = 0.2f * w;
         r.height = 0.075f * h;

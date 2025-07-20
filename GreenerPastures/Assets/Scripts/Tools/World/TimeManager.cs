@@ -28,7 +28,7 @@ public class TimeManager : MonoBehaviour
     public float currentTempC;
     public float currentTempF;
     public float dayProgress;
-    public int dayOfMonth = 1;
+    public int dayOfMonth;
     public WorldMonth monthOfYear;
     public WorldSeason season;
     public float annualProgress;
@@ -490,8 +490,8 @@ public class TimeManager : MonoBehaviour
         
         future.worldTimeOfDay += daysAhead;
         future.worldTimeOfDay %= 1f;
-        // REVIEW: due to int (we do not want this to round up?)
-        future.worldDayOfMonth += Mathf.RoundToInt(daysAhead);
+        // REVIEW: due to int, we do want this to round up
+        future.worldDayOfMonth += Mathf.RoundToInt(daysAhead + 0.5f);
         future.worldDayOfMonth %= 30;
         // REVIEW: due to int
         future.worldMonth += Mathf.RoundToInt((daysAhead/30f));
@@ -539,6 +539,10 @@ public class TimeManager : MonoBehaviour
             }
             // weather manager
             wm.FastForwardWeather(fastForwardTime);
+            // player spell book cooldowns
+            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+            if (ggm != null)
+                ggm.FastForwardPlayerSpellbookCooldowns(fastForwardTime);
             // reset
             savedTimeOfDay = 0f;
             fastForwardTime = 0f;

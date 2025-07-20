@@ -25,7 +25,7 @@ public class WeatherManager : MonoBehaviour
     private TimeManager tim;
     private CameraManager cm;
 
-    const float WEATHERCHECKINTERVAL = 15f;
+    const float WEATHERCHECKINTERVAL = .0618f;
 
     const float WINDFACTORSCALE = 1f;
     const float WINDFACTOROFFSET = 3.81f;

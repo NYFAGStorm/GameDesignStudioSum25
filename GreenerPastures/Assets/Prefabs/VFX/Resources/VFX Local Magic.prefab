@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8716436456439284358}
   - component: {fileID: 912848267401557998}
   m_Layer: 0
-  m_Name: VFX_LocalMagic
+  m_Name: VFX Local Magic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
