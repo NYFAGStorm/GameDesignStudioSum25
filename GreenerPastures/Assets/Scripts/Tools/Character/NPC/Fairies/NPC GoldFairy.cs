@@ -129,9 +129,9 @@ public class NPCGoldFairy : MonoBehaviour
         pos.z = islandPos.z;
         // from center of island, move fairy off
         Vector3 rand = Random.onUnitSphere;
-        rand *= 38.1f;
         rand.y = Mathf.Abs(rand.y);
-        rand.z = -38.1f; // behind player
+        rand.z = -1f * Mathf.Abs(rand.z);
+        rand = rand.normalized * 38.1f;
         pos += rand;
         gameObject.transform.position = pos;
         startLocation = pos;

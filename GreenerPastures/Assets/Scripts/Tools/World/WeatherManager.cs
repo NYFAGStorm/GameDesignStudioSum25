@@ -25,7 +25,7 @@ public class WeatherManager : MonoBehaviour
     private TimeManager tim;
     private CameraManager cm;
 
-    const float WEATHERCHECKINTERVAL = .0618f;
+    const float WEATHERCHECKINTERVAL = 15f; //.0618f;
 
     const float WINDFACTORSCALE = 1f;
     const float WINDFACTOROFFSET = 3.81f;
@@ -70,7 +70,8 @@ public class WeatherManager : MonoBehaviour
         if (!GameSystem.IsZero(previousWeather) && !GameSystem.IsZero(targetWeather) &&
             GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
         {
-            previousWeather = targetWeather;
+            previousWeather = GameSystem.Zero();
+            targetWeather = GameSystem.Zero();
             //Debug.Log("-- near zero difference in weather conditions --");
             if (GameSystem.PositionDistance(new PositionData(), targetWeather) < 0.1f)
             {
@@ -83,7 +84,7 @@ public class WeatherManager : MonoBehaviour
         if (weatherTimer > 0f)
         {
             weatherTimer -= Time.deltaTime;
-            float smoothProgress = 1f - (weatherTimer / (WEATHERCHECKINTERVAL / (timeMultiplier / 60f)));
+            float smoothProgress = Mathf.Clamp01(1f - (weatherTimer / (WEATHERCHECKINTERVAL / (timeMultiplier / 60f))));
             if (weatherTimer > 0f)
             {
                 // smooth results with lerp between checks
@@ -96,11 +97,11 @@ public class WeatherManager : MonoBehaviour
             }
         }
 
-        // set weather to target
-        windAmount = targetWeather.x;
-        windDirection = targetWeather.y;
-        cloudAmount = targetWeather.z;
-        rainAmount = targetWeather.w;
+        // set previous weather
+        previousWeather.x = windAmount;
+        previousWeather.y = windDirection;
+        previousWeather.z = cloudAmount;
+        previousWeather.w = rainAmount;
 
         // timer set
         weatherTimer = WEATHERCHECKINTERVAL / (timeMultiplier / 60f);
@@ -139,12 +140,6 @@ public class WeatherManager : MonoBehaviour
     PositionData CalculateCurrentWeather( float offsetDays )
     {
         PositionData weatherDelta = new PositionData(); // may be used in fast-forward
-
-        // smoothing
-        previousWeather.x = targetWeather.x; // wind
-        previousWeather.y = targetWeather.y; // wind dir
-        previousWeather.z = targetWeather.z; // cloud
-        previousWeather.w = targetWeather.w; // rain
 
         // time check
         globalTimeProgress = tim.GetGlobalTimeProgress();
