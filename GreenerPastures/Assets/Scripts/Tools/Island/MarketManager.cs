@@ -1085,8 +1085,7 @@ public class MarketManager : MonoBehaviour
         // add icon art to all menu items
         for (int i = 0; i < (idx-1); i++)
         {
-            menuItems[i].itemIcon = 
-                alm.GetImageList(alm.GetArtData(menuItems[i].itemType, (PlantType)menuItems[i].plantIndex))[0];
+            menuItems[i].itemIcon = alm.GetImageList(alm.GetArtData(menuItems[i].itemType, (PlantType)menuItems[i].plantIndex))[0];
         }
     }
 

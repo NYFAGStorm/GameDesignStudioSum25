@@ -18,6 +18,12 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
         DontDestroyOnLoad(gameObject);
     }
 
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_PassMessage([RpcTarget] PlayerRef targ, string message)
+    {
+        Debug.Log(message);
+    }
+
     // Use GameMode.Host and GameMode.Client to determine join type
     public async void StartMultiplayerGame(GameMode mode, string code)
     {
@@ -43,8 +49,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (Runner.IsServer)
         {
-            //players[plrCount] = player;
-            //plrCount++;
+            RPC_PassMessage(player, "You are connected as " + player);
         }
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
