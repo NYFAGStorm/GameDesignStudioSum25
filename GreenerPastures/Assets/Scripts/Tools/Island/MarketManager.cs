@@ -1159,6 +1159,7 @@ public class MarketManager : MonoBehaviour
 
             r.y += 0.12f * h;
         }
+
         //r.x = (w - 0.7f * h) / 2;
         //r.y = 0.2f * h;
         //r.width = 0.7f * h;
