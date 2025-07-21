@@ -3056,6 +3056,7 @@ MonoBehaviour:
   sunLight: {fileID: 0}
   moonLight: {fileID: 0}
   moonPhase: 0
+  moonRenderer: {fileID: 0}
   baseTemperature: 0
   currentTempC: 0
   currentTempF: 0

@@ -132,3 +132,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuItems: []
+  roundedBox: {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}

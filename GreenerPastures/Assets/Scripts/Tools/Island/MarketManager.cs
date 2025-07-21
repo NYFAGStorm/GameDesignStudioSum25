@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class MarketManager : MonoBehaviour
@@ -48,7 +49,7 @@ public class MarketManager : MonoBehaviour
     const float PLAYERCHECKTIME = 1f;
     const float MARKETPROXIMITYRANGE = .5f;
     const float REJECTFLASHTIME = 1f;
-    const int MENUITEMSINLIST = 7;
+    const int MENUITEMSINLIST = 4;
 
 
     void Start()
@@ -1084,10 +1085,10 @@ public class MarketManager : MonoBehaviour
         float w = Screen.width;
         float h = Screen.height;
 
-        r.x = 0.35f * w;
-        r.y = 0.25f * h;
-        r.width = 0.3f * w;
-        r.height = 0.5f * h;
+        r.x = (w - 0.8f * h) / 2;
+        r.y = 0.1f * h;
+        r.width = 0.8f * h;
+        r.height = 0.8f * h;
 
         // draw bg
         Texture2D t = Texture2D.whiteTexture;
@@ -1098,68 +1099,88 @@ public class MarketManager : MonoBehaviour
         GUI.DrawTexture(r, t);
         
         GUIStyle g = new GUIStyle(GUI.skin.label);
-        g.fontSize = Mathf.RoundToInt( 20 * (w/1024f) );
         g.fontStyle = FontStyle.Bold;
 
         string s = "";
 
-        r.x = 0.35f * w;
-        r.y = 0.275f * h;
-        r.width = 0.3f * w;
+        r.x = (w - 0.8f * h) / 2;
+        r.y = 0.1f * h;
+        r.width = 0.8f * h;
         r.height = 0.1f * h;
         g.alignment = TextAnchor.MiddleCenter;
         s = marketInstructions;
         GUI.color = Color.white;
         GUI.Label(r, s, g);
 
-        r.x = 0.3625f * w;
-        r.y = 0.4f * h;
-        r.width = 0.25f * w;
-        r.height = 0.05f * h;
-        g.alignment = TextAnchor.MiddleLeft;
+        r.y = 0.2f * h;
+        r.height = 0.1f * h;
         for (int i = 0; i < menuItems.Length; i++)
         {
+            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+
             if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
                 continue;
             if (currentCustomer.playerData.level < 2 && i > 20)
                 continue;
+
             s = menuItems[i].itemName;
-            c = Color.white;
+            c = new Color(0.3f, 0.3f, 0.3f);
             if (i == menuItemSelection)
             {
-                c = Color.yellow;
+                c = new Color(0.25f, 0.6f, 0.2f);
                 if (rejectFlashTimer > 0f)
                     c.g = (rejectFlashTimer * 5f) % 1f;
             }
+
+            // Item Background
+            r.x = (w - 0.7f * h) / 2;
+            r.width = 0.7f * h;
+
             GUI.color = c;
+            GUI.DrawTexture(r, t);
+
+            r.x = (w - 0.6f * h) / 2;
+            r.width = 0.6f * h;
+
+            // Item Name
+            g.alignment = TextAnchor.MiddleLeft;
+            GUI.color = Color.white;
             GUI.Label(r, s, g);
-            r.y += 0.04f * h;
-        }
-        r.x = 0.5625f * w;
-        r.y = 0.4f * h;
-        r.width = 0.075f * w;
-        r.height = 0.05f * h;
-        g.alignment = TextAnchor.MiddleRight;
-        for (int i = 0; i < menuItems.Length; i++)
-        {
-            if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
-                continue;
-            if (currentCustomer.playerData.level < 2 && i > 20)
-                continue;
+
+            // Item Value
+            g.fontSize = Mathf.RoundToInt(g.fontSize * 1.5f);
+            g.alignment = TextAnchor.MiddleRight;
+
             if (customerMode == CustomerMode.Sell)
-                s = (menuItems[i].buyItemValue-1).ToString(); // (less 1 gold as profit margin)
+                s = "$" + (menuItems[i].buyItemValue - 1).ToString(); // (less 1 gold as profit margin)
             else
-                s = menuItems[i].buyItemValue.ToString();
-            c = Color.white;
-            if (i == menuItemSelection)
-            {
-                c = Color.yellow;
-                if (rejectFlashTimer > 0f)
-                    c.g = (rejectFlashTimer * 5f) % 1f;
-            }
-            GUI.color = c;
+                s = "$" + menuItems[i].buyItemValue.ToString();
             GUI.Label(r, s, g);
-            r.y += 0.04f * h;
+
+            r.y += 0.12f * h;
         }
+        //r.x = (w - 0.7f * h) / 2;
+        //r.y = 0.2f * h;
+        //r.width = 0.7f * h;
+        //r.height = 0.05f * h;
+        //for (int i = 0; i < menuItems.Length; i++)
+        //{
+        //    if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
+        //        continue;
+        //    if (currentCustomer.playerData.level < 2 && i > 20)
+        //        continue;
+
+        //    //c = Color.white;
+        //    //if (i == menuItemSelection)
+        //    //{
+        //    //    c = Color.yellow;
+        //    //    if (rejectFlashTimer > 0f)
+        //    //        c.g = (rejectFlashTimer * 5f) % 1f;
+        //    //}
+        //    //GUI.color = c;
+
+
+        //    r.y += 0.06f * h;
+        //}
     }
 }

@@ -9,8 +9,6 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     // Author: Gustavo Rojas Flores
     // Handles all things connected to network management
-    
-    // Q: Where should I connect StartMultiplayerGame() and within which script?
 
     private NetworkRunner Runner;
 
