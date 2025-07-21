@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Fusion;
 using Fusion.Sockets;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -12,22 +12,29 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private NetworkRunner Runner;
 
+    private void Start()
+    {
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
+    }
+
     // Use GameMode.Host and GameMode.Client to determine join type
     public async void StartMultiplayerGame(GameMode mode, string code)
     {
         Runner = gameObject.AddComponent<NetworkRunner>();
         Runner.ProvideInput = true;
 
-        var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
-        var sceneInfo = new NetworkSceneInfo();
-        if (scene.IsValid) sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
+        //var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
+        //var sceneInfo = new NetworkSceneInfo();
+        //if (scene.IsValid) sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
 
         await Runner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
             SessionName = code,
-            Scene = scene,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            PlayerCount = 8,
+            IsOpen = true,
+            IsVisible = false
         }
         );
     }
@@ -63,7 +70,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadStart(NetworkRunner runner) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-    public void OnShutdown(NetworkRunner runner, ShutdownReason exit) {}
+    public void OnShutdown(NetworkRunner runner, ShutdownReason exit) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }

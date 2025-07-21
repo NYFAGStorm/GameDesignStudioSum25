@@ -52,6 +52,7 @@ public class MarketManager : MonoBehaviour
     const float MARKETPROXIMITYRANGE = .5f;
     const float REJECTFLASHTIME = 1f;
     const int MENUITEMSINLIST = 4;
+    const float MENUVERTICALOFFSETPERCENT = 0.06f;
 
 
     void Start()
@@ -1102,7 +1103,7 @@ public class MarketManager : MonoBehaviour
         float h = Screen.height;
 
         r.x = (w - 0.8f * h) / 2;
-        r.y = 0.1f * h;
+        r.y = 0.1f * h + (MENUVERTICALOFFSETPERCENT * h);
         r.width = 0.8f * h;
         r.height = 0.8f * h;
 
@@ -1116,11 +1117,12 @@ public class MarketManager : MonoBehaviour
 
         GUIStyle g = new GUIStyle(GUI.skin.label);
         g.fontStyle = FontStyle.Bold;
+        g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
 
         string s = "";
 
         r.x = (w - 0.8f * h) / 2;
-        r.y = 0.1f * h;
+        r.y = 0.1f * h + (MENUVERTICALOFFSETPERCENT * h);
         r.width = 0.8f * h;
         r.height = 0.1f * h;
         g.alignment = TextAnchor.MiddleCenter;
@@ -1128,7 +1130,7 @@ public class MarketManager : MonoBehaviour
         GUI.color = Color.white;
         GUI.Label(r, s, g);
 
-        r.y = 0.2f * h;
+        r.y = 0.2f * h + (MENUVERTICALOFFSETPERCENT * h);
         for (int i = 0; i < menuItems.Length; i++)
         {
             r.x = (w - 0.7f * h) / 2;
@@ -1150,7 +1152,6 @@ public class MarketManager : MonoBehaviour
             }
 
             // Item Background
-
             GUI.color = c;
             GUI.DrawTexture(r, t);
 
