@@ -1113,7 +1113,7 @@ public class MarketManager : MonoBehaviour
         c.a = 0.381f;
         GUI.color = c;
         GUI.DrawTexture(r, t);
-        
+
         GUIStyle g = new GUIStyle(GUI.skin.label);
         g.fontStyle = FontStyle.Bold;
 
@@ -1129,9 +1129,11 @@ public class MarketManager : MonoBehaviour
         GUI.Label(r, s, g);
 
         r.y = 0.2f * h;
-        r.height = 0.1f * h;
         for (int i = 0; i < menuItems.Length; i++)
         {
+            r.x = (w - 0.7f * h) / 2;
+            r.width = 0.7f * h;
+            r.height = 0.1f * h;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
 
             if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
@@ -1139,7 +1141,6 @@ public class MarketManager : MonoBehaviour
             if (currentCustomer.playerData.level < 2 && i > 20)
                 continue;
 
-            s = menuItems[i].itemName;
             c = new Color(0.3f, 0.3f, 0.3f);
             if (i == menuItemSelection)
             {
@@ -1149,28 +1150,28 @@ public class MarketManager : MonoBehaviour
             }
 
             // Item Background
-            r.x = (w - 0.7f * h) / 2;
-            r.width = 0.7f * h;
 
             GUI.color = c;
             GUI.DrawTexture(r, t);
 
-            r.x = (w - 0.6f * h) / 2;
-            r.width = 0.6f * h;
+            // Icon
+            r.width = r.height;
+            GUI.DrawTexture(r, menuItems[i].itemIcon);
 
-            // Item Name
+            r.x = (w - 0.5f * h) * 0.55f;
+            r.width = 0.5f * h;
+
+            // Display Name
+            s = menuItems[i].itemName;
             g.alignment = TextAnchor.MiddleLeft;
             GUI.color = Color.white;
             GUI.Label(r, s, g);
 
-            // Item Value
+            // Market Value
             g.fontSize = Mathf.RoundToInt(g.fontSize * 1.5f);
             g.alignment = TextAnchor.MiddleRight;
 
-            if (customerMode == CustomerMode.Sell)
-                s = "$" + (menuItems[i].buyItemValue - 1).ToString(); // (less 1 gold as profit margin)
-            else
-                s = "$" + menuItems[i].buyItemValue.ToString();
+            s = "$" + (menuItems[i].buyItemValue - (customerMode == CustomerMode.Sell ? 1 : 0)).ToString(); // (less 1 gold as profit margin)
             GUI.Label(r, s, g);
 
             r.y += 0.12f * h;
