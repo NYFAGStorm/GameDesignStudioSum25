@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class MarketManager : MonoBehaviour
@@ -17,6 +16,7 @@ public class MarketManager : MonoBehaviour
     public struct MenuItem
     {
         public string itemName;
+        public Texture2D itemIcon;
         public ItemType itemType;
         public int plantIndex;
         public int buyItemValue;
@@ -46,6 +46,8 @@ public class MarketManager : MonoBehaviour
     int specialPlants = 10;
     //int uniquePlants = 9;
 
+    private ArtLibraryManager alm;
+
     const float PLAYERCHECKTIME = 1f;
     const float MARKETPROXIMITYRANGE = .5f;
     const float REJECTFLASHTIME = 1f;
@@ -58,6 +60,12 @@ public class MarketManager : MonoBehaviour
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
             Debug.LogWarning("--- MarketManager [Start] : no multi gamepad found. will ignore.");
+        alm = GameObject.FindFirstObjectByType<ArtLibraryManager>();
+        if (alm == null)
+        {
+            Debug.LogError("--- MarketManager [Start] : no art library manager found in scene. aborting.");
+            enabled = false;
+        }
         // initialize
         if ( enabled )
         {
@@ -474,7 +482,7 @@ public class MarketManager : MonoBehaviour
 
     void InitializeMenu()
     {
-        menuItems = new MenuItem[generalItems + (plantItemTypes * 
+        menuItems = new MenuItem[generalItems + (plantItemTypes *
             (commonPlants + uncommonPlants + rarePlants + specialPlants))]; // + uniquePlants];
 
         int idx = 0;
@@ -1071,6 +1079,14 @@ public class MarketManager : MonoBehaviour
         idx++;
 
         // -- UNIQUE PLANTS --
+        // REVIEW:
+
+        // add icon art to all menu items
+        for (int i = 0; i < (idx-1); i++)
+        {
+            menuItems[i].itemIcon = 
+                alm.GetImageList(alm.GetArtData(menuItems[i].itemType, (PlantType)menuItems[i].plantIndex))[0];
+        }
     }
 
     void OnGUI()
