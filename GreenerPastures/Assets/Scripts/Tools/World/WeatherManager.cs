@@ -70,13 +70,17 @@ public class WeatherManager : MonoBehaviour
         if (!GameSystem.IsZero(previousWeather) && !GameSystem.IsZero(targetWeather) &&
             GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
         {
-            previousWeather = GameSystem.Zero();
-            targetWeather = GameSystem.Zero();
-            //Debug.Log("-- near zero difference in weather conditions --");
+
+            //previousWeather = GameSystem.Zero();
+            previousWeather = targetWeather;
+            //targetWeather = GameSystem.Zero();
+            Debug.Log("-- near zero difference in weather conditions --");
             if (GameSystem.PositionDistance(new PositionData(), targetWeather) < 0.1f)
             {
-                previousWeather = new PositionData();
-                targetWeather = new PositionData();
+                //previousWeather = targetWeather;
+                print("-- previous set to equal --");
+                //new PositionData();
+                //targetWeather = new PositionData();
             }
         }
 
