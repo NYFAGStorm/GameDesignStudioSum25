@@ -161,13 +161,13 @@ public class PlantManager : MonoBehaviour
             (pData.rarity == PlantRarity.Common || 
             pData.rarity == PlantRarity.Uncommon ||
             pData.rarity == PlantRarity.Rare ||
-            pData.rarity == PlantRarity.Special))
+            pData.rarity == PlantRarity.Special ||
+            pData.rarity == PlantRarity.Unique))
             plantImage.material.mainTexture = (Texture2D)Resources.Load(plantTextureName);
     }
 
     string GetPlantShootSize( PlantType plantType )
     {
-        // TODO: unique plants
         string retString = "Short";
 
         if (plantType == PlantType.Rose ||
@@ -184,7 +184,10 @@ public class PlantManager : MonoBehaviour
             plantType == PlantType.FleurDeLis ||
             plantType == PlantType.BlastApple ||
             plantType == PlantType.PixiePlumeria ||
-            plantType == PlantType.SplatBerry)
+            plantType == PlantType.SplatBerry ||
+            plantType == PlantType.Jazzmyne ||
+            plantType == PlantType.BettingHedge ||
+            plantType == PlantType.GenesisSapling)
             retString = "Medium";
 
         if (plantType == PlantType.Corn ||
@@ -197,7 +200,10 @@ public class PlantManager : MonoBehaviour
             plantType == PlantType.Coconut ||
             plantType == PlantType.Mysteria ||
             plantType == PlantType.CrystalRose ||
-            plantType == PlantType.Tropicus)
+            plantType == PlantType.Tropicus ||
+            plantType == PlantType.HerbalPert ||
+            plantType == PlantType.WillowWisp ||
+            plantType == PlantType.WalkingStick)
             retString = "Tall";
 
         return retString;

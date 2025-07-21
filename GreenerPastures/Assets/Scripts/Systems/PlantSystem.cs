@@ -420,6 +420,99 @@ public static class PlantSystem
                 retData.winterVitality = .65f;
                 break;
             // UNIQUE PLANTS
+            case PlantType.Jazzmyne:
+                retData.plantName = "Jazzmyne";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.canReFruit = true;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.Mashroom:
+                retData.plantName = "Mashroom";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.isDarkPlant = true;
+                retData.canReFruit = false;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.HerbalPert:
+                retData.plantName = "Herbal Pert";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.canReFruit = true;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.FireflyTrap:
+                retData.plantName = "Firefly Trap";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.isDarkPlant = true;
+                retData.canReFruit = true;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.BettingHedge:
+                retData.plantName = "Betting Hedge";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.canReFruit = true;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.BawnSigh:
+                retData.plantName = "Bawn Sigh";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.canReFruit = false;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.WillowWisp:
+                retData.plantName = "Willow Wisp";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.isDarkPlant = true;
+                retData.canReFruit = true;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.WalkingStick:
+                retData.plantName = "Walking Stick";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.canReFruit = true;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
+            case PlantType.GenesisSapling:
+                retData.plantName = "Genesis Sapling";
+                retData.rarity = PlantRarity.Unique;
+                retData.growthRate = .381f;
+                retData.canReFruit = false;
+                retData.springVitality = .618f;
+                retData.summerVitality = 1f;
+                retData.fallVitality = .618f;
+                retData.winterVitality = .381f;
+                break;
             default:
                 UnityEngine.Debug.LogWarning("--- PlantSystem [ConfigurePlantByType] : type "+type.ToString()+" not found. will ignore.");
                 break;

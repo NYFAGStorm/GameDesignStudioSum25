@@ -288,7 +288,7 @@ public class ArtLibraryManager : MonoBehaviour
     {
         // PLANT ITEMS
         ArtData[] newArtData =
-            new ArtData[3 * (COMMONPLANTS + UNCOMMONPLANTS + RAREPLANTS + SPECIALPLANTS)]; // + UNIQUEPLANTS)];
+            new ArtData[3 * (COMMONPLANTS + UNCOMMONPLANTS + RAREPLANTS + SPECIALPLANTS + UNIQUEPLANTS)];
 
         string itemName;
         string plant;
@@ -372,7 +372,6 @@ public class ArtLibraryManager : MonoBehaviour
             AddToImages((Texture2D)Resources.Load(itemName));
         }
         
-        /*
         // unique
         rarity = "Unique";
         min += SPECIALPLANTS;
@@ -391,7 +390,6 @@ public class ArtLibraryManager : MonoBehaviour
             newArtData[idx + 2] = ConfigItemArtData(plant, ItemType.Plant, (PlantType)(i + 1), idx + 2);
             AddToImages((Texture2D)Resources.Load(itemName));
         }
-        */
 
         AddToArtData(newArtData);
     }

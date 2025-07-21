@@ -46,7 +46,16 @@ public enum PlantType
     PixiePlumeria,
     FaeFoxglove,
     DruidsLotus,
-    SplatBerry
+    SplatBerry,
+    Jazzmyne,
+    Mashroom,
+    HerbalPert,
+    FireflyTrap,
+    BettingHedge,
+    BawnSigh,
+    WillowWisp,
+    WalkingStick,
+    GenesisSapling
 }
 
 public enum PlantRarity
