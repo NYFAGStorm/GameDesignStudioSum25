@@ -1,8 +1,10 @@
-Shader "Unlit/Three Layer Composite"
+Shader "Unlit/Six Layer Composite"
 {
     // Author: Glenn Storm
-    // composite three-layer unlit with transparency, rendered both sides
+    // composite six-layer unlit with transparency, rendered both sides
     // _LineArt outline,
+    // _HairFill fill image, _HairCol color property for hair fill
+    // _SkinFill fill image, _SkinCol color property for skin fill
     // _AccentFill fill image, _AccentCol color property for accent fill
     // _AltFill fill image, _AltCol color property for alt fill
     // _Maintex fill image, _Color property for fill
@@ -10,6 +12,10 @@ Shader "Unlit/Three Layer Composite"
     Properties
     {
         _LineArt ("Texture", 2D) = "white" {}
+        _HairFill ("Texture", 2D) = "white" {}
+        _HairCol ("Color", Color) = (1,1,1,1)
+        _SkinFill ("Texture", 2D) = "white" {}
+        _SkinCol ("Color", Color) = (1,1,1,1)
         _AccentFill ("Texture", 2D) = "white" {}
         _AccentCol ("Color", Color) = (1,1,1,1)
         _AltFill ("Textue", 2D) = "white" {}
@@ -54,13 +60,19 @@ Shader "Unlit/Three Layer Composite"
             };
 
             sampler2D _LineArt;
+            sampler2D _HairFill;
+            sampler2D _SkinFill;
             sampler2D _AccentFill;
             sampler2D _AltFill;
             sampler2D _MainTex;
             float4 _LineArt_ST;
+            float4 _HairFill_ST;
+            float4 _SkinFill_ST;
             float4 _AccentFill_ST;
             float4 _AltFill_ST;
             float4 _MainTex_ST;
+            float4 _HairCol;
+            float4 _SkinCol;
             float4 _AccentCol;
             float4 _AltCol;
             float4 _Color;
@@ -78,15 +90,25 @@ Shader "Unlit/Three Layer Composite"
             {
                 // sample fill texture
                 fixed4 lin = tex2D(_LineArt, i.uv);
+                fixed4 har = tex2D(_HairFill, i.uv);
+                fixed4 skn = tex2D(_SkinFill, i.uv);
                 fixed4 acc = tex2D(_AccentFill, i.uv);
                 fixed4 alt = tex2D(_AltFill, i.uv);
                 fixed4 col = tex2D(_MainTex, i.uv);
+                // apply hair fill color
+                har = har * _HairCol;
+                // apply skin fill color
+                skn = skn * _SkinCol;
                 // apply accent fill color
                 acc = acc * _AccentCol;
                 // apply alt fill color
                 alt = alt * _AltCol;
                 // apply main fill color
                 col = col * _Color;
+                // lay hair on top of main
+                col = lerp(col,har,har.a);
+                // lay skin on top of main
+                col = lerp(col,skn,skn.a);
                 // lay alt on top of main
                 col = lerp(col,alt,alt.a);
                 // lay accent on top of main
@@ -94,7 +116,7 @@ Shader "Unlit/Three Layer Composite"
                 // lay line on top of main
                 col = lerp(col,lin,lin.a);
                 // clamp add alpha from all
-                col.a = clamp(lin.a + acc.a + alt.a + col.a,0,1);
+                col.a = clamp(lin.a + har.a + skn.a + acc.a + alt.a + col.a,0,1);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
