@@ -141,50 +141,206 @@ public static class MagicSystem
                 break;
             case SpellType.FastGrowI:
                 retSpell.name = "Fast Grow I";
-                retSpell.cooldownDuration = 1440f; // one day
+                retSpell.cooldownDuration = 300f; // one day
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = 3f; // 4x4 plot range
                 break;
             case SpellType.SummonWaterI:
                 retSpell.name = "Summon Water I";
-                retSpell.cooldownDuration = 1440f;
+                retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
+            case SpellType.SoiledItI: // TODO: revise all new spell config
+                retSpell.name = "Soiled It I";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = .1f; // instant
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.MirrorMirror:
+                retSpell.name = "Mirror Mirror";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = .1f; // instant
+                retSpell.castAOE = 1f; // self
+                break;
             case SpellType.BlessI:
                 retSpell.name = "Bless I";
-                retSpell.cooldownDuration = 1440f;
+                retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = 3f; // 4x4 plot range
                 break;
+            case SpellType.DaylightI:
+                retSpell.name = "Daylight I";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.GildedWordsI:
+                retSpell.name = "Gilded Words I";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.SeedingEcho:
+                retSpell.name = "Seeding Echo";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.ColorTrailI:
+                retSpell.name = "Color Trail I";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.ColorTrailII:
+                retSpell.name = "Color Trail II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.ColorTrailIII:
+                retSpell.name = "Color Trail III";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
             case SpellType.MalnutritionI:
                 retSpell.name = "Malnutrition I";
-                retSpell.cooldownDuration = 1440f;
+                retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = 3f; // 4x4 plot range
                 break;
             case SpellType.ProsperousI:
                 retSpell.name = "Prosperous I";
-                retSpell.cooldownDuration = 1440f;
+                retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 720f; // half day
                 retSpell.castAOE = 3f; // 4x4 plot range
                 break;
+            case SpellType.TheGreatHarvest:
+                retSpell.name = "The Great Harvest";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.FastGrowII:
+                retSpell.name = "Fast Grow II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.Splaturn:
+                retSpell.name = "Splaturn";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
             case SpellType.LesionI:
                 retSpell.name = "Lesion I";
-                retSpell.cooldownDuration = 1440f;
+                retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 720f; // half day
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.BlessedSpring:
+                retSpell.name = "Blessed Spring";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.TheReaper:
+                retSpell.name = "The Reaper";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.Swiftness:
+                retSpell.name = "Swiftness";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.LightWork:
+                retSpell.name = "Light Work";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.SummonWaterII:
+                retSpell.name = "Summon Water II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.StarbloomBurst:
+                retSpell.name = "Starbloom Burst";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.EclipseI:
                 retSpell.name = "Eclipse I";
-                retSpell.cooldownDuration = 1440f;
+                retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = 3f; // 4x4 plot range
                 break;
             case SpellType.GoldenThumbI:
                 retSpell.name = "Golden Thumb I";
-                retSpell.cooldownDuration = 1440f;
+                retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 720f; // half day
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.GildedWordsII:
+                retSpell.name = "Gilded Words II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.DullEarth:
+                retSpell.name = "Dull Earth";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.FogOfWar:
+                retSpell.name = "Fog Of War";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.SoiledItII:
+                retSpell.name = "Soiled It II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.ProsperousII:
+                retSpell.name = "Prosperous II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.MalnutritionII:
+                retSpell.name = "Malnutrition II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.BlessII:
+                retSpell.name = "Bless II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.DaylightII:
+                retSpell.name = "Daylight II";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
+                retSpell.castAOE = 1.5f; // 2x2 plot range
+                break;
+            case SpellType.RabbitHole:
+                retSpell.name = "Rabbit Hole";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 1440f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             default:
@@ -357,6 +513,22 @@ public static class MagicSystem
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 retSpell.ingredients[1] = InitializeIngredient(ItemType.Fruit, PlantType.Default);
                 break;
+            case SpellType.SoiledItI: // TODO: revise all new spell config
+                retSpell.name = "Soiled It I";
+                retSpell.description = "Increase the quality of the soil. (10%)";
+                retSpell.ingredients = new IngredientData[4];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[3] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                break;
+            case SpellType.MirrorMirror:
+                retSpell.name = "Mirror Mirror";
+                retSpell.description = "Change your appearance.";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Stalk, PlantType.Tomato);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
             case SpellType.BlessI:
                 retSpell.name = "Bless I";
                 retSpell.description = "Make plants immune to all hazards for one day.";
@@ -364,6 +536,48 @@ public static class MagicSystem
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
                 retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
                 retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.DaylightI:
+                retSpell.name = "Daylight I";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.GildedWordsI:
+                retSpell.name = "Gilded Words I";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.SeedingEcho:
+                retSpell.name = "Seeding Echo";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.ColorTrailI:
+                retSpell.name = "Color Trail I";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.ColorTrailII:
+                retSpell.name = "Color Trail II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.ColorTrailIII:
+                retSpell.name = "Color Trail III";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             case SpellType.MalnutritionI:
                 retSpell.name = "Malnutrition I";
@@ -382,6 +596,27 @@ public static class MagicSystem
                 retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 retSpell.ingredients[3] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
+            case SpellType.TheGreatHarvest:
+                retSpell.name = "The Great Harvest";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.FastGrowII:
+                retSpell.name = "Fast Grow II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.Splaturn:
+                retSpell.name = "Splaturn";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
             case SpellType.LesionI:
                 retSpell.name = "Lesion I";
                 retSpell.description = "Curse plots and decrease harvest quality. (-5%)";
@@ -390,6 +625,48 @@ public static class MagicSystem
                 retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
                 retSpell.ingredients[2] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
                 retSpell.ingredients[3] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.BlessedSpring:
+                retSpell.name = "Blessed Spring";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.TheReaper:
+                retSpell.name = "The Reaper";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.Swiftness:
+                retSpell.name = "Swiftness";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.LightWork:
+                retSpell.name = "Light Work";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.SummonWaterII:
+                retSpell.name = "Summon Water II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.StarbloomBurst:
+                retSpell.name = "Starbloom Burst";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             case SpellType.EclipseI:
                 retSpell.name = "Eclipse I";
@@ -409,6 +686,69 @@ public static class MagicSystem
                 retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 retSpell.ingredients[3] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 retSpell.ingredients[4] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.GildedWordsII:
+                retSpell.name = "Gilded Words II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.DullEarth:
+                retSpell.name = "Dull Earth";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.FogOfWar:
+                retSpell.name = "Fog Of War";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.SoiledItII:
+                retSpell.name = "Soiled It II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.ProsperousII:
+                retSpell.name = "Prosperous II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.MalnutritionII:
+                retSpell.name = "Malnutrition II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.BlessII:
+                retSpell.name = "Bless II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.DaylightII:
+                retSpell.name = "Daylight II";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
+                break;
+            case SpellType.RabbitHole:
+                retSpell.name = "Rabbit Hole";
+                retSpell.description = "";
+                retSpell.ingredients = new IngredientData[2];
+                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);
                 break;
             default:
                 UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureGrimoireEntry] : spell type undefined. will ignore.");
