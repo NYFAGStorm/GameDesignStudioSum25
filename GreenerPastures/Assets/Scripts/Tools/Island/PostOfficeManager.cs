@@ -101,19 +101,31 @@ public class PostOfficeManager : MonoBehaviour
         timedMessages[idx].day = 3;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
-        timedMessages[idx].message = "Hello Good Friend,\n\nIf your trees and other re-fruiting plants are growing slowly, here's a tip:\n\nDig up the whole plant and drop in fertilizer, then drop the plant back in the renourished soil.'Hope that helps!\n\nLove, Eden";
+        timedMessages[idx].message = "I have good advice for you,\n\nYour Biomancer's Almanac is a wealth of valuable information.\n\nFind time each day to read a little more about the world we live in.\n\nAnd watch for new entries to be unlocked as you level up!\n\nLove, Eden";
         idx++;
 
         timedMessages[idx].day = 4;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
-        timedMessages[idx].message = "You Are Loved,\n\nYou are appreciated and recognized. You have more to offer the world. Please create and share. Be well, do good, have fun and take care.\n\nLove, Eden\n\nP.S. - Remember to pay the tax man at the end of the month.";
+        timedMessages[idx].message = "Hello Good Friend,\n\nIf your trees and other re-fruiting plants are growing slowly, here's a tip:\n\nDig up the whole plant and drop in fertilizer, then drop the plant back in the renourished soil.'Hope that helps!\n\nLove, Eden";
         idx++;
 
         timedMessages[idx].day = 5;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "You Are Loved,\n\nYou are appreciated and recognized. You have more to offer the world. Please create and share. Be well, do good, have fun and take care.\n\nLove, Eden\n\nP.S. - Remember to pay the tax man at the end of the month.";
+        idx++;
+
+        timedMessages[idx].day = 6;
+        timedMessages[idx].month = WorldMonth.Mar;
+        timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "Biomancer Friend,\n\nMay the sun and rain bless your garden and grow your magic for the Genesis Tree.\n\nKeep in mind the our market has new sale items when you level up and their items change every season.\n\nLove, Eden";
+        idx++;
+
+        timedMessages[idx].day = 7;
+        timedMessages[idx].month = WorldMonth.Mar;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Grace of the Genesis Tree be with you,\n\nKeep in mind that you can hold the fruit of one plant, and graft it to the stalk of another.\n\nIf they are compatible, you'll have a new more rare plant. Happy grafting!\n\nLove, Eden";
         idx++;
     }
 
