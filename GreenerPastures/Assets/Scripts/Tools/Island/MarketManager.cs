@@ -1154,10 +1154,6 @@ public class MarketManager : MonoBehaviour
             GUI.color = c;
             GUI.DrawTexture(r, t);
 
-            // Icon
-            r.width = r.height;
-            GUI.DrawTexture(r, menuItems[i].itemIcon);
-
             r.x = (w - 0.5f * h) * 0.55f;
             r.width = 0.5f * h;
 
@@ -1171,7 +1167,15 @@ public class MarketManager : MonoBehaviour
             g.fontSize = Mathf.RoundToInt(g.fontSize * 1.5f);
             g.alignment = TextAnchor.MiddleRight;
 
-            s = "$" + (menuItems[i].buyItemValue - (customerMode == CustomerMode.Sell ? 1 : 0)).ToString(); // (less 1 gold as profit margin)
+            // Icon (placed above)
+            r.x = (w - 0.7f * h) / 2;
+            r.width = r.height;
+            GUI.DrawTexture(r, menuItems[i].itemIcon);
+
+            // not dollars, currency is gold
+            r.x = (w - 0.5f * h) * 0.55f;
+            r.width = 0.5f * h;
+            s = (menuItems[i].buyItemValue - (customerMode == CustomerMode.Sell ? 1 : 0)).ToString(); // (less 1 gold as profit margin)
             GUI.Label(r, s, g);
 
             r.y += 0.12f * h;
