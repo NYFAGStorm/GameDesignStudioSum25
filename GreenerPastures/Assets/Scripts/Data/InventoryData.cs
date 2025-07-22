@@ -14,7 +14,9 @@ public enum ItemType
     GoldSack,
     Package,
     Letter,
-    Coupon // REVIEW: 
+    Coupon,
+    Scroll,
+    Potion // REVIEW: 
 }
 
 // if there are discrete effects that can be applied to an item

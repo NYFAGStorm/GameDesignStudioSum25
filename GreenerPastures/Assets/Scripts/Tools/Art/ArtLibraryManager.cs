@@ -11,7 +11,7 @@ public class ArtLibraryManager : MonoBehaviour
     public ArtLibraryData itemArtData;
     public Texture2D[] itemImages;
 
-    const int GENERALITEMS = 11;
+    const int GENERALITEMS = 13;
     const int COMMONPLANTS = 10;
     const int UNCOMMONPLANTS = 11;
     const int RAREPLANTS = 10;
@@ -278,6 +278,17 @@ public class ArtLibraryManager : MonoBehaviour
         // coupon
         itemName = "Coupon";
         newArtData[idx] = ConfigItemArtData(itemName, ItemType.Coupon, PlantType.Default, idx);
+        AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
+
+        // scroll
+        itemName = "Scroll";
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Scroll, PlantType.Default, idx);
+        AddToImages((Texture2D)Resources.Load("Item_" + itemName));
+        idx++;
+        // potion
+        itemName = "Potion";
+        newArtData[idx] = ConfigItemArtData(itemName, ItemType.Potion, PlantType.Default, idx);
         AddToImages((Texture2D)Resources.Load("Item_" + itemName));
         idx++;
 

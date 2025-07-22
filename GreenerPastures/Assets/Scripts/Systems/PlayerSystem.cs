@@ -33,6 +33,58 @@ public static class PlayerSystem
         return retPlayer;
     }
 
+    public static UnityEngine.Color GetPlayerHairColor( PlayerHairColor shade )
+    {
+        UnityEngine.Color retColor = new UnityEngine.Color();
+
+        switch (shade)
+        {
+            case PlayerHairColor.Default:
+                retColor.r = 1f;
+                retColor.g = 1f;
+                retColor.b = 1f;
+                break;
+            case PlayerHairColor.ShadeA:
+                retColor.r = .618f;
+                retColor.g = .618f;
+                retColor.b = .618f;
+                break;
+            case PlayerHairColor.ShadeB:
+                retColor.r = .1f;
+                retColor.g = .1f;
+                retColor.b = .1f;
+                break;
+            case PlayerHairColor.ShadeC:
+                retColor.r = .618f;
+                retColor.g = .381f;
+                retColor.b = .2f;
+                break;
+            case PlayerHairColor.ShadeD:
+                retColor.r = .381f;
+                retColor.g = .2f;
+                retColor.b = .1f;
+                break;
+            case PlayerHairColor.ShadeE:
+                retColor.r = .8f;
+                retColor.g = .618f;
+                retColor.b = .381f;
+                break;
+            case PlayerHairColor.ShadeF:
+                retColor.r = .9f;
+                retColor.g = .8f;
+                retColor.b = .618f;
+                break;
+            case PlayerHairColor.ShadeG:
+                retColor.r = 1f;
+                retColor.g = .381f;
+                retColor.b = .381f;
+                break;
+        }
+        retColor.a = 1f;
+
+        return retColor;
+    }
+
     public static UnityEngine.Color GetPlayerSkinColor( PlayerSkinColor tone )
     {
         UnityEngine.Color retColor = new UnityEngine.Color();

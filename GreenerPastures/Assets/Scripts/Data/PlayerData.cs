@@ -20,6 +20,18 @@ public enum PlayerModelType
     Female
 }
 
+public enum PlayerHairColor
+{
+    Default,
+    ShadeA,
+    ShadeB,
+    ShadeC,
+    ShadeD,
+    ShadeE,
+    ShadeF,
+    ShadeG
+}
+
 public enum PlayerSkinColor
 {
     Default,
@@ -56,8 +68,10 @@ public enum PlayerColor
 public struct PlayerOptions
 {
     public PlayerModelType model;
+    public PlayerHairColor hairColor;
     public PlayerSkinColor skinColor;
     public PlayerColor mainColor;
+    public PlayerColor secondaryColor;
     public PlayerColor accentColor;
 }
 
