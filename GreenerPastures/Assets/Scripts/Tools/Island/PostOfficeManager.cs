@@ -83,7 +83,7 @@ public class PostOfficeManager : MonoBehaviour
 
     void InitializeTimedMessages()
     {
-        timedMessages = new ScheduledMessages[5];
+        timedMessages = new ScheduledMessages[7];
         int idx = 0;
 
         timedMessages[idx].day = 1;

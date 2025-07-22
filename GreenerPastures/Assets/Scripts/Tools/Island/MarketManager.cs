@@ -35,6 +35,8 @@ public class MarketManager : MonoBehaviour
     private float rejectFlashTimer;
     private Vector3 purchaseOffset = new Vector3(-1f,0f,0f);
 
+    private int playerItemFinalSellValue; // value determined when selling item, per quality
+
     private int[] maxMenuListPerLevel = new int[11];
     
     int generalItems = 1; // fertilizer
@@ -342,7 +344,10 @@ public class MarketManager : MonoBehaviour
                         if (menuItems[i].itemType == iData.type &&
                             menuItems[i].plantIndex == (int)iData.plant)
                         {
-                            value = menuItems[i].sellItemValue;
+                            // use item quality in determining final sell value
+                            playerItemFinalSellValue = GetFinalMarketSellValue(iData);
+                            // display final sell value and use as amount to give player
+                            value = playerItemFinalSellValue;
                             found = true;
                             menuItemSelection = i;
                             topOfMenuList = i;
@@ -371,6 +376,8 @@ public class MarketManager : MonoBehaviour
                         // PLAYER STATS:
                         currentCustomer.playerData.stats.totalGoldEarned += value;
                         currentCustomer.AwardXP(PlayerData.XP_SELLTOSHOP);
+                        // reset final sell value
+                        playerItemFinalSellValue = 0;
                     }
                 }
             }
@@ -385,6 +392,7 @@ public class MarketManager : MonoBehaviour
                 marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
                 if (padMgr != null && padMgr.gamepads[0].isActive)
                     marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
+                playerItemFinalSellValue = 0;
             }
         }
     }
@@ -471,12 +479,12 @@ public class MarketManager : MonoBehaviour
         if (item == null || item.type == ItemType.Default)
             return retInt;
 
-        // REVIEW: amount of quality ding
+        // amount of quality ding
         float qualityReduction = 1f - item.quality;
         // quality factor
         int qualityDing = Mathf.RoundToInt(baseValue * qualityReduction);
         retInt -= qualityDing;
-        // TODO: other factors
+        // REVIEW: other factors
 
         return retInt;
     }
@@ -1154,12 +1162,15 @@ public class MarketManager : MonoBehaviour
             GUI.color = c;
             GUI.DrawTexture(r, t);
 
-            r.x = (w - 0.5f * h) * 0.55f;
+            r.x = (w - 0.575f * h) * 0.55f;
             r.width = 0.5f * h;
 
             // Display Name
             s = menuItems[i].itemName;
+            if (customerMode == CustomerMode.Sell && menuItemSelection == i)
+                s = menuItems[i].itemName + "\nQuality "+(Mathf.RoundToInt(currentCustomer.GetPlayerCurrentItemSelection().quality * 100f))+"%";
             g.alignment = TextAnchor.MiddleLeft;
+            g.wordWrap = true;
             GUI.color = Color.white;
             GUI.Label(r, s, g);
 
@@ -1173,9 +1184,18 @@ public class MarketManager : MonoBehaviour
             GUI.DrawTexture(r, menuItems[i].itemIcon);
 
             // not dollars, currency is gold
+            // and items have an individual sell value, per GDD tables
+            // (which is part of menu item list data already)
             r.x = (w - 0.5f * h) * 0.55f;
             r.width = 0.5f * h;
-            s = (menuItems[i].buyItemValue - (customerMode == CustomerMode.Sell ? 1 : 0)).ToString(); // (less 1 gold as profit margin)
+            s = menuItems[i].buyItemValue.ToString(); // buy value
+            if (customerMode == CustomerMode.Sell)
+            {
+                if (i == menuItemSelection)
+                    s = playerItemFinalSellValue.ToString(); // starting with item sell value taking quality into account
+                else
+                    s = menuItems[i].sellItemValue.ToString(); // normal sell value displayed for other items
+            }
             GUI.Label(r, s, g);
 
             r.y += 0.12f * h;

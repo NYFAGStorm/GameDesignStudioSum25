@@ -66,21 +66,21 @@ public class WeatherManager : MonoBehaviour
 
     void Update()
     {
-        // fix rounding error values in weather conditions
-        if (!GameSystem.IsZero(previousWeather) && !GameSystem.IsZero(targetWeather) &&
-            GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
+        // fix rounding error values in weather conditions (clouds and rain not zero)
+        if (targetWeather.z > 0f && previousWeather.z > 0f)
         {
-
-            //previousWeather = GameSystem.Zero();
-            previousWeather = targetWeather;
-            //targetWeather = GameSystem.Zero();
-            Debug.Log("-- near zero difference in weather conditions --");
-            if (GameSystem.PositionDistance(new PositionData(), targetWeather) < 0.1f)
+            if (previousWeather.z < .01f)
             {
-                //previousWeather = targetWeather;
-                print("-- previous set to equal --");
-                //new PositionData();
-                //targetWeather = new PositionData();
+                if (GameSystem.PositionDistance(new PositionData(), targetWeather) < 0.1f)
+                {
+                    targetWeather = new PositionData();
+                    Debug.Log("-- near zero target weather conditions. set target to zero. --");
+                }
+                if (GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
+                {
+                    previousWeather = targetWeather;
+                    Debug.Log("-- near zero difference in weather conditions. set prev to target. --");
+                }
             }
         }
 
