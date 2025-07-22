@@ -1167,8 +1167,9 @@ public class MarketManager : MonoBehaviour
 
             // Display Name
             s = menuItems[i].itemName;
-            if (customerMode == CustomerMode.Sell && menuItemSelection == i)
-                s = menuItems[i].itemName + "\nQuality "+(Mathf.RoundToInt(currentCustomer.GetPlayerCurrentItemSelection().quality * 100f))+"%";
+            if (customerMode == CustomerMode.Sell && menuItemSelection == i &&
+                currentCustomer.GetPlayerCurrentItemSelection() != null)
+                s = menuItems[i].itemName + "\nQuality "+(Mathf.RoundToInt(currentCustomer.GetPlayerCurrentItemSelection().quality * 1000f)/10f)+"%";
             g.alignment = TextAnchor.MiddleLeft;
             g.wordWrap = true;
             GUI.color = Color.white;

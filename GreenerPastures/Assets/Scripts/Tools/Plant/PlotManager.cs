@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlotManager : MonoBehaviour
 {
@@ -682,6 +683,9 @@ public class PlotManager : MonoBehaviour
                             {
                                 iData.plant = data.plant.type;
                                 iData.name += " (" + data.plant.plantName.ToString() + ")";
+                                // transfer properties of fruit to item (revise item data)
+                                iData.size = data.plant.growth;
+                                iData.quality = data.plant.quality;
                             }
                             currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
                         }

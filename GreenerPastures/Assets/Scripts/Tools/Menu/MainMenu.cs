@@ -402,6 +402,8 @@ public class MainMenu : MonoBehaviour
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "LOGIN";
+            if (saveMgr.GetRosterData().profiles.Length == 0)
+                s = "NEW";
             if (profileActive)
                 s = "LOGOUT";
             else if (popupConfirm && popupPass == confirmPass)
