@@ -261,7 +261,7 @@ public class PlayerIntroduction : MonoBehaviour
     //
     void ConfigureIntroBeats()
     {
-        introBeats = new ScriptedBeat[125]; // we use ~122 beats, currently
+        introBeats = new ScriptedBeat[130]; // we use ~124 beats, currently
         int beat = 0;
         introBeats[beat].name = "intro launch - world view";
         introBeats[beat].action = ScriptedBeatAction.Default;
@@ -825,10 +825,22 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].transition = ScriptedBeatTransition.Default;
         introBeats[beat].islandPos.w = 1f;
         beat++;
+        introBeats[beat].name = "'actions earn XP'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].dialogLine =
+            "You will earn XP from doing farm work and other actions.";
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        introBeats[beat].name = "'you will level up when you have enough xp'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].dialogLine =
+            "When you have enough XP, you will level up and unlock new abilities.";
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
         introBeats[beat].name = "'All this hard work pays'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
-            "All this hard work pays off at the market, and it all leads to magic.";
+            "Farm work pays off at the market in gold, and it all leads to magic.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "'When you level up'";
@@ -840,13 +852,13 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].name = "'On the table, your grimiore'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
-            "On the table, your grimiore will have new spells available to craft.";
+            "On the table, your Grimiore will have new spells available to craft.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "'Crafted spells are stored'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
-            "Crafted spells are stored in your spell book, so you can cast them.";
+            "Crafted spells are stored in your Spell Book, so you can cast them.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "- dramatic pause -";
@@ -1208,7 +1220,10 @@ public class PlayerIntroduction : MonoBehaviour
                     vfx.transform.position = vfxPos;
                     if (vfx.GetComponentInChildren<SpriteRenderer>()!= null)
                         vfx.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
-                    Destroy(vfx, 3.81f);
+                    if (currentBeat.islandPos.w >= 0f)
+                        Destroy(vfx, 1f);
+                    else
+                        Destroy(vfx, 3.81f);
                     break;
                 case ScriptedBeatAction.ItemSpawn:
                     // item type
