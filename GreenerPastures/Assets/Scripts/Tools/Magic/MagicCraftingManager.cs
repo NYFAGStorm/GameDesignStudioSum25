@@ -506,9 +506,6 @@ public class MagicCraftingManager : MonoBehaviour
         for ( int i = 0; i < entry.ingredients.Length; i++ )
         {
             bool found = false;
-
-            // REVIEW: will this properly handle multiples of same ingredient?
-
             for (int n = 0; n < pcm.playerData.inventory.items.Length; n++)
             {
                 if ((entry.ingredients[i].plant == PlantType.Default && 
@@ -552,9 +549,6 @@ public class MagicCraftingManager : MonoBehaviour
         for (int i = 0; i < recipe.ingredients.Length; i++)
         {
             bool found = false;
-
-            // REVIEW: will this properly handle multiples of same ingredient?
-
             for (int n = 0; n < pcm.playerData.inventory.items.Length; n++)
             {
                 if ((recipe.ingredients[i].plant == PlantType.Default && 
@@ -571,6 +565,45 @@ public class MagicCraftingManager : MonoBehaviour
             if (!found)
                 Debug.LogWarning("--- MagicCraftingManager [FillCauldronInventory] : missing recipe ingredient '" + recipe.ingredients[i].name + "'. will ignore.");
         }
+    }
+
+    bool DoesCauldronHaveEachPlacedPiece()
+    {
+        bool retBool = true;
+
+        // player has solved puzzle, and still has inventory ingredients
+        // we've already verified the cauldron inventory has valid ingredients
+        // but we cannot guarantee their shapes are the same
+        // (if not, puzzle needs to be reset for player to solve anew)
+        // placed pieces must match shape, so seeds are always fine
+        // otherwise match plant type
+        
+        for (int i = 0; i < placedIngredients.Length; i++)
+        {
+            if (placedIngredients[i].ingredient.item == ItemType.Plant ||
+                placedIngredients[i].ingredient.item == ItemType.Stalk ||
+                placedIngredients[i].ingredient.item == ItemType.Fruit)
+            {
+                // find plant match in cauldron
+                bool found = false;
+                for (int n = 0; n < cauldronInventory.items.Length; n++)
+                {
+                    if (cauldronInventory.items[n].type == placedIngredients[i].ingredient.item &&
+                        cauldronInventory.items[n].plant == placedIngredients[i].ingredient.plant)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    retBool = false;
+                    break;
+                }
+            }
+        }
+
+        return retBool;
     }
 
     void ClearCauldronInventory()
@@ -922,7 +955,9 @@ public class MagicCraftingManager : MonoBehaviour
             // NOTE: this sits top-left, to receive spell charge
 
             // grimoire recipe entry (cauldron inventory display)
-            ItemData[] cauldronInv = cauldronInventory.items;
+            ItemData[] cauldronInv = new ItemData[0];
+            if (cauldronInventory != null && cauldronInventory.items.Length > 0) 
+                cauldronInv = cauldronInventory.items; // else we should not be in cauldron anymore
             r.x = 0.15f * w;
             r.y = 0.55f * h;
             r.width = 0.3f * w;
@@ -951,7 +986,7 @@ public class MagicCraftingManager : MonoBehaviour
 
             Vector3 mouseClickPos = Vector3.zero;
             // acquire held item from mouse position and click
-            if (heldIngredient.cauldronInventoryIndex == -1 && Input.GetMouseButtonDown(0))
+            if (currentEntryValid && heldIngredient.cauldronInventoryIndex == -1 && Input.GetMouseButtonDown(0))
             {
                 mouseClickPos = Input.mousePosition;
                 // convert mouse position pixels to viewport space
@@ -978,8 +1013,9 @@ public class MagicCraftingManager : MonoBehaviour
             r.height = r.width; // square
             c = Color.white;
             GUI.color = c;
-            for (int i = 0; i < cauldronInventory.items.Length; i++)
+            for (int i = 0; i < pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients.Length; i++)
             {
+                // if not valid, we should never need cauldron inventory items available here
                 if (currentEntryValid)
                 {
                     // item icon
@@ -1016,7 +1052,7 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 // inventory slot frame
                 t = (Texture2D)Resources.Load("Plot_Cursor");
-                if (padMgr != null && padMgr.gamepads[0].isActive 
+                if (padMgr != null && padMgr.gamepads[0].isActive
                     && padIngredientSelection == i)
                     c = Color.yellow;
                 GUI.color = c;
@@ -1164,7 +1200,7 @@ public class MagicCraftingManager : MonoBehaviour
         }
 
         // detect mouse release held item or gamepad a button release
-        if (heldIngredient.cauldronInventoryIndex > -1 && (
+        if (currentEntryValid && heldIngredient.cauldronInventoryIndex > -1 && (
             ( (padMgr == null || !padMgr.gamepads[0].isActive) && Input.GetMouseButtonUp(0) ) || 
             ( padMgr != null && padMgr.gamepads[0].isActive && !padMgr.gamepads[0].aButton ) ) )
         {
@@ -1301,11 +1337,32 @@ public class MagicCraftingManager : MonoBehaviour
 
                 pcm.AwardXP(PlayerData.XP_CRAFTMAGIC);
 
-                // remove all recipe ingredient items from player inventory
+                // remove all cauldron inventory items from player inventory
                 RemoveAllIngredientsFromPlayer();
-                // if player no longer has necessary ingredients available, un-solve puzzle
-                if (!PlayerInventoryHasAllIngredients(gData))
+                // clear cauldron inventory
+                ClearCauldronInventory();
+                // re-fill cauldron inventory if player has necessary ingredients
+                if (PlayerInventoryHasAllIngredients(gData))
                 {
+                    FillCauldronInventory(gData);
+                    // if placed pieces do not match cauldron inventory items (shape), reset puzzle
+                    if (!DoesCauldronHaveEachPlacedPiece())
+                    {
+                        // TODO: make a unified ResetPuzzle function
+                        heldIngredient.cauldronInventoryIndex = -1;
+                        heldIngredient.ingredient.name = "";
+                        heldIngredient.ingredient.item = ItemType.Default;
+                        heldIngredient.ingredient.plant = PlantType.Default;
+                        heldPosition = Vector3.zero;
+                        heldIngredientShape = new bool[9];
+                        ClearPlacedPieces();
+                        ClearCauldronGrid();
+                        craftingSolved = false;
+                    }
+                }
+                else
+                {
+                    // if player no longer has necessary ingredients available, un-solve puzzle
                     currentEntryValid = false;
                     // reset craft interface due to lack of ingredients
                     heldIngredient.cauldronInventoryIndex = -1;
