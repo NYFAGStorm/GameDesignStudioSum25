@@ -220,7 +220,7 @@ public class InGameAlmanac : MonoBehaviour
             if (pcm.hidePlayerHUD)
                 return;
             r.x = 0.85f * w;
-            r.y = 0.05f * h;
+            r.y = 0.0625f * h;
             r.width = 0.15f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);

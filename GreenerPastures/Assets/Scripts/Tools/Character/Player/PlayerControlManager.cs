@@ -1101,8 +1101,51 @@ public class PlayerControlManager : MonoBehaviour
         GUI.color = Color.white;
 
         r.x += 0.125f * w;
-        r.y = 0.015f * h;
+        r.y = 0.025f * h;
+        r.width = 0.125f * w;
+        r.height = 0.03f * h;
+        t = Texture2D.whiteTexture;
+        c = Color.black;
+        c.a = 0.381f;
+        GUI.color = c;
+        GUI.DrawTexture(r, t);
+        float levelInterval = PlayerSystem.GetXPLevelInterval(playerData.level);
+        float amtToNext = PlayerSystem.GetXPAmountToNextLevel(playerData.xp, playerData.level);
+        float amtToCurrent = PlayerSystem.GetXPAmountToLevel(playerData.level);
+        r.width = (0.125f * w) * ( (playerData.xp - amtToCurrent) / levelInterval);
+        c = Color.yellow;
+        c.a = 0.381f;
+        GUI.color = c;
+        GUI.DrawTexture(r, t);
 
+        r.x += 0.005f * w;
+        r.y = 0.015f * h;
+        r.width = 0.125f * w;
+        r.height = 0.05f * h;
+        s = "XP: ";
+        s += playerData.xp.ToString();
+
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+        c = Color.black;
+        if (XPDisplayTimer > 0f)
+            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 2f) % 1f));
+        GUI.color = c;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        c = Color.yellow;
+        if (XPDisplayTimer > 0f)
+            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 2f) % 1f));
+        GUI.color = c;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+        r.x -= 0.0025f * w;
+        r.y += 0.04f * h;
+        g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
+        g.padding = new RectOffset(0, 0, 0, 0);
         s = "LEVEL: ";
         s += playerData.level.ToString();
 
@@ -1110,34 +1153,14 @@ public class PlayerControlManager : MonoBehaviour
         r.y += 0.001f * h;
         c = Color.black;
         if (levelUpDisplayTimer > 0f)
-            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 2f) % 1f));
+            c.a = Mathf.Clamp01(.381f + (1f - (levelUpDisplayTimer * 3f) % 1f));
         GUI.color = c;
         GUI.Label(r, s, g);
         r.x -= 0.0012f * w;
         r.y -= 0.002f * h;
         c = Color.yellow;
         if (levelUpDisplayTimer > 0f)
-            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 2f) % 1f));
-        GUI.color = c;
-        GUI.Label(r, s, g);
-        GUI.color = Color.white;
-
-        r.y += 0.04f * h;
-        s = "XP: ";
-        s += playerData.xp.ToString();
-
-        r.x += 0.0006f * w;
-        r.y += 0.001f * h;
-        c = Color.black;
-        if (XPDisplayTimer > 0f)
-            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 3f) % 1f));
-        GUI.color = c;
-        GUI.Label(r, s, g);
-        r.x -= 0.0012f * w;
-        r.y -= 0.002f * h;
-        c = Color.yellow;
-        if (XPDisplayTimer > 0f)
-            c.a = Mathf.Clamp01(.381f + (1f - (XPDisplayTimer * 3f) % 1f));
+            c.a = Mathf.Clamp01(.381f + (1f - (levelUpDisplayTimer * 3f) % 1f));
         GUI.color = c;
         GUI.Label(r, s, g);
         GUI.color = Color.white;

@@ -12,7 +12,7 @@ public static class WorldSystem
 
         // initialize
         retWorld.worldTimeOfDay = 9f; // 9am
-        retWorld.worldDayOfMonth = 1;
+        retWorld.worldDayOfMonth = 0;
         retWorld.worldMonth = WorldMonth.Mar;
         retWorld.worldSeason = WorldSeason.Spring;
         // REVIEW: leave for functions to set

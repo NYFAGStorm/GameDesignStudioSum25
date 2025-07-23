@@ -455,8 +455,6 @@ public class TimeManager : MonoBehaviour
         wm.SetStartWeather(startWeather);
 
         UpdateAmbientLighting();
-
-
     }
 
     /// <summary>
@@ -490,9 +488,11 @@ public class TimeManager : MonoBehaviour
         
         future.worldTimeOfDay += daysAhead;
         future.worldTimeOfDay %= 1f;
-        // REVIEW: due to int, we do want this to round up
-        future.worldDayOfMonth += Mathf.RoundToInt(daysAhead + 0.5f);
+        //
+        future.worldDayOfMonth += Mathf.RoundToInt(daysAhead);
         future.worldDayOfMonth %= 30;
+        if (future.worldDayOfMonth == 0)
+            future.worldDayOfMonth = 1; // REVIEW: prevents day 0
         // REVIEW: due to int
         future.worldMonth += Mathf.RoundToInt((daysAhead/30f));
         future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);

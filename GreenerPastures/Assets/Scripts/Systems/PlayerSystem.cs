@@ -230,14 +230,14 @@ public static class PlayerSystem
     }
 
     /// <summary>
-    /// Returns the regular interval a player can reach the next level
+    /// Returns the additional xp needed to reach the next level given the current level
     /// </summary>
-    /// <returns>xp amount of the level interval</returns>
-    public static int GetXPLevelInterval()
+    /// <returns>xp amount of the level</returns>
+    public static int GetXPLevelInterval( int currentLevel )
     {
-        const int XPLEVELINTERVAL = 300; // x10 spreadsheet numbers (we could x100)
+        int xpToNextLevel = 600 + (UnityEngine.Mathf.Max(currentLevel,0) * 300);
 
-        return XPLEVELINTERVAL;
+        return xpToNextLevel;
     }
 
     /// <summary>
@@ -248,13 +248,35 @@ public static class PlayerSystem
     public static int GetPlayerLevel( int xp )
     {
         int retInt = 0;
+        int xpUsed = xp;
 
-        // x2 interval needed to reach level 1
-        retInt = (xp / GetXPLevelInterval()) - 1;
+        while ( xpUsed >= 0 )
+        {
+            xpUsed -= GetXPLevelInterval(retInt);
+            retInt++;
+        }
+        retInt--;
 
         if (retInt < 0)
             retInt = 0;
         
+        return retInt;
+    }
+
+    /// <summary>
+    /// Returns the amount of xp that would be needed for a player to reach the given level
+    /// </summary>
+    /// <param name="targetLevel">target level hypothetically reached</param>
+    /// <returns>amount of xp needed</returns>
+    public static int GetXPAmountToLevel( int targetLevel )
+    {
+        int retInt = 0;
+
+        for (int i = 0; i < targetLevel; i++)
+        {
+           retInt += GetXPLevelInterval(i);
+        }
+
         return retInt;
     }
 
@@ -268,9 +290,13 @@ public static class PlayerSystem
     {
         int retInt = 0;
 
-        int targetAmount = (currentLevel + 1) * GetXPLevelInterval();
-        // x2 interval needed to reach level 1
-        targetAmount += GetXPLevelInterval();
+        int prevLevel = currentLevel;
+        int prevLevelXP = 0;
+        for ( int i = 0; i < prevLevel; i++ )
+        {
+            prevLevelXP += GetXPLevelInterval(i);
+        }
+        int targetAmount = prevLevelXP + GetXPLevelInterval( currentLevel );
         retInt = targetAmount - currentXP;
 
         return retInt;

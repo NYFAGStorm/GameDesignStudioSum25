@@ -1664,7 +1664,7 @@ public class PlayerIntroduction : MonoBehaviour
         if (canSkipIntro)
         {
             r.x = 0.875f * w;
-            r.y = 0.05f * h;
+            r.y = 0.06f * h;
             r.width = 0.1f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.button);
