@@ -306,17 +306,17 @@ public class CheatManager : MonoBehaviour
                 PlayerData pData = plcm.playerData;
                 pData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, pData.magic.library);
                 pData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, pData.magic.library);
-                pData.magic.library.grimiore[0].name = "Fast Grow I";
-                pData.magic.library.grimiore[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
-                pData.magic.library.grimiore[0].description = "Plants grow faster for one day. (5%)";
-                pData.magic.library.grimiore[0].ingredients = new IngredientData[2];
-                pData.magic.library.grimiore[0].ingredients[0].item = ItemType.Fertilizer;
-                pData.magic.library.grimiore[0].ingredients[1].item = ItemType.Stalk;
-                pData.magic.library.grimiore[1].name = "Summon Water I";
-                pData.magic.library.grimiore[1].description = "Waters a 2x2 area that stays hydrated for one day.";
-                pData.magic.library.grimiore[1].ingredients = new IngredientData[2];
-                pData.magic.library.grimiore[1].ingredients[0].item = ItemType.Seed;
-                pData.magic.library.grimiore[1].ingredients[1].item = ItemType.Fruit;
+                pData.magic.library.grimoire[0].name = "Fast Grow I";
+                pData.magic.library.grimoire[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
+                pData.magic.library.grimoire[0].description = "Plants grow faster for one day. (5%)";
+                pData.magic.library.grimoire[0].ingredients = new IngredientData[2];
+                pData.magic.library.grimoire[0].ingredients[0].item = ItemType.Fertilizer;
+                pData.magic.library.grimoire[0].ingredients[1].item = ItemType.Stalk;
+                pData.magic.library.grimoire[1].name = "Summon Water I";
+                pData.magic.library.grimoire[1].description = "Waters a 2x2 area that stays hydrated for one day.";
+                pData.magic.library.grimoire[1].ingredients = new IngredientData[2];
+                pData.magic.library.grimoire[1].ingredients[0].item = ItemType.Seed;
+                pData.magic.library.grimoire[1].ingredients[1].item = ItemType.Fruit;
                 break;
             case 10:
                 BackgroundManager bm = GameObject.FindFirstObjectByType<BackgroundManager>();

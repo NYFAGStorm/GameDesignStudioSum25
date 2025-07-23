@@ -78,9 +78,9 @@ public class IngredientData
     public PlantType plant;
 }
 
-// a grimiore holds a player's list of learned spell recipes available to make charges
+// a grimoire holds a player's list of learned spell recipes available to make charges
 [System.Serializable]
-public class GrimioreData
+public class GrimoireData
 {
     public string name;
     public string description;
@@ -102,13 +102,13 @@ public class SpellBookData
     public float castAOE; // range (radius) of area of effect
 }
 
-// the spell library is both the grimiore and spell book for a single player
-// a grimiore is a list of the spells a player has learned the recipe for
+// the spell library is both the grimoire and spell book for a single player
+// a grimoire is a list of the spells a player has learned the recipe for
 // a spell book is a collection of crafted spells charges for a player
 [System.Serializable]
 public class SpellLibrary
 {
-    public GrimioreData[] grimiore;
+    public GrimoireData[] grimoire;
     public SpellBookData[] spellBook;
 }
 

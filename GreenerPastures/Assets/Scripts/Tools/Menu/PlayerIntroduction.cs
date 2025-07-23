@@ -861,10 +861,10 @@ public class PlayerIntroduction : MonoBehaviour
             "When you level up, you'll find the magic crafting table in your tower.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
-        introBeats[beat].name = "'On the table, your grimiore'";
+        introBeats[beat].name = "'On the table, your grimoire'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
-            "On the table, your Grimiore will have new spells available to craft.";
+            "On the table, your Grimoire will have new spells available to craft.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "'Crafted spells are stored'";

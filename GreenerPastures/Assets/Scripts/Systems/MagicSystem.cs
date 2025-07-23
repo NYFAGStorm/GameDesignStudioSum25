@@ -13,7 +13,7 @@ public static class MagicSystem
         // initialize
         retMagic.stats = new MagicStats();
         retMagic.library = new SpellLibrary();
-        retMagic.library.grimiore = new GrimioreData[0];
+        retMagic.library.grimoire = new GrimoireData[0];
         retMagic.library.spellBook = new SpellBookData[0];
 
         return retMagic;
@@ -432,12 +432,12 @@ public static class MagicSystem
     {
         bool retBool = false;
 
-        if (library.grimiore == null || library.grimiore.Length == 0)
+        if (library.grimoire == null || library.grimoire.Length == 0)
             return retBool;
 
-        for (int i=0; i<library.grimiore.Length; i++)
+        for (int i=0; i<library.grimoire.Length; i++)
         {
-            if (library.grimiore[i].type == spell)
+            if (library.grimoire[i].type == spell)
             {
                 retBool = true;
                 break;
@@ -452,9 +452,9 @@ public static class MagicSystem
     /// </summary>
     /// <param name="spell">spell type</param>
     /// <returns>initialized grimoire data</returns>
-    public static GrimioreData InitializeGrimoireEntry( SpellType spell )
+    public static GrimoireData InitializeGrimoireEntry( SpellType spell )
     {
-        GrimioreData retEntry = new GrimioreData();
+        GrimoireData retEntry = new GrimoireData();
 
         retEntry.name = spell.ToString(); // to be configured
         retEntry.description = "";
@@ -487,9 +487,9 @@ public static class MagicSystem
         return retIngredient;
     }
 
-    static GrimioreData ConfigureGrimoireEntry( GrimioreData entry )
+    static GrimoireData ConfigureGrimoireEntry( GrimoireData entry )
     {
-        GrimioreData retSpell = entry;
+        GrimoireData retSpell = entry;
 
         // configure by spell type
         switch (entry.type)
@@ -770,16 +770,16 @@ public static class MagicSystem
 
         // validate does not yet exist in grimoire
         bool found = false;
-        if (retLibrary.grimiore == null || retLibrary.grimiore.Length == 0)
+        if (retLibrary.grimoire == null || retLibrary.grimoire.Length == 0)
         {
             // no spell data yet, create
-            retLibrary.grimiore = new GrimioreData[0];
+            retLibrary.grimoire = new GrimoireData[0];
         }
         else
         {
-            for (int i = 0; i < retLibrary.grimiore.Length; i++)
+            for (int i = 0; i < retLibrary.grimoire.Length; i++)
             {
-                if (retLibrary.grimiore[i].type == spell)
+                if (retLibrary.grimoire[i].type == spell)
                 {
                     found = true;
                     break;
@@ -789,13 +789,13 @@ public static class MagicSystem
         if (!found)
         {
             // add listing to grimoire
-            GrimioreData[] tmp = new GrimioreData[retLibrary.grimiore.Length + 1];
-            for (int i = 0; i < retLibrary.grimiore.Length; i++)
+            GrimoireData[] tmp = new GrimoireData[retLibrary.grimoire.Length + 1];
+            for (int i = 0; i < retLibrary.grimoire.Length; i++)
             {
-                tmp[i] = retLibrary.grimiore[i];
+                tmp[i] = retLibrary.grimoire[i];
             }
-            tmp[retLibrary.grimiore.Length] = InitializeGrimoireEntry(spell);
-            retLibrary.grimiore = tmp;
+            tmp[retLibrary.grimoire.Length] = InitializeGrimoireEntry(spell);
+            retLibrary.grimoire = tmp;
         }
         else
             UnityEngine.Debug.LogWarning("--- MagicSystem [AddSpellToGrimoire] : spell type " + spell.ToString() + " already exists in grimoire. will ignore.");

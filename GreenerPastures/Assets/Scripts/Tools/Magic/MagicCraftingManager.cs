@@ -386,7 +386,7 @@ public class MagicCraftingManager : MonoBehaviour
                 // we should never be here
                 break;
             case CraftState.Grimoire:
-                if ( pcm.playerData.magic.library.grimiore.Length > 0 && 
+                if ( pcm.playerData.magic.library.grimoire.Length > 0 && 
                     selectedGrimoireRecipe == -1)
                 {
                     // allow player to change current recipe entry from grimoire listing
@@ -394,7 +394,7 @@ public class MagicCraftingManager : MonoBehaviour
                         currentGrimoireEntry--;
                     if (Input.GetKeyDown(pcm.downKey) || (padMgr != null && padMgr.gPadDown[0].YaxisL < 0f))
                         currentGrimoireEntry++;
-                    currentGrimoireEntry = Mathf.Clamp(currentGrimoireEntry, 0, pcm.playerData.magic.library.grimiore.Length - 1);
+                    currentGrimoireEntry = Mathf.Clamp(currentGrimoireEntry, 0, pcm.playerData.magic.library.grimoire.Length - 1);
                     // set top of recipe list
                     if (currentGrimoireEntry < topOfRecipeList)
                         topOfRecipeList = currentGrimoireEntry;
@@ -404,7 +404,7 @@ public class MagicCraftingManager : MonoBehaviour
                 if (currentGrimoireEntry != -1)
                 {
                     // validate at least one of each ingredients in inventory
-                    currentEntryValid = PlayerInventoryHasAllIngredients(pcm.playerData.magic.library.grimiore[currentGrimoireEntry]);
+                    currentEntryValid = PlayerInventoryHasAllIngredients(pcm.playerData.magic.library.grimoire[currentGrimoireEntry]);
                     if (!currentEntryValid)
                         break;
                     // allow player to make selection of recipe to craft in cauldron state
@@ -412,7 +412,7 @@ public class MagicCraftingManager : MonoBehaviour
                     {
                         selectedGrimoireRecipe = currentGrimoireEntry;
                         // fill cauldron inventory with first-found items matching grimoire recipe
-                        FillCauldronInventory(pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe]);
+                        FillCauldronInventory(pcm.playerData.magic.library.grimoire[selectedGrimoireRecipe]);
                         // ensure held ingredient is empty
                         heldIngredient.cauldronInventoryIndex = -1;
                     }
@@ -498,7 +498,7 @@ public class MagicCraftingManager : MonoBehaviour
         }
     }
 
-    bool PlayerInventoryHasAllIngredients( GrimioreData entry )
+    bool PlayerInventoryHasAllIngredients( GrimoireData entry )
     {
         bool retBool = true;
 
@@ -542,7 +542,7 @@ public class MagicCraftingManager : MonoBehaviour
         }
     }
 
-    void FillCauldronInventory( GrimioreData recipe )
+    void FillCauldronInventory( GrimoireData recipe )
     {
         cauldronInventory = InventorySystem.InitializeInventory(recipe.ingredients.Length);
         // fill inventory with first-found matching ingredients from player inventory
@@ -609,6 +609,19 @@ public class MagicCraftingManager : MonoBehaviour
     void ClearCauldronInventory()
     {
         cauldronInventory = null;
+    }
+
+    void ResetPuzzle()
+    {
+        heldIngredient.cauldronInventoryIndex = -1;
+        heldIngredient.ingredient.name = "";
+        heldIngredient.ingredient.item = ItemType.Default;
+        heldIngredient.ingredient.plant = PlantType.Default;
+        heldPosition = Vector3.zero;
+        heldIngredientShape = new bool[9];
+        ClearPlacedPieces();
+        ClearCauldronGrid();
+        craftingSolved = false;
     }
 
     // use cauldron inventory index to allow multiple of the same kind of ingredient
@@ -869,8 +882,8 @@ public class MagicCraftingManager : MonoBehaviour
             c = Color.white;
             GUI.color = c;
             // default empty grimoire display
-            if ( pcm.playerData.magic.library.grimiore == null ||
-                pcm.playerData.magic.library.grimiore.Length == 0 )
+            if ( pcm.playerData.magic.library.grimoire == null ||
+                pcm.playerData.magic.library.grimoire.Length == 0 )
             {
                 g.fontStyle = FontStyle.BoldAndItalic;
                 GUI.Label(r, s, g);
@@ -882,12 +895,12 @@ public class MagicCraftingManager : MonoBehaviour
                 r.width = 0.7f * w;
                 r.height = 0.065f * h;
                 g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
-                for ( int i = 0; i < pcm.playerData.magic.library.grimiore.Length; i++ )
+                for ( int i = 0; i < pcm.playerData.magic.library.grimoire.Length; i++ )
                 {
                     // display only four entries at a time
                     if (i < topOfRecipeList || i > topOfRecipeList + 3)
                         continue;
-                    // grimiore entry display
+                    // grimoire entry display
                     c = Color.green;
                     c *= 0.381f;
                     if (i == currentGrimoireEntry)
@@ -902,7 +915,7 @@ public class MagicCraftingManager : MonoBehaviour
                         c.g = 0.2f;
                     }
                     GUI.color = c;
-                    GrimioreData grim = pcm.playerData.magic.library.grimiore[i];
+                    GrimoireData grim = pcm.playerData.magic.library.grimoire[i];
                     // spell name
                     g.alignment = TextAnchor.MiddleLeft;
                     s = grim.name;
@@ -930,7 +943,7 @@ public class MagicCraftingManager : MonoBehaviour
                 r.y = 0.775f * h;
                 GUI.color = Color.black;
                 g.alignment = TextAnchor.MiddleCenter;
-                s = "Spell Recipe " + (currentGrimoireEntry+1) + " of " + pcm.playerData.magic.library.grimiore.Length;
+                s = "Spell Recipe " + (currentGrimoireEntry+1) + " of " + pcm.playerData.magic.library.grimoire.Length;
                 GUI.Label(r, s, g);
             }
         }
@@ -965,7 +978,7 @@ public class MagicCraftingManager : MonoBehaviour
             g = new GUIStyle(GUI.skin.label);
             g.alignment = TextAnchor.MiddleLeft;
             g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
-            s = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].name;
+            s = pcm.playerData.magic.library.grimoire[selectedGrimoireRecipe].name;
             c = Color.white;
             GUI.color = c;
             GUI.Label(r, s, g);
@@ -1013,7 +1026,7 @@ public class MagicCraftingManager : MonoBehaviour
             r.height = r.width; // square
             c = Color.white;
             GUI.color = c;
-            for (int i = 0; i < pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe].ingredients.Length; i++)
+            for (int i = 0; i < pcm.playerData.magic.library.grimoire[selectedGrimoireRecipe].ingredients.Length; i++)
             {
                 // if not valid, we should never need cauldron inventory items available here
                 if (currentEntryValid)
@@ -1330,7 +1343,7 @@ public class MagicCraftingManager : MonoBehaviour
             else
             {
                 // add spell charge to spell book (stay in this state)
-                GrimioreData gData = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe];
+                GrimoireData gData = pcm.playerData.magic.library.grimoire[selectedGrimoireRecipe];
                 string spellName = gData.name;
                 pcm.playerData.magic.library = 
                     MagicSystem.AddChargeToSpellBook(gData.type, pcm.playerData.magic.library);
@@ -1347,33 +1360,14 @@ public class MagicCraftingManager : MonoBehaviour
                     FillCauldronInventory(gData);
                     // if placed pieces do not match cauldron inventory items (shape), reset puzzle
                     if (!DoesCauldronHaveEachPlacedPiece())
-                    {
-                        // TODO: make a unified ResetPuzzle function
-                        heldIngredient.cauldronInventoryIndex = -1;
-                        heldIngredient.ingredient.name = "";
-                        heldIngredient.ingredient.item = ItemType.Default;
-                        heldIngredient.ingredient.plant = PlantType.Default;
-                        heldPosition = Vector3.zero;
-                        heldIngredientShape = new bool[9];
-                        ClearPlacedPieces();
-                        ClearCauldronGrid();
-                        craftingSolved = false;
-                    }
+                        ResetPuzzle();
                 }
                 else
                 {
                     // if player no longer has necessary ingredients available, un-solve puzzle
                     currentEntryValid = false;
                     // reset craft interface due to lack of ingredients
-                    heldIngredient.cauldronInventoryIndex = -1;
-                    heldIngredient.ingredient.name = "";
-                    heldIngredient.ingredient.item = ItemType.Default;
-                    heldIngredient.ingredient.plant = PlantType.Default;
-                    heldPosition = Vector3.zero;
-                    heldIngredientShape = new bool[9];
-                    ClearPlacedPieces();
-                    ClearCauldronGrid();
-                    craftingSolved = false; // disallow another spell charge
+                    ResetPuzzle();
                 }
             }
         }
@@ -1408,17 +1402,7 @@ public class MagicCraftingManager : MonoBehaviour
             (GUI.Button(r, s, g) || 
             (GUI.enabled && padMgr != null && padMgr.gamepads[0].isActive && 
                 padMgr.gPadDown[0].xButton)))
-        {
-            heldIngredient.cauldronInventoryIndex = -1;
-            heldIngredient.ingredient.name = "";
-            heldIngredient.ingredient.item = ItemType.Default;
-            heldIngredient.ingredient.plant = PlantType.Default;
-            heldPosition = Vector3.zero;
-            heldIngredientShape = new bool[9];
-            ClearPlacedPieces();
-            ClearCauldronGrid();
-            craftingSolved = false;
-        }
+            ResetPuzzle();
         GUI.enabled = true;
 
         // return to grimoire button
@@ -1450,15 +1434,7 @@ public class MagicCraftingManager : MonoBehaviour
             (padMgr != null && padMgr.gamepads[0].isActive &&
                 padMgr.gPadDown[0].yButton)))
         {
-            heldIngredient.cauldronInventoryIndex = -1;
-            heldIngredient.ingredient.name = "";
-            heldIngredient.ingredient.item = ItemType.Default;
-            heldIngredient.ingredient.plant = PlantType.Default;
-            heldPosition = Vector3.zero;
-            heldIngredientShape = new bool[9];
-            ClearPlacedPieces();
-            ClearCauldronGrid();
-            craftingSolved = false;
+            ResetPuzzle();
             // to grimoire
             ClearCauldronInventory();
             selectedGrimoireRecipe = -1;

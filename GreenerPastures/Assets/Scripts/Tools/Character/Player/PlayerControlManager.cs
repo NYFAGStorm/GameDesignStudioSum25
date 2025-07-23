@@ -181,17 +181,17 @@ public class PlayerControlManager : MonoBehaviour
                 playerData.magic = MagicSystem.IntializeMagic();
                 playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, playerData.magic.library);
                 playerData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, playerData.magic.library);
-                playerData.magic.library.grimiore[0].name = "Fast Grow I";
-                playerData.magic.library.grimiore[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
-                playerData.magic.library.grimiore[0].description = "Plants grow faster for one day. (5%)";
-                playerData.magic.library.grimiore[0].ingredients = new IngredientData[2];
-                playerData.magic.library.grimiore[0].ingredients[0].item = ItemType.Fertilizer;
-                playerData.magic.library.grimiore[0].ingredients[1].item = ItemType.Stalk;
-                playerData.magic.library.grimiore[1].name = "Summon Water I";
-                playerData.magic.library.grimiore[1].description = "Waters a 2x2 area that stays hydrated for one day.";
-                playerData.magic.library.grimiore[1].ingredients = new IngredientData[2];
-                playerData.magic.library.grimiore[1].ingredients[0].item = ItemType.Seed;
-                playerData.magic.library.grimiore[1].ingredients[1].item = ItemType.Fruit;
+                playerData.magic.library.grimoire[0].name = "Fast Grow I";
+                playerData.magic.library.grimoire[0].type = SpellType.FastGrowI; // REVIEW: why this not already in?
+                playerData.magic.library.grimoire[0].description = "Plants grow faster for one day. (5%)";
+                playerData.magic.library.grimoire[0].ingredients = new IngredientData[2];
+                playerData.magic.library.grimoire[0].ingredients[0].item = ItemType.Fertilizer;
+                playerData.magic.library.grimoire[0].ingredients[1].item = ItemType.Stalk;
+                playerData.magic.library.grimoire[1].name = "Summon Water I";
+                playerData.magic.library.grimoire[1].description = "Waters a 2x2 area that stays hydrated for one day.";
+                playerData.magic.library.grimoire[1].ingredients = new IngredientData[2];
+                playerData.magic.library.grimoire[1].ingredients[0].item = ItemType.Seed;
+                playerData.magic.library.grimoire[1].ingredients[1].item = ItemType.Fruit;
 
                 playerName = "Test Player";
             }
