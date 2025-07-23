@@ -5,6 +5,14 @@ public class MarketManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles the market transactions with players
 
+    // REVIEW: we have the ability to set individual items 'available to buy' or not
+    // we should consider _not_ offering everything to buy, so rare items are rare
+    // For Example:
+    // all special fruit and seed not available to buy
+    // all rare seed not available to buy
+    // while we would need to have another way for players to get these (like grafting)
+    // the point would be, the market isn't the 'all too easy' way to get very rare items
+
     public enum CustomerMode
     {
         Default,
@@ -18,7 +26,8 @@ public class MarketManager : MonoBehaviour
         public string itemName;
         public Texture2D itemIcon;
         public ItemType itemType;
-        public int plantIndex;
+        public PlantType plantType;
+        public bool availableToBuy;
         public int buyItemValue;
         public int sellItemValue;
     }
@@ -83,6 +92,8 @@ public class MarketManager : MonoBehaviour
 
     void InitializeMaxMenuList()
     {
+        // REFACTOR: what if the market should not sell every item it can buy?
+
         for (int i = 0; i < maxMenuListPerLevel.Length; i++)
         {
             switch (i)
@@ -240,8 +251,7 @@ public class MarketManager : MonoBehaviour
                 rejectFlashTimer = 0f;
             }
             int maxMenuList = menuItems.Length - 1;
-            //if (currentCustomer.playerData.level < 2)
-                maxMenuList = maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level,0,9)]; // 20
+            maxMenuList = maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level,0,9)];
             menuItemSelection = Mathf.Clamp(menuItemSelection, 0, maxMenuList);
             // set top of menu list
             if (menuItemSelection < topOfMenuList)
@@ -253,7 +263,8 @@ public class MarketManager : MonoBehaviour
                 (padMgr != null && padMgr.gamepads[0].isActive && 
                     padMgr.gPadDown[0].aButton))
             {
-                if (menuItems[menuItemSelection].buyItemValue <= currentCustomer.playerData.gold)
+                if (menuItems[menuItemSelection].availableToBuy && 
+                    menuItems[menuItemSelection].buyItemValue <= currentCustomer.playerData.gold)
                 {
                     currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;
                     currentCustomer.AwardXP(PlayerData.XP_BUYFROMSHOP);
@@ -266,7 +277,7 @@ public class MarketManager : MonoBehaviour
                             Debug.LogWarning("--- MarketManager [CheckBuyMode] : unable to initialize item. will ignore.");
                         else
                         {
-                            iData.plant = (PlantType)menuItems[menuItemSelection].plantIndex;
+                            iData.plant = (PlantType)menuItems[menuItemSelection].plantType;
                             if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                                 menuItems[menuItemSelection].itemType == ItemType.Fruit)
                             {
@@ -284,7 +295,7 @@ public class MarketManager : MonoBehaviour
                         targ += pos;
                         ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
                         LooseItemData loose = InventorySystem.CreateItem(menuItems[menuItemSelection].itemType);
-                        loose.inv.items[0].plant = (PlantType)menuItems[menuItemSelection].plantIndex;
+                        loose.inv.items[0].plant = (PlantType)menuItems[menuItemSelection].plantType;
                         if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                             menuItems[menuItemSelection].itemType == ItemType.Fruit)
                         {
@@ -342,7 +353,7 @@ public class MarketManager : MonoBehaviour
                     for (int i = 0; i < menuItems.Length; i++)
                     {
                         if (menuItems[i].itemType == iData.type &&
-                            menuItems[i].plantIndex == (int)iData.plant)
+                            menuItems[i].plantType == iData.plant)
                         {
                             // use item quality in determining final sell value
                             playerItemFinalSellValue = GetFinalMarketSellValue(iData);
@@ -414,7 +425,7 @@ public class MarketManager : MonoBehaviour
 
         for (int i = 0; i < menuItems.Length; i++)
         {
-            if (menuItems[i].itemType == iType && menuItems[i].plantIndex == (int)pType )
+            if (menuItems[i].itemType == iType && menuItems[i].plantType == pType )
             {
                 retInt = menuItems[i].buyItemValue;
                 found = true;
@@ -445,7 +456,7 @@ public class MarketManager : MonoBehaviour
 
         for (int i = 0; i < menuItems.Length; i++)
         {
-            if (menuItems[i].itemType == iType && menuItems[i].plantIndex == (int)pType)
+            if (menuItems[i].itemType == iType && menuItems[i].plantType == pType)
             {
                 retInt = menuItems[i].sellItemValue;
                 found = true;
@@ -500,7 +511,7 @@ public class MarketManager : MonoBehaviour
 
         menuItems[idx].itemName = "Fertilizer";
         menuItems[idx].itemType = ItemType.Fertilizer;
-        menuItems[idx].plantIndex = -1;
+        menuItems[idx].plantType = PlantType.Default;
         menuItems[idx].buyItemValue = 1;
         menuItems[idx].sellItemValue = 0;
         idx++;
@@ -509,140 +520,140 @@ public class MarketManager : MonoBehaviour
 
         menuItems[idx].itemName = "Seed (Corn)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Corn;
+        menuItems[idx].plantType = PlantType.Corn;
         menuItems[idx].buyItemValue = 3;
         menuItems[idx].sellItemValue = 2;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Corn)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Corn;
+        menuItems[idx].plantType = PlantType.Corn;
         menuItems[idx].buyItemValue = 7;
         menuItems[idx].sellItemValue = 6;
         idx++;
 
         menuItems[idx].itemName = "Seed (Tomato)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Tomato;
+        menuItems[idx].plantType = PlantType.Tomato;
         menuItems[idx].buyItemValue = 4;
         menuItems[idx].sellItemValue = 3;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Tomato)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Tomato;
+        menuItems[idx].plantType = PlantType.Tomato;
         menuItems[idx].buyItemValue = 9;
         menuItems[idx].sellItemValue = 8;
         idx++;
 
         menuItems[idx].itemName = "Seed (Carrot)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Carrot;
+        menuItems[idx].plantType = PlantType.Carrot;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Carrot)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Carrot;
+        menuItems[idx].plantType = PlantType.Carrot;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Poppy)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Poppy;
+        menuItems[idx].plantType = PlantType.Poppy;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Poppy)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Poppy;
+        menuItems[idx].plantType = PlantType.Poppy;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Rose)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Rose;
+        menuItems[idx].plantType = PlantType.Rose;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Rose)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Rose;
+        menuItems[idx].plantType = PlantType.Rose;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Sunflower)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Sunflower;
+        menuItems[idx].plantType = PlantType.Sunflower;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Sunflower)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Sunflower;
+        menuItems[idx].plantType = PlantType.Sunflower;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Moonflower)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Moonflower;
+        menuItems[idx].plantType = PlantType.Moonflower;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Moonflower)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Moonflower;
+        menuItems[idx].plantType = PlantType.Moonflower;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Apple)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Apple;
+        menuItems[idx].plantType = PlantType.Apple;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Apple)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Apple;
+        menuItems[idx].plantType = PlantType.Apple;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Orange)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Orange;
+        menuItems[idx].plantType = PlantType.Orange;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Orange)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Orange;
+        menuItems[idx].plantType = PlantType.Orange;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Lemon)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Lemon;
+        menuItems[idx].plantType = PlantType.Lemon;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Lemon)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Lemon;
+        menuItems[idx].plantType = PlantType.Lemon;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
@@ -651,154 +662,154 @@ public class MarketManager : MonoBehaviour
 
         menuItems[idx].itemName = "Seed (Lotus)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Lotus;
+        menuItems[idx].plantType = PlantType.Lotus;
         menuItems[idx].buyItemValue = 7;
         menuItems[idx].sellItemValue = 6;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Lotus)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Lotus;
+        menuItems[idx].plantType = PlantType.Lotus;
         menuItems[idx].buyItemValue = 16;
         menuItems[idx].sellItemValue = 15;
         idx++;
 
         menuItems[idx].itemName = "Seed (Marigold)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Marigold;
+        menuItems[idx].plantType = PlantType.Marigold;
         menuItems[idx].buyItemValue = 6;
         menuItems[idx].sellItemValue = 5;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Marigold)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Marigold;
+        menuItems[idx].plantType = PlantType.Marigold;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 14;
         idx++;
 
         menuItems[idx].itemName = "Seed (Magnolia)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Magnolia;
+        menuItems[idx].plantType = PlantType.Magnolia;
         menuItems[idx].buyItemValue = 5;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Magnolia)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Magnolia;
+        menuItems[idx].plantType = PlantType.Magnolia;
         menuItems[idx].buyItemValue = 11;
         menuItems[idx].sellItemValue = 10;
         idx++;
 
         menuItems[idx].itemName = "Seed (Myosotis)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Myosotis;
+        menuItems[idx].plantType = PlantType.Myosotis;
         menuItems[idx].buyItemValue = 8;
         menuItems[idx].sellItemValue = 6;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Myosotis)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Myosotis;
+        menuItems[idx].plantType = PlantType.Myosotis;
         menuItems[idx].buyItemValue = 17;
         menuItems[idx].sellItemValue = 15;
         idx++;
 
         menuItems[idx].itemName = "Seed (Chrystalia)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Chrystalia;
+        menuItems[idx].plantType = PlantType.Chrystalia;
         menuItems[idx].buyItemValue = 7;
         menuItems[idx].sellItemValue = 5;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Chrystalia)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Chrystalia;
+        menuItems[idx].plantType = PlantType.Chrystalia;
         menuItems[idx].buyItemValue = 17;
         menuItems[idx].sellItemValue = 15;
         idx++;
 
         menuItems[idx].itemName = "Seed (Pumpkin)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Pumpkin;
+        menuItems[idx].plantType = PlantType.Pumpkin;
         menuItems[idx].buyItemValue = 7;
         menuItems[idx].sellItemValue = 6;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Pumpkin)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Pumpkin;
+        menuItems[idx].plantType = PlantType.Pumpkin;
         menuItems[idx].buyItemValue = 16;
         menuItems[idx].sellItemValue = 15;
         idx++;
 
         menuItems[idx].itemName = "Seed (Underbloom)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Underbloom;
+        menuItems[idx].plantType = PlantType.Underbloom;
         menuItems[idx].buyItemValue = 7;
         menuItems[idx].sellItemValue = 6;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Underbloom)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Underbloom;
+        menuItems[idx].plantType = PlantType.Underbloom;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 14;
         idx++;
 
         menuItems[idx].itemName = "Seed (Water Lily)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.WaterLily;
+        menuItems[idx].plantType = PlantType.WaterLily;
         menuItems[idx].buyItemValue = 8;
         menuItems[idx].sellItemValue = 5;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Water Lily)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.WaterLily;
+        menuItems[idx].plantType = PlantType.WaterLily;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 12;
         idx++;
 
         menuItems[idx].itemName = "Seed (Snowgrace)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Snowgrace;
+        menuItems[idx].plantType = PlantType.Snowgrace;
         menuItems[idx].buyItemValue = 7;
         menuItems[idx].sellItemValue = 6;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Snowgrace)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Snowgrace;
+        menuItems[idx].plantType = PlantType.Snowgrace;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 14;
         idx++;
 
         menuItems[idx].itemName = "Seed (Popcorn)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Popcorn;
+        menuItems[idx].plantType = PlantType.Popcorn;
         menuItems[idx].buyItemValue = 7;
         menuItems[idx].sellItemValue = 6;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Popcorn)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Popcorn;
+        menuItems[idx].plantType = PlantType.Popcorn;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 14;
         idx++;
 
         menuItems[idx].itemName = "Seed (Esclipse Flower)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.EclipseFlower;
+        menuItems[idx].plantType = PlantType.EclipseFlower;
         menuItems[idx].buyItemValue = 6;
         menuItems[idx].sellItemValue = 4;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Esclipse Flower)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.EclipseFlower;
+        menuItems[idx].plantType = PlantType.EclipseFlower;
         menuItems[idx].buyItemValue = 17;
         menuItems[idx].sellItemValue = 16;
         idx++;
@@ -807,140 +818,140 @@ public class MarketManager : MonoBehaviour
 
         menuItems[idx].itemName = "Seed (Golden Apple)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.GoldenApple;
+        menuItems[idx].plantType = PlantType.GoldenApple;
         menuItems[idx].buyItemValue = 9;
         menuItems[idx].sellItemValue = 8;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Golden Apple)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.GoldenApple;
+        menuItems[idx].plantType = PlantType.GoldenApple;
         menuItems[idx].buyItemValue = 21;
         menuItems[idx].sellItemValue = 19;
         idx++;
 
         menuItems[idx].itemName = "Seed (Hollowbloom)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Hollowbloom;
+        menuItems[idx].plantType = PlantType.Hollowbloom;
         menuItems[idx].buyItemValue = 6;
         menuItems[idx].sellItemValue = 5;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Hollowbloom)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Hollowbloom;
+        menuItems[idx].plantType = PlantType.Hollowbloom;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 14;
         idx++;
 
         menuItems[idx].itemName = "Seed (Mandrake)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Mandrake;
+        menuItems[idx].plantType = PlantType.Mandrake;
         menuItems[idx].buyItemValue = 10;
         menuItems[idx].sellItemValue = 8;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Mandrake)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Mandrake;
+        menuItems[idx].plantType = PlantType.Mandrake;
         menuItems[idx].buyItemValue = 21;
         menuItems[idx].sellItemValue = 18;
         idx++;
 
         menuItems[idx].itemName = "Seed (Frost Lily)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.FrostLily;
+        menuItems[idx].plantType = PlantType.FrostLily;
         menuItems[idx].buyItemValue = 10;
         menuItems[idx].sellItemValue = 9;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Frost Lily)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.FrostLily;
+        menuItems[idx].plantType = PlantType.FrostLily;
         menuItems[idx].buyItemValue = 21;
         menuItems[idx].sellItemValue = 20;
         idx++;
 
         menuItems[idx].itemName = "Seed (Banana)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Banana;
+        menuItems[idx].plantType = PlantType.Banana;
         menuItems[idx].buyItemValue = 9;
         menuItems[idx].sellItemValue = 8;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Banana)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Banana;
+        menuItems[idx].plantType = PlantType.Banana;
         menuItems[idx].buyItemValue = 23;
         menuItems[idx].sellItemValue = 19;
         idx++;
 
         menuItems[idx].itemName = "Seed (Coconut)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Coconut;
+        menuItems[idx].plantType = PlantType.Coconut;
         menuItems[idx].buyItemValue = 9;
         menuItems[idx].sellItemValue = 8;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Coconut)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Coconut;
+        menuItems[idx].plantType = PlantType.Coconut;
         menuItems[idx].buyItemValue = 22;
         menuItems[idx].sellItemValue = 21;
         idx++;
 
         menuItems[idx].itemName = "Seed (Mysteria)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Mysteria;
+        menuItems[idx].plantType = PlantType.Mysteria;
         menuItems[idx].buyItemValue = 9;
         menuItems[idx].sellItemValue = 8;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Mysteria)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Mysteria;
+        menuItems[idx].plantType = PlantType.Mysteria;
         menuItems[idx].buyItemValue = 23;
         menuItems[idx].sellItemValue = 21;
         idx++;
 
         menuItems[idx].itemName = "Seed (Nightshade)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Nightshade;
+        menuItems[idx].plantType = PlantType.Nightshade;
         menuItems[idx].buyItemValue = 10;
         menuItems[idx].sellItemValue = 9;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Nightshade)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Nightshade;
+        menuItems[idx].plantType = PlantType.Nightshade;
         menuItems[idx].buyItemValue = 23;
         menuItems[idx].sellItemValue = 21;
         idx++;
 
         menuItems[idx].itemName = "Seed (Crystal Rose)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.CrystalRose;
+        menuItems[idx].plantType = PlantType.CrystalRose;
         menuItems[idx].buyItemValue = 10;
         menuItems[idx].sellItemValue = 9;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Crystal Rose)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.CrystalRose;
+        menuItems[idx].plantType = PlantType.CrystalRose;
         menuItems[idx].buyItemValue = 22;
         menuItems[idx].sellItemValue = 21;
         idx++;
 
         menuItems[idx].itemName = "Seed (Yarrow)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Yarrow;
+        menuItems[idx].plantType = PlantType.Yarrow;
         menuItems[idx].buyItemValue = 9;
         menuItems[idx].sellItemValue = 8;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Yarrow)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Yarrow;
+        menuItems[idx].plantType = PlantType.Yarrow;
         menuItems[idx].buyItemValue = 23;
         menuItems[idx].sellItemValue = 19;
         idx++;
@@ -949,151 +960,157 @@ public class MarketManager : MonoBehaviour
 
         menuItems[idx].itemName = "Seed (Dragonroot)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Dragonroot;
+        menuItems[idx].plantType = PlantType.Dragonroot;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 12;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Dragonroot)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Dragonroot;
+        menuItems[idx].plantType = PlantType.Dragonroot;
         menuItems[idx].buyItemValue = 32;
         menuItems[idx].sellItemValue = 30;
         idx++;
 
         menuItems[idx].itemName = "Seed (Winter Rose)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.WinterRose;
+        menuItems[idx].plantType = PlantType.WinterRose;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 12;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Winter Rose)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.WinterRose;
+        menuItems[idx].plantType = PlantType.WinterRose;
         menuItems[idx].buyItemValue = 32;
         menuItems[idx].sellItemValue = 30;
         idx++;
 
         menuItems[idx].itemName = "Seed (Fleur-De-Lis)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.FleurDeLis;
+        menuItems[idx].plantType = PlantType.FleurDeLis;
         menuItems[idx].buyItemValue = 14;
         menuItems[idx].sellItemValue = 11;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Fleur-De-Lis)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.FleurDeLis;
+        menuItems[idx].plantType = PlantType.FleurDeLis;
         menuItems[idx].buyItemValue = 32;
         menuItems[idx].sellItemValue = 31;
         idx++;
 
         menuItems[idx].itemName = "Seed (Tropicus)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.Tropicus;
+        menuItems[idx].plantType = PlantType.Tropicus;
         menuItems[idx].buyItemValue = 14;
         menuItems[idx].sellItemValue = 11;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Tropicus)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.Tropicus;
+        menuItems[idx].plantType = PlantType.Tropicus;
         menuItems[idx].buyItemValue = 32;
         menuItems[idx].sellItemValue = 31;
         idx++;
 
         menuItems[idx].itemName = "Seed (Mourning Nyx)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.MourningNyx;
+        menuItems[idx].plantType = PlantType.MourningNyx;
         menuItems[idx].buyItemValue = 14;
         menuItems[idx].sellItemValue = 11;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Mourning Nyx)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.MourningNyx;
+        menuItems[idx].plantType = PlantType.MourningNyx;
         menuItems[idx].buyItemValue = 34;
         menuItems[idx].sellItemValue = 31;
         idx++;
 
         menuItems[idx].itemName = "Seed (Blast Apple)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.BlastApple;
+        menuItems[idx].plantType = PlantType.BlastApple;
         menuItems[idx].buyItemValue = 16;
         menuItems[idx].sellItemValue = 11;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Blast Apple)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.BlastApple;
+        menuItems[idx].plantType = PlantType.BlastApple;
         menuItems[idx].buyItemValue = 33;
         menuItems[idx].sellItemValue = 30;
         idx++;
 
         menuItems[idx].itemName = "Seed (Pixie Plumeria)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.PixiePlumeria;
+        menuItems[idx].plantType = PlantType.PixiePlumeria;
         menuItems[idx].buyItemValue = 16;
         menuItems[idx].sellItemValue = 13;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Pixie Plumeria)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.PixiePlumeria;
+        menuItems[idx].plantType = PlantType.PixiePlumeria;
         menuItems[idx].buyItemValue = 33;
         menuItems[idx].sellItemValue = 31;
         idx++;
 
         menuItems[idx].itemName = "Seed (Fae Foxglove)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.FaeFoxglove;
+        menuItems[idx].plantType = PlantType.FaeFoxglove;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 11;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Fae Foxglove)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.FaeFoxglove;
+        menuItems[idx].plantType = PlantType.FaeFoxglove;
         menuItems[idx].buyItemValue = 32;
         menuItems[idx].sellItemValue = 31;
         idx++;
 
         menuItems[idx].itemName = "Seed (Druid's Lotus)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.DruidsLotus;
+        menuItems[idx].plantType = PlantType.DruidsLotus;
         menuItems[idx].buyItemValue = 15;
         menuItems[idx].sellItemValue = 13;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Druid's Lotus)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.DruidsLotus;
+        menuItems[idx].plantType = PlantType.DruidsLotus;
         menuItems[idx].buyItemValue = 33;
         menuItems[idx].sellItemValue = 31;
         idx++;
 
         menuItems[idx].itemName = "Seed (Splat Berry)";
         menuItems[idx].itemType = ItemType.Seed;
-        menuItems[idx].plantIndex = (int)PlantType.SplatBerry;
+        menuItems[idx].plantType = PlantType.SplatBerry;
         menuItems[idx].buyItemValue = 18;
         menuItems[idx].sellItemValue = 16;
         idx++;
 
         menuItems[idx].itemName = "Fruit (Splat Berry)";
         menuItems[idx].itemType = ItemType.Fruit;
-        menuItems[idx].plantIndex = (int)PlantType.SplatBerry;
+        menuItems[idx].plantType = PlantType.SplatBerry;
         menuItems[idx].buyItemValue = 40;
         menuItems[idx].sellItemValue = 35;
         idx++;
 
         // -- UNIQUE PLANTS --
-        // REVIEW:
+        // REVIEW: why are we offering very rare items at the market at all?
 
         // add icon art to all menu items
         for (int i = 0; i < (idx-1); i++)
         {
-            menuItems[i].itemIcon = alm.GetImageList(alm.GetArtData(menuItems[i].itemType, (PlantType)menuItems[i].plantIndex))[0];
+            menuItems[i].itemIcon = alm.GetImageList(alm.GetArtData(menuItems[i].itemType, menuItems[i].plantType))[0];
+        }
+
+        // TODO: set various availabilities of individual menu items
+        for (int i = 0; i < (idx - 1); i++)
+        {
+            menuItems[i].availableToBuy = true;
         }
     }
 
@@ -1172,7 +1189,10 @@ public class MarketManager : MonoBehaviour
                 s = menuItems[i].itemName + "\nQuality "+(Mathf.RoundToInt(currentCustomer.GetPlayerCurrentItemSelection().quality * 1000f)/10f)+"%";
             g.alignment = TextAnchor.MiddleLeft;
             g.wordWrap = true;
-            GUI.color = Color.white;
+            if (menuItems[i].availableToBuy)
+                GUI.color = Color.white;
+            else
+                GUI.color = Color.gray;
             GUI.Label(r, s, g);
 
             // Market Value
@@ -1189,7 +1209,10 @@ public class MarketManager : MonoBehaviour
             // (which is part of menu item list data already)
             r.x = (w - 0.5f * h) * 0.55f;
             r.width = 0.5f * h;
-            s = menuItems[i].buyItemValue.ToString(); // buy value
+            if (menuItems[i].availableToBuy)
+                s = menuItems[i].buyItemValue.ToString(); // buy value
+            else
+                s = "--";
             if (customerMode == CustomerMode.Sell)
             {
                 if (i == menuItemSelection)
@@ -1198,6 +1221,15 @@ public class MarketManager : MonoBehaviour
                     s = menuItems[i].sellItemValue.ToString(); // normal sell value displayed for other items
             }
             GUI.Label(r, s, g);
+
+            if( !menuItems[i].availableToBuy )
+            {
+                // 'Not Available' overlay
+                r.x = (w - 0.5f * h) * 0.45f;
+                r.width = 0.5f * h;
+                GUI.color = Color.white;
+                GUI.Label(r, "Not Available", g);
+            }
 
             r.y += 0.12f * h;
         }
