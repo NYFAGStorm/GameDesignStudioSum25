@@ -23,6 +23,7 @@ public class PostOfficeManager : MonoBehaviour
         public WorldMonth month;
         public string sender;
         public string message;
+        public PlayerEffect requiredPlayerEffect;
     }
     private ScheduledMessages[] timedMessages;
     private int latestDailyDelivery;
@@ -90,42 +91,49 @@ public class PostOfficeManager : MonoBehaviour
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "We're so happy you're here!\n\nEveryone enjoys seeing a new Biomancer's island on the horizon.\n\nRemember you can use dark plants like Moonflower to grow more during the night time.\n\nLove, Eden";
+        timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterOne;
         idx++;
 
         timedMessages[idx].day = 2;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "Each new day brings us joy, and you're a part of that now.\n\nRemember you can always use spells to water plants or grow them faster.\n\nLevel up and use the magic table in your tower.\n\nLove, Eden";
+        timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterTwo;
         idx++;
 
         timedMessages[idx].day = 3;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "I have good advice for you,\n\nYour Biomancer's Almanac is a wealth of valuable information.\n\nFind time each day to read a little more about the world we live in.\n\nAnd watch for new entries to be unlocked as you level up!\n\nLove, Eden";
+        timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterThree;
         idx++;
 
         timedMessages[idx].day = 4;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "Hello Good Friend,\n\nIf your trees and other re-fruiting plants are growing slowly, here's a tip:\n\nDig up the whole plant and drop in fertilizer, then drop the plant back in the renourished soil.'Hope that helps!\n\nLove, Eden";
+        timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterFour;
         idx++;
 
         timedMessages[idx].day = 5;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "You Are Loved,\n\nYou are appreciated and recognized. You have more to offer the world. Please create and share. Be well, do good, have fun and take care.\n\nLove, Eden\n\nP.S. - Remember to pay the tax man at the end of the month.";
+        timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterFive;
         idx++;
 
         timedMessages[idx].day = 6;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "Biomancer Friend,\n\nMay the sun and rain bless your garden and grow your magic for the Genesis Tree.\n\nKeep in mind the our market has new sale items when you level up and their items change every season.\n\nLove, Eden";
+        timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterSix;
         idx++;
 
         timedMessages[idx].day = 7;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "Grace of the Genesis Tree be with you,\n\nKeep in mind that you can hold the fruit of one plant, and graft it to the stalk of another.\n\nIf they are compatible, you'll have a new more rare plant. Happy grafting!\n\nLove, Eden";
+        timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterSeven;
         idx++;
     }
 
@@ -151,9 +159,40 @@ public class PostOfficeManager : MonoBehaviour
         if (day <= latestDailyDelivery)
             return;
 
+        // send player effect messages to players who have not had them sent yet
+        for (int i = 0; i < ggm.game.players.Length; i++)
+        {
+            bool letterSent = false; // one letter from Eden per day for new players
+            for (int n = 0; n < ggm.game.players[i].effects.Length; n++)
+            {
+                if (letterSent)
+                    continue;
+                if (ggm.game.players[i].effects[n] <= PlayerEffect.EdenLetterSeven)
+                {
+                    for (int t = 0; t < timedMessages.Length; t++)
+                    {
+                        if (letterSent)
+                            continue;
+                        if (PlayerSystem.PlayerHasEffect(ggm.game.players[i], timedMessages[t].requiredPlayerEffect))
+                        {
+                            // send letter
+                            string pName = ggm.game.players[i].playerName;
+                            SendLetter(timedMessages[t].sender, pName, timedMessages[t].message);
+                            // remove effect from this player
+                            ggm.game.players[i] = PlayerSystem.RemovePlayerEffect(ggm.game.players[i], timedMessages[t].requiredPlayerEffect);
+                            // continue to next player (additional letters saved for another day)
+                            letterSent = true;
+                        }
+                    }
+                }
+            }
+        }
+
         for (int i = 0; i < timedMessages.Length; i++)
         {
-            if (timedMessages[i].day == day && timedMessages[i].month == month)
+            // ignore messages that require player effect (already handled above)
+            if (timedMessages[i].requiredPlayerEffect == PlayerEffect.Default && 
+                timedMessages[i].day == day && timedMessages[i].month == month)
             {
                 // send message in a letter to all players
                 for (int n = 0; n < ggm.game.players.Length; n++)

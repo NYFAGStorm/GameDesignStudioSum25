@@ -21,7 +21,7 @@ public enum ItemType
 
 // if there are discrete effects that can be applied to an item
 // each effect can then apply separate rules in a modular way
-public enum ItemEffects
+public enum ItemEffect
 {
     Default,
     EffectA,
@@ -39,7 +39,7 @@ public class ItemData
     public float size; // if plant is growth, else is item size? item amount? (default 1f)
     public float health; // if plant is health, else is item durability (default 1f)
     public float quality; // if plant is quality, else is item quality? (default 1f)
-    public ItemEffects[] effects;
+    public ItemEffect[] effects;
 }
 
 [System.Serializable]

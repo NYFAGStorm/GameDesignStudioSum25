@@ -226,6 +226,18 @@ public class PlayerIntroduction : MonoBehaviour
         }
     }
 
+    void InitializeEdenLetters()
+    {
+        // pcm already validated
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterOne);
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterTwo);
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterThree);
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterFour);
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterFive);
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterSix);
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterSeven);
+    }
+
     void FindManagedPlot()
     {
         PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
@@ -2047,6 +2059,10 @@ public class PlayerIntroduction : MonoBehaviour
                 pcm.freezeCharacterActions = false;
                 GameObject playerObj = pcm.gameObject;
                 playerObj.transform.GetChild(0).GetComponent<Renderer>().enabled = true;
+                //
+                // stack player effects for introductory first-week letters from Eden
+                //
+                InitializeEdenLetters();
             }
             // reset intro timer
             introTimer = LONGPAUSETIME;

@@ -34,7 +34,7 @@ public static class FarmSystem
         {
             retFarm.plots[i] = InitializePlot();
         }
-        retFarm.farmEffects = new FarmEffects[0];
+        retFarm.farmEffects = new FarmEffect[0];
 
         return retFarm;
     }

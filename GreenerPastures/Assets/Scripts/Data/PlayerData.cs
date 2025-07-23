@@ -93,9 +93,16 @@ public class PlayerMessage
 
 // if there are discrete effects that can be applied to a player character
 // each effect can then apply separate rules in a modular way
-public enum PlayerEffects
+public enum PlayerEffect
 {
     Default,
+    EdenLetterOne,
+    EdenLetterTwo,
+    EdenLetterThree,
+    EdenLetterFour,
+    EdenLetterFive,
+    EdenLetterSix,
+    EdenLetterSeven,
     EffectA,
     EffectB,
     EffectC,
@@ -125,7 +132,7 @@ public class PlayerData
     public InventoryData inventory;
     public MagicData magic;
     public AlmanacDiscovery almanac;
-    public PlayerEffects[] effects;
+    public PlayerEffect[] effects;
 
     // XP AWARD VALUES
     public const int XP_USETELEPORTER = 0; // abuse potential too high

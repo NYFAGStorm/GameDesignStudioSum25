@@ -28,7 +28,83 @@ public static class PlayerSystem
         retPlayer.magic = MagicSystem.IntializeMagic();
         retPlayer.almanac = new AlmanacDiscovery();
         retPlayer.almanac.revealed = new bool[0];
-        retPlayer.effects = new PlayerEffects[0];
+        retPlayer.effects = new PlayerEffect[0];
+
+        return retPlayer;
+    }
+
+    /// <summary>
+    /// Returns true if given player data includes given player effect type
+    /// </summary>
+    /// <param name="player">player data</param>
+    /// <param name="effect">player effect type</param>
+    /// <returns>true if given player data includes given player effect type, false if not</returns>
+    public static bool PlayerHasEffect( PlayerData player, PlayerEffect effect )
+    {
+        bool retBool = false;
+
+        for ( int i = 0; i < player.effects.Length; i++ )
+        {
+            if (player.effects[i] == effect)
+            {
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    /// <summary>
+    /// Adds a given player effect type to the given player data
+    /// </summary>
+    /// <param name="player">player data</param>
+    /// <param name="effect">player effect type</param>
+    /// <returns>player data with effect added, if it didn't already exist</returns>
+    public static PlayerData AddPlayerEffect( PlayerData player, PlayerEffect effect )
+    {
+        PlayerData retPlayer = player;
+
+        // validate does not exist
+        if (PlayerHasEffect(retPlayer, effect))
+            return retPlayer;
+        // add effect
+        PlayerEffect[] tmp = new PlayerEffect[retPlayer.effects.Length + 1];
+        for (int i = 0; i < retPlayer.effects.Length; i++)
+        {
+            tmp[i] = retPlayer.effects[i];
+        }
+        tmp[player.effects.Length] = effect;
+        retPlayer.effects = tmp;
+
+        return retPlayer;
+    }
+
+    /// <summary>
+    /// Removes an player effect from a given player, if it existed
+    /// </summary>
+    /// <param name="island">player data</param>
+    /// <param name="effect">effect type</param>
+    /// <returns>player data with effect removed, if it existed</returns>
+    public static PlayerData RemovePlayerEffect( PlayerData player, PlayerEffect effect )
+    {
+        PlayerData retPlayer = player;
+
+        // validate does exist
+        if (!PlayerHasEffect(retPlayer, effect))
+            return retPlayer;
+        // remove effect
+        int count = 0;
+        PlayerEffect[] tmp = new PlayerEffect[retPlayer.effects.Length - 1];
+        for (int i = 0; i < retPlayer.effects.Length; i++)
+        {
+            if (retPlayer.effects[i] != effect)
+            {
+                tmp[count] = retPlayer.effects[i];
+                count++;
+            }
+        }
+        retPlayer.effects = tmp;
 
         return retPlayer;
     }

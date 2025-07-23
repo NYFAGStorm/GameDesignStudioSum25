@@ -39,7 +39,7 @@ public class PlotData
 
 // if there are discrete effects that can be applied to a whole farm
 // each effect can then apply separate rules in a modular way
-public enum FarmEffects
+public enum FarmEffect
 {
     Default,
     EffectA,
@@ -52,5 +52,5 @@ public enum FarmEffects
 public class FarmData
 {
     public PlotData[] plots;
-    public FarmEffects[] farmEffects;
+    public FarmEffect[] farmEffects;
 }

@@ -1296,7 +1296,6 @@ public class MagicCraftingManager : MonoBehaviour
                 // add spell charge to spell book (stay in this state)
                 GrimioreData gData = pcm.playerData.magic.library.grimiore[selectedGrimoireRecipe];
                 string spellName = gData.name;
-                print("adding '"+spellName+"' charge to spell book");
                 pcm.playerData.magic.library = 
                     MagicSystem.AddChargeToSpellBook(gData.type, pcm.playerData.magic.library);
 

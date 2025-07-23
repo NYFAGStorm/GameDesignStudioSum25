@@ -125,7 +125,7 @@ public static class InventorySystem
         retItem.size = 1f;
         retItem.health = 1f;
         retItem.quality = 1f;
-        retItem.effects = new ItemEffects[0];
+        retItem.effects = new ItemEffect[0];
 
         return retItem;
     }
