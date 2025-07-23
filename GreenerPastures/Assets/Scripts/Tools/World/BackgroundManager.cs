@@ -175,7 +175,7 @@ public class BackgroundManager : MonoBehaviour
         cloudMovement = wm.windAmount * wm.windDirection;
 
         // handle cloud cover effects
-        RenderSettings.fog = (cloudCover > 0f);
+        RenderSettings.fog = (cloudCover > 0.1f);
         if (cloudCover > 0f)
         {
             // update fog for cloud cover

@@ -71,10 +71,10 @@ public class WeatherManager : MonoBehaviour
         {
             if (previousWeather.z < .01f)
             {
-                if (GameSystem.PositionDistance(new PositionData(), targetWeather) < 0.1f)
+                if (targetWeather.z < 0.01f)
                 {
-                    targetWeather = new PositionData();
-                    Debug.Log("-- near zero target weather conditions. set target to zero. --");
+                    targetWeather.z = 0f;
+                    Debug.Log("-- near zero target cloud weather conditions. set target to zero. --");
                 }
                 if (GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
                 {
