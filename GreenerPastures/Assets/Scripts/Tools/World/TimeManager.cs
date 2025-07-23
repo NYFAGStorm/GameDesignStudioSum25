@@ -222,7 +222,7 @@ public class TimeManager : MonoBehaviour
         if (moonPhase < 0.001f)
             moonPhase = 0f;
         moonPhase = 1f - moonPhase; // makes 15th new moon, 30th full moon
-        moonRenderer.material.SetFloat("_MoonPhase", moonPhase);
+        moonRenderer.material.SetFloat("_MoonPhase", ((float)dayOfMonth/30f));
         Color moonColor = Color.white;
         moonColor.a = Mathf.Clamp01(1f - (sunLight.intensity * 3.81f));
         moonRenderer.material.color = moonColor;

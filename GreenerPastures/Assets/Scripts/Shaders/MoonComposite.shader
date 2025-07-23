@@ -85,34 +85,6 @@ Shader "Unlit/Moon Composite"
                 return ret;
             }
 
-            float2 cullLeft( float2 uv )
-            {
-                float2 ret;
-
-                ret.x = uv.x;
-                if (ret.x < .5)
-                    ret.x = 0;
-
-                ret.y = uv.y;
-                ret = clamp(ret, 0.0, 1.0);
-
-                return ret;
-            }
-
-            float2 cullRight( float2 uv )
-            {
-                float2 ret;
-
-                ret.x = uv.x;
-                if (ret.x > .5)
-                    ret.x = 1;
-
-                ret.y = uv.y;
-                ret = clamp(ret, 0.0, 1.0);
-
-                return ret;
-            }
-
             v2f vert (appdata v)
             {
                 v2f o;
@@ -137,18 +109,11 @@ Shader "Unlit/Moon Composite"
 
                 fixed4 clearColor = (0,1,0,0);
 
-                // WIP: not implemented as noted here
-                // get 'cull' functions to properly remove half
-                // store half circle shadows (left and right)
+                // TODO: cleanup
                 fixed4 leftShadow = tex2D(_Shadow, i.uv);
                 leftShadow = leftShadow * fullShadow;
-                //if (i.uv.x > .5)
-                //    i.uv = clearColor;
-                //leftShadow = lerp(leftShadow, leftShadow, fullShadow.a);
                 fixed4 rightShadow = tex2D(_Shadow, i.uv);
                 rightShadow = rightShadow * fullShadow;
-                //if (i.uv.x < .5)
-                //    i.uv = clearColor;
 
                 // convert _MoonPhase to four quarters of progress
                 float edgeProgress;
@@ -183,7 +148,6 @@ Shader "Unlit/Moon Composite"
                 // apply shadow color
                 col = col * shadow;
                 // cut shadow with fill
-                //shadow.a = col.a;
                 shadow = lerp(col, shadow, col.a);
                 // store left shadow
                 fixed4 leftEdgeShadow = shadow;
@@ -196,7 +160,6 @@ Shader "Unlit/Moon Composite"
                 // apply shadow color 
                 col = col * shadow;
                 // cut shadow with fill
-                //shadow.a = col.a;
                 shadow = lerp(col, shadow, col.a);
                 // store right shadow
                 fixed4 rightMidShadow = rightShadow;
@@ -211,7 +174,6 @@ Shader "Unlit/Moon Composite"
                 // apply shadow color 
                 col = col * shadow;
                 // cut shadow with fill
-                //shadow.a = col.a;
                 shadow = lerp(col, shadow, col.a);
                 // store left shadow
                 fixed4 leftMidShadow = leftShadow;
@@ -227,7 +189,6 @@ Shader "Unlit/Moon Composite"
                 // apply shadow color
                 col = col * shadow;
                 // cut shadow with fill
-                //shadow.a = col.a;
                 shadow = lerp(col, shadow, col.a);
                 fixed4 rightEdgeShadow = shadow;
 
@@ -262,12 +223,13 @@ Shader "Unlit/Moon Composite"
                     if (i.uv.x >= .5)
                         shadow = clearColor;
                 }
+                
                 // lay shadow on top of moon
                 moon = lerp(moon, shadow, shadow.a);
-                
+                // apply color to moon
                 moon = moon * _Color;
 
-                // clamp add alpha from both/
+                // clamp add alpha from both
                 //moon.a = clamp(moon.a + col.a, 0, 1);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, moon);
