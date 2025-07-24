@@ -426,6 +426,47 @@ public class SaveLoadManager : MonoBehaviour
         return retBool;
     }
 
+    /// <summary>
+    /// Returns binary formatted stream of game data (entire game data set)
+    /// </summary>
+    /// <returns>Stream type of game data, or null if failed</returns>
+    public Stream GetTransferGameData()
+    {
+        Stream retByteStream = null;
+
+        if (game == null)
+        {
+            Debug.LogError("--- SaveLoadManager [GetTransferGameData] : no game data available. aborting.");
+            return null;
+        }
+
+        BinaryFormatter bf = new BinaryFormatter();
+        bf.Serialize(retByteStream, game);
+
+        return retByteStream;
+    }
+
+    /// <summary>
+    /// Attempts to set binary formatted game data stream (entire game data set)
+    /// </summary>
+    /// <param name="gameDataStream">stream of GameData tyoe</param>
+    /// <returns>true if game data stream was applied to the game, false if null game data stream</returns>
+    public bool SetTransferGameData(Stream gameDataStream)
+    {
+        bool retBool = false;
+
+        if (gameDataStream == null)
+        {
+            Debug.LogError("--- SaveLoadManager [SetTransferGameData] : no game data stream is null. aborting.");
+            return retBool;
+        }
+
+        BinaryFormatter bf = new BinaryFormatter();
+        game = bf.Deserialize(gameDataStream) as GameData;
+
+        return retBool;
+    }
+
     public bool IsGameCurrentlyLoaded()
     {
         return (game != null);
