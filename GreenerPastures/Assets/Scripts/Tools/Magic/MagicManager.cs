@@ -444,6 +444,30 @@ public class MagicManager : MonoBehaviour
         selectionInvalidTimer = 0f;
     }
 
+    string DisplayCooldownTime( float cooldown )
+    {
+        string retString = "";
+        // display as in-game minutes (real-time seconds)
+        // 227.435
+        int d = 0;
+        int h = 0;
+        if ( cooldown > 1440f )
+        {
+            d = Mathf.RoundToInt(cooldown / 1440f);
+        }    
+        if ( cooldown > 60f )
+        {
+            h = Mathf.RoundToInt(((cooldown - (d * 1440f)) / 60f)-.5f);
+        }
+        if (d > 0)
+            retString += d.ToString() + "d, ";
+        if (h > 0)
+            retString += h.ToString() + "h, ";
+        retString += Mathf.RoundToInt(cooldown - (d * 1440f) - (h * 60f));
+
+        return retString;
+    }
+
     void OnGUI()
     {
         if (!selectionDisplay && !castInstructionsDisplay)
@@ -454,6 +478,7 @@ public class MagicManager : MonoBehaviour
         float h = Screen.height;
 
         GUIStyle g = new GUIStyle(GUI.skin.box);
+        g.padding = new RectOffset(0, 0, 20, 0);
         g.fontSize = Mathf.RoundToInt(20f * (w/1024f));
 
         string s = "SPELL BOOK";
@@ -462,10 +487,10 @@ public class MagicManager : MonoBehaviour
 
         Color c = Color.white;
 
-        r.x = 0.25f * w;
-        r.y = 0.1f * h;
-        r.width = 0.5f * w;
-        r.height = 0.3f * h;
+        r.x = 0.2f * w;
+        r.y = 0.05f * h;
+        r.width = 0.6f * w;
+        r.height = 0.4f * h;
 
         GUI.color = c;
         GUI.Box(r, s, g);
@@ -501,14 +526,15 @@ public class MagicManager : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = Color.white;
+        g.hover.textColor = Color.white;
         g.active.textColor = Color.white;
 
         if (mode == SpellCastMode.Selecting)
         {
             // individual spell charges
-            r.x = 0.3f * w;
-            r.y = 0.15f * h;
-            r.width = 0.4f * w;
+            r.x = 0.25f * w;
+            r.y = 0.1f * h;
+            r.width = 0.5f * w;
             r.height = 0.05f * h;
 
             c = Color.white;
@@ -516,7 +542,7 @@ public class MagicManager : MonoBehaviour
             s = "Up - Down = Select, A Button to Target";
 
             GUI.Label(r, s, g);
-            r.y += 0.0375f * h;
+            r.y += 0.05f * h;
 
             for ( int i = 0; i < pcm.playerData.magic.library.spellBook.Length; i++ )
             {
@@ -543,7 +569,7 @@ public class MagicManager : MonoBehaviour
                 s = "[" + pcm.playerData.magic.library.spellBook[i].chargesAvailable + "] " + pcm.playerData.magic.library.spellBook[i].name;
 
                 if (pcm.playerData.magic.library.spellBook[i].cooldown > 0f)
-                    s += " (COOLDOWN)";
+                    s += " (COOLDOWN "+DisplayCooldownTime(pcm.playerData.magic.library.spellBook[i].cooldown) +"min)";
 
                 GUI.Label(r, s, g);
                 r.y += 0.0375f * h;

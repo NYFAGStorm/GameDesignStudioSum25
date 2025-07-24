@@ -319,11 +319,11 @@ public class PlayerControlManager : MonoBehaviour
                 activePlot.ActionClear();
         }
 
-        // REVIEW: cast magic is last considered?
+        // cast magic is last considered
         if (characterActions.castMagic)
         {
             if (!mm.EnterSpellCastMode())
-                Debug.LogWarning("--- PlayerControlManager [Update] : unable to enter spell cast mode without spell charges. will ignore.");
+                ggm.AddNotification("You have no spell charges in your spell book. Craft more charges to cast.");
         }
     }
 
@@ -1305,6 +1305,7 @@ public class PlayerControlManager : MonoBehaviour
 
         if (levelUpDisplayTimer > 0f)
         {
+            int guiDepth = GUI.depth;
             // level up banner
             r.x = 0.2f * w;
             r.y = 0.225f * h;
@@ -1316,6 +1317,8 @@ public class PlayerControlManager : MonoBehaviour
             g.fontSize = Mathf.RoundToInt(100f * (w / 1024f));
             g.fontStyle = FontStyle.BoldAndItalic;
             s = "LEVEL UP!";
+
+            GUI.depth = -999; // TEST: banner on top always?
 
             r.x += 0.0024f * w;
             r.y += 0.004f * h;
@@ -1329,6 +1332,8 @@ public class PlayerControlManager : MonoBehaviour
             c.a = Mathf.Clamp01(levelUpDisplayTimer);
             GUI.color = c;
             GUI.Label(r, s, g);
+
+            GUI.depth = guiDepth;
         }
 
         if (currentInventorySelection >= playerInventory.items.Length)
