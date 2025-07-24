@@ -28,11 +28,14 @@ public class GreenerGameManager : MonoBehaviour
     private string[] notificationMessages; // able to 'stack'
     private float[] notificationTimers;
     private int notificationToRemove = -1; // remove only one per tick
+    private string[] delayNotificationStack; // held to notify with delay interval
+    private float delayNotificationTimer;
 
     private float goldFairHelpPauseTimer;
 
     const float HOSTPINGINTERVAL = 1f;
-    const float NOTIFICATIONHOLDTIME = 6.18f;
+    const float NOTIFICATIONHOLDTIME = 8f;
+    const float NOTIFICATIONDELAYINTERVAL = 1f;
     const float GOLDFAIRYHELPPAUSE = 360f;
 
 
@@ -92,6 +95,7 @@ public class GreenerGameManager : MonoBehaviour
             }
             // init notification system
             notificationMessages = new string[0];
+            delayNotificationStack = new string[0];
             notificationTimers = new float[0];
         }
     }
@@ -165,6 +169,34 @@ public class GreenerGameManager : MonoBehaviour
         if (!gameDataDistributed)
             return;
 
+        // run notification delay timers (for held stack)
+        if (delayNotificationTimer > 0f)
+        {
+            delayNotificationTimer -= Time.deltaTime;
+            if (delayNotificationTimer < 0f)
+            {
+                delayNotificationTimer = 0f;
+                // pop stack and notify
+                if (delayNotificationStack.Length > 0)
+                {
+                    delayNotificationTimer = NOTIFICATIONDELAYINTERVAL;
+                    AddNotification(delayNotificationStack[0]);
+                }
+                if (delayNotificationStack.Length > 1)
+                {
+                    string[] tmp = new string[delayNotificationStack.Length - 1];
+                    int count = 0;
+                    for (int i = 0; i < delayNotificationStack.Length; i++)
+                    {
+                        if (i != 0)
+                            tmp[count++] = delayNotificationStack[i];
+                    }
+                    delayNotificationStack = tmp;
+                }
+                else
+                    delayNotificationStack = new string[0];
+            }
+        }
         // run notification timers
         for (int i = 0; i < notificationTimers.Length; i++)
         {
@@ -307,6 +339,17 @@ public class GreenerGameManager : MonoBehaviour
     public bool IsHostGame()
     {
         return isHostGame;
+    }
+
+    /// <summary>
+    /// Provides an array of timed notifications tags to be displayed with an interval delay before each
+    /// </summary>
+    /// <param name="messages">the array of messages to display as notifications</param>
+    public void StackNotifications( string[] messages )
+    {
+        delayNotificationTimer = NOTIFICATIONDELAYINTERVAL;
+        delayNotificationStack = messages;
+        print(delayNotificationStack.Length+" messages stacked as notifications");
     }
 
     /// <summary>

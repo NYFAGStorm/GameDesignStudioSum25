@@ -489,49 +489,73 @@ public static class PlayerSystem
                 // welcome to the game
                 break;
             case 1:
-                retNotifications = new string[3];
-                retNotifications[0] = "Magic Crafting\nUNLOCKED";
-                retNotifications[1] = "New spell in Grimoire:\nFast Grow I";
-                retNotifications[2] = "New spell in Grimoire:\nSummon Water I";
+                retNotifications = new string[4];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 1";
+                retNotifications[1] = "Magic Crafting\nUNLOCKED";
+                retNotifications[2] = "New spell in Grimoire:\nFast Grow I";
+                retNotifications[3] = "New spell in Grimoire:\nSummon Water I";
                 break;
             case 2:
-                retNotifications = new string[2];
-                retNotifications[0] = "Plant Grafting\nUNLOCKED";
-                retNotifications[1] = "New spell in Grimoire:\nBless I";
+                retNotifications = new string[4];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 2";
+                retNotifications[1] = "Plant Grafting\nUNLOCKED";
+                retNotifications[2] = "UNCOMMON plants at market\nAVAILABLE";
+                retNotifications[3] = "New spell in Grimoire:\nBless I";
                 break;
             case 3:
-                retNotifications = new string[2];
-                retNotifications[0] = "New spell in Grimoire:\nMalnutrition I";
-                retNotifications[1] = "New spell in Grimoire:\nProsperous I";
+                retNotifications = new string[4];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 3";
+                retNotifications[1] = "Magic Crafting Cauldron\nUPGRADED";
+                retNotifications[2] = "New spell in Grimoire:\nMalnutrition I";
+                retNotifications[3] = "New spell in Grimoire:\nProsperous I";
                 break;
             case 4:
-                retNotifications = new string[1];
-                retNotifications[0] = "New spell in Grimoire:\nLesion I";
+                retNotifications = new string[2];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 4";
+                retNotifications[1] = "New spell in Grimoire:\nLesion I";
                 break;
             case 5:
-                retNotifications = new string[2];
-                retNotifications[0] = "New spell in Grimoire:\nEclipse I";
-                retNotifications[1] = "New spell in Grimoire:\nGolden Thumb I";
+                retNotifications = new string[5];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 5";
+                retNotifications[1] = "RARE plants at market\nAVAILABLE";
+                retNotifications[2] = "Magic Crafting Cauldron\nUPGRADED";
+                retNotifications[3] = "New spell in Grimoire:\nEclipse I";
+                retNotifications[4] = "New spell in Grimoire:\nGolden Thumb I";
                 break;
             case 6:
+                retNotifications = new string[1];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 6";
                 break;
             case 7:
+                retNotifications = new string[2];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 7";
+                retNotifications[1] = "Magic Crafting Cauldron\nUPGRADED";
                 break;
             case 8:
+                retNotifications = new string[2];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 8";
+                retNotifications[1] = "SPECIAL plants at market\nAVAILABLE";
                 break;
             case 9:
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 9";
                 break;
             case 10:
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 10";
                 break;
             case 11:
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 11";
                 break;
             case 12:
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 12";
                 break;
             case 13:
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 13";
                 break;
             case 14:
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 14";
                 break;
             case 15:
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 15";
                 break;
         }
 

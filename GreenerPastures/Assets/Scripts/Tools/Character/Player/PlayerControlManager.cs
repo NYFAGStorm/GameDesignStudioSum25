@@ -623,13 +623,7 @@ public class PlayerControlManager : MonoBehaviour
         if (retBool)
         {
             if (ggm != null)
-            {
-                string[] notifies = PlayerSystem.GetLevelUpNotifications(playerData.level);
-                for (int i = 0; i < notifies.Length; i++)
-                {
-                    ggm.AddNotification(notifies[i]);
-                }
-            }
+                ggm.StackNotifications(PlayerSystem.GetLevelUpNotifications(playerData.level));
             else
                 Debug.LogWarning("--- PlayerControlManager [AwardXP] : no reference to game manager for notifications. will ignore.");
         }
