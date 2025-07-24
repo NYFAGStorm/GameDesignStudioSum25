@@ -15,7 +15,7 @@ public class ShapeLibraryManager : MonoBehaviour
     [Tooltip("Each entry represents the shape of one ingredient. The nine booleans represent a 3x3 grid; 0-2 on top row, 3-5 middle row, 6-8 bottom row. True means this shape includes this square.")]
     public IngredientShapeType[] ingredientShapes;
 
-    const int TOTALINGREDIENTSHAPETYPES = 170;
+    const int TOTALINGREDIENTSHAPETYPES = 210;
 
 
     void Start()
@@ -145,10 +145,10 @@ public class ShapeLibraryManager : MonoBehaviour
             }
         }
         // 
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 50; i++)
         {
             int idx = 6 + (i * 4);
-            PlantType pt = (PlantType)i;
+            PlantType pt = (PlantType)(i+1);
             ingredientShapes[idx].item = ItemType.Seed;
             ingredientShapes[idx].plant = pt;
             ingredientShapes[idx].pieces[4] = true;
