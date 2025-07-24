@@ -153,13 +153,14 @@ public class MarketManager : MonoBehaviour
                         (rarePlants * plantItemTypes) +
                         (specialPlants * plantItemTypes);
                     break;
-                case >9: // TODO:
-                    maxMenuListPerLevel[i] = generalItems +
-                        (commonPlants * plantItemTypes) + 
-                        (uncommonPlants * plantItemTypes) +
-                        (rarePlants * plantItemTypes) +
-                        (specialPlants * plantItemTypes);
-                    break;
+            }
+            if (i>9)
+            {
+                maxMenuListPerLevel[i] = generalItems +
+                (commonPlants * plantItemTypes) +
+                (uncommonPlants * plantItemTypes) +
+                (rarePlants * plantItemTypes) +
+                (specialPlants * plantItemTypes);
             }
             maxMenuListPerLevel[i]--;
         }
@@ -867,7 +868,7 @@ public class MarketManager : MonoBehaviour
 
             if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
                 continue;
-            if (currentCustomer.playerData.level < 2 && i > 20)
+            if (i > maxMenuListPerLevel[currentCustomer.playerData.level])
                 continue;
 
             c = new Color(0.3f, 0.3f, 0.3f);
@@ -908,8 +909,7 @@ public class MarketManager : MonoBehaviour
             GUI.DrawTexture(r, menuItems[i].itemIcon);
 
             // not dollars, currency is gold
-            // and items have an individual sell value, per GDD tables
-            // (which is part of menu item list data already)
+            // and items have an individual sell value
             r.x = (w - 0.5f * h) * 0.55f;
             r.width = 0.5f * h;
             if (menuItems[i].availableToBuy)
@@ -944,29 +944,5 @@ public class MarketManager : MonoBehaviour
 
             r.y += 0.12f * h;
         }
-
-        //r.x = (w - 0.7f * h) / 2;
-        //r.y = 0.2f * h;
-        //r.width = 0.7f * h;
-        //r.height = 0.05f * h;
-        //for (int i = 0; i < menuItems.Length; i++)
-        //{
-        //    if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
-        //        continue;
-        //    if (currentCustomer.playerData.level < 2 && i > 20)
-        //        continue;
-
-        //    //c = Color.white;
-        //    //if (i == menuItemSelection)
-        //    //{
-        //    //    c = Color.yellow;
-        //    //    if (rejectFlashTimer > 0f)
-        //    //        c.g = (rejectFlashTimer * 5f) % 1f;
-        //    //}
-        //    //GUI.color = c;
-
-
-        //    r.y += 0.06f * h;
-        //}
     }
 }
