@@ -17,7 +17,7 @@ public class PostOfficeManager : MonoBehaviour
     private GreenerGameManager ggm;
     private bool mailboxesFound;
 
-    private struct ScheduledMessages
+    private struct ScheduledMessage
     {
         public int day;
         public WorldMonth month;
@@ -25,7 +25,16 @@ public class PostOfficeManager : MonoBehaviour
         public string message;
         public PlayerEffect requiredPlayerEffect;
     }
-    private ScheduledMessages[] timedMessages;
+    private ScheduledMessage[] timedMessages;
+    private struct ScheduledPackage
+    {
+        public int day;
+        public WorldMonth month;
+        public string sender;
+        public string message; // letter included with every package
+        public ItemData[] packedItems;
+    }
+    private ScheduledPackage[] timedPackages;
     private int latestDailyDelivery;
 
 
@@ -42,6 +51,7 @@ public class PostOfficeManager : MonoBehaviour
         if (enabled)
         {
             InitializeTimedMessages();
+            InitializeTimedPackages();
         }
     }
 
@@ -84,7 +94,7 @@ public class PostOfficeManager : MonoBehaviour
 
     void InitializeTimedMessages()
     {
-        timedMessages = new ScheduledMessages[7];
+        timedMessages = new ScheduledMessage[8];
         int idx = 0;
 
         timedMessages[idx].day = 1;
@@ -134,6 +144,156 @@ public class PostOfficeManager : MonoBehaviour
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "Grace of the Genesis Tree be with you,\n\nKeep in mind that you can hold the fruit of one plant, and graft it to the stalk of another.\n\nIf they are compatible, you'll have a new more rare plant. Happy grafting!\n\nLove, Eden";
         timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterSeven;
+        idx++;
+    }
+
+    void InitializeTimedPackages()
+    {
+        timedPackages = new ScheduledPackage[12];
+        int idx = 0;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Jan;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "It's a New Year and New Moon so come visit the market!\n\nEvery Biomancer needs supplies and we've got what you need!\n\nEnjoy this 50% off coupon good for any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Feb;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "New Moon Specials at the market!\n\nEverything is special for our valued customers!\n\nEnjoy this coupon for 50% off any item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Mar;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "Visit the market during the New Moon!\n\nWe've got everything a Biomancer needs to nurture their farm and craft their magic!\n\nEnjoy this complementary coupon worth 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Apr;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "New Moon nights are dark, but market is your bright light!\n\nCome one by and get your magic and farming supplies!\n\nPlease accept this 50% discount coupon for any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.May;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "Joyful New Moon to all our happy customers!\n\nEvery Biomancer needs supplies and we've got everything you need at the market!\n\nBring this coupon with you and get 50% off any item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Jun;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "New Moon means gifts for all our valued customers!\n\nCome on into the market where we have all you need!\n\nTake this 50% off coupon as our way of saying we value you! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Jul;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "Happy New Moon!\n\nWhether you need special crafting items or just need to sell you wares, the market is the place to be!\n\nGet 50% off any one item with this coupon! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Aug;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "A New Moon means savings down at the market!\n\nWe value each of our Biomancer customers, and aim to make sure you get all you need!\n\nUse this 50% off coupon during your next visit!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Sep;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "The New Moon is here!\n\nA happy farm and an active magic crafting table come from goods you'll find at the market!\n\nEnjoy this complementary coupon worth 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Oct;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "Visit the market during the New Moon!\n\nOur market menu includes all the items a thriving Biomancer needs!\n\nTake this 50% discount coupon as our way of saying 'thank you'! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Nov;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "We love the New Moon!\n\nThe dark nights are a perfect time to craft magic, and we have all the ingredients you need!\n\nEnjoy this coupon worth 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
+        idx++;
+
+        timedPackages[idx].day = 14;
+        timedPackages[idx].month = WorldMonth.Dec;
+        timedPackages[idx].sender = "Mr. Salesalot";
+        timedPackages[idx].message = "The New Moon means big deals at the market!\n\nCome visit the market and see what we have for you!\n\nBring this complementary coupon that gives you a 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].packedItems = new ItemData[3];
+        timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
+        timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
+        timedPackages[idx].packedItems[0].quality = .5f;
+        timedPackages[idx].packedItems[1] = InventorySystem.SetItemAsPlant(InventorySystem.InitializeItem(ItemType.Fruit), PlantSystem.InitializePlant(PlantType.Rose));
+        timedPackages[idx].packedItems[2] = InventorySystem.InitializeItem(ItemType.Letter);
         idx++;
     }
 
@@ -202,6 +362,23 @@ public class PostOfficeManager : MonoBehaviour
                 }
             }
         }
+
+        for (int i = 0; i < timedPackages.Length; i++)
+        {
+            if (timedPackages[i].day == day && timedPackages[i].month == month)
+            {
+                // pack letter and send package
+                for (int n = 0; n < ggm.game.players.Length; n++)
+                {
+                    string pName = ggm.game.players[n].playerName;
+                    ItemData[] items = timedPackages[i].packedItems;
+                    items[2].name = "Letter (from '" + timedPackages[i].sender + "')";
+                    items[2].quality = StoreLetterMessage(GameSystem.GetProfileIDOfPlayer(ggm.game, pName), timedPackages[i].sender, pName, timedPackages[i].message);
+                    SendPackage(timedPackages[i].sender, pName, items);
+                }
+            }
+        }
+
         latestDailyDelivery = day;
 
         return;

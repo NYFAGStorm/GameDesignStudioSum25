@@ -1357,7 +1357,7 @@ public class PlayerControlManager : MonoBehaviour
 
         g = new GUIStyle(GUI.skin.label);
         g.alignment = TextAnchor.MiddleCenter;
-        g.fontSize = Mathf.RoundToInt( 22f * (w/ 1024f));
+        g.fontSize = Mathf.RoundToInt( 20f * (w/ 1024f));
         g.fontStyle = FontStyle.Bold;
         s = playerInventory.items[currentInventorySelection].name;
 

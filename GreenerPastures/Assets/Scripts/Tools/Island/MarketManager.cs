@@ -276,7 +276,11 @@ public class MarketManager : MonoBehaviour
                     menuItems[menuItemSelection].buyItemValue <= currentCustomer.playerData.gold)
                 {
                     if (discountBuy < 1f)
+                    {
                         currentCustomer.playerData.gold -= Mathf.RoundToInt(menuItems[menuItemSelection].buyItemValue * discountBuy);
+                        // take coupon
+                        currentCustomer.playerData.inventory = InventorySystem.RemoveItemFromInventory(currentCustomer.playerData.inventory, currentCustomer.GetPlayerCurrentItemSelection() );
+                    }
                     else
                         currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;
                     currentCustomer.AwardXP(PlayerData.XP_BUYFROMSHOP);

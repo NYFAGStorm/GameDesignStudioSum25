@@ -15,7 +15,7 @@ public enum ItemType
     Package,
     Letter,
     Coupon,
-    Scroll,
+    Scroll, // REVIEW:
     Potion // REVIEW: 
 }
 
@@ -28,6 +28,18 @@ public enum ItemEffect
     EffectB,
     EffectC,
     EffectD
+
+    /*
+    ScrollLevelOneSpellCharge,
+    ScrollLevelTwoSpellCharge,
+    ScrollLevelThreeSpellCharge,
+    ScrollLevelFourSpellCharge,
+    ScrollLevelFiveSpellCharge,
+    PotionClearOneCooldown,
+    PotionAddOneCharge,
+    PotionClearAllCooldowns,
+    PotionAddAllCharges,
+    */
 }
 
 [System.Serializable]
