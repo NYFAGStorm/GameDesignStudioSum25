@@ -216,6 +216,9 @@ public class IslandManager : MonoBehaviour
                 case StructureType.MarketShop:
                     prefabName = "Market Shop";
                     break;
+                case StructureType.MarketShopInterior:
+                    prefabName = "Market Interior";
+                    break;
                 default:
                     break;
             }

@@ -956,7 +956,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4846969565510464227}
   m_Layer: 0
-  m_Name: Test Market Interior
+  m_Name: Market Interior
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

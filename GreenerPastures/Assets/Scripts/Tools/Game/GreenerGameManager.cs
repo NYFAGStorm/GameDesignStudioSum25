@@ -841,16 +841,18 @@ public class GreenerGameManager : MonoBehaviour
 
         game.islands = new IslandData[2];
 
+        // TODO: make central island central, player island off set (-20,0,20)
+
         pos.x = 0f;
         pos.y = 0f;
         pos.z = 0f;
         pos.w = 1f; // scale of 1,1,1
-        game.islands[0] = IslandSystem.InitializeIsland("Alpha", pos);
+        game.islands[0] = IslandSystem.InitializeIsland("Player Farm", pos);
         pos.x = 20f;
         pos.y = 0f;
         pos.z = -20f;
         pos.w = 1f; // scale of 1,1,1
-        game.islands[1] = IslandSystem.InitializeIsland("Beta", pos);
+        game.islands[1] = IslandSystem.InitializeIsland("Central", pos);
 
         game.islands[0].tports = new TPortNodeConfig[3];
         pos.x = 1.3f;
@@ -865,16 +867,17 @@ public class GreenerGameManager : MonoBehaviour
         pos.w = 0f;
         game.islands[0].tports[1] = IslandSystem.InitializeTeleportNode("tower", 1, pos);
         game.islands[0].tports[1].cameraMode = CameraManager.CameraMode.PanFollow;
-        pos.x = 1f;
-        pos.y = -1.17f;
-        pos.z = -3f;
+        // cam position offset from island location
+        pos.x = 1f + game.islands[0].location.x;
+        pos.y = -1.17f + game.islands[0].location.y;
+        pos.z = -3f + game.islands[0].location.z;
         pos.w = 0f;
         game.islands[0].tports[1].cameraPosition = pos;
         pos.x = 4f;
         pos.y = 0f;
         pos.z = -4f;
         pos.w = 0f;
-        game.islands[0].tports[2] = IslandSystem.InitializeTeleportNode("testTPort", 0, pos);
+        game.islands[0].tports[2] = IslandSystem.InitializeTeleportNode("centralTport", 0, pos);
         game.islands[0].structures = new StructureData[2];
         pos.x = 1f;
         pos.y = 1f;
@@ -919,22 +922,45 @@ public class GreenerGameManager : MonoBehaviour
         game.islands[0].props[5] = IslandSystem.InitializeProp("banner B", PropType.BannerB, pos);
 
 
-        game.islands[1].tports = new TPortNodeConfig[1];
+        game.islands[1].tports = new TPortNodeConfig[3];
         pos.x = -4f;
         pos.y = 0f;
         pos.z = 4f;
         pos.w = 0f;
-        game.islands[1].tports[0] = IslandSystem.InitializeTeleportNode("testTPort", 1, pos);
-        game.islands[1].structures = new StructureData[1];
-        pos.x = -.75f;
-        pos.y = 0.5f;
-        pos.z = -2f;
+        game.islands[1].tports[0] = IslandSystem.InitializeTeleportNode("centralTport", 1, pos);
+        pos.x = 0f;
+        pos.y = 0f;
+        pos.z = -1f;
+        pos.w = 0f;
+        game.islands[1].tports[1] = IslandSystem.InitializeTeleportNode("market", 0, pos);
+        game.islands[1].tports[1].cameraMode = CameraManager.CameraMode.Follow;
+        pos.x = 0f;
+        pos.y = -3.67f;
+        pos.z = -2.5f;
+        pos.w = 0f;
+        game.islands[1].tports[2] = IslandSystem.InitializeTeleportNode("market", 0, pos);
+        game.islands[1].tports[2].cameraMode = CameraManager.CameraMode.PanFollow;
+        // cam position offset from island location
+        pos.x = -.381f + game.islands[1].location.x;
+        pos.y = -1.1f + game.islands[1].location.y;
+        pos.z = -3f + game.islands[1].location.z;
+        pos.w = 0f;
+        game.islands[1].tports[2].cameraPosition = pos;
+        game.islands[1].structures = new StructureData[2];
+        pos.x = 0f;
+        pos.y = 0.75f;
+        pos.z = 0f;
         pos.w = 0f;
         game.islands[1].structures[0] = IslandSystem.InitializeStructure("market", StructureType.MarketShop, pos);
+        pos.x = 0f;
+        pos.y = -2f;
+        pos.z = 0f;
+        pos.w = 0f;
+        game.islands[1].structures[1] = IslandSystem.InitializeStructure("market interior", StructureType.MarketShopInterior, pos);
         game.islands[1].props = new PropData[3];
         pos.x = -1.5f;
         pos.y = 0f;
-        pos.z = -1f;
+        pos.z = -2f;
         pos.w = 0f;
         game.islands[1].props[0] = IslandSystem.InitializeProp("lamp post A", PropType.LampPostA, pos);
         pos.x = 4f;

@@ -339,7 +339,7 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "move eden wider";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(22f, 0f, -24f);
+        introBeats[beat].npcMark = new Vector3(22f, 0f, -23f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "'This central island'";
@@ -350,7 +350,7 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "move eden near market";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(20.25f, 0f, -23.5f);
+        introBeats[beat].npcMark = new Vector3(20.25f, 0f, -22.5f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "'Here is the market'";
@@ -359,9 +359,9 @@ public class PlayerIntroduction : MonoBehaviour
             "Here is the market, where we can buy supplies and sell your wares.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
-        introBeats[beat].name = "eden purchase";
+        introBeats[beat].name = "eden market doorway";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(18.75f, 0f, -23.25f);
+        introBeats[beat].npcMark = new Vector3(20f, 0f, -21f);
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 1f;
         beat++;
@@ -371,14 +371,30 @@ public class PlayerIntroduction : MonoBehaviour
             "Let me purchase a couple seeds and take you to your floating island.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
+        introBeats[beat].name = "eden enter market";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].npcMark = new Vector3(20f, 0f, -20f);
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
         introBeats[beat].name = "pause for purchase";
         introBeats[beat].action = ScriptedBeatAction.Default;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
         beat++;
+        introBeats[beat].name = "eden exit market";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].npcMark = new Vector3(20f, 0f, -21f);
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "'Mr. Salesalot'";
+        introBeats[beat].action = ScriptedBeatAction.Dialog;
+        introBeats[beat].dialogLine =
+            "Mr. Salesalot is so sweet! You'll meet him when you visit the market.";
+        introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
         introBeats[beat].name = "eden move away from market";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(18f, 0f, -22.5f);
+        introBeats[beat].npcMark = new Vector3(18f, 0f, -21f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "brief pause";
@@ -961,7 +977,7 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "eden walks into market";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(19.381f, 0f, -22f);
+        introBeats[beat].npcMark = new Vector3(20f, 0f, -20f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "help message almanac";
@@ -994,7 +1010,7 @@ public class PlayerIntroduction : MonoBehaviour
                     currentBeat = introBeats[currentBeatIndex];
                     currentBeat.dialogLine = "Again, welcome and enjoy your time with us.";
                     dialogPop = true;
-                    GameObject islandA = GameObject.Find("Island Alpha");
+                    GameObject islandA = GameObject.Find("Island Player Farm");
                     islandA.transform.position = Vector3.zero;
                     break;
                 case < 23:
@@ -1003,7 +1019,7 @@ public class PlayerIntroduction : MonoBehaviour
                     currentBeat = introBeats[currentBeatIndex];
                     currentBeat.dialogLine = "Again, welcome and enjoy your time with us.";
                     dialogPop = true;
-                    islandA = GameObject.Find("Island Alpha");
+                    islandA = GameObject.Find("Island Player Farm");
                     islandA.transform.position = Vector3.zero;
                     break;
                 case < 27:
@@ -1065,7 +1081,7 @@ public class PlayerIntroduction : MonoBehaviour
             if (currentBeat.action == ScriptedBeatAction.MoveIsland)
             {
                 AnimationCurve curve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-                GameObject islandA = GameObject.Find("Island Alpha");
+                GameObject islandA = GameObject.Find("Island Player Farm");
                 Vector3 iPos = Vector3.zero;
                 iPos.x = 4f;
                 iPos.y = -40f;
@@ -1534,7 +1550,7 @@ public class PlayerIntroduction : MonoBehaviour
         FindManagedPlot();
 
         // alpha island out of frame
-        GameObject islandA = GameObject.Find("Island Alpha");
+        GameObject islandA = GameObject.Find("Island Player Farm");
         Vector3 iPos = Vector3.zero;
         iPos.x = 4f;
         iPos.y = -40f;
@@ -1752,6 +1768,8 @@ public class PlayerIntroduction : MonoBehaviour
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
             g.fontStyle = FontStyle.Normal;
             g.alignment = TextAnchor.MiddleCenter;
+            if (!Application.isEditor)
+                c *= 0.618f;
             g.normal.textColor = c;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
