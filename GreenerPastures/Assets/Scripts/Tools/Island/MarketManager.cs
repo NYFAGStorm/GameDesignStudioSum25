@@ -45,6 +45,8 @@ public class MarketManager : MonoBehaviour
     private float rejectFlashTimer;
     private Vector3 purchaseOffset = new Vector3(-1f,0f,0f);
 
+    private float discountBuy;
+    private int playerItemFinalBuyValue; // value determined after applying coupon discount
     private int playerItemFinalSellValue; // value determined when selling item, per quality
 
     private int[] maxMenuListPerLevel = new int[11];
@@ -93,8 +95,6 @@ public class MarketManager : MonoBehaviour
 
     void InitializeMaxMenuList()
     {
-        // REFACTOR: what if the market should not sell every item it can buy?
-
         for (int i = 0; i < maxMenuListPerLevel.Length; i++)
         {
             switch (i)
@@ -259,6 +259,14 @@ public class MarketManager : MonoBehaviour
                 topOfMenuList = menuItemSelection;
             if (menuItemSelection > topOfMenuList + MENUITEMSINLIST)
                 topOfMenuList = menuItemSelection - MENUITEMSINLIST;
+            // detect player coupon is selected in inventory
+            ItemData coupon = currentCustomer.GetPlayerCurrentItemSelection();
+            discountBuy = 1f; // 100% purchase price (no discount by default)
+            if (coupon != null && coupon.type == ItemType.Coupon)
+            {
+                discountBuy -= coupon.quality; // coupon quality represents % off price
+                discountBuy = Mathf.Clamp01(discountBuy);
+            }
             // allow player to buy item
             if (Input.GetKeyDown(currentCustomer.actionAKey) || 
                 (padMgr != null && padMgr.gamepads[0].isActive && 
@@ -267,7 +275,10 @@ public class MarketManager : MonoBehaviour
                 if (menuItems[menuItemSelection].availableToBuy && 
                     menuItems[menuItemSelection].buyItemValue <= currentCustomer.playerData.gold)
                 {
-                    currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;
+                    if (discountBuy < 1f)
+                        currentCustomer.playerData.gold -= Mathf.RoundToInt(menuItems[menuItemSelection].buyItemValue * discountBuy);
+                    else
+                        currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;
                     currentCustomer.AwardXP(PlayerData.XP_BUYFROMSHOP);
 
                     // try place in inventory, spawn to the side if fail
@@ -899,7 +910,13 @@ public class MarketManager : MonoBehaviour
             r.x = (w - 0.5f * h) * 0.55f;
             r.width = 0.5f * h;
             if (menuItems[i].availableToBuy)
-                s = menuItems[i].buyItemValue.ToString(); // buy value
+            {
+                // buy value
+                if (discountBuy < 1f)
+                    s = Mathf.RoundToInt(menuItems[i].buyItemValue * discountBuy ).ToString();
+                else
+                    s = menuItems[i].buyItemValue.ToString();
+            }
             else
                 s = "--";
             if (customerMode == CustomerMode.Sell)
