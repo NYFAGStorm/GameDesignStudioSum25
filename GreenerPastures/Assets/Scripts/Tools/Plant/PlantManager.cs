@@ -9,6 +9,8 @@ public class PlantManager : MonoBehaviour
     private Renderer plantImage;
     private PlotManager plot;
 
+    private AudioManager sfxAudio;
+
     // temp (use time manager multiplier)
     const float PLANTSTAGEDURATION = 10f;
     const float PLANTCHECKINTERVAL = 1f;
@@ -29,6 +31,7 @@ public class PlantManager : MonoBehaviour
             Debug.LogError("--- PlantManager [Start] : " + gameObject.name + " no renderer found in children. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if ( enabled )
         {
@@ -120,6 +123,7 @@ public class PlantManager : MonoBehaviour
             growNumber = Mathf.Clamp(growNumber, 3, 4);
 
         string plantTextureName = "";
+        bool plantHadTexture = (plantImage.material.mainTexture.name != "Util_Clear");
         
         switch (growNumber)
         {
@@ -164,6 +168,9 @@ public class PlantManager : MonoBehaviour
             pData.rarity == PlantRarity.Special ||
             pData.rarity == PlantRarity.Unique))
             plantImage.material.mainTexture = (Texture2D)Resources.Load(plantTextureName);
+
+        if (sfxAudio != null && !plantHadTexture && plantTextureName == "Seedling")
+            sfxAudio.StartSound("Plant Seedling Appear", plot.gameObject, 0f, 6.18f);
     }
 
     string GetPlantShootSize( PlantType plantType )

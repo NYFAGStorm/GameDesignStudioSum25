@@ -73,6 +73,7 @@ public class MagicCraftingManager : MonoBehaviour
     private PlayerControlManager leaving; // used in deactivation
     private ArtLibraryManager alm;
     private QuitOnEscape qoe; // disable to suspend use of start button during crafting
+    private AudioManager sfxAudio;
 
     private MultiGamepad padMgr;
     // a button down to turn on padDragOn, with padDragOn true detect a button unpressed to turn off
@@ -116,6 +117,7 @@ public class MagicCraftingManager : MonoBehaviour
             Debug.LogError("--- MagicCraftingManager [Start] : no quit on escape found in scene. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -356,9 +358,13 @@ public class MagicCraftingManager : MonoBehaviour
                         break;
                     case CraftState.Grimoire:
                         fadingOverlay = false;
+                        if (sfxAudio != null && sfxAudio.IsSoundPlaying("Magic Cauldron Bubble Loop"))
+                            sfxAudio.StopSound("Magic Cauldron Bubble Loop");
                         break;
                     case CraftState.Cauldron:
                         fadingOverlay = false;
+                        if (sfxAudio != null && !sfxAudio.IsSoundPlaying("Magic Cauldron Bubble Loop"))
+                            sfxAudio.StartSound("Magic Cauldron Bubble Loop");
                         break;
                     case CraftState.Exiting:
                         libraryStateTimer = (LIBRARYSTATETIMERMAX/2f); // exit faster
@@ -367,6 +373,8 @@ public class MagicCraftingManager : MonoBehaviour
                         fadingOverlay = false;
                         currentGrimoireEntry = -1;
                         selectedGrimoireRecipe = -1;
+                        if (sfxAudio != null && sfxAudio.IsSoundPlaying("Magic Cauldron Bubble Loop"))
+                            sfxAudio.StopSound("Magic Cauldron Bubble Loop");
                         break;
                     default:
                         Debug.LogWarning("--- MagicCraftingManager [RunCraftStateTimer] : craft state undefined. will ignore.");
@@ -1264,6 +1272,17 @@ public class MagicCraftingManager : MonoBehaviour
                         offsetY++;
                     }
                 }
+                // sfx
+                if (sfxAudio != null)
+                {
+                    float rnd = RandomSystem.FlatRandom01();
+                    if (rnd < .333f)
+                        sfxAudio.StartSound("Magic Cauldron Drop 1");
+                    else if (rnd < .667)
+                        sfxAudio.StartSound("Magic Cauldron Drop 2");
+                    else
+                        sfxAudio.StartSound("Magic Cauldron Drop 3");
+                }
                 // clear held item
                 heldIngredient.cauldronInventoryIndex = -1;
                 heldIngredient.ingredient.name = "";
@@ -1347,7 +1366,9 @@ public class MagicCraftingManager : MonoBehaviour
                 string spellName = gData.name;
                 pcm.playerData.magic.library = 
                     MagicSystem.AddChargeToSpellBook(gData.type, pcm.playerData.magic.library);
-
+                // sfx
+                if (sfxAudio != null)
+                    sfxAudio.StartSound("Magic Cauldron Charge Crafted");
                 pcm.AwardXP(PlayerData.XP_CRAFTMAGIC);
 
                 // remove all cauldron inventory items from player inventory

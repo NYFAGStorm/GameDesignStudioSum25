@@ -20,6 +20,8 @@ public class TeleportManager : MonoBehaviour
     private float teleportCheckTimer;
     private TeleportManager pairedPad;
 
+    private AudioManager sfxAudio;
+
     const float TELEPORTDURATION = 0.5f;
     const float TELEPORTPADRADUIS = 0.25f;
     const float TELEPORTCHECKINTERVAL = 1f;
@@ -66,6 +68,7 @@ public class TeleportManager : MonoBehaviour
             Debug.LogError("--- TeleportManager [Start] : " + gameObject.name + " no teleport pad found with tag '" + teleporterTag + "'. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -178,7 +181,9 @@ public class TeleportManager : MonoBehaviour
         vfx.transform.position = transform.position;
         vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = Color.yellow;
         Destroy(vfx, 1f);
-        // TODO: sfx
+        // sfx
+        if (sfxAudio != null)
+            sfxAudio.StartSound("Teleport", gameObject, 0f, 6.18f, .381f);
     }
 
     public void HandleLocalCamera()

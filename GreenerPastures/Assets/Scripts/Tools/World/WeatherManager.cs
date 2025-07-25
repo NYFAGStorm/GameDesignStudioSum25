@@ -24,6 +24,7 @@ public class WeatherManager : MonoBehaviour
     private float weatherTimer;
     private TimeManager tim;
     private CameraManager cm;
+    private AudioManager sfxAudio;
 
     const float WEATHERCHECKINTERVAL = 15f; //.0618f;
 
@@ -52,6 +53,7 @@ public class WeatherManager : MonoBehaviour
             Debug.LogError("--- WeatherManager [Start] : no time manager found in scene. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -67,6 +69,26 @@ public class WeatherManager : MonoBehaviour
     void Update()
     {
         // fix rounding error values in weather conditions (clouds and rain not zero)
+        if (targetWeather.x > 0f && previousWeather.x > 0f)
+        {
+            if (previousWeather.x < .01f)
+            {
+                if (targetWeather.x < 0.01f)
+                {
+                    targetWeather.x = 0f;
+                    //Debug.Log("-- near zero target wind weather conditions. set target to zero. --");
+                }
+                if (GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
+                {
+                    previousWeather = targetWeather;
+                    //Debug.Log("-- near zero wind difference in weather conditions. set prev to target. --");
+                }
+            }
+        }
+        if (previousWeather.x == 0f)
+            previousWeather.y = 0f;
+        if (targetWeather.x == 0f)
+            targetWeather.y = 0f;
         if (targetWeather.z > 0f && previousWeather.z > 0f)
         {
             if (previousWeather.z < .01f)
@@ -74,12 +96,97 @@ public class WeatherManager : MonoBehaviour
                 if (targetWeather.z < 0.01f)
                 {
                     targetWeather.z = 0f;
-                    Debug.Log("-- near zero target cloud weather conditions. set target to zero. --");
+                    //Debug.Log("-- near zero target cloud weather conditions. set target to zero. --");
                 }
                 if (GameSystem.PositionDistance(previousWeather, targetWeather) < 0.1f)
                 {
                     previousWeather = targetWeather;
-                    Debug.Log("-- near zero difference in weather conditions. set prev to target. --");
+                    //Debug.Log("-- near zero cloud difference in weather conditions. set prev to target. --");
+                }
+            }
+        }
+
+        // weather sfx
+        if (sfxAudio != null)
+        {
+            if (rainAmount > 0f)
+            {
+                // rain
+                if (sfxAudio.IsSoundPlaying("Rain Loop"))
+                {
+                    float currentRain = sfxAudio.GetSoundVolume("Rain Loop");
+                    currentRain = FadeTo(currentRain, rainAmount * .618f);
+                    sfxAudio.SetSoundVolume("Rain Loop", currentRain);
+                }
+                else
+                {
+                    sfxAudio.StartSound("Rain Loop");
+                    sfxAudio.SetSoundVolume("Rain Loop", rainAmount);
+                }
+            }
+            else
+            {
+                // no rain
+                if (sfxAudio.IsSoundPlaying("Rain Loop"))
+                    sfxAudio.StopSound("Rain Loop");
+            }
+            if (windAmount > 0f)
+            {
+                print("wind amount updating sfx");
+                float lightWind = Mathf.Sin((windAmount / .5f) * Mathf.PI);
+                float medWind = Mathf.Sin(((windAmount - .381f) / (.618f - .381f)) * Mathf.PI);
+                float heavyWind = Mathf.Sin((windAmount - .5f) * Mathf.PI);
+                if (windAmount > 0f)
+                {
+                    if (sfxAudio.IsSoundPlaying("Wind Loop Light"))
+                    {
+                        float current = sfxAudio.GetSoundVolume("Wind Loop Light");
+                        current = FadeTo(current, lightWind);
+                        sfxAudio.SetSoundVolume("Wind Loop Light", current);
+                        if (current < 0.05f)
+                            sfxAudio.StopSound("Wind Loop Light");
+                    }
+                    else
+                    {
+                        sfxAudio.StartSound("Wind Loop Light");
+                        sfxAudio.SetSoundVolume("Wind Loop Light", lightWind);
+                    }
+                    if (sfxAudio.IsSoundPlaying("Wind Loop Medium"))
+                    {
+                        float current = sfxAudio.GetSoundVolume("Wind Loop Medium");
+                        current = FadeTo(current, medWind * .618f);
+                        sfxAudio.SetSoundVolume("Wind Loop Medium", current);
+                        if (current < 0.05f)
+                            sfxAudio.StopSound("Wind Loop Medium");
+                    }
+                    else
+                    {
+                        sfxAudio.StartSound("Wind Loop Medium");
+                        sfxAudio.SetSoundVolume("Wind Loop Medium", medWind * .618f);
+                    }
+                    if (sfxAudio.IsSoundPlaying("Wind Loop Heavy"))
+                    {
+                        float current = sfxAudio.GetSoundVolume("Wind Loop Heavy");
+                        current = FadeTo(current, heavyWind * .381f);
+                        sfxAudio.SetSoundVolume("Wind Loop Heavy", current);
+                        if (current < 0.05f)
+                            sfxAudio.StopSound("Wind Loop Heavy");
+                    }
+                    else
+                    {
+                        sfxAudio.StartSound("Wind Loop Heavy");
+                        sfxAudio.SetSoundVolume("Wind Loop Heavy", heavyWind * .381f);
+                    }
+                }
+                else
+                {
+                    // no wind
+                    if (sfxAudio.IsSoundPlaying("Wind Loop Light"))
+                        sfxAudio.StopSound("Wind Loop Light");
+                    if (sfxAudio.IsSoundPlaying("Wind Loop Medium"))
+                        sfxAudio.StopSound("Wind Loop Medium");
+                    if (sfxAudio.IsSoundPlaying("Wind Loop Heavy"))
+                        sfxAudio.StopSound("Wind Loop Heavy");
                 }
             }
         }
@@ -134,6 +241,17 @@ public class WeatherManager : MonoBehaviour
             float adjust = (windAmount * windDirection) + (cloudAmount * -2f);
             tim.SetTemperatureAdjust(adjust);
         }
+    }
+
+    float FadeTo(float current, float target)
+    {
+        if (Mathf.Abs(target - current) < 0.01f)
+            current = target;
+        if (current < target)
+            current += ((target - current) * 0.1f);
+        if (current > target)
+            current -= ((current - target) * 0.1f);
+        return current;
     }
 
     /// <summary>

@@ -58,6 +58,7 @@ public class MagicManager : MonoBehaviour
     private MultiGamepad padMgr;
     private CastManager castMgr;
     private QuitOnEscape qoe;
+    private AudioManager sfxAudio;
 
     const float CASTMODECHANGETIME = 1f;
     const float SELECTIONINVALIDTIME = 1.5f;
@@ -90,6 +91,7 @@ public class MagicManager : MonoBehaviour
             Debug.LogError("--- MagicManager [Start] : no quit on escape found in scene. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -209,10 +211,19 @@ public class MagicManager : MonoBehaviour
                         spellData.cooldownTimestamp = tim.GetGlobalTimestamp(spellData.cooldownDuration);
                         cData.lifeTimestamp = tim.GetGlobalTimestamp(spellData.castDuration);
                     }
+                    // vfx
                     GameObject castVFX = GameObject.Instantiate((GameObject)Resources.Load("VFX Cast Magic"));
                     castVFX.name = "VFX Cast Magic";
                     castVFX.transform.position = gameObject.transform.position; // centered on player
                     Destroy(castVFX, 3.81f);
+                    // sfx
+                    if ( sfxAudio != null )
+                    {
+                        if (RandomSystem.FlatRandom01() < 0.5f)
+                            sfxAudio.StartSound("Magic Cast 1");
+                        else
+                            sfxAudio.StartSound("Magic Cast 2");
+                    }
                     castMgr.AcquireNewCast(cData);
                     pcm.AwardXP(PlayerData.XP_CASTMAGIC);
                     retBool = true;

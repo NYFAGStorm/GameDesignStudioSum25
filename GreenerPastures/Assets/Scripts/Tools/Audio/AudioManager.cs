@@ -188,6 +188,69 @@ public class AudioManager : MonoBehaviour
         return retInt;
     }
 
+    public bool IsSoundPlaying( string soundName )
+    {
+        bool retBool = false;
+
+        int idx = FindSoundByName(soundName);
+        for (int i = 0; i < plays.Length; i++)
+        {
+            if (plays[i].soundIndex == idx)
+            {
+                retBool = true;
+                break;
+            }
+        }
+
+        return retBool;
+    }
+
+    public float GetSoundVolume( string soundName )
+    {
+        float retFloat = 0f;
+
+        int idx = FindSoundByName(soundName);
+        for (int i = 0; i<plays.Length; i++)
+        {
+            if (plays[i].soundIndex == idx)
+            {
+                retFloat = plays[i].source.volume;
+                break;
+            }
+        }
+
+        return retFloat;
+    }
+
+    public void SetSoundVolume( string soundName, float volume )
+    {
+        int idx = FindSoundByName(soundName);
+        sounds[idx].volume = volume;
+        for (int i = 0; i < plays.Length; i++)
+        {
+            if (plays[i].soundIndex == idx)
+            {
+                plays[i].source.volume = volume;
+                break;
+            }
+        }
+    }
+
+    public void StopSound( string soundName )
+    {
+        int idx = FindSoundByName(soundName);
+        for (int i = 0; i < plays.Length; i++)
+        {
+            if (plays[i].soundIndex == idx)
+            {
+                plays[i].source.Stop();
+                plays[i].source.volume = 0f;
+                plays[i].playTimer = 0f;
+                break;
+            }
+        }
+    }
+
     /// <summary>
     /// Play a sound.
     /// </summary>
@@ -275,6 +338,35 @@ public class AudioManager : MonoBehaviour
         InitSource(plays[playIdx].source, sounds[sndIdx].clip);
     }
 
+    public void StartSound(string soundName, GameObject gameObj, float minDist, float maxDist, float spatialBlend)
+    {
+        int sndIdx = FindSoundByName(soundName);
+        if (sndIdx == -1)
+            return;
+        if (sounds[sndIdx].type == AType.MusicLoop)
+        {
+            StartSound(soundName);
+            Debug.LogWarning("--- AudioManager [StartSound] : sound " + soundName + " is a music loop and cannot be in 3D.");
+            return;
+        }
+        if (gameObj == null)
+        {
+            Debug.LogWarning("--- AudioManager [StartSound] : Game Object missing. Will ignore.");
+            return;
+        }
+        // create play
+        int playIdx = CreatePlay(sndIdx);
+        plays[playIdx].externalObj = gameObj;
+        plays[playIdx].source = plays[playIdx].externalObj.AddComponent<AudioSource>();
+        plays[playIdx].source.spatialBlend = 1f;
+        plays[playIdx].source.rolloffMode = AudioRolloffMode.Linear;
+        plays[playIdx].source.minDistance = minDist;
+        plays[playIdx].source.maxDistance = maxDist;
+        plays[playIdx].source.volume = sounds[plays[playIdx].soundIndex].volume;
+        plays[playIdx].source.spatialBlend = spatialBlend;
+        InitSource(plays[playIdx].source, sounds[sndIdx].clip);
+    }
+
     void InitSource( AudioSource src, AudioClip clp )
     {
         src.playOnAwake = false;
@@ -333,7 +425,8 @@ public class AudioManager : MonoBehaviour
             }
             if (plays[i].playTimer == 0f && (plays[i].source == null || !plays[i].source.isPlaying))
             {
-                if (sounds[plays[i].soundIndex].type == AType.SFXLoop || sounds[plays[i].soundIndex].type == AType.MusicLoop)
+                if (plays[i].source.volume > 0f && 
+                    (sounds[plays[i].soundIndex].type == AType.SFXLoop || sounds[plays[i].soundIndex].type == AType.MusicLoop))
                 {
                     // set timer for loop
                     plays[i].playTimer = sounds[plays[i].soundIndex].delay;

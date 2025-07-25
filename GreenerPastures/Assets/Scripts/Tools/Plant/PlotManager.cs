@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlotManager : MonoBehaviour
 {
@@ -50,6 +49,8 @@ public class PlotManager : MonoBehaviour
     private float harvestQualityValue;
 
     private Renderer plotTexture;
+
+    private AudioManager sfxAudio;
 
     const float CURSORPULSEDURATION = 0.618f;
     // temp use time manager multiplier
@@ -104,6 +105,7 @@ public class PlotManager : MonoBehaviour
             Debug.LogError("--- PlotManager [Start] : no ground child renderer found. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // inititalize
         if (enabled)
         {
@@ -611,6 +613,9 @@ public class PlotManager : MonoBehaviour
 
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         pcm.AwardXP(PlayerData.XP_WATERTHEPLOT);
+        // sfx
+        if (sfxAudio != null)
+            sfxAudio.StartSound("Player Watering");
 
         data.water = 1f;
     }
@@ -747,6 +752,9 @@ public class PlotManager : MonoBehaviour
                             }
                         }
                     }
+                    // sfx
+                    if (sfxAudio != null)
+                        sfxAudio.StartSound("Player Harvest");
                 }
                 // harvest results display
                 harvestDisplayTimer = HARVESTDISPLAYDURATION;
@@ -826,7 +834,16 @@ public class PlotManager : MonoBehaviour
                 }
                 ism.SpawnItem(loose, gameObject.transform.position, target, true);
             }
+            // sfx
+            if (sfxAudio != null)
+                sfxAudio.StartSound("Player Uproot");
         }
+        else
+        {
+            // sfx
+            sfxAudio.StartSound("Player Dig Hole");
+        }
+
         // remove plant
         Destroy(plant);
         data.plant = PlantSystem.InitializePlant(PlantType.Default);

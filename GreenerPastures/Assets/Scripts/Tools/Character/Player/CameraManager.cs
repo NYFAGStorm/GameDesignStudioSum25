@@ -47,6 +47,7 @@ public class CameraManager : MonoBehaviour
     private GameObject rainBox;
     private ParticleSystem rainVFX;
     private bool rainOn;
+    private AudioManager sfxAudio;
 
     const float CAMERAPAUSEDURATION = 0.0618f;
     const float CAMERAMOVEDURATION = 0.618f;
@@ -76,6 +77,7 @@ public class CameraManager : MonoBehaviour
             Debug.LogWarning("--- CameraManager[Start] : no gamepad manager found. will ignore.");
             // enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -280,7 +282,12 @@ public class CameraManager : MonoBehaviour
             // rain vfx config (on)
             rainBox.SetActive(true);
             if (rainOn)
+            {
                 rainVFX.Play();
+                // sfx
+                if (sfxAudio != null && !sfxAudio.IsSoundPlaying("Rain Loop"))
+                    sfxAudio.StartSound("Rain Loop");
+            }
         }
     }
 
@@ -300,6 +307,8 @@ public class CameraManager : MonoBehaviour
             // rain vfx config (off)
             rainOn = rainVFX.isPlaying;
             rainBox.SetActive(false);
+            if (sfxAudio != null && sfxAudio.IsSoundPlaying("Rain Loop"))
+                sfxAudio.StopSound("Rain Loop");
         }
     }
 

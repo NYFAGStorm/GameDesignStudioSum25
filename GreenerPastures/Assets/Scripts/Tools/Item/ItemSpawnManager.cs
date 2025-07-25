@@ -26,6 +26,8 @@ public class ItemSpawnManager : MonoBehaviour
     }
     private DroppedItem[] drops = new DroppedItem[0];
 
+    private AudioManager sfxAudio;
+
     const float DROPTIME = 1f;
     const float VERTICALORIGIN = 0.25f;
     const float TARGETDETECTRADIUS = 0.381f;
@@ -39,6 +41,7 @@ public class ItemSpawnManager : MonoBehaviour
             Debug.LogError("--- ItemSpawnManager [Start] : drop curve undefined. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -109,6 +112,10 @@ public class ItemSpawnManager : MonoBehaviour
         tmp[drops.Length].remoteDrop = remoteDrop;
 
         drops = tmp;
+
+        // sfx
+        if (sfxAudio != null)
+            sfxAudio.StartSound("Item Drop", item, 0f, 6.18f);
     }
 
     void RemoveDrop( int index )

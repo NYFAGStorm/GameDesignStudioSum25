@@ -366,6 +366,7 @@ Transform:
   m_Children:
   - {fileID: 315054322}
   - {fileID: 1651088193}
+  - {fileID: 2073833400}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &465892697
@@ -1192,6 +1193,245 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2073833399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2073833400}
+  - component: {fileID: 2073833402}
+  - component: {fileID: 2073833401}
+  m_Layer: 0
+  m_Name: AudioMgr SFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2073833400
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073833399}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 435026383}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2073833401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073833399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb2949f4ca392f94a85ce209b7cf865a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2073833402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073833399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c84ee89b53e7d06479daf259d5fd914c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: Item Drop
+    clip: {fileID: 8300000, guid: f17aab3068a795943aa47755b3813712, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Teleport
+    clip: {fileID: 8300000, guid: 8a4ee9b1c85edc3429d26d2d6ef71cb0, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Rain Loop
+    clip: {fileID: 8300000, guid: e712ced8c1991774fb2eed27a52e8d6b, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.618
+    volumeVariance: 0
+  - name: Wind Loop Light
+    clip: {fileID: 8300000, guid: cb4b345fdcff8c743ae9ccb10d2532b5, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Wind Loop Medium
+    clip: {fileID: 8300000, guid: d0e1bb7ebb66e0b42accb38f476b321f, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.618
+    volumeVariance: 0
+  - name: Wind Loop Heavy
+    clip: {fileID: 8300000, guid: 32bac55f0b6baf340a744ded59c18796, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.381
+    volumeVariance: 0
+  - name: Magic Cast 1
+    clip: {fileID: 8300000, guid: b9e5f82cfef3e204aaafaa78dc84fe63, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.381
+    volumeVariance: 0
+  - name: Magic Cast 2
+    clip: {fileID: 8300000, guid: d466ab68a5b7b1e4e9e524de3290fd52, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.618
+    volumeVariance: 0
+  - name: Magic Cauldron Bubble Loop
+    clip: {fileID: 8300000, guid: 3dffa6829a541d84ca7d0fa4f5410e6e, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.381
+    volumeVariance: 0
+  - name: Magic Cauldron Drop 1
+    clip: {fileID: 8300000, guid: b7d402f148d8cb248beb2211707ae7f8, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Magic Cauldron Drop 2
+    clip: {fileID: 8300000, guid: 14ed4186d14bc154a872327d0612a099, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Magic Cauldron Drop 3
+    clip: {fileID: 8300000, guid: 732bb09a6b7885c4aa6631a6c3bb5d72, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Magic Cauldron Charge Crafted
+    clip: {fileID: 8300000, guid: 9090ed17869f3dc439f1955ef46c2b15, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Plant Seedling Appear
+    clip: {fileID: 8300000, guid: 0c45bd2f8fe126e4e90d7c84f1dbc6d8, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Player Dig Hole
+    clip: {fileID: 8300000, guid: 59c6e5d4b3c740646a42b490dcf2f1a4, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Player Harvest
+    clip: {fileID: 8300000, guid: 8b23b1e7714492a4e81addf167e6df7e, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Player Uproot
+    clip: {fileID: 8300000, guid: 4493a16759d48fc449fa5c704430b181, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Player Watering
+    clip: {fileID: 8300000, guid: 2b1310c06663f8049915ca09c6c246b6, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  musicCrossFadeTime: 3.81
 --- !u!1001 &918166386300932168
 PrefabInstance:
   m_ObjectHideFlags: 0

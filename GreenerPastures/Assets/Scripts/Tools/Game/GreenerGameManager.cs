@@ -349,7 +349,6 @@ public class GreenerGameManager : MonoBehaviour
     {
         delayNotificationTimer = NOTIFICATIONDELAYINTERVAL;
         delayNotificationStack = messages;
-        print(delayNotificationStack.Length+" messages stacked as notifications");
     }
 
     /// <summary>
