@@ -83,7 +83,9 @@ public class GreenerGameManager : MonoBehaviour
             Debug.LogError("--- GreenerGameManager [Start] : no art library manager found in scene. aborting.");
             enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -470,8 +472,10 @@ public class GreenerGameManager : MonoBehaviour
 
     public void DoShutDownGameDataCollection()
     {
-        // have weather manager halt all sfx
+        // have weather manager halt weather sfx
         GameObject.FindFirstObjectByType<WeatherManager>().HaltWeatherSFX(true);
+        // halt other sfx from here
+        sfxAudio.StopAllSounds();
 
         if (shutdownDataCollected)
             return;

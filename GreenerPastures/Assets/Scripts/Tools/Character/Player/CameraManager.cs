@@ -47,7 +47,7 @@ public class CameraManager : MonoBehaviour
     private GameObject rainBox;
     private ParticleSystem rainVFX;
     private bool rainOn;
-    private AudioManager sfxAudio;
+    private WeatherManager wm;
 
     const float CAMERAPAUSEDURATION = 0.0618f;
     const float CAMERAMOVEDURATION = 0.618f;
@@ -74,10 +74,15 @@ public class CameraManager : MonoBehaviour
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
         {
-            Debug.LogWarning("--- CameraManager[Start] : no gamepad manager found. will ignore.");
+            Debug.LogWarning("--- CameraManager [Start] : no gamepad manager found. will ignore.");
             // enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        wm = GameObject.FindFirstObjectByType<WeatherManager>();
+        if (wm == null)
+        {
+            Debug.LogError("--- CameraManager [Start] : no weather manager found. will ignore.");
+            enabled = false;
+        }
         // initialize
         if (enabled)
         {
@@ -276,7 +281,7 @@ public class CameraManager : MonoBehaviour
         mode = CameraMode.Follow;
         GetFollowTarget();
         gameObject.transform.eulerAngles = savedRotation;
-
+        // play weather vfx as outdoors
         if (rainBox != null)
         {
             // rain vfx config (on)
@@ -284,11 +289,10 @@ public class CameraManager : MonoBehaviour
             if (rainOn)
             {
                 rainVFX.Play();
-                // sfx
-                if (sfxAudio != null && !sfxAudio.IsSoundPlaying("Rain Loop"))
-                    sfxAudio.StartSound("Rain Loop");
             }
         }
+        // play all weather sfx as outdoors
+        wm.SFXForIndoors(false);
     }
 
     /// <summary>
@@ -301,15 +305,15 @@ public class CameraManager : MonoBehaviour
         savedPostion = camPosition;
         mode = CameraMode.PanFollow;
         GetPanTarget();
-
+        // play no weather vfx (indoors)
         if (rainBox != null)
         {
             // rain vfx config (off)
             rainOn = rainVFX.isPlaying;
             rainBox.SetActive(false);
-            if (sfxAudio != null && sfxAudio.IsSoundPlaying("Rain Loop"))
-                sfxAudio.StopSound("Rain Loop");
         }
+        // play all weather vfx as indoors
+        wm.SFXForIndoors(true);
     }
 
     public void SetWorldViewIntro()

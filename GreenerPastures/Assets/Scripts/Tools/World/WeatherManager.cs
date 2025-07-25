@@ -24,8 +24,10 @@ public class WeatherManager : MonoBehaviour
     private float weatherTimer;
     private TimeManager tim;
     private CameraManager cm;
+
     private AudioManager sfxAudio;
     private bool haltWeatherSFX;
+    private bool indoorWeatherSFX;
 
     const float WEATHERCHECKINTERVAL = 15f; //.0618f;
 
@@ -60,7 +62,9 @@ public class WeatherManager : MonoBehaviour
             Debug.LogError("--- WeatherManager [Start] : no time manager found in scene. aborting.");
             enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        GameObject sfxObj = GameObject.Find("AudioMgr Weather SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -72,7 +76,6 @@ public class WeatherManager : MonoBehaviour
     {
         cm = camMgr;
     }
-
 
     void Update()
     {
@@ -140,9 +143,15 @@ public class WeatherManager : MonoBehaviour
             }
             if (windAmount > 0f)
             {
-                float lightWind = Mathf.Sin((windAmount / .5f) * Mathf.PI);
-                float medWind = Mathf.Sin(((windAmount - .381f) / (.618f - .381f)) * Mathf.PI);
-                float heavyWind = Mathf.Sin((windAmount - .5f) * Mathf.PI);
+                float lightWind = Mathf.Sin(Mathf.Clamp01(windAmount / .5f) * Mathf.PI);
+                if (lightWind < 0.01f)
+                    lightWind = 0f;
+                float medWind = Mathf.Sin(Mathf.Clamp01((windAmount - .25f) / .5f) * Mathf.PI);
+                if (medWind < 0.01f)
+                    medWind = 0f;
+                float heavyWind = Mathf.Sin(Mathf.Clamp01(windAmount - .5f) * Mathf.PI);
+                if (heavyWind < 0.01f)
+                    heavyWind = 0f;
                 if (windAmount > 0f)
                 {
                     if (lightWind > 0f)
@@ -150,10 +159,13 @@ public class WeatherManager : MonoBehaviour
                         if (sfxAudio.IsSoundPlaying("Wind Loop Light"))
                         {
                             float current = sfxAudio.GetSoundVolume("Wind Loop Light");
-                            current = FadeTo(current, lightWind);
-                            sfxAudio.SetSoundVolume("Wind Loop Light", current);
-                            if (current < 0.05f)
+                            if (current == 0f)
                                 sfxAudio.StopSound("Wind Loop Light");
+                            else
+                            {
+                                current = FadeTo(current, lightWind);
+                                sfxAudio.SetSoundVolume("Wind Loop Light", current);
+                            }
                         }
                         else
                         {
@@ -168,10 +180,13 @@ public class WeatherManager : MonoBehaviour
                         if (sfxAudio.IsSoundPlaying("Wind Loop Medium"))
                         {
                             float current = sfxAudio.GetSoundVolume("Wind Loop Medium");
-                            current = FadeTo(current, medWind * .618f);
-                            sfxAudio.SetSoundVolume("Wind Loop Medium", current);
-                            if (current < 0.05f)
+                            if (current == 0f)
                                 sfxAudio.StopSound("Wind Loop Medium");
+                            else
+                            {
+                                current = FadeTo(current, medWind * .618f);
+                                sfxAudio.SetSoundVolume("Wind Loop Medium", current);
+                            }
                         }
                         else
                         {
@@ -186,10 +201,13 @@ public class WeatherManager : MonoBehaviour
                         if (sfxAudio.IsSoundPlaying("Wind Loop Heavy"))
                         {
                             float current = sfxAudio.GetSoundVolume("Wind Loop Heavy");
-                            current = FadeTo(current, heavyWind * .381f);
-                            sfxAudio.SetSoundVolume("Wind Loop Heavy", current);
-                            if (current < 0.05f)
+                            if (current == 0f)
                                 sfxAudio.StopSound("Wind Loop Heavy");
+                            else
+                            {
+                                current = FadeTo(current, heavyWind * .381f);
+                                sfxAudio.SetSoundVolume("Wind Loop Heavy", current);
+                            }
                         }
                         else
                         {
@@ -211,6 +229,7 @@ public class WeatherManager : MonoBehaviour
                         sfxAudio.StopSound("Wind Loop Heavy");
                 }
             }
+            KeepLowPassFilterOnBottom();
         }
 
         // run weather timer
@@ -223,6 +242,10 @@ public class WeatherManager : MonoBehaviour
                 // smooth results with lerp between checks
                 windAmount = Mathf.Lerp(previousWeather.x, targetWeather.x, smoothProgress);
                 windDirection = Mathf.Lerp(previousWeather.y, targetWeather.y, smoothProgress);
+                if (windDirection < 0f)
+                    windDirection = -1f;
+                else if (windDirection > 0f)
+                    windDirection = 1f;
                 cloudAmount = Mathf.Lerp(previousWeather.z, targetWeather.z, smoothProgress);
                 rainAmount = Mathf.Lerp(previousWeather.w, targetWeather.w, smoothProgress);
 
@@ -276,11 +299,56 @@ public class WeatherManager : MonoBehaviour
         return current;
     }
 
-    public void HaltWeatherSFX( bool stopSFX )
+    public void HaltWeatherSFX(bool stopSFX)
     {
         haltWeatherSFX = stopSFX;
         if (stopSFX && sfxAudio != null)
+        {
             sfxAudio.StopAllSounds();
+            AudioLowPassFilter lowPass = sfxAudio.gameObject.AddComponent<AudioLowPassFilter>();
+            if (lowPass != null)
+                Destroy(lowPass);
+        }
+    }
+
+    public void SFXForIndoors(bool indoorSFX)
+    {
+        if (sfxAudio != null)
+        {
+            indoorWeatherSFX = indoorSFX;
+            AudioLowPassFilter lowPass = sfxAudio.gameObject.GetComponent<AudioLowPassFilter>();
+            if (indoorSFX)
+            {
+                if (lowPass == null)
+                    lowPass = sfxAudio.gameObject.AddComponent<AudioLowPassFilter>();
+                lowPass.cutoffFrequency = 381;
+            }
+            else if (lowPass != null)
+                Destroy(lowPass);
+        }
+    }
+
+    void KeepLowPassFilterOnBottom()
+    {
+        if (sfxAudio == null)
+            return;
+        AudioLowPassFilter lowPass = sfxAudio.gameObject.GetComponent<AudioLowPassFilter>();
+        if (lowPass == null)
+        {
+            if (!indoorWeatherSFX)
+                return;
+            lowPass = sfxAudio.gameObject.AddComponent<AudioLowPassFilter>();
+            lowPass.cutoffFrequency = 381;
+            return;
+        }
+        else if (!indoorWeatherSFX)
+        {
+            Destroy(lowPass);
+            return;
+        }
+        int filterIndex = sfxAudio.gameObject.GetComponentIndex(lowPass);
+        if (sfxAudio.gameObject.GetComponentCount() - 1 > filterIndex)
+            Destroy(lowPass); // one will be made next tick
     }
 
     /// <summary>

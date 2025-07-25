@@ -31,7 +31,9 @@ public class PlantManager : MonoBehaviour
             Debug.LogError("--- PlantManager [Start] : " + gameObject.name + " no renderer found in children. aborting.");
             enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if ( enabled )
         {

@@ -68,7 +68,9 @@ public class TeleportManager : MonoBehaviour
             Debug.LogError("--- TeleportManager [Start] : " + gameObject.name + " no teleport pad found with tag '" + teleporterTag + "'. aborting.");
             enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {

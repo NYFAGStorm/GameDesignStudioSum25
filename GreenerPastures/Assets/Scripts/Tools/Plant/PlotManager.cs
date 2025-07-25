@@ -105,7 +105,9 @@ public class PlotManager : MonoBehaviour
             Debug.LogError("--- PlotManager [Start] : no ground child renderer found. aborting.");
             enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // inititalize
         if (enabled)
         {
@@ -971,6 +973,9 @@ public class PlotManager : MonoBehaviour
 
             GUI.Label(r, s, g);
         }
+
+        if (currentPlayer == null || currentPlayer.hidePlayerHUD)
+            return;
 
         if (harvestDisplayTimer == 0f && !actionProgressDisplay)
         {

@@ -41,7 +41,9 @@ public class ItemSpawnManager : MonoBehaviour
             Debug.LogError("--- ItemSpawnManager [Start] : drop curve undefined. aborting.");
             enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {

@@ -651,6 +651,11 @@ public class PlayerControlManager : MonoBehaviour
         return playerInventory.items[currentInventorySelection];
     }
 
+    public int GetPlayerCurrentItemSelectionIndex()
+    {
+        return currentInventorySelection;
+    }
+
     /// <summary>
     /// Removes the current item selection from player inventory ( *poof* )
     /// </summary>

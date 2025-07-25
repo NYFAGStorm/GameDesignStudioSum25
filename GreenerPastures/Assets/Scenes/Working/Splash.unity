@@ -367,6 +367,7 @@ Transform:
   - {fileID: 315054322}
   - {fileID: 1651088193}
   - {fileID: 2073833400}
+  - {fileID: 1322618448}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &465892697
@@ -864,6 +865,105 @@ Transform:
   - {fileID: 553792937}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1322618447
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1322618448}
+  - component: {fileID: 1322618450}
+  - component: {fileID: 1322618449}
+  m_Layer: 0
+  m_Name: AudioMgr Weather SFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1322618448
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322618447}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 435026383}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1322618449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322618447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb2949f4ca392f94a85ce209b7cf865a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1322618450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322618447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c84ee89b53e7d06479daf259d5fd914c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: Rain Loop
+    clip: {fileID: 8300000, guid: e712ced8c1991774fb2eed27a52e8d6b, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.618
+    volumeVariance: 0
+  - name: Wind Loop Light
+    clip: {fileID: 8300000, guid: cb4b345fdcff8c743ae9ccb10d2532b5, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Wind Loop Medium
+    clip: {fileID: 8300000, guid: d0e1bb7ebb66e0b42accb38f476b321f, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.618
+    volumeVariance: 0
+  - name: Wind Loop Heavy
+    clip: {fileID: 8300000, guid: 32bac55f0b6baf340a744ded59c18796, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.381
+    volumeVariance: 0
+  musicCrossFadeTime: 3.81
 --- !u!1 &1568004405
 GameObject:
   m_ObjectHideFlags: 0
@@ -1270,46 +1370,6 @@ MonoBehaviour:
     pitch: 0
     pitchVariance: 0
     volume: 0
-    volumeVariance: 0
-  - name: Rain Loop
-    clip: {fileID: 8300000, guid: e712ced8c1991774fb2eed27a52e8d6b, type: 3}
-    type: 1
-    delay: 0
-    maxDelay: 0
-    spaceBlend: 0
-    pitch: 0
-    pitchVariance: 0
-    volume: 0.618
-    volumeVariance: 0
-  - name: Wind Loop Light
-    clip: {fileID: 8300000, guid: cb4b345fdcff8c743ae9ccb10d2532b5, type: 3}
-    type: 1
-    delay: 0
-    maxDelay: 0
-    spaceBlend: 0
-    pitch: 0
-    pitchVariance: 0
-    volume: 0
-    volumeVariance: 0
-  - name: Wind Loop Medium
-    clip: {fileID: 8300000, guid: d0e1bb7ebb66e0b42accb38f476b321f, type: 3}
-    type: 1
-    delay: 0
-    maxDelay: 0
-    spaceBlend: 0
-    pitch: 0
-    pitchVariance: 0
-    volume: 0.618
-    volumeVariance: 0
-  - name: Wind Loop Heavy
-    clip: {fileID: 8300000, guid: 32bac55f0b6baf340a744ded59c18796, type: 3}
-    type: 1
-    delay: 0
-    maxDelay: 0
-    spaceBlend: 0
-    pitch: 0
-    pitchVariance: 0
-    volume: 0.381
     volumeVariance: 0
   - name: Magic Cast 1
     clip: {fileID: 8300000, guid: b9e5f82cfef3e204aaafaa78dc84fe63, type: 3}

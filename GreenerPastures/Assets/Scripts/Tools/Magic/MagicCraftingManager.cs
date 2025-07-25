@@ -117,7 +117,9 @@ public class MagicCraftingManager : MonoBehaviour
             Debug.LogError("--- MagicCraftingManager [Start] : no quit on escape found in scene. aborting.");
             enabled = false;
         }
-        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {

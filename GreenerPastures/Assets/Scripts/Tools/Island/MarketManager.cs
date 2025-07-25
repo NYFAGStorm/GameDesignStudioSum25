@@ -1278,7 +1278,7 @@ public class MarketManager : MonoBehaviour
             // draw inventory slot frame
             t = (Texture2D)Resources.Load("Plot_Cursor");
             c = Color.white;
-            if (iData != null && i < pInv.items.Length && pInv.items[i] == iData)
+            if (i == currentCustomer.GetPlayerCurrentItemSelectionIndex())
                 c = Color.yellow;
             GUI.color = c;
             GUI.DrawTexture(r, t);
