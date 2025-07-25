@@ -20,6 +20,13 @@ public class MoonPhaseTesting : MonoBehaviour
     public float drivingValue;
     //
 
+    // -- float rounding
+    [Range(0f, 1f)]
+    public float valueToRound;
+    public float valueMultiplier;
+    public int roundedResult;
+    //
+
     void Start()
     {
         
@@ -27,6 +34,10 @@ public class MoonPhaseTesting : MonoBehaviour
 
     void Update()
     {
+        // - float rounding
+        roundedResult = Mathf.RoundToInt((valueToRound * valueMultiplier) + 0.5f);
+        roundedResult = Mathf.Clamp(roundedResult, 1, (int)valueMultiplier);
+
         // - dynamic audio blending
         light = Mathf.Sin(Mathf.Clamp01( drivingValue / .5f ) * Mathf.PI);
         if (light < 0.01f)

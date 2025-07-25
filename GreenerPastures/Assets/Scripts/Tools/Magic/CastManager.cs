@@ -10,17 +10,6 @@ public class CastManager : MonoBehaviour
     private int birthNewCast; // apply effect for one cast at birth
     private int singleCastToRemove; // remove effect and cast upon expiration
 
-    // [ ] allow time manager signal to fast forward time
-
-    // TIME PASSAGE MECHANICS
-    // TODO: check in with time manager re: time passage
-    // TODO: fast forward time wrt cast lifetime
-    // TODO: remove casts for those that expired
-    // REVIEW: in case casts were removed in time passage,
-    //  ... find a way to allow a portion of effects to apply?
-    // NOTE: for each system, time passage should be defined
-    //  ... how does a unit of game time affect system?
-
 
     void Start()
     {
@@ -166,10 +155,10 @@ public class CastManager : MonoBehaviour
                     // should never be here
                     break;
                 case SpellType.FastGrowI:
-                    // Plants grow faster for one day. (5%)
+                    // Plants grow faster for one day. (33%)
                     plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.FastGrowI);
                     if (plots[i].plant != null)
-                        plots[i].data.plant.adjustedGrowthRate += 0.05f;
+                        plots[i].data.plant.adjustedGrowthRate += 0.33f;
                     break;
                 case SpellType.SummonWaterI:
                     // Waters a 2x2 area that stays hydrated for one day.
@@ -235,10 +224,10 @@ public class CastManager : MonoBehaviour
                     // should never be here
                     break;
                 case SpellType.FastGrowI:
-                    // Plants grow faster for one day. (5%)
+                    // Plants grow faster for one day. (33%)
                     plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.FastGrowI);
                     if (plots[i].plant != null)
-                        plots[i].data.plant.adjustedGrowthRate -= 0.05f;
+                        plots[i].data.plant.adjustedGrowthRate -= 0.33f;
                     break;
                 case SpellType.SummonWaterI:
                     // Waters a 2x2 area that stays hydrated for one day.

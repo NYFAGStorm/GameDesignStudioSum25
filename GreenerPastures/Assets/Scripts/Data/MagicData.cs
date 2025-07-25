@@ -33,39 +33,39 @@ public class MagicStats
 public enum SpellType
 {
     Default,
-    FastGrowI,
+    FastGrowI, // level one
     SummonWaterI,
     SoiledItI,
     MirrorMirror,
-    BlessI,
+    BlessI, // level two
     DaylightI,
     GildedWordsI,
     SeedingEcho,
     ColorTrailI,
     ColorTrailII,
     ColorTrailIII,
-    MalnutritionI,
+    MalnutritionI, // level three
     ProsperousI,
     TheGreatHarvest,
     FastGrowII,
     Splaturn,
-    LesionI,
-    BlessedSpring,
+    LesionI, // level four
     TheReaper,
     Swiftness,
     LightWork,
     SummonWaterII,
     StarbloomBurst,
-    EclipseI,
+    EclipseI, // level five
     GoldenThumbI,
     GildedWordsII,
     DullEarth,
     FogOfWar,
     SoiledItII,
-    ProsperousII,
+    BlessedSpring,
+    ProsperousII, // level six
     MalnutritionII,
     BlessII,
-    DaylightII,
+    DaylightII, // level seven
     RabbitHole
 }
 

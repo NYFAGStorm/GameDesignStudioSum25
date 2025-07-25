@@ -698,7 +698,108 @@ public class PlayerControlManager : MonoBehaviour
                 // use quality property as message id for post office
                 letterMessage = pom.GetLetterMessage(activeItem.looseItem.inv.items[0].quality);
                 letterPopupTimer = LETTERPOPUPTIME;
-                // REVIEW: actually destroy letter?
+                skipPickup = true;
+                break;
+            case ItemType.Scroll:
+                // detect scroll effect
+                ItemEffect scrollEffect = activeItem.looseItem.inv.items[0].effects[0];
+                SpellType scrollAddsCharge = SpellType.Default;
+                int scrollCharge = 0;
+                switch (scrollEffect)
+                {
+                    case ItemEffect.Default:
+                        // we should never be here
+                        break;
+                    case ItemEffect.ScrollRandomSpellCharge:
+                        // weighted random spell type
+                        scrollCharge = Mathf.RoundToInt((RandomSystem.WeightedRandom01() * System.Enum.GetNames(typeof(SpellType)).Length));
+                        scrollAddsCharge = (SpellType)scrollCharge;
+                        break;
+                    case ItemEffect.ScrollLevelOneSpellCharge:
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 4) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 1); // level one spells start at 1
+                        break;
+                    case ItemEffect.ScrollLevelTwoSpellCharge:
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 7) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 5); // level two spells start at 5
+                        break;
+                    case ItemEffect.ScrollLevelThreeSpellCharge:
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 5) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 12); // level three spells start at 12
+                        break;
+                    case ItemEffect.ScrollLevelFourSpellCharge:
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 6) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 17); // level four spells start at 17
+                        break;
+                    case ItemEffect.ScrollLevelFiveSpellCharge:
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 7) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 23); // level five spells start at 23
+                        break;
+                    case ItemEffect.ScrollLevelSixSpellCharge:
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 3) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 30); // level five spells start at 30
+                        break;
+                    case ItemEffect.ScrollLevelSevenSpellCharge:
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 2) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 33); // level five spells start at 33
+                        break;
+                }
+                // apply effect
+                playerData.magic.library = MagicSystem.AddChargeToSpellBook(scrollAddsCharge, playerData.magic.library);
+                string[] scrollNotify = new string[2];
+                scrollNotify[0] = "You have read a magic scroll\nand it gives you a spell!";
+                scrollNotify[1] = "Charge added to spell book!\n" + scrollAddsCharge.ToString() + " ADDED!";
+                ggm.StackNotifications(scrollNotify);
+                skipPickup = true;
+                break;
+            case ItemType.Potion:
+                // detect potion effect
+                ItemEffect potionEffect = activeItem.looseItem.inv.items[0].effects[0];
+                //PlayerEffect potionAddsEffect = PlayerEffect.Default;
+                string[] potionNotify = new string[2];
+                potionNotify[0] = "You consumed a magic potion\nand it has an effect!";
+                switch (potionEffect)
+                {
+                    case ItemEffect.Default:
+                        // we should never be here
+                        break;
+                    case ItemEffect.PotionPlayerEffect:
+                        /*
+                         * disabled atm
+                         * TODO: figure out how to time this player effect, like a cast does but not a spell type
+                        // player effect detailed in quality of potion item
+                        potionAddsEffect = (PlayerEffect)((int)activeItem.looseItem.inv.items[0].quality);
+                        // apply effect
+                        playerData = PlayerSystem.AddPlayerEffect(playerData, PlayerEffect.Default);
+                        string effectDescription = potionAddsEffect.ToString(); // temp
+                        potionNotify[1] = "You now feel very much\n" + effectDescription + "!";
+                        // TODO: create a special cast to handle the effect wearing off over time
+                        CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
+                        if (cm != null)
+                        {
+                            CastData cData = new CastData();
+                            cData.type = SpellType.Default;
+                            cData.lifetime = 300f; // 5 game-time hours
+                            //cData.lifeTimestamp = 
+                            cm.AcquireNewCast(cData);
+                        }
+                        // apply effect
+                        */
+                        break;
+                    case ItemEffect.PotionClearOneCooldown:
+                        int rndspell = Mathf.RoundToInt( RandomSystem.FlatRandom01() * playerData.magic.library.spellBook.Length );
+                        playerData.magic.library.spellBook[rndspell].cooldown = 0.1f;
+                        potionNotify[1] = playerData.magic.library.spellBook[rndspell].name + "\ncooldown is CLEARED!";
+                        break;
+                    case ItemEffect.PotionClearAllCooldowns:
+                        for (int i = 0; i < playerData.magic.library.spellBook.Length; i++)
+                        {
+                            playerData.magic.library.spellBook[i].cooldown = 0.1f;
+                        }
+                        potionNotify[1] = "All spell cooldowns\nare CLEARED!";
+                        break;
+                }
+                ggm.StackNotifications(potionNotify);
                 skipPickup = true;
                 break;
         }

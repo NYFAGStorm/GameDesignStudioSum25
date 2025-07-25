@@ -139,110 +139,108 @@ public static class MagicSystem
             case SpellType.Default:
                 // should never be here
                 break;
+            // level one
             case SpellType.FastGrowI:
                 retSpell.name = "Fast Grow I";
-                retSpell.cooldownDuration = 300f; // one day
+                retSpell.cooldownDuration = 180f; // three hours
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 3f; // 4x4 plot range
+                retSpell.castAOE = .5f; // 1x1 plot range
                 break;
             case SpellType.SummonWaterI:
                 retSpell.name = "Summon Water I";
-                retSpell.cooldownDuration = 300f;
+                retSpell.cooldownDuration = 300f; // five hours
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // 1x1 plot range
                 break;
             case SpellType.SoiledItI: // TODO: revise all new spell config
                 retSpell.name = "Soiled It I";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = .1f; // instant
+                retSpell.castDuration = 1440f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.MirrorMirror:
                 retSpell.name = "Mirror Mirror";
-                retSpell.cooldownDuration = 300f;
+                retSpell.cooldownDuration = 1400f;
                 retSpell.castDuration = .1f; // instant
-                retSpell.castAOE = 1f; // self
+                retSpell.castAOE = .5f; // self
                 break;
+            // level two
             case SpellType.BlessI:
                 retSpell.name = "Bless I";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 3f; // 4x4 plot range
+                retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.DaylightI:
                 retSpell.name = "Daylight I";
-                retSpell.cooldownDuration = 300f;
+                retSpell.cooldownDuration = 180f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // 1x1 plot range
                 break;
             case SpellType.GildedWordsI:
                 retSpell.name = "Gilded Words I";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castDuration = 300f;
+                retSpell.castAOE = .5f; // self
                 break;
             case SpellType.SeedingEcho:
                 retSpell.name = "Seeding Echo";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
+                retSpell.castDuration = .1f; // instant plant effect
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.ColorTrailI:
                 retSpell.name = "Color Trail I";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // self
                 break;
             case SpellType.ColorTrailII:
                 retSpell.name = "Color Trail II";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // self
                 break;
             case SpellType.ColorTrailIII:
                 retSpell.name = "Color Trail III";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // self
                 break;
+            // level 3
             case SpellType.MalnutritionI:
                 retSpell.name = "Malnutrition I";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 3f; // 4x4 plot range
+                retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.ProsperousI:
                 retSpell.name = "Prosperous I";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 720f; // half day
-                retSpell.castAOE = 3f; // 4x4 plot range
+                retSpell.castDuration = 1440f; // half day
+                retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.TheGreatHarvest:
                 retSpell.name = "The Great Harvest";
-                retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.cooldownDuration = 180f;
+                retSpell.castDuration = .1f; // instant plot auto-harvests
+                retSpell.castAOE = 2f; // 3x3 plot range
                 break;
             case SpellType.FastGrowII:
                 retSpell.name = "Fast Grow II";
-                retSpell.cooldownDuration = 300f;
+                retSpell.cooldownDuration = 180f;
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.Splaturn:
                 retSpell.name = "Splaturn";
-                retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
+                retSpell.cooldownDuration = 1440f;
+                retSpell.castDuration = .1f; // instant permanent structure effect (clear others of same type)
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
+            // level 4
             case SpellType.LesionI:
                 retSpell.name = "Lesion I";
-                retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 720f; // half day
-                retSpell.castAOE = 1.5f; // 2x2 plot range
-                break;
-            case SpellType.BlessedSpring:
-                retSpell.name = "Blessed Spring";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
@@ -250,20 +248,20 @@ public static class MagicSystem
             case SpellType.TheReaper:
                 retSpell.name = "The Reaper";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castDuration = .1f; // instant plots auto-uproot
+                retSpell.castAOE = 2f; // 3x3 plot range
                 break;
             case SpellType.Swiftness:
                 retSpell.name = "Swiftness";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // self
                 break;
             case SpellType.LightWork:
                 retSpell.name = "Light Work";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // self
                 break;
             case SpellType.SummonWaterII:
                 retSpell.name = "Summon Water II";
@@ -275,25 +273,26 @@ public static class MagicSystem
                 retSpell.name = "Starbloom Burst";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = 2.5f; // 4x4 plot range
                 break;
+            // level 5
             case SpellType.EclipseI:
                 retSpell.name = "Eclipse I";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 3f; // 4x4 plot range
+                retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.GoldenThumbI:
                 retSpell.name = "Golden Thumb I";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 720f; // half day
+                retSpell.castDuration = 1440f; // half day
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.GildedWordsII:
                 retSpell.name = "Gilded Words II";
-                retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.cooldownDuration = 720f;
+                retSpell.castDuration = 300f;
+                retSpell.castAOE = .5f; // self
                 break;
             case SpellType.DullEarth:
                 retSpell.name = "Dull Earth";
@@ -304,44 +303,51 @@ public static class MagicSystem
             case SpellType.FogOfWar:
                 retSpell.name = "Fog Of War";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
+                retSpell.castDuration = 720f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.SoiledItII:
                 retSpell.name = "Soiled It II";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
+                retSpell.castDuration = .1f; // instant plot stat change
+                retSpell.castAOE = 2f; // 3x3 plot range
+                break;
+            case SpellType.BlessedSpring:
+                retSpell.name = "Blessed Spring";
+                retSpell.cooldownDuration = 300f;
+                retSpell.castDuration = 720f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
+            // level 6
             case SpellType.ProsperousII:
                 retSpell.name = "Prosperous II";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
+                retSpell.castDuration = 720f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.MalnutritionII:
                 retSpell.name = "Malnutrition II";
                 retSpell.cooldownDuration = 300f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = 2f; // 3x3 plot range
                 break;
             case SpellType.BlessII:
                 retSpell.name = "Bless II";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castDuration = 4320f;
+                retSpell.castAOE = 2f; // 3x3 plot range
                 break;
             case SpellType.DaylightII:
                 retSpell.name = "Daylight II";
                 retSpell.cooldownDuration = 300f;
-                retSpell.castDuration = 1440f;
+                retSpell.castDuration = 2880f;
                 retSpell.castAOE = 1.5f; // 2x2 plot range
                 break;
             case SpellType.RabbitHole:
                 retSpell.name = "Rabbit Hole";
-                retSpell.cooldownDuration = 300f;
+                retSpell.cooldownDuration = 720f;
                 retSpell.castDuration = 1440f;
-                retSpell.castAOE = 1.5f; // 2x2 plot range
+                retSpell.castAOE = .5f; // other player
                 break;
             default:
                 UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureSpellBookEntry] : spell type undefined. will ignore.");
@@ -501,7 +507,7 @@ public static class MagicSystem
                 break;
             case SpellType.FastGrowI:
                 retSpell.name = "Fast Grow I";
-                retSpell.description = "Plants grow faster for one day. (5%)";
+                retSpell.description = "Plants grow faster for one day. (33%)";
                 retSpell.ingredients = new IngredientData[2];
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
                 retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Default);
@@ -605,7 +611,7 @@ public static class MagicSystem
                 break;
             case SpellType.FastGrowII:
                 retSpell.name = "Fast Grow II";
-                retSpell.description = "";
+                retSpell.description = "Maximize the quality of the soil. (100%)";
                 retSpell.ingredients = new IngredientData[2];
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
                 retSpell.ingredients[1] = InitializeIngredient(ItemType.Seed, PlantType.Default);

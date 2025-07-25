@@ -24,22 +24,21 @@ public enum ItemType
 public enum ItemEffect
 {
     Default,
-    EffectA,
-    EffectB,
-    EffectC,
-    EffectD
-
-    /*
+    ScrollRandomSpellCharge, // weighted random spell type
     ScrollLevelOneSpellCharge,
     ScrollLevelTwoSpellCharge,
     ScrollLevelThreeSpellCharge,
     ScrollLevelFourSpellCharge,
     ScrollLevelFiveSpellCharge,
+    ScrollLevelSixSpellCharge,
+    ScrollLevelSevenSpellCharge,
+    PotionPlayerEffect,
     PotionClearOneCooldown,
-    PotionAddOneCharge,
     PotionClearAllCooldowns,
-    PotionAddAllCharges,
-    */
+    EffectA,
+    EffectB,
+    EffectC,
+    EffectD
 }
 
 [System.Serializable]

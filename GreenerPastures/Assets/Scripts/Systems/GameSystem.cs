@@ -376,4 +376,20 @@ public static class GameSystem
 
         return retColor;
     }
+
+    /// <summary>
+    /// Returns a rounded integer using a given normalized value to found (0-1) and a value multiplier
+    /// </summary>
+    /// <param name="valueToRound">normalized percentage value to round</param>
+    /// <param name="valueMultiplier">value multiplier applied to percentage</param>
+    /// <returns>rounded integer within range between 1 and value multiplier</returns>
+    public static int RoundedResult( float valueToRound, int valueMultiplier )
+    {
+        int retInt = 0;
+
+        retInt = UnityEngine.Mathf.RoundToInt((valueToRound * valueMultiplier) + 0.5f);
+        retInt = UnityEngine.Mathf.Clamp(retInt, 1, (int)valueMultiplier);
+
+        return retInt;
+    }
 }

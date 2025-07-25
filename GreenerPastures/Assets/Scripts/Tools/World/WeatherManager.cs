@@ -35,13 +35,13 @@ public class WeatherManager : MonoBehaviour
     const float WINDFACTOROFFSET = 3.81f;
     const float WINDVECTOROFFSET = 0.1f;
     const float WINDCHANGEMULTIPLIER = 0.618f;
-    const float WINDWEIGHT = 0.0381f;
+    const float WINDWEIGHT = 0.5f; //0.0381f;
 
     const float CLOUDFACTORSCALE = 0.618f;
     const float CLOUDFACTOROFFSET = 6.18f;
     const float CLOUDVECTOROFFSET = 0.2f;
     const float CLOUDCHANGEMULTIPLIER = 0.381f;
-    const float CLOUDWEIGHT = 0.00618f;
+    const float CLOUDWEIGHT = 0.01f; //0.00618f;
 
     const float RAINCLOUDTHRESHOLD = 0.618f;
     const float RAINWATERINGRATE = 38.1f;
