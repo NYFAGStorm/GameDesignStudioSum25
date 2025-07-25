@@ -8,8 +8,9 @@ public class MarketManager : MonoBehaviour
     // REVIEW: we have the ability to set individual items 'available to buy' or not
     // we should consider _not_ offering everything to buy, so rare items are rare
     // For Example:
-    // all special fruit and seed not available to buy
-    // all rare seed not available to buy
+    // all special plant, fruit and seed not available to buy
+    // all rare plant and seed not available to buy
+    // all uncommon plant not available to buy
     // while we would need to have another way for players to get these (like grafting)
     // the point would be, the market isn't the 'all too easy' way to get very rare items
 
@@ -38,6 +39,7 @@ public class MarketManager : MonoBehaviour
     private string marketInstructions;
     private float playerCheckTimer;
     private PlayerControlManager currentCustomer;
+    private PlayerControlManager leavingCustomer;
     private int menuItemSelection = -1;
     private int topOfMenuList = 0;
     private CustomerMode customerMode;
@@ -45,7 +47,6 @@ public class MarketManager : MonoBehaviour
     private Vector3 purchaseOffset = new Vector3(-1f,0f,0f);
 
     private float discountBuy;
-    private int playerItemFinalBuyValue; // value determined after applying coupon discount
     private int playerItemFinalSellValue; // value determined when selling item, per quality
 
     private int[] maxMenuListPerLevel = new int[11];
@@ -60,12 +61,49 @@ public class MarketManager : MonoBehaviour
     int uniquePlants = 9;
 
     private ArtLibraryManager alm;
+    private QuitOnEscape qoe; // disable to suspend use of start button while in market
+
+    public Texture2D marketUIOL;
+    public Texture2D marketBookOL;
+    public Texture2D[] marketNPCFrames;
+    public Texture2D marketBG;
+
+    public enum CustomerState
+    {
+        Default,        // ready to be approached by customer
+        Activating,     // beginning to change interface
+        Active,         // in market, now handled by market state
+        Deactivating    // end market interface, detect player left to reset
+    }
+    public CustomerState customerState;
+    public enum MarketState
+    {
+        Default,        // ready to enter market
+        StandardMarket, // REVIEW: can implement tavern, chicken race, alternate market stalls here
+        Exiting         // leaving market
+    }
+    public MarketState marketState;
+
+    private float customerStateTimer;
+    private float marketStateTimer;
+    private bool marketDisplay;
+
+    private bool fadingOverlay;
+    private bool fadingFromBlack;
+    private Texture2D currentBackground;
+
+    private int currentNPCFrame;
+    private float npcFrameTimer;
+
+    private Texture2D[] buttonTex;
 
     const float PLAYERCHECKTIME = 1f;
     const float MARKETPROXIMITYRANGE = .5f;
     const float REJECTFLASHTIME = 1f;
-    const int MENUITEMSINLIST = 4;
-    const float MENUVERTICALOFFSETPERCENT = 0.06f;
+    const int MENUITEMSINLIST = 2;
+    const float CUSTOMERSTATETIMERMAX = 1f;
+    const float MARKETSTATETIMERMAX = 1f;
+    const float MARKETNPCFRAMETIME = 3.81f;
 
 
     void Start()
@@ -80,15 +118,30 @@ public class MarketManager : MonoBehaviour
             Debug.LogError("--- MarketManager [Start] : no art library manager found in scene. aborting.");
             enabled = false;
         }
+        qoe = GameObject.FindFirstObjectByType<QuitOnEscape>();
+        if (qoe == null)
+        {
+            Debug.LogError("--- MarketManager [Start] : no quit on escape found in scene. aborting.");
+            enabled = false;
+        }
         // initialize
         if ( enabled )
         {
             InitializeMenu();
             InitializeMaxMenuList();
             playerCheckTimer = PLAYERCHECKTIME;
-            marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
+            marketInstructions = "Welcome, Biomancer!\nE=BUY F=SELL";
             if (padMgr != null && padMgr.gamepads[0].isActive)
-                marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
+                marketInstructions = "Welcome, Biomancer!\nA=BUY B=SELL";
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -176,50 +229,230 @@ public class MarketManager : MonoBehaviour
                 rejectFlashTimer = 0f;
         }
 
-        // run player check timer
-        if ( playerCheckTimer > 0f )
+        if (!DetectPlayerCustomer())
+            return;
+
+        RunMarketNPCFrameTimer();
+
+        HandleCustomerStates();
+
+        RunMarketStateTimer();
+
+        HandleMarketStates();
+    }
+
+    bool DetectPlayerCustomer()
+    {
+        if (customerState != CustomerState.Default && customerState != CustomerState.Deactivating)
+            return true; // we must already have player engaged, skip
+
+        // if no player, run player check timer
+        if (currentCustomer == null && playerCheckTimer > 0f)
         {
             playerCheckTimer -= Time.deltaTime;
-            if ( playerCheckTimer < 0f )
+            if (playerCheckTimer < 0f)
             {
-                playerCheckTimer = PLAYERCHECKTIME;
-
-                // allow player to 'enter' and 'exit' (proximity)
+                playerCheckTimer = 0f;
+                // detect player in proximity
                 PlayerControlManager[] pcms = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
-                int found = -1;
-                for ( int i=0; i<pcms.Length; i++ )
+                // 
+                for (int i = 0; i < pcms.Length; i++)
                 {
                     float dist = Vector3.Distance(gameObject.transform.position, pcms[i].gameObject.transform.position);
-                    if ( dist < MARKETPROXIMITYRANGE )
+                    if (dist < MARKETPROXIMITYRANGE)
                     {
-                        found = i;
+                        currentCustomer = pcms[i];
                         break;
                     }
                 }
-                if (found > -1)
-                    currentCustomer = pcms[found];
+                // if no player, reset check timer
+                if (currentCustomer == null)
+                {
+                    playerCheckTimer = PLAYERCHECKTIME;
+                    if (leavingCustomer != null)
+                    {
+                        // customer has left, reset
+                        leavingCustomer = null;
+                        customerState = CustomerState.Default;
+                        customerStateTimer = 0f;
+                    }
+                }
+                else if (leavingCustomer != null && currentCustomer == leavingCustomer)
+                {
+                    // REVIEW: remain active until player has left?
+                    currentCustomer = null;
+                    playerCheckTimer = PLAYERCHECKTIME;
+                }
                 else
                 {
-                    if (currentCustomer != null )
-                    {
-                        currentCustomer.characterFrozen = false;
-                        currentCustomer.hidePlayerNameTag = false;
-                    }
-                    currentCustomer = null;
+                    // customer engagement, activate
+                    currentCustomer.characterFrozen = true;
+                    currentCustomer.hidePlayerNameTag = true;
+                    currentCustomer.hidePlayerHUD = true;
+                    // disable almanac
+                    InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                    if (iga != null)
+                        iga.enabled = false;
+                    // disable controls display
+                    InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+                    if (igc != null)
+                        igc.enabled = false;
+                    customerState = CustomerState.Activating;
+                    customerStateTimer = CUSTOMERSTATETIMERMAX;
                 }
             }
         }
 
-        if (currentCustomer == null)
+        return (currentCustomer != null);
+    }
+
+    void HandleCustomerStates()
+    {
+        if (customerStateTimer == 0f)
             return;
 
-        PlayerControlManager.PlayerActions pa = currentCustomer.GetPlayerActions();
+        if (customerStateTimer > 0f)
+        {
+            customerStateTimer -= Time.deltaTime;
+            if (customerStateTimer < 0f)
+            {
+                customerStateTimer = 0f;
+                // handle state
+                switch (customerState)
+                {
+                    case CustomerState.Default:
+                        // we should never be here
+                        break;
+                    case CustomerState.Activating:
+                        customerState = CustomerState.Active;
+                        marketDisplay = true;
+                        marketState = MarketState.StandardMarket;
+                        marketStateTimer = MARKETSTATETIMERMAX;
+                        fadingOverlay = true;
+                        qoe.enabled = false;
+                        break;
+                    case CustomerState.Active:
+                        currentCustomer.characterFrozen = false;
+                        currentCustomer.freezeCharacterActions = false;
+                        currentCustomer.hidePlayerHUD = false;
+                        // re-able almanac
+                        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                        if (iga != null)
+                            iga.enabled = true;
+                        // show controls display hud item
+                        InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+                        if (igc != null)
+                            igc.enabled = true;
+                        customerState = CustomerState.Deactivating;
+                        customerStateTimer = CUSTOMERSTATETIMERMAX;
+                        break;
+                    case CustomerState.Deactivating:
+                        if (currentCustomer != null)
+                        {
+                            leavingCustomer = currentCustomer;
+                            currentCustomer = null;
+                        }
+                        // remain in this state until leaving customer not detected
+                        playerCheckTimer = PLAYERCHECKTIME;
+                        customerStateTimer = CUSTOMERSTATETIMERMAX;
+                        qoe.enabled = true;
+                        break;
+                    default:
+                        Debug.LogWarning("--- MarketManager [HandleCustomerStates] : customer state undefined. will ignore.");
+                        break;
+                }
+            }
+        }
+    }
 
-        // allow player to enter buy mode
-        CheckBuyMode( pa );
+    void RunMarketStateTimer()
+    {
+        if (marketStateTimer > 0f)
+        {
+            marketStateTimer -= Time.deltaTime;
+            if (marketStateTimer < (MARKETSTATETIMERMAX / 2f))
+            {
+                // configure market background images between overlay fades
+                switch (marketState)
+                {
+                    case MarketState.Default:
+                        break;
+                    case MarketState.StandardMarket:
+                        if (!fadingFromBlack)
+                        {
+                            if (currentBackground == null && marketBG != null)
+                                currentBackground = marketBG;
+                            if (currentBackground == null)
+                                currentBackground = Texture2D.whiteTexture; // TEMP
+                            currentNPCFrame = 0;
+                            npcFrameTimer = MARKETNPCFRAMETIME;
+                        }
+                        break;
+                    case MarketState.Exiting:
+                        if (!fadingFromBlack)
+                            currentBackground = null;
+                        break;
+                }
+                fadingFromBlack = true;
+            }
+            if (marketStateTimer < 0f)
+            {
+                marketStateTimer = 0f;
+                fadingFromBlack = false;
+                // handle market state changes
+                switch (marketState)
+                {
+                    case MarketState.Default:
+                        // we should never be here
+                        break;
+                    case MarketState.StandardMarket:
+                        fadingOverlay = false;
+                        break;
+                    case MarketState.Exiting:
+                        customerStateTimer = (CUSTOMERSTATETIMERMAX/2f); // exit faster
+                        marketState = MarketState.Default;
+                        marketDisplay = false;
+                        fadingOverlay = false;
+                        break;
+                    default:
+                        Debug.LogWarning("--- MarketManager [RunMarketStateTimer] : market state undefined. will ignore.");
+                        break;
+                }
+            }
+        }
+    }
 
-        // allow player to sell inventory item
-        CheckSellMode( pa );
+    void HandleMarketStates()
+    {
+        switch (marketState)
+        {
+            case MarketState.Default:
+                // we should never be here
+                break;
+            case MarketState.StandardMarket:
+                PlayerControlManager.PlayerActions pa = currentCustomer.GetPlayerActions();
+                // allow player to enter buy mode
+                CheckBuyMode(pa);
+                // allow player to sell inventory item
+                CheckSellMode(pa);
+                break;
+            case MarketState.Exiting:
+                break;
+        }
+    }
+
+    void RunMarketNPCFrameTimer()
+    {
+        if (npcFrameTimer > 0f)
+        {
+            npcFrameTimer -= Time.deltaTime;
+            if (npcFrameTimer < 0f)
+            {
+                npcFrameTimer = RandomSystem.GaussianRandom01() * MARKETNPCFRAMETIME;
+                currentNPCFrame = Mathf.RoundToInt(RandomSystem.FlatRandom01() * 3);
+                currentNPCFrame = Mathf.Clamp(currentNPCFrame, 0, 2);
+            }
+        }
     }
 
     void CheckBuyMode( PlayerControlManager.PlayerActions pa )
@@ -229,9 +462,9 @@ public class MarketManager : MonoBehaviour
             customerMode = CustomerMode.Buy;
             currentCustomer.characterFrozen = true;
             menuItemSelection = 0;
-            marketInstructions = "MARKET [BUY MODE]\nE=BUY V=EXIT";
+            marketInstructions = "- BUY MODE -\nE=BUY V=EXIT";
             if (padMgr != null && padMgr.gamepads[0].isActive)
-                marketInstructions = "MARKET [BUY MODE]\nA=BUY Y=EXIT";
+                marketInstructions = "- BUY MODE -\nA=BUY Y=EXIT";
             return; // consume input, do not allow purchase with current actionA signal
         }
         if (customerMode == CustomerMode.Buy)
@@ -293,7 +526,7 @@ public class MarketManager : MonoBehaviour
                             Debug.LogWarning("--- MarketManager [CheckBuyMode] : unable to initialize item. will ignore.");
                         else
                         {
-                            iData.plant = (PlantType)menuItems[menuItemSelection].plantType;
+                            iData.plant = menuItems[menuItemSelection].plantType;
                             if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                                 menuItems[menuItemSelection].itemType == ItemType.Fruit)
                             {
@@ -311,7 +544,7 @@ public class MarketManager : MonoBehaviour
                         targ += pos;
                         ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
                         LooseItemData loose = InventorySystem.CreateItem(menuItems[menuItemSelection].itemType);
-                        loose.inv.items[0].plant = (PlantType)menuItems[menuItemSelection].plantType;
+                        loose.inv.items[0].plant = menuItems[menuItemSelection].plantType;
                         if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
                             menuItems[menuItemSelection].itemType == ItemType.Fruit)
                         {
@@ -332,9 +565,9 @@ public class MarketManager : MonoBehaviour
                 customerMode = CustomerMode.Default;
                 currentCustomer.characterFrozen = false;
                 menuItemSelection = -1;
-                marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
+                marketInstructions = "Welcome, Biomancer!\nE=BUY F=SELL";
                 if (padMgr != null && padMgr.gamepads[0].isActive)
-                    marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
+                    marketInstructions = "Welcome, Biomancer!\nA=BUY B=SELL";
             }
         }
     }
@@ -346,9 +579,9 @@ public class MarketManager : MonoBehaviour
             customerMode = CustomerMode.Sell;
             currentCustomer.characterFrozen = true;
             menuItemSelection = -1;
-            marketInstructions = "MARKET [SELL MODE]\nE=SELL V=EXIT";
+            marketInstructions = "- SELL MODE -\nE=SELL V=EXIT";
             if (padMgr != null && padMgr.gamepads[0].isActive)
-                marketInstructions = "MARKET [SELL MODE]\nA=SELL Y=EXIT";
+                marketInstructions = "- SELL MODE -\nA=SELL Y=EXIT";
             return; // consume input of actionB signal
         }
         if (customerMode == CustomerMode.Sell)
@@ -416,9 +649,9 @@ public class MarketManager : MonoBehaviour
                 customerMode = CustomerMode.Default;
                 currentCustomer.characterFrozen = false;
                 menuItemSelection = -1;
-                marketInstructions = "MARKET [Welcome]\nE=BUY F=SELL";
+                marketInstructions = "Welcome, Biomancer!\nE=BUY F=SELL";
                 if (padMgr != null && padMgr.gamepads[0].isActive)
-                    marketInstructions = "MARKET [Welcome]\nA=BUY B=SELL";
+                    marketInstructions = "Welcome, Biomancer!\nA=BUY B=SELL";
                 playerItemFinalSellValue = 0;
             }
         }
@@ -820,8 +1053,11 @@ public class MarketManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (currentCustomer == null)
+        if (!marketDisplay)
             return;
+
+        // TODO: de-conflict HUD layout between market UI overlay and player inventory HUD + gold display
+        // (they need to sell and more)
 
         // handle player tag display
         currentCustomer.hidePlayerNameTag = true;
@@ -830,63 +1066,124 @@ public class MarketManager : MonoBehaviour
         float w = Screen.width;
         float h = Screen.height;
 
-        r.x = (w - 0.8f * h) / 2;
-        r.y = 0.1f * h + (MENUVERTICALOFFSETPERCENT * h);
-        r.width = 0.8f * h;
-        r.height = 0.8f * h;
+        GUIStyle g = new GUIStyle(GUI.skin.label);
+        Texture2D t = Texture2D.whiteTexture;
+        Color c = Color.white;
+        string s = "";
+
+        r.x = 0f;
+        r.y = 0f;
+        r.width = w;
+        r.height = h;
+
+        // crafting background image appears halfway through overlay fading
+        if (currentBackground != null)
+        {
+            c = Color.white;
+            GUI.color = c;
+            // REVIEW: we could alter background for different market stalls
+            if (marketState == MarketState.StandardMarket || marketState == MarketState.Exiting)
+            {
+                t = marketBG;
+                GUI.DrawTexture(r, t); // market bg
+                t = marketNPCFrames[currentNPCFrame];
+                GUI.DrawTexture(r, t); // market npc
+                t = marketBookOL;
+                GUI.DrawTexture(r, t); // market book OL
+                t = marketUIOL;
+                GUI.DrawTexture(r, t); // market UI OL
+            }
+        }
+
+        // handle fading to and from black for market state transitions
+        if (fadingOverlay)
+        {
+            t = Texture2D.whiteTexture;
+            c = Color.black;
+            if (fadingFromBlack)
+                c.a = ((marketStateTimer * 2f) / MARKETSTATETIMERMAX);
+            else
+                c.a = 1f - (((marketStateTimer * 2f) / MARKETSTATETIMERMAX) - 1f);
+            GUI.color = c;
+            GUI.DrawTexture(r, t);
+            // if fading overlay, no other display
+            return;
+        }
+
+        if (marketStateTimer > 0f)
+            return;
+
+        c = Color.white;
+        GUI.color = c;
+
+        // legacy market UI
+        // TODO: revise layout to match market bg art
+
+        r.x = 0.375f * w;
+        r.y = 0.08f * h;
+        r.width = 0.2522f * w;
+        r.height = 0.1f * h;
 
         // draw bg
-        Texture2D t = Texture2D.whiteTexture;
-        Color c = Color.black;
-        c.g = 0.618f;
+        t = Texture2D.whiteTexture;
+        c = Color.black;
+        c *= 0.1f;
+        c.g = 0.381f;
         c.a = 0.381f;
         GUI.color = c;
         GUI.DrawTexture(r, t);
 
-        GUIStyle g = new GUIStyle(GUI.skin.label);
         g.fontStyle = FontStyle.Bold;
         g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
 
-        string s = "";
-
-        r.x = (w - 0.8f * h) / 2;
-        r.y = 0.1f * h + (MENUVERTICALOFFSETPERCENT * h);
-        r.width = 0.8f * h;
+        r.x = 0.375f * w;
+        r.y = 0.08f * h;
+        r.width = 0.2522f * w;
         r.height = 0.1f * h;
+        //r.x = 0.1f * w;
+        //r.y = 0.165f * h;
+        //r.width = 0.305f * w;
+        //r.height = 0.1f * h;
         g.alignment = TextAnchor.MiddleCenter;
         s = marketInstructions;
+        r.x += 0.0007f * w;
+        r.y += 0.0009f * w;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0014f * w;
+        r.y -= 0.0018f * w;
         GUI.color = Color.white;
         GUI.Label(r, s, g);
 
-        r.y = 0.2f * h + (MENUVERTICALOFFSETPERCENT * h);
+        r.y = 0.2875f * h;
+        r.height = 0.125f * h;
+
         for (int i = 0; i < menuItems.Length; i++)
         {
-            r.x = (w - 0.7f * h) / 2;
-            r.width = 0.7f * h;
-            r.height = 0.1f * h;
-            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+            r.x = 0.1f * w;
+            r.width = 0.305f * w;
+            g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
 
             if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
                 continue;
             if (i > maxMenuListPerLevel[currentCustomer.playerData.level])
                 continue;
 
-            c = new Color(0.3f, 0.3f, 0.3f);
+            c = new Color(0.381f, 0.381f, 0.381f, 0.618f);
             if (i == menuItemSelection)
             {
-                c = new Color(0.25f, 0.6f, 0.2f);
+                c = new Color(0.25f, 0.6f, 0.2f, 0.618f);
                 if (rejectFlashTimer > 0f)
-                    c.g = (rejectFlashTimer * 5f) % 1f;
+                    c.g = ((rejectFlashTimer * 5f) % 1f ) * .6f;
             }
 
             // Item Background
             GUI.color = c;
             GUI.DrawTexture(r, t);
 
-            r.x = (w - 0.575f * h) * 0.55f;
-            r.width = 0.5f * h;
-
             // Display Name
+            r.x = 0.175f * w;
+            r.width = 0.19f * w;
             s = menuItems[i].itemName;
             if (customerMode == CustomerMode.Sell && menuItemSelection == i &&
                 currentCustomer.GetPlayerCurrentItemSelection() != null)
@@ -899,19 +1196,18 @@ public class MarketManager : MonoBehaviour
                 GUI.color = Color.gray;
             GUI.Label(r, s, g);
 
-            // Market Value
-            g.fontSize = Mathf.RoundToInt(g.fontSize * 1.5f);
-            g.alignment = TextAnchor.MiddleRight;
-
             // Icon (placed above)
-            r.x = (w - 0.7f * h) / 2;
+            r.x = .1025f * w;
             r.width = r.height;
             GUI.DrawTexture(r, menuItems[i].itemIcon);
 
+            // Market Value
+            g.fontSize = Mathf.RoundToInt(g.fontSize * 1.5f);
+            g.alignment = TextAnchor.MiddleRight;
             // not dollars, currency is gold
             // and items have an individual sell value
-            r.x = (w - 0.5f * h) * 0.55f;
-            r.width = 0.5f * h;
+            r.x = .2875f * w;
+            r.width = 0.1f * w;
             if (menuItems[i].availableToBuy)
             {
                 // buy value
@@ -942,7 +1238,136 @@ public class MarketManager : MonoBehaviour
                 g.fontStyle = FontStyle.Bold;
             }
 
-            r.y += 0.12f * h;
+            r.y += 0.175f * h;
+        }
+
+        // -- special player HUD just for market --
+        ItemData iData = null;
+        if (currentCustomer != null)
+            iData = currentCustomer.GetPlayerCurrentItemSelection();
+        InventoryData pInv = currentCustomer.playerData.inventory;
+        // inventory display
+        r.x = 0.225f * w;
+        r.y = 0.8325f * h;
+        r.width = 0.05f * w;
+        r.height = r.width;
+
+        r.x -= (0.05f * w) * ((pInv.maxSlots / 2f) + 0.5f);
+        for (int i = 0; i < 5; i++)
+        {
+            r.x += 0.05f * w;
+            if (pInv.items != null && pInv.items.Length > i)
+            {
+                if (pInv.items[i].type != ItemType.Default)
+                {
+                    // adjust smaller
+                    r.x += 0.005f * w;
+                    r.y += (0.005f * w);
+                    r.width -= (0.01f * w);
+                    r.height -= (0.01f * w);
+                    // draw inventory item
+                    t = alm.itemImages[alm.GetArtData(pInv.items[i].type, pInv.items[i].plant).artIndexBase];
+                    GUI.DrawTexture(r, t);
+                    // re-adjust larger again
+                    r.x -= 0.005f * w;
+                    r.y -= (0.005f * w);
+                    r.width += (0.01f * w);
+                    r.height += (0.01f * w);
+                }
+            }
+            // draw inventory slot frame
+            t = (Texture2D)Resources.Load("Plot_Cursor");
+            c = Color.white;
+            if (iData != null && i < pInv.items.Length && pInv.items[i] == iData)
+                c = Color.yellow;
+            GUI.color = c;
+            GUI.DrawTexture(r, t);
+            GUI.color = Color.white;
+        }
+
+        // selected item label
+        r.x = 0.125f * w;
+        r.y = 0.9225f * h;
+        r.width = 0.25f * w;
+        r.height = 0.05f * h;
+        // label bg
+        t = Texture2D.whiteTexture;
+        c = Color.white;
+        c.r = .1f;
+        c.g = .1f;
+        c.b = .1f;
+        c.a = 0.25f;
+        GUI.color = c;
+        GUI.DrawTexture(r, t);
+        // label
+        GUI.color = Color.white;
+        g = new GUIStyle(GUI.skin.label);
+        g.alignment = TextAnchor.MiddleCenter;
+        g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+        g.fontStyle = FontStyle.Bold;
+        s = "";
+        if (iData != null)
+            s = iData.name;
+        r.x += 0.0005f * w;
+        r.y += 0.0008f * w;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.001f * w;
+        r.y -= 0.0016f * w;
+        GUI.color = Color.white;
+        GUI.Label(r, s, g);
+
+        // gold display
+        r.x = 0.025f * w;
+        r.y = 0.85f * h;
+        r.width = 0.125f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.label);
+        g.alignment = TextAnchor.MiddleLeft;
+        g.fontSize = Mathf.RoundToInt(16f * (w / 1024f));
+        g.fontStyle = FontStyle.Bold;
+        s = "GOLD: ";
+        s += currentCustomer.playerData.gold.ToString();
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        GUI.color = Color.white;
+
+
+        // exit market button
+        r.x = 0.4f * w;
+        r.y = 0.9f * h;
+        r.width = 0.2f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.button);
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
+        else
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
+        g.active.textColor = Color.white;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
+        s = "EXIT MARKET";
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            s += "\n[BACK BUTTON]";
+
+        GUI.enabled = (customerMode == CustomerMode.Default);
+        if (GUI.Button(r,s,g))
+        {
+            marketState = MarketState.Exiting;
+            marketStateTimer = MARKETSTATETIMERMAX;
+            fadingOverlay = true;
         }
     }
 }

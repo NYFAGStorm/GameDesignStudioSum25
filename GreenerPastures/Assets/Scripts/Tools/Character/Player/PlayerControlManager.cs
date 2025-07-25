@@ -1026,7 +1026,7 @@ public class PlayerControlManager : MonoBehaviour
 
         r.x -= (0.05f * w) * ((playerInventory.maxSlots/2f) + 0.5f);
         for (int i=0; i<5; i++)
-        {
+        { 
             r.x += 0.05f * w;
             if (playerInventory.items != null && playerInventory.items.Length > i)
             {
@@ -1351,7 +1351,7 @@ public class PlayerControlManager : MonoBehaviour
 
         g = new GUIStyle(GUI.skin.label);
         g.alignment = TextAnchor.MiddleCenter;
-        g.fontSize = Mathf.RoundToInt( 20f * (w/ 1024f));
+        g.fontSize = Mathf.RoundToInt(20f * (w/ 1024f));
         g.fontStyle = FontStyle.Bold;
         s = playerInventory.items[currentInventorySelection].name;
 

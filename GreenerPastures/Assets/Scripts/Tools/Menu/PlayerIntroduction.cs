@@ -386,15 +386,15 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].npcMark = new Vector3(20f, 0f, -21f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
-        introBeats[beat].name = "'Mr. Salesalot'";
+        introBeats[beat].name = "'Mr. Sells Alat'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
-            "Mr. Salesalot is so sweet! You'll meet him when you visit the market.";
+            "Mr. Sells Alat is so sweet! You'll meet him when you visit the market.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "eden move away from market";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(18f, 0f, -21f);
+        introBeats[beat].npcMark = new Vector3(19f, 0f, -21f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "brief pause";

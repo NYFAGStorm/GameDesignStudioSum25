@@ -281,7 +281,7 @@ public class MagicCraftingManager : MonoBehaviour
                         pcm.characterFrozen = false;
                         pcm.freezeCharacterActions = false;
                         pcm.hidePlayerHUD = false;
-                        // hide controls display hud item
+                        // show controls display hud item
                         InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
                         if (igc != null)
                             igc.enabled = true;
@@ -300,7 +300,7 @@ public class MagicCraftingManager : MonoBehaviour
                         qoe.enabled = true;
                         break;
                     default:
-                        Debug.LogWarning("--- MagicCraftingManager [HandleLibraryStates] : library libraryState undefined. will ignore.");
+                        Debug.LogWarning("--- MagicCraftingManager [HandleLibraryStates] : library state undefined. will ignore.");
                         break;
                 }
             }

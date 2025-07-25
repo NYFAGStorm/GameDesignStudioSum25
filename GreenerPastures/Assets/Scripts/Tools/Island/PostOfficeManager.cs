@@ -154,8 +154,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Jan;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "It's a New Year and New Moon so come visit the market!\n\nEvery Biomancer needs supplies and we've got what you need!\n\nEnjoy this 50% off coupon good for any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "It's a New Year and New Moon so come visit the market!\n\nEvery Biomancer needs supplies and we've got what you need!\n\nEnjoy this 50% off coupon good for any one item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -166,8 +166,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Feb;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "New Moon Specials at the market!\n\nEverything is special for our valued customers!\n\nEnjoy this coupon for 50% off any item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "New Moon Specials at the market!\n\nEverything is special for our valued customers!\n\nEnjoy this coupon for 50% off any item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -178,8 +178,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Mar;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "Visit the market during the New Moon!\n\nWe've got everything a Biomancer needs to nurture their farm and craft their magic!\n\nEnjoy this complementary coupon worth 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "Visit the market during the New Moon!\n\nWe've got everything a Biomancer needs to nurture their farm and craft their magic!\n\nEnjoy this complementary coupon worth 50% off any one item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -190,8 +190,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Apr;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "New Moon nights are dark, but market is your bright light!\n\nCome one by and get your magic and farming supplies!\n\nPlease accept this 50% discount coupon for any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "New Moon nights are dark, but market is your bright light!\n\nCome one by and get your magic and farming supplies!\n\nPlease accept this 50% discount coupon for any one item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -202,8 +202,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.May;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "Joyful New Moon to all our happy customers!\n\nEvery Biomancer needs supplies and we've got everything you need at the market!\n\nBring this coupon with you and get 50% off any item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "Joyful New Moon to all our happy customers!\n\nEvery Biomancer needs supplies and we've got everything you need at the market!\n\nBring this coupon with you and get 50% off any item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -214,8 +214,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Jun;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "New Moon means gifts for all our valued customers!\n\nCome on into the market where we have all you need!\n\nTake this 50% off coupon as our way of saying we value you! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "New Moon means gifts for all our valued customers!\n\nCome on into the market where we have all you need!\n\nTake this 50% off coupon as our way of saying we value you! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -226,8 +226,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Jul;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "Happy New Moon!\n\nWhether you need special crafting items or just need to sell you wares, the market is the place to be!\n\nGet 50% off any one item with this coupon! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "Happy New Moon!\n\nWhether you need special crafting items or just need to sell you wares, the market is the place to be!\n\nGet 50% off any one item with this coupon! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -238,8 +238,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Aug;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "A New Moon means savings down at the market!\n\nWe value each of our Biomancer customers, and aim to make sure you get all you need!\n\nUse this 50% off coupon during your next visit!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "A New Moon means savings down at the market!\n\nWe value each of our Biomancer customers, and aim to make sure you get all you need!\n\nUse this 50% off coupon during your next visit!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -250,8 +250,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Sep;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "The New Moon is here!\n\nA happy farm and an active magic crafting table come from goods you'll find at the market!\n\nEnjoy this complementary coupon worth 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "The New Moon is here!\n\nA happy farm and an active magic crafting table come from goods you'll find at the market!\n\nEnjoy this complementary coupon worth 50% off any one item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -262,8 +262,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Oct;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "Visit the market during the New Moon!\n\nOur market menu includes all the items a thriving Biomancer needs!\n\nTake this 50% discount coupon as our way of saying 'thank you'! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "Visit the market during the New Moon!\n\nOur market menu includes all the items a thriving Biomancer needs!\n\nTake this 50% discount coupon as our way of saying 'thank you'! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -274,8 +274,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Nov;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "We love the New Moon!\n\nThe dark nights are a perfect time to craft magic, and we have all the ingredients you need!\n\nEnjoy this coupon worth 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "We love the New Moon!\n\nThe dark nights are a perfect time to craft magic, and we have all the ingredients you need!\n\nEnjoy this coupon worth 50% off any one item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
@@ -286,8 +286,8 @@ public class PostOfficeManager : MonoBehaviour
 
         timedPackages[idx].day = 14;
         timedPackages[idx].month = WorldMonth.Dec;
-        timedPackages[idx].sender = "Mr. Salesalot";
-        timedPackages[idx].message = "The New Moon means big deals at the market!\n\nCome visit the market and see what we have for you!\n\nBring this complementary coupon that gives you a 50% off any one item! See you soon!\n\nMr. Salesalot";
+        timedPackages[idx].sender = "Mr. Sells Alat";
+        timedPackages[idx].message = "The New Moon means big deals at the market!\n\nCome visit the market and see what we have for you!\n\nBring this complementary coupon that gives you a 50% off any one item! See you soon!\n\nMr. Sells Alat";
         timedPackages[idx].packedItems = new ItemData[3];
         timedPackages[idx].packedItems[0] = InventorySystem.InitializeItem(ItemType.Coupon);
         timedPackages[idx].packedItems[0].name = "Coupon (50% off)";
