@@ -33,6 +33,8 @@ public class GreenerGameManager : MonoBehaviour
 
     private float goldFairHelpPauseTimer;
 
+    private AudioManager sfxAudio;
+
     const float HOSTPINGINTERVAL = 1f;
     const float NOTIFICATIONHOLDTIME = 8f;
     const float NOTIFICATIONDELAYINTERVAL = 1f;
@@ -81,6 +83,7 @@ public class GreenerGameManager : MonoBehaviour
             Debug.LogError("--- GreenerGameManager [Start] : no art library manager found in scene. aborting.");
             enabled = false;
         }
+        sfxAudio = GameObject.Find("AudioMgr SFX").GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -469,6 +472,10 @@ public class GreenerGameManager : MonoBehaviour
     {
         if (shutdownDataCollected)
             return;
+
+        // sfx shutdown
+        if (sfxAudio != null)
+            sfxAudio.StopAllSounds();
 
         // detect mid-intro quit, configure player island settings appropriately
         if (game.players[0].island.w < 7f)

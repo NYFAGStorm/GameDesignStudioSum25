@@ -132,51 +132,65 @@ public class WeatherManager : MonoBehaviour
             }
             if (windAmount > 0f)
             {
-                print("wind amount updating sfx");
                 float lightWind = Mathf.Sin((windAmount / .5f) * Mathf.PI);
                 float medWind = Mathf.Sin(((windAmount - .381f) / (.618f - .381f)) * Mathf.PI);
                 float heavyWind = Mathf.Sin((windAmount - .5f) * Mathf.PI);
                 if (windAmount > 0f)
                 {
-                    if (sfxAudio.IsSoundPlaying("Wind Loop Light"))
+                    if (lightWind > 0f)
                     {
-                        float current = sfxAudio.GetSoundVolume("Wind Loop Light");
-                        current = FadeTo(current, lightWind);
-                        sfxAudio.SetSoundVolume("Wind Loop Light", current);
-                        if (current < 0.05f)
-                            sfxAudio.StopSound("Wind Loop Light");
+                        if (sfxAudio.IsSoundPlaying("Wind Loop Light"))
+                        {
+                            float current = sfxAudio.GetSoundVolume("Wind Loop Light");
+                            current = FadeTo(current, lightWind);
+                            sfxAudio.SetSoundVolume("Wind Loop Light", current);
+                            if (current < 0.05f)
+                                sfxAudio.StopSound("Wind Loop Light");
+                        }
+                        else
+                        {
+                            sfxAudio.StartSound("Wind Loop Light");
+                            sfxAudio.SetSoundVolume("Wind Loop Light", lightWind);
+                        }
                     }
-                    else
+                    else if (sfxAudio.IsSoundPlaying("Wind Loop Light"))
+                        sfxAudio.StopSound("Wind Loop Light");
+                    if (medWind > 0f)
                     {
-                        sfxAudio.StartSound("Wind Loop Light");
-                        sfxAudio.SetSoundVolume("Wind Loop Light", lightWind);
+                        if (sfxAudio.IsSoundPlaying("Wind Loop Medium"))
+                        {
+                            float current = sfxAudio.GetSoundVolume("Wind Loop Medium");
+                            current = FadeTo(current, medWind * .618f);
+                            sfxAudio.SetSoundVolume("Wind Loop Medium", current);
+                            if (current < 0.05f)
+                                sfxAudio.StopSound("Wind Loop Medium");
+                        }
+                        else
+                        {
+                            sfxAudio.StartSound("Wind Loop Medium");
+                            sfxAudio.SetSoundVolume("Wind Loop Medium", medWind * .618f);
+                        }
                     }
-                    if (sfxAudio.IsSoundPlaying("Wind Loop Medium"))
+                    else if (sfxAudio.IsSoundPlaying("Wind Loop Medium"))
+                        sfxAudio.StopSound("Wind Loop Medium");
+                    if (heavyWind > 0f)
                     {
-                        float current = sfxAudio.GetSoundVolume("Wind Loop Medium");
-                        current = FadeTo(current, medWind * .618f);
-                        sfxAudio.SetSoundVolume("Wind Loop Medium", current);
-                        if (current < 0.05f)
-                            sfxAudio.StopSound("Wind Loop Medium");
+                        if (sfxAudio.IsSoundPlaying("Wind Loop Heavy"))
+                        {
+                            float current = sfxAudio.GetSoundVolume("Wind Loop Heavy");
+                            current = FadeTo(current, heavyWind * .381f);
+                            sfxAudio.SetSoundVolume("Wind Loop Heavy", current);
+                            if (current < 0.05f)
+                                sfxAudio.StopSound("Wind Loop Heavy");
+                        }
+                        else
+                        {
+                            sfxAudio.StartSound("Wind Loop Heavy");
+                            sfxAudio.SetSoundVolume("Wind Loop Heavy", heavyWind * .381f);
+                        }
                     }
-                    else
-                    {
-                        sfxAudio.StartSound("Wind Loop Medium");
-                        sfxAudio.SetSoundVolume("Wind Loop Medium", medWind * .618f);
-                    }
-                    if (sfxAudio.IsSoundPlaying("Wind Loop Heavy"))
-                    {
-                        float current = sfxAudio.GetSoundVolume("Wind Loop Heavy");
-                        current = FadeTo(current, heavyWind * .381f);
-                        sfxAudio.SetSoundVolume("Wind Loop Heavy", current);
-                        if (current < 0.05f)
-                            sfxAudio.StopSound("Wind Loop Heavy");
-                    }
-                    else
-                    {
-                        sfxAudio.StartSound("Wind Loop Heavy");
-                        sfxAudio.SetSoundVolume("Wind Loop Heavy", heavyWind * .381f);
-                    }
+                    else if (sfxAudio.IsSoundPlaying("Wind Loop Heavy"))
+                        sfxAudio.StopSound("Wind Loop Heavy");
                 }
                 else
                 {

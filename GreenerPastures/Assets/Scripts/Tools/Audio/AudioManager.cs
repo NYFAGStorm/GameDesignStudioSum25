@@ -251,6 +251,17 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public void StopAllSounds()
+    {
+        for (int i = 0; i < plays.Length; i++)
+        {
+            plays[i].source.Stop();
+            plays[i].source.volume = 0f;
+            plays[i].playTimer = 0f;
+            break;
+        }
+    }
+
     /// <summary>
     /// Play a sound.
     /// </summary>
