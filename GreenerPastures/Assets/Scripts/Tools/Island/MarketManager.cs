@@ -563,7 +563,7 @@ public class MarketManager : MonoBehaviour
                     padMgr.gPadDown[0].yButton))
             {
                 customerMode = CustomerMode.Default;
-                currentCustomer.characterFrozen = false;
+                //currentCustomer.characterFrozen = false;
                 menuItemSelection = -1;
                 marketInstructions = "Welcome, Biomancer!\nE=BUY F=SELL";
                 if (padMgr != null && padMgr.gamepads[0].isActive)
@@ -577,7 +577,7 @@ public class MarketManager : MonoBehaviour
         if (customerMode == CustomerMode.Default && pa.actionBDown)
         {
             customerMode = CustomerMode.Sell;
-            currentCustomer.characterFrozen = true;
+            //currentCustomer.characterFrozen = true;
             menuItemSelection = -1;
             marketInstructions = "- SELL MODE -\nE=SELL V=EXIT";
             if (padMgr != null && padMgr.gamepads[0].isActive)
@@ -647,7 +647,7 @@ public class MarketManager : MonoBehaviour
                     padMgr.gPadDown[0].yButton))
             {
                 customerMode = CustomerMode.Default;
-                currentCustomer.characterFrozen = false;
+                //currentCustomer.characterFrozen = false;
                 menuItemSelection = -1;
                 marketInstructions = "Welcome, Biomancer!\nE=BUY F=SELL";
                 if (padMgr != null && padMgr.gamepads[0].isActive)
@@ -1230,8 +1230,8 @@ public class MarketManager : MonoBehaviour
             if( !menuItems[i].availableToBuy )
             {
                 // 'Not Available' overlay
-                r.x = (w - 0.5f * h) * 0.45f;
-                r.width = 0.5f * h;
+                r.x = 0.175f * w;
+                r.width = 0.19f * w;
                 g.fontStyle = FontStyle.Italic;
                 GUI.color = Color.white;
                 GUI.Label(r, "Not Available", g);

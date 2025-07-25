@@ -231,7 +231,6 @@ public class AudioManager : MonoBehaviour
             if (plays[i].soundIndex == idx)
             {
                 plays[i].source.volume = volume;
-                break;
             }
         }
     }
@@ -246,7 +245,6 @@ public class AudioManager : MonoBehaviour
                 plays[i].source.Stop();
                 plays[i].source.volume = 0f;
                 plays[i].playTimer = 0f;
-                break;
             }
         }
     }
@@ -258,7 +256,6 @@ public class AudioManager : MonoBehaviour
             plays[i].source.Stop();
             plays[i].source.volume = 0f;
             plays[i].playTimer = 0f;
-            break;
         }
     }
 

@@ -25,6 +25,7 @@ public class WeatherManager : MonoBehaviour
     private TimeManager tim;
     private CameraManager cm;
     private AudioManager sfxAudio;
+    private bool haltWeatherSFX;
 
     const float WEATHERCHECKINTERVAL = 15f; //.0618f;
 
@@ -43,6 +44,12 @@ public class WeatherManager : MonoBehaviour
     const float RAINCLOUDTHRESHOLD = 0.618f;
     const float RAINWATERINGRATE = 38.1f;
 
+
+    private void OnDisable()
+    {
+        if (sfxAudio != null)
+            sfxAudio.StopAllSounds();
+    }
 
     void Start()
     {
@@ -65,6 +72,7 @@ public class WeatherManager : MonoBehaviour
     {
         cm = camMgr;
     }
+
 
     void Update()
     {
@@ -107,7 +115,7 @@ public class WeatherManager : MonoBehaviour
         }
 
         // weather sfx
-        if (sfxAudio != null)
+        if (sfxAudio != null && !haltWeatherSFX)
         {
             if (rainAmount > 0f)
             {
@@ -266,6 +274,13 @@ public class WeatherManager : MonoBehaviour
         if (current > target)
             current -= ((current - target) * 0.1f);
         return current;
+    }
+
+    public void HaltWeatherSFX( bool stopSFX )
+    {
+        haltWeatherSFX = stopSFX;
+        if (stopSFX && sfxAudio != null)
+            sfxAudio.StopAllSounds();
     }
 
     /// <summary>

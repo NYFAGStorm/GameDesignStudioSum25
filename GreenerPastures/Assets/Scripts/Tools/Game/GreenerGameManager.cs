@@ -470,12 +470,11 @@ public class GreenerGameManager : MonoBehaviour
 
     public void DoShutDownGameDataCollection()
     {
+        // have weather manager halt all sfx
+        GameObject.FindFirstObjectByType<WeatherManager>().HaltWeatherSFX(true);
+
         if (shutdownDataCollected)
             return;
-
-        // sfx shutdown
-        if (sfxAudio != null)
-            sfxAudio.StopAllSounds();
 
         // detect mid-intro quit, configure player island settings appropriately
         if (game.players[0].island.w < 7f)
