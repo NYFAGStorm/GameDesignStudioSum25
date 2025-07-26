@@ -59,7 +59,7 @@ public class RemotePlayerManager : MonoBehaviour
             {
                 PlayerData pData = GameSystem.GetProfilePlayer(gData, profileID);
                 if (pData != null)
-                    ConfigureAppearance(pData.options);
+                    pam.ConfigureAppearance(pData.options);
             }
         }
         remotePlayerIntialized = true;
@@ -100,42 +100,5 @@ public class RemotePlayerManager : MonoBehaviour
         pos.z = playerPosition.z;
         pam.characterMoveVector = moveVector;
         gameObject.transform.position = pos;
-    }
-
-    // the same routine as used in player control manager
-    public void ConfigureAppearance( PlayerOptions options )
-    {
-        Renderer r = transform.GetComponentInChildren<Renderer>();
-        if (r != null)
-        {
-            if (options.model == PlayerModelType.Male)
-            {
-                // line (_LineArt)
-                r.material.SetTexture("_LineArt", (Texture2D)Resources.Load("ProtoWizard_LineArt"));
-                // skin (_AccentFill,_AccentCol)
-                r.material.SetTexture("_AccentFill", (Texture2D)Resources.Load("ProtoWizard_FillSkin"));
-                r.material.SetColor("_AccentCol", PlayerSystem.GetPlayerSkinColor(options.skinColor));
-                // accent (_AltFill, _AltCol)
-                r.material.SetTexture("_AltFill", (Texture2D)Resources.Load("ProtoWizard_FillAccent"));
-                r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
-                // fill (_MainTex, _Color)
-                r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizard_FillMain"));
-                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.mainColor));
-            }
-            else if (options.model == PlayerModelType.Female)
-            {
-                // line (_LineArt)
-                r.material.SetTexture("_LineArt", (Texture2D)Resources.Load("ProtoWizardF_LineArt"));
-                // skin (_AccentFill,_AccentCol)
-                r.material.SetTexture("_AccentFill", (Texture2D)Resources.Load("ProtoWizardF_FillSkin"));
-                r.material.SetColor("_AccentCol", PlayerSystem.GetPlayerSkinColor(options.skinColor));
-                // accent (_AltFill, _AltCol)
-                r.material.SetTexture("_AltFill", (Texture2D)Resources.Load("ProtoWizardF_FillAccent"));
-                r.material.SetColor("_AltCol", PlayerSystem.GetPlayerColor(options.accentColor));
-                // fill (_MainTex, _Color)
-                r.material.SetTexture("_MainTex", (Texture2D)Resources.Load("ProtoWizardF_FillMain"));
-                r.material.SetColor("_Color", PlayerSystem.GetPlayerColor(options.mainColor));
-            }
-        }
     }
 }

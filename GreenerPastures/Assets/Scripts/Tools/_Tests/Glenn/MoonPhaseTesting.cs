@@ -13,9 +13,9 @@ public class MoonPhaseTesting : MonoBehaviour
     // 
 
     // -- dynamic audio blend
-    public float light;
-    public float med;
-    public float heavy;
+    public float lightVal;
+    public float medVal;
+    public float heavyVal;
     [Range(0f,1f)]
     public float drivingValue;
     //
@@ -39,15 +39,15 @@ public class MoonPhaseTesting : MonoBehaviour
         roundedResult = Mathf.Clamp(roundedResult, 1, (int)valueMultiplier);
 
         // - dynamic audio blending
-        light = Mathf.Sin(Mathf.Clamp01( drivingValue / .5f ) * Mathf.PI);
-        if (light < 0.01f)
-            light = 0f;
-        med = Mathf.Sin(Mathf.Clamp01( (drivingValue - .25f) / .5f ) * Mathf.PI);
-        if (med < 0.01f)
-            med = 0f;
-        heavy = Mathf.Sin(Mathf.Clamp01( drivingValue - .5f ) * Mathf.PI);
-        if (heavy < 0.01f)
-            heavy = 0f;
+        lightVal = Mathf.Sin(Mathf.Clamp01( drivingValue / .5f ) * Mathf.PI);
+        if (lightVal < 0.01f)
+            lightVal = 0f;
+        medVal = Mathf.Sin(Mathf.Clamp01( (drivingValue - .25f) / .5f ) * Mathf.PI);
+        if (medVal < 0.01f)
+            medVal = 0f;
+        heavyVal = Mathf.Sin(Mathf.Clamp01( drivingValue - .5f ) * Mathf.PI);
+        if (heavyVal < 0.01f)
+            heavyVal = 0f;
 
         // - moon phase -
         if (Input.GetKeyDown(KeyCode.Space))
