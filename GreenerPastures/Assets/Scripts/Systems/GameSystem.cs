@@ -1,5 +1,6 @@
 // REVIEW: necessary namespaces
 
+
 public static class GameSystem
 {
     /// <summary>
@@ -336,6 +337,23 @@ public static class GameSystem
         retPos.w = 0f;
 
         return retPos;
+    }
+
+    /// <summary>
+    /// Returns a vector representing the delta between to position data (a - b)
+    /// </summary>
+    /// <param name="posA">position A</param>
+    /// <param name="posB">position B</param>
+    /// <returns>delta vector</returns>
+    public static UnityEngine.Vector3 GetDeltaVector( PositionData posA, PositionData posB )
+    {
+        UnityEngine.Vector3 retVector = UnityEngine.Vector3.zero;
+
+        retVector.x = posA.x - posB.x;
+        retVector.y = posA.y - posB.y;
+        retVector.z = posA.z - posB.z;
+
+        return retVector;
     }
 
     /// <summary>

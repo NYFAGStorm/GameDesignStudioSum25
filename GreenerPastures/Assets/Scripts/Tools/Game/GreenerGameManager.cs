@@ -809,8 +809,9 @@ public class GreenerGameManager : MonoBehaviour
         pos.x = game.players[0].location.x;
         pos.y = game.players[0].location.y;
         pos.z = game.players[0].location.z;
-        bool playerArtFlipped = game.players[0].location.w < 0f;
-        pc.transform.GetChild(0).GetComponent<PlayerAnimManager>().imageFlipped = playerArtFlipped;
+        Vector3 charMoveVector = Vector3.zero;
+        charMoveVector.x = game.players[0].location.w;
+        pc.transform.GetChild(0).GetComponent<CharacterAnimManager>().characterMoveVector = charMoveVector;
         pc.transform.parent = GameObject.Find("Character").transform;
         PlayerControlManager pcm = pc.GetComponent<PlayerControlManager>();
 

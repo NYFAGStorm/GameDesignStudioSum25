@@ -21,8 +21,7 @@ public class NPCController : MonoBehaviour
     public bool destinationReached; // readable as a call-back
 
     private Vector3 moveVector;
-    private bool imageFlipped;
-    private Renderer rend;
+    private CharacterAnimManager pam;
 
     const float MOVETARGETTHRESHOLD = 0.1f;
 
@@ -30,10 +29,10 @@ public class NPCController : MonoBehaviour
     void Start()
     {
         // validate
-        rend = GetComponentInChildren<Renderer>();
-        if (rend == null)
+        pam = GetComponentInChildren<CharacterAnimManager>();
+        if (pam == null)
         {
-            Debug.LogError("--- NPCController [Start] : " + gameObject.name + " no renderer found on child obhect. aborting.");
+            Debug.LogError("--- NPCController [Start] : " + gameObject.name + " no character animation manager found on child obhect. aborting.");
             enabled = false;
         }
         // initialize
@@ -50,8 +49,8 @@ public class NPCController : MonoBehaviour
         // handle movement
         if (HandleMovement())
         {
-            // handle image flip
-            HandleImageFlip();
+            // handle character animation
+            HandleCharacterAnimation();
             // detect target destination reached
             destinationReached = IsAtTarget();
         }
@@ -98,15 +97,9 @@ public class NPCController : MonoBehaviour
         return true;
     }
 
-    void HandleImageFlip()
+    void HandleCharacterAnimation()
     {
-        // determine image flip
-        imageFlipped = (moveVector.x < 0f);
-        // handle image flip
-        Vector2 flipVec = new Vector2(1f, 1f);
-        if (imageFlipped)
-            flipVec.x = -1f;
-        rend.material.SetTextureScale("_MainTex", flipVec);
+        pam.characterMoveVector = moveVector;
     }
 
     bool IsAtTarget()

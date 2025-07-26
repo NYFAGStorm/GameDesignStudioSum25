@@ -10,10 +10,11 @@ public class RemotePlayerManager : MonoBehaviour
     public string profileID; // remote player profile ID
     public string playerName; // remote player name
 
-    public PositionData playerPosition; // x,y,z + 'w' which = -1 if flipped art
+    public PositionData playerPosition; // x,y,z + 'w' which = character facing pose
 
-    private PositionData previousPosition; // perhaps we use this to help smooth pops in movement
-    private PlayerAnimManager pam;
+    private PositionData previousPosition; // we use this to help smooth, drive character anim mgr
+    private Vector3 moveVector; // used for character anim mgr
+    private CharacterAnimManager pam;
 
     private bool remotePlayerIntialized;
 
@@ -23,10 +24,10 @@ public class RemotePlayerManager : MonoBehaviour
     void Start()
     {
         // validate
-        pam = gameObject.GetComponentInChildren<PlayerAnimManager>();
+        pam = gameObject.GetComponentInChildren<CharacterAnimManager>();
         if (pam == null)
         {
-            Debug.LogError("--- RemotePlayerManager [Start] : " + gameObject.name + " no player anim manager found on this object. aborting.");
+            Debug.LogError("--- RemotePlayerManager [Start] : " + gameObject.name + " no character anim manager found on this object. aborting.");
             enabled = false;
         }
         // initialize
@@ -64,17 +65,22 @@ public class RemotePlayerManager : MonoBehaviour
         remotePlayerIntialized = true;
     }
 
+    /// <summary>
+    /// Use SetRemovePlayerPosition(pos) instead
+    /// </summary>
     public void SetRemotePlayerPosition( Vector3 pos, bool artFlipped )
     {
         previousPosition = playerPosition;
         playerPosition.x = pos.x;
         playerPosition.y = pos.y;
         playerPosition.z = pos.z;
+        // this will cause anim problems (needs to be based on move vector)
         playerPosition.w = artFlipped ? -1 : 1;
     }
 
     public void SetRemotePlayerPosition( PositionData pos )
     {
+        moveVector = GameSystem.GetDeltaVector(pos, previousPosition);
         previousPosition = playerPosition;
         playerPosition = pos;
     }
@@ -92,7 +98,7 @@ public class RemotePlayerManager : MonoBehaviour
         pos.x = playerPosition.x;
         pos.y = playerPosition.y;
         pos.z = playerPosition.z;
-        pam.imageFlipped = playerPosition.w < 0f;
+        pam.characterMoveVector = moveVector;
         gameObject.transform.position = pos;
     }
 

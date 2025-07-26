@@ -61,6 +61,7 @@ GameObject:
   - component: {fileID: 1929850557079256798}
   - component: {fileID: 6657017650457671777}
   - component: {fileID: 305525381525947744}
+  - component: {fileID: 6856580194492059981}
   m_Layer: 0
   m_Name: NPC Art
   m_TagString: Untagged
@@ -136,3 +137,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6856580194492059981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4514807217243539525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85931b8183899594a9544231b04ed4b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  imageFlipped: 0

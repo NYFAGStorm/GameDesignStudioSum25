@@ -81,7 +81,7 @@ public class PlayerControlManager : MonoBehaviour
 
     private GreenerGameManager ggm;
     private CameraManager cam;
-    private PlayerAnimManager pam;
+    private CharacterAnimManager pam;
     private MagicManager mm;
     private ArtLibraryManager alm;
     private TimeManager tim;
@@ -111,10 +111,10 @@ public class PlayerControlManager : MonoBehaviour
             Debug.LogError("--- PlayerControlManager [Start] : " + gameObject.name + " no camera manager found in scene. aborting.");
             enabled = false;
         }
-        pam = gameObject.transform.GetComponentInChildren<PlayerAnimManager>();
+        pam = gameObject.transform.GetComponentInChildren<CharacterAnimManager>();
         if ( pam == null )
         {
-            Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no player anim manager found in children. aborting.");
+            Debug.LogError("--- PlayerControlManager [Start] : "+gameObject.name+" no character anim manager found in children. aborting.");
             enabled = false;
         }
         mm = gameObject.GetComponent<MagicManager>();
@@ -370,10 +370,7 @@ public class PlayerControlManager : MonoBehaviour
     public PlayerData GetPlayerData()
     {
         // update player location data
-        if (pam.imageFlipped)
-            playerData.location.w = -1f;
-        else
-            playerData.location.w = 1f;
+        playerData.location.w = pam.characterMoveVector.x;
         playerData.location.x = gameObject.transform.position.x;
         playerData.location.y = gameObject.transform.position.y;
         playerData.location.z = gameObject.transform.position.z;
@@ -471,7 +468,9 @@ public class PlayerControlManager : MonoBehaviour
         playerInventory = playerData.inventory;
         playerName = playerData.playerName;
         // place player character in location
-        pam.imageFlipped = playerData.location.w < 0f;
+        Vector3 moveVec = Vector3.zero;
+        moveVec.x = playerData.location.w;
+        pam.characterMoveVector = moveVec;
         Vector3 pos = new Vector3(playerData.location.x, playerData.location.y, playerData.location.z);
         gameObject.transform.position = pos;
         // restore cam location and mode
@@ -1004,11 +1003,7 @@ public class PlayerControlManager : MonoBehaviour
     {
         Vector3 pos = gameObject.transform.position;
         pos += characterMove;
-        // handle character art flip
-        if (characterMove.x < 0f)
-            pam.imageFlipped = true;
-        if (characterMove.x > 0f)
-            pam.imageFlipped = false;
+        pam.characterMoveVector = characterMove;
         gameObject.transform.position = pos;
     }
 
@@ -1133,7 +1128,7 @@ public class PlayerControlManager : MonoBehaviour
             {
                 LooseItemData lid = InventorySystem.DropItem(playerInventory.items[currentInventorySelection], playerInventory, out playerInventory);
                 Vector3 pos = gameObject.transform.position;
-                if (pam.imageFlipped)
+                if (pam.GetImageFlipped())
                     pos += Vector3.left * PROXIMITYRANGE;
                 else
                     pos += Vector3.right * PROXIMITYRANGE;
