@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Eden
-  m_Shader: {fileID: 4800000, guid: bd7b8365035bd5142baad235f664e4d5, type: 3}
+  m_Shader: {fileID: 4800000, guid: ed358c81f60c6994a9bf3d930f87b36b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -24,11 +24,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AccentFill:
-        m_Texture: {fileID: 2800000, guid: 49a14f9c275df1a4aa97d97574a29e73, type: 3}
+        m_Texture: {fileID: 2800000, guid: 2d5cac9b4a2323a468592b8f88cb25ed, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _AltFill:
-        m_Texture: {fileID: 2800000, guid: 739c301d60b59004fbdcc9e8c2736cc2, type: 3}
+        m_Texture: {fileID: 2800000, guid: f4671313b1af79d40a5300cc18de2157, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _BumpMap:
@@ -51,12 +51,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HairFill:
+        m_Texture: {fileID: 2800000, guid: 0898ddaf81384794e8e21d703ca73d97, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _LineArt:
-        m_Texture: {fileID: 2800000, guid: ff852331a6b30e04ca4c8ef18715be8f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 593aee9aaf86dd44294ac5a1e56e620f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c058e081153f0eb4ab70ec85b216bcd4, type: 3}
+        m_Texture: {fileID: 2800000, guid: 939a7502ca12760409acc0d3830ea230, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _MetallicGlossMap:
@@ -69,6 +73,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SkinFill:
+        m_Texture: {fileID: 2800000, guid: 34107353d853d844a961488644398b5b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -90,9 +98,11 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _AccentCol: {r: 0.62, g: 0.5336133, b: 0.3844, a: 1}
-    - _AltCol: {r: 0.8, g: 0.75864977, b: 0.30379745, a: 1}
-    - _Color: {r: 0.75547165, g: 0.899371, b: 0.77465826, a: 1}
+    - _AccentCol: {r: 0.9, g: 0.9, b: 0.618, a: 1}
+    - _AltCol: {r: 0.618, g: 0.8, b: 0.618, a: 1}
+    - _Color: {r: 0, g: 0.618, b: 0.381, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _HairCol: {r: 0.95, g: 0.95, b: 0.8, a: 1}
+    - _SkinCol: {r: 0.95, g: 0.9, b: 0.8, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

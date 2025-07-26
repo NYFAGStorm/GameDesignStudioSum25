@@ -49,6 +49,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerData:
     playerName: 
+    nowPlaying: 0
+    options:
+      model: 0
+      hairColor: 0
+      skinColor: 0
+      mainColor: 0
+      secondaryColor: 0
+      accentColor: 0
     stats:
       totalGameTime: 0
       totalPlanted: 0
@@ -56,6 +64,7 @@ MonoBehaviour:
       totalGoldEarned: 0
       totalArcanaEarned: 0
       totalXPEarned: 0
+      totalLevelsEarned: 0
     profileID: 
     farm:
       plots: []
@@ -98,8 +107,10 @@ MonoBehaviour:
         totalChargesCrafted: 0
         totalChargesCast: 0
       library:
-        grimiore: []
+        grimoire: []
         spellBook: []
+    almanac:
+      revealed: 
     effects: 
   characterSpeed: 2.7
   upKey: 119
@@ -113,6 +124,7 @@ MonoBehaviour:
   lBumpKey: 91
   rBumpKey: 93
   castKey: 113
+  graftKey: 103
   characterFrozen: 0
   freezeCharacterActions: 0
   hidePlayerHUD: 0
@@ -213,7 +225,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9632c773bff4cf646a2c1ee0911a2302, type: 2}
+  - {fileID: 2100000, guid: 39102d89b256146419ebf72c377c7636, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
