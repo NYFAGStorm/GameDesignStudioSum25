@@ -68,18 +68,22 @@ public class CharacterAnimManager : MonoBehaviour
         if (previousPose == pose)
             return;
 
+        int idx = 0;
+        if (pose == CharacterPose.Side)
+            idx += 6;
+
         // line (_LineArt)
-        rend.material.SetTexture("_LineArt", characterLayers[0]);
+        rend.material.SetTexture("_LineArt", characterLayers[idx++]);
         // hair (_HairFill)
-        rend.material.SetTexture("_HairFill", characterLayers[1]);
+        rend.material.SetTexture("_HairFill", characterLayers[idx++]);
         // skin (_SkinFill)
-        rend.material.SetTexture("_SkinFill", characterLayers[2]);
+        rend.material.SetTexture("_SkinFill", characterLayers[idx++]);
         // light (_AccentFill)
-        rend.material.SetTexture("_AccentFill", characterLayers[3]);
+        rend.material.SetTexture("_AccentFill", characterLayers[idx++]);
         // medium (_AltFill)
-        rend.material.SetTexture("_AltFill", characterLayers[4]);
+        rend.material.SetTexture("_AltFill", characterLayers[idx++]);
         // dark (_MainTex)
-        rend.material.SetTexture("_MainTex", characterLayers[5]);
+        rend.material.SetTexture("_MainTex", characterLayers[idx++]);
 
         previousPose = pose;
     }
@@ -107,14 +111,26 @@ public class CharacterAnimManager : MonoBehaviour
         string currentArtSet = artNameBase + charType + poseName + suffix;
 
         // store layer images
-        characterLayers = new Texture2D[6];
+        // (front)
+        characterLayers = new Texture2D[12];
+        currentArtSet = artNameBase + charType + "Front " + suffix;
         characterLayers[0] = (Texture2D)Resources.Load(currentArtSet + "Line");
         characterLayers[1] = (Texture2D)Resources.Load(currentArtSet + "Hair");
         characterLayers[2] = (Texture2D)Resources.Load(currentArtSet + "Skin");
         characterLayers[3] = (Texture2D)Resources.Load(currentArtSet + "Light");
         characterLayers[4] = (Texture2D)Resources.Load(currentArtSet + "Medium");
         characterLayers[5] = (Texture2D)Resources.Load(currentArtSet + "Dark");
+        // (side)
+        currentArtSet = artNameBase + charType + "Side " + suffix;
+        characterLayers[6] = (Texture2D)Resources.Load(currentArtSet + "Line");
+        characterLayers[7] = (Texture2D)Resources.Load(currentArtSet + "Hair");
+        characterLayers[8] = (Texture2D)Resources.Load(currentArtSet + "Skin");
+        characterLayers[9] = (Texture2D)Resources.Load(currentArtSet + "Light");
+        characterLayers[10] = (Texture2D)Resources.Load(currentArtSet + "Medium");
+        characterLayers[11] = (Texture2D)Resources.Load(currentArtSet + "Dark");
 
+        // apply to character art
+        currentArtSet = artNameBase + charType + poseName + suffix;
         // line (_LineArt)
         rend.material.SetTexture("_LineArt", characterLayers[0]);
         // hair (_HairFill, _HairCol)
