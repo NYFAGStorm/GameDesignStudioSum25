@@ -66,6 +66,9 @@ public class CharacterAnimManager : MonoBehaviour
 
     void UpdatePoseLayers()
     {
+        if (rend == null || characterLayers == null || characterLayers.Length == 0)
+            return;
+
         if (previousPose == pose)
             return;
 

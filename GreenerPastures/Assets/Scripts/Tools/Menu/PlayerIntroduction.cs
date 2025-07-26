@@ -54,16 +54,19 @@ public class PlayerIntroduction : MonoBehaviour
     public bool dialogPop;
 
     private Texture2D[] characterLines;
+    private Texture2D[] characterHairs;
     private Texture2D[] characterSkins;
     private Texture2D[] characterAccents;
+    private Texture2D[] characterSecondaries;
     private Texture2D[] characterFills;
 
+    private Color[] characterHairShades;
     private Color[] characterSkinTones;
     private Color[] characterColors;
 
     private PlayerOptions configOptions;
     private bool configValid;
-    private bool[] configsTouched = new bool[4];
+    private bool[] configsTouched = new bool[6];
 
     private enum IntroHelpMessage
     {
@@ -88,8 +91,10 @@ public class PlayerIntroduction : MonoBehaviour
     private LooseItemManager droppedItem;
 
     private int modelSelection = 0;
+    private int hairSelection = 0;
     private int skinSelection = 0;
     private int accentSelection = 0;
+    private int secondarySelection = 0;
     private int fillSelection = 0;
 
     private PlayerControlManager pcm;
@@ -199,6 +204,26 @@ public class PlayerIntroduction : MonoBehaviour
     void InitializeCharacterTextures()
     {
         characterLines = new Texture2D[2];
+        characterLines[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Line");
+        characterLines[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Line");
+        characterHairs = new Texture2D[2];
+        characterHairs[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Hair");
+        characterHairs[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Hair");
+        characterSkins = new Texture2D[2];
+        characterSkins[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Skin");
+        characterSkins[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Skin");
+        characterAccents = new Texture2D[2];
+        characterAccents[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Light");
+        characterAccents[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Light");
+        characterSecondaries = new Texture2D[2];
+        characterSecondaries[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Medium");
+        characterSecondaries[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Medium");
+        characterFills = new Texture2D[2];
+        characterFills[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Dark");
+        characterFills[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Dark");
+
+        /*
+        characterLines = new Texture2D[2];
         characterLines[0] = (Texture2D)Resources.Load("ProtoWizard_LineArt");
         characterLines[1] = (Texture2D)Resources.Load("ProtoWizardF_LineArt");
         characterSkins = new Texture2D[2];
@@ -210,10 +235,16 @@ public class PlayerIntroduction : MonoBehaviour
         characterFills = new Texture2D[2];
         characterFills[0] = (Texture2D)Resources.Load("ProtoWizard_FillMain");
         characterFills[1] = (Texture2D)Resources.Load("ProtoWizardF_FillMain");
+        */
     }
 
     void InitializeCharacterColors()
     {
+        characterHairShades = new Color[8];
+        for (int i = 0; i < 8; i++)
+        {
+            characterHairShades[i] = PlayerSystem.GetPlayerHairColor((PlayerHairColor)i);
+        }
         characterSkinTones = new Color[8];
         for (int i = 0; i < 8; i++)
         {
@@ -1875,6 +1906,15 @@ public class PlayerIntroduction : MonoBehaviour
         c.a = 1f;
         GUI.color = c;
         GUI.Box(r, s, g);
+        // secondary
+        t = characterSecondaries[modelSelection];
+        g.normal.background = t;
+        g.hover.background = t;
+        g.active.background = t;
+        c = characterColors[secondarySelection];
+        c.a = 1f;
+        GUI.color = c;
+        GUI.Box(r, s, g);
         // accent
         t = characterAccents[modelSelection];
         g.normal.background = t;
@@ -1891,6 +1931,14 @@ public class PlayerIntroduction : MonoBehaviour
         c = characterSkinTones[skinSelection];
         GUI.color = c;
         GUI.Box(r, s, g);
+        // hair
+        t = characterHairs[modelSelection];
+        g.normal.background = t;
+        g.hover.background = t;
+        g.active.background = t;
+        c = characterHairShades[hairSelection];
+        GUI.color = c;
+        GUI.Box(r, s, g);
         // line
         t = characterLines[modelSelection];
         g.normal.background = t;
@@ -1903,7 +1951,7 @@ public class PlayerIntroduction : MonoBehaviour
         // CHARACTER DETAILS
         // name label
         r.x = 0.5f * w;
-        r.y = 0.3f * h;
+        r.y = 0.225f * h;
         r.width = 0.375f * w;
         r.height = 0.05f * h;
         g = new GUIStyle(GUI.skin.label);
@@ -1926,6 +1974,10 @@ public class PlayerIntroduction : MonoBehaviour
         g.fontStyle = FontStyle.Bold;
         s = "PLAYER MODEL";
         GUI.Label(r, s, g);
+        // hair shade label
+        r.y += 0.075f * h;
+        s = "HAIR SHADE";
+        GUI.Label(r, s, g);
         // skin tone label
         r.y += 0.075f * h;
         s = "SKIN TONE";
@@ -1934,6 +1986,10 @@ public class PlayerIntroduction : MonoBehaviour
         r.y += 0.075f * h;
         s = "MAIN COLOR";
         GUI.Label(r, s, g);
+        // secondary color label
+        r.y += 0.075f * h;
+        s = "SECONDARY COLOR";
+        GUI.Label(r, s, g);
         // accent color label
         r.y += 0.075f * h;
         s = "ACCENT COLOR";
@@ -1941,7 +1997,7 @@ public class PlayerIntroduction : MonoBehaviour
 
         // CONTROL BUTTONS
         r.x = 0.525f * w;
-        r.y = 0.35f * h;
+        r.y = 0.275f * h;
         r.width = 0.05f * w;
         r.height = r.width; // square
         g = new GUIStyle(GUI.skin.button);
@@ -1976,6 +2032,26 @@ public class PlayerIntroduction : MonoBehaviour
                 modelSelection = 0;
             configsTouched[0] = true;
         }
+        // hair -/+
+        r.x = 0.525f * w;
+        r.y += 0.075f * h;
+        s = "<";
+        if (GUI.Button(r, s, g))
+        {
+            hairSelection--;
+            if (hairSelection < 0)
+                hairSelection = characterHairShades.Length - 1;
+            configsTouched[1] = true;
+        }
+        r.x += 0.3f * w;
+        s = ">";
+        if (GUI.Button(r, s, g))
+        {
+            hairSelection++;
+            if (hairSelection > characterHairShades.Length - 1)
+                hairSelection = 0;
+            configsTouched[1] = true;
+        }
         // skin -/+
         r.x = 0.525f * w;
         r.y += 0.075f * h;
@@ -1985,7 +2061,7 @@ public class PlayerIntroduction : MonoBehaviour
             skinSelection--;
             if (skinSelection < 0)
                 skinSelection = characterSkinTones.Length - 1;
-            configsTouched[1] = true;
+            configsTouched[2] = true;
         }
         r.x += 0.3f * w;
         s = ">";
@@ -1994,7 +2070,7 @@ public class PlayerIntroduction : MonoBehaviour
             skinSelection++;
             if (skinSelection > characterSkinTones.Length - 1)
                 skinSelection = 0;
-            configsTouched[1] = true;
+            configsTouched[2] = true;
         }
         // main -/+
         r.x = 0.525f * w;
@@ -2005,7 +2081,7 @@ public class PlayerIntroduction : MonoBehaviour
             fillSelection--;
             if (fillSelection < 0)
                 fillSelection = characterColors.Length - 1;
-            configsTouched[2] = true;
+            configsTouched[3] = true;
         }
         r.x += 0.3f * w;
         s = ">";
@@ -2014,7 +2090,27 @@ public class PlayerIntroduction : MonoBehaviour
             fillSelection++;
             if (fillSelection > characterColors.Length - 1)
                 fillSelection = 0;
-            configsTouched[2] = true;
+            configsTouched[3] = true;
+        }
+        // secondary -/+
+        r.x = 0.525f * w;
+        r.y += 0.075f * h;
+        s = "<";
+        if (GUI.Button(r, s, g))
+        {
+            secondarySelection--;
+            if (secondarySelection < 0)
+                secondarySelection = characterColors.Length - 1;
+            configsTouched[4] = true;
+        }
+        r.x += 0.3f * w;
+        s = ">";
+        if (GUI.Button(r, s, g))
+        {
+            secondarySelection++;
+            if (secondarySelection > characterColors.Length - 1)
+                secondarySelection = 0;
+            configsTouched[4] = true;
         }
         // accent -/+
         r.x = 0.525f * w;
@@ -2025,7 +2121,7 @@ public class PlayerIntroduction : MonoBehaviour
             accentSelection--;
             if (accentSelection < 0)
                 accentSelection = characterColors.Length - 1;
-            configsTouched[3] = true;
+            configsTouched[5] = true;
         }
         r.x += 0.3f * w;
         s = ">";
@@ -2034,12 +2130,12 @@ public class PlayerIntroduction : MonoBehaviour
             accentSelection++;
             if (accentSelection > characterColors.Length - 1)
                 accentSelection = 0;
-            configsTouched[3] = true;
+            configsTouched[5] = true;
         }
 
         // detect config valid
-        configValid = (configsTouched[0] && configsTouched[1] &&
-            configsTouched[2] && configsTouched[3]);
+        configValid = (configsTouched[0] && configsTouched[1] && configsTouched[2] 
+            && configsTouched[3] && configsTouched[4] && configsTouched[5]);
 
         // accept button
         r.x = 0.4f * w;
@@ -2064,8 +2160,10 @@ public class PlayerIntroduction : MonoBehaviour
         {
             // store player options
             configOptions.model = (PlayerModelType)modelSelection + 1;
+            configOptions.hairColor = (PlayerHairColor)hairSelection;
             configOptions.skinColor = (PlayerSkinColor)skinSelection;
             configOptions.mainColor = (PlayerColor)fillSelection;
+            configOptions.secondaryColor = (PlayerColor)secondarySelection;
             configOptions.accentColor = (PlayerColor)accentSelection;
             // end of player options configuration
             introPop = false;
