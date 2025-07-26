@@ -433,7 +433,7 @@ public class AudioManager : MonoBehaviour
             }
             if (plays[i].playTimer == 0f && (plays[i].source == null || !plays[i].source.isPlaying))
             {
-                if (plays[i].source.volume > 0f && 
+                if (plays[i].source != null && plays[i].source.volume > 0f && 
                     (sounds[plays[i].soundIndex].type == AType.SFXLoop || sounds[plays[i].soundIndex].type == AType.MusicLoop))
                 {
                     // set timer for loop

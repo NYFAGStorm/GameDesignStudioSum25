@@ -337,6 +337,7 @@ public static class MagicSystem
                 retSpell.castDuration = 4320f;
                 retSpell.castAOE = 2f; // 3x3 plot range
                 break;
+            // level 7
             case SpellType.DaylightII:
                 retSpell.name = "Daylight II";
                 retSpell.cooldownDuration = 300f;

@@ -291,15 +291,18 @@ public class CameraManager : MonoBehaviour
                 rainVFX.Play();
             }
         }
-        // play all weather sfx as outdoors
-        wm.SFXForIndoors(false);
+        if (wm != null)
+        {
+            // play all weather sfx as outdoors
+            wm.SFXForIndoors(false);
+        }
     }
 
     /// <summary>
     /// Sets the camera mode to lock in a position and pan to follow player
     /// </summary>
     /// <param name="camPosition"></param>
-    public void SetCameraPanMode( Vector3 camPosition )
+    public void SetCameraPanMode(Vector3 camPosition)
     {
         gameObject.transform.position = camPosition;
         savedPostion = camPosition;
@@ -312,8 +315,11 @@ public class CameraManager : MonoBehaviour
             rainOn = rainVFX.isPlaying;
             rainBox.SetActive(false);
         }
-        // play all weather vfx as indoors
-        wm.SFXForIndoors(true);
+        if (wm != null)
+        {
+            // play all weather vfx as indoors
+            wm.SFXForIndoors(true);
+        }
     }
 
     public void SetWorldViewIntro()

@@ -305,7 +305,7 @@ public class WeatherManager : MonoBehaviour
         if (stopSFX && sfxAudio != null)
         {
             sfxAudio.StopAllSounds();
-            AudioLowPassFilter lowPass = sfxAudio.gameObject.AddComponent<AudioLowPassFilter>();
+            AudioLowPassFilter lowPass = sfxAudio.gameObject.GetComponent<AudioLowPassFilter>();
             if (lowPass != null)
                 Destroy(lowPass);
         }
@@ -319,9 +319,10 @@ public class WeatherManager : MonoBehaviour
             AudioLowPassFilter lowPass = sfxAudio.gameObject.GetComponent<AudioLowPassFilter>();
             if (indoorSFX)
             {
-                if (lowPass == null)
+                if (lowPass == null && sfxAudio.gameObject.GetComponent<AudioSource>() != null)
                     lowPass = sfxAudio.gameObject.AddComponent<AudioLowPassFilter>();
-                lowPass.cutoffFrequency = 381;
+                if (lowPass != null)
+                    lowPass.cutoffFrequency = 381;
             }
             else if (lowPass != null)
                 Destroy(lowPass);
@@ -337,8 +338,12 @@ public class WeatherManager : MonoBehaviour
         {
             if (!indoorWeatherSFX)
                 return;
-            lowPass = sfxAudio.gameObject.AddComponent<AudioLowPassFilter>();
-            lowPass.cutoffFrequency = 381;
+            if (sfxAudio.gameObject.GetComponent<AudioSource>() != null)
+            {
+                lowPass = sfxAudio.gameObject.AddComponent<AudioLowPassFilter>();
+                if (lowPass != null)
+                    lowPass.cutoffFrequency = 381;
+            }
             return;
         }
         else if (!indoorWeatherSFX)

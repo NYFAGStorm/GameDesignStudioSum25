@@ -22,12 +22,13 @@ public class MarketManager : MonoBehaviour
     }
     
     [System.Serializable]
-    public struct MenuItem
+    public class MenuItem
     {
         public string itemName;
         public Texture2D itemIcon;
         public ItemType itemType;
         public PlantType plantType;
+        public ItemEffect effect; // scrolls and potions defined by item effect
         public bool availableToBuy;
         public int buyItemValue;
         public int sellItemValue;
@@ -51,7 +52,7 @@ public class MarketManager : MonoBehaviour
 
     private int[] maxMenuListPerLevel = new int[11];
     
-    int generalItems = 1; // fertilizer
+    int generalItems = 9; // fertilizer + 6 scrolls + 2 potions
     int plantItemTypes = 3; // seed, fruit, plant
 
     int commonPlants = 10;
@@ -533,6 +534,14 @@ public class MarketManager : MonoBehaviour
                                 PlantType p = iData.plant;
                                 iData.name += " (" + p.ToString() + ")";
                             }
+                            else if (menuItems[menuItemSelection].itemType == ItemType.Scroll ||
+                                menuItems[menuItemSelection].itemType == ItemType.Potion)
+                            {
+                                // magic item config
+                                iData.name = menuItems[menuItemSelection].itemName;
+                                iData.effects = new ItemEffect[1];
+                                iData.effects[0] = menuItems[menuItemSelection].effect;
+                            }
                         }
                         currentCustomer.playerData.inventory = InventorySystem.AddToInventory(currentCustomer.playerData.inventory, iData);
                     }
@@ -760,6 +769,7 @@ public class MarketManager : MonoBehaviour
         }
         else
             retMenuItem.itemName = iType.ToString();
+
         retMenuItem.itemType = iType;
         retMenuItem.plantType = pType;
         retMenuItem.availableToBuy = true;
@@ -807,6 +817,19 @@ public class MarketManager : MonoBehaviour
         SetMenuItemAvailable(ItemType.Plant, PlantType.Popcorn, false);
     }
 
+    void SetMenuItemEffect( MenuItem mItem, ItemEffect iEffect, string itemNameSuffix )
+    {
+        for (int i = 0; i < menuItems.Length; i++)
+        {
+            if (menuItems[i] == mItem)
+            {
+                menuItems[i].effect = iEffect;
+                menuItems[i].itemName += itemNameSuffix;
+                break;
+            }
+        }
+    }
+
     void InitializeMenu()
     {
         menuItems = new MenuItem[generalItems + (plantItemTypes *
@@ -816,6 +839,30 @@ public class MarketManager : MonoBehaviour
         int idx = 0;
 
         // -- GENERAL ITEMS --
+
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 100, 50);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Unknown)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 50, 25);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelOneSpellCharge, " (Level One)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 65, 32);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelTwoSpellCharge, " (Level Two)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 80, 40);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelThreeSpellCharge, " (Level Three)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 100, 50);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Four)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 120, 60);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Five)");
+
+        menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 30, 20);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearOneCooldown, " (Grey)");
+        menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 75, 50);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearAllCooldowns, " (White)");
+
+        // TODO: reset general item count when able to implement spell revision
+        //menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 150, 75);
+        //SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Six)");
+        //menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 200, 100);
+        //SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Seven)");
 
         menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
 

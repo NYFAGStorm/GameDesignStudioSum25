@@ -577,9 +577,15 @@ public class PlotManager : MonoBehaviour
                 data.condition = PlotCondition.Growing;
                 // PLOT EFFECTS:
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.FastGrowI))
-                    data.plant.adjustedGrowthRate += 0.05f;
+                    data.plant.adjustedGrowthRate += 0.33f;
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.MalnutritionI))
                     data.plant.adjustedGrowthRate -= 0.1f;
+                // PLANT EFFECTS:
+                if (data.plant.type == PlantType.WalkingStick)
+                {
+                    data.plant.plantEffects = new PlantEffect[1];
+                    data.plant.plantEffects[0] = PlantEffect.WalkingStickScrollHarvest;
+                }
                 break;
             case PlotCondition.Uprooted:
                 // change ground texture
@@ -682,17 +688,35 @@ public class PlotManager : MonoBehaviour
                         // check if empty inventory slot availbale on player, drop loose if not
                         if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
                         {
+                            // TODO: unify the item data creation routine
                             // harvesting gives fruit
                             ItemData iData = InventorySystem.InitializeItem(ItemType.Fruit);
-                            if (iData == null)
-                                Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize fruit item. will ignore.");
+                            // (unless plant has a special effect)
+                            if (data.plant.plantEffects.Length == 0 || data.plant.plantEffects[0] != PlantEffect.WalkingStickScrollHarvest)
+                            {
+                                if (iData == null)
+                                    Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize fruit item. will ignore.");
+                                else
+                                {
+                                    iData.plant = data.plant.type;
+                                    iData.name += " (" + data.plant.plantName.ToString() + ")";
+                                    // transfer properties of fruit to item (revise item data)
+                                    iData.size = data.plant.growth;
+                                    iData.quality = data.plant.quality;
+                                }
+                            }
                             else
                             {
-                                iData.plant = data.plant.type;
-                                iData.name += " (" + data.plant.plantName.ToString() + ")";
-                                // transfer properties of fruit to item (revise item data)
-                                iData.size = data.plant.growth;
-                                iData.quality = data.plant.quality;
+                                iData = InventorySystem.InitializeItem(ItemType.Scroll);
+                                if (iData == null)
+                                    Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize scroll item. will ignore.");
+                                else
+                                {
+                                    iData.plant = PlantType.Default;
+                                    iData.name += " (Unknown)";
+                                    iData.effects = new ItemEffect[1];
+                                    iData.effects[0] = ItemEffect.ScrollRandomSpellCharge;
+                                }
                             }
                             currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
                         }
@@ -703,11 +727,29 @@ public class PlotManager : MonoBehaviour
                             target.z -= 0.01f; // in front of plant
                             // harvesting drops fruit
                             LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
-                            // transfer properties of fruit to item (revise item data)
-                            loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
-                            loose.inv.items[0].size = data.plant.growth;
-                            loose.inv.items[0].quality = data.plant.quality;
-                            ism.SpawnItem(loose, gameObject.transform.position, target, true);
+                            // (unless plant has a special effect)
+                            if ( data.plant.plantEffects.Length == 0 || data.plant.plantEffects[0] != PlantEffect.WalkingStickScrollHarvest)
+                            { 
+                                // transfer properties of fruit to item (revise item data)
+                                loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
+                                loose.inv.items[0].size = data.plant.growth;
+                                loose.inv.items[0].quality = data.plant.quality;
+                                ism.SpawnItem(loose, gameObject.transform.position, target, true);
+                            }
+                            else
+                            {
+                                loose = InventorySystem.CreateItem(ItemType.Scroll);
+                                if (loose == null)
+                                    Debug.LogWarning("--- PlotManager [HarvestPlant] : unable to initialize scroll item. will ignore.");
+                                else
+                                {
+                                    // configure special scroll harvest
+                                    loose.inv.items[0].name += " (Unknown)";
+                                    loose.inv.items[0].effects = new ItemEffect[1];
+                                    loose.inv.items[0].effects[0] = ItemEffect.ScrollRandomSpellCharge;
+                                    ism.SpawnItem(loose, gameObject.transform.position, target, true);
+                                }
+                            }
                         }
                     }
                     // harvesting may drop seed
@@ -974,7 +1016,7 @@ public class PlotManager : MonoBehaviour
             GUI.Label(r, s, g);
         }
 
-        if (currentPlayer == null || currentPlayer.hidePlayerHUD)
+        if (currentPlayer == null)
             return;
 
         if (harvestDisplayTimer == 0f && !actionProgressDisplay)

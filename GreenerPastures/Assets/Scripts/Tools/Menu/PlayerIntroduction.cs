@@ -1361,7 +1361,7 @@ public class PlayerIntroduction : MonoBehaviour
                             // eden miffed that player dug up plant
                             currentBeat.action = ScriptedBeatAction.Dialog;
                             currentBeat.transition = ScriptedBeatTransition.PlayerResponse;
-                            currentBeat.dialogLine = "... Well, I supposed you know what you're doing.";
+                            currentBeat.dialogLine = "... Well, I suppose you know what you're doing.";
                             dialogPop = true;
                             cancelIntro = true;
                         }
@@ -1392,6 +1392,7 @@ public class PlayerIntroduction : MonoBehaviour
                                 grow = 0.618f;
                             else
                                 grow = 0.9f;
+                            managedPlot.data.plant.quality += .1f; // eden magic grow quality buff
                         }
                         else
                         {
