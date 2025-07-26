@@ -948,7 +948,7 @@ public class GreenerGameManager : MonoBehaviour
         pos.y = -3.67f;
         pos.z = -2.5f;
         pos.w = 0f;
-        game.islands[1].tports[2] = IslandSystem.InitializeTeleportNode("market", 0, pos, true);
+        game.islands[1].tports[2] = IslandSystem.InitializeTeleportNode("market", 1, pos, true);
         game.islands[1].tports[2].cameraMode = CameraManager.CameraMode.PanFollow;
         // cam position offset from island location
         pos.x = -.381f + game.islands[1].location.x;

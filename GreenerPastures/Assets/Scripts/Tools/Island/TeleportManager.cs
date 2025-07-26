@@ -4,7 +4,6 @@ public class TeleportManager : MonoBehaviour
 {
     // Author: Glenn Storm
     // This handles teleport pads, linked together in pairs
-    // REVIEW: characters only? players only?
 
     public string teleporterTag;
     public GameObject teleportSubject;
@@ -23,9 +22,19 @@ public class TeleportManager : MonoBehaviour
 
     private AudioManager sfxAudio;
 
+    public enum FadeProgress
+    {
+        Default,
+        FadeToBlack,
+        FadeFromBlack
+    }
+    private FadeProgress fadeProgress;
+    private float fadeTimer;
+
     const float TELEPORTDURATION = 0.5f;
     const float TELEPORTPADRADUIS = 0.25f;
     const float TELEPORTCHECKINTERVAL = 1f;
+    const float FADETIME = .618f;
 
 
     void Start()
@@ -75,15 +84,12 @@ public class TeleportManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-            teleportCheckTimer = TELEPORTCHECKINTERVAL;
+            teleportCheckTimer = TELEPORTCHECKINTERVAL / 2f;
         }
     }
 
     void Update()
     {
-        // hide silent teleport node
-        gameObject.transform.GetChild(0).GetComponent<Renderer>().enabled = (!silentTeleport);
-
         // run teleport timer
         if (teleportTimer > 0f)
         {
@@ -93,6 +99,11 @@ public class TeleportManager : MonoBehaviour
                 teleportTimer = 0f;
                 DepositTeleported();
                 teleportActive = false;
+                if (silentTeleport)
+                {
+                    fadeTimer = FADETIME;
+                    fadeProgress = FadeProgress.FadeFromBlack;
+                }
             }
         }
 
@@ -100,14 +111,31 @@ public class TeleportManager : MonoBehaviour
         if (teleportActive)
             return;
 
+        // run fade timer for fade from black
+        if (silentTeleport && fadeTimer > 0f)
+        {
+            fadeTimer -= Time.deltaTime;
+            if (fadeTimer < 0f)
+            {
+                // reset
+                fadeTimer = 0;
+                fadeProgress = FadeProgress.Default;
+                pairedPad.teleportActive = false;
+            }
+        }
+
+        // wait between checks for player proximity
         if (teleportCheckTimer > 0f)
         {
             teleportCheckTimer -= Time.deltaTime;
             if (teleportCheckTimer > 0f)
                 return;
             teleportCheckTimer = TELEPORTCHECKINTERVAL;
+            // hide silent teleport node , show normal teleport node
+            gameObject.transform.GetChild(0).GetComponent<Renderer>().enabled = (!silentTeleport);
         }
 
+        // check for player on teleport pad
         PlayerControlManager[] players = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
         for (int i=0; i<players.Length; i++)
         {
@@ -133,14 +161,22 @@ public class TeleportManager : MonoBehaviour
         teleportSubject = subject;
         // de-materialize teleport subject
         teleportSubject.GetComponent<PlayerControlManager>().characterFrozen = true;
-        Renderer[] rends = subject.GetComponentsInChildren<Renderer>();
-        foreach (Renderer r in rends)
+        // if not silent teleport with fade, hide subject
+        if (silentTeleport)
+            fadeProgress = FadeProgress.FadeToBlack;
+        else
         {
-            r.enabled = false;
+            Renderer[] rends = subject.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in rends)
+            {
+                r.enabled = false;
+            }
         }
 
         // engage teleport
         teleportActive = true;
+        if (silentTeleport)
+            pairedPad.teleportActive = true;
         teleportTimer = TELEPORTDURATION;
     }
 
@@ -154,7 +190,10 @@ public class TeleportManager : MonoBehaviour
         }
 
         // teleport location
-        pairedPad.LaunchTeleportEffects();
+        if (silentTeleport)
+            fadeProgress = FadeProgress.FadeFromBlack;
+        else
+            pairedPad.LaunchTeleportEffects();
         teleportSubject.transform.position = pairedPad.transform.position;
         // materialize teleport subject
         PlayerControlManager pcm = teleportSubject.GetComponent<PlayerControlManager>();
@@ -168,6 +207,8 @@ public class TeleportManager : MonoBehaviour
 
         // handle local player camera manager changes for node destination
         pairedPad.HandleLocalCamera();
+        if (silentTeleport)
+            pairedPad.HoldPairedTeleportPad();
 
         // hold player to new location
         pcm.playerData.island.w = pairedPad.islandRadius;
@@ -192,6 +233,11 @@ public class TeleportManager : MonoBehaviour
         // sfx
         if (sfxAudio != null)
             sfxAudio.StartSound("Teleport", gameObject, 0f, 6.18f, .381f);
+    }
+
+    public void HoldPairedTeleportPad()
+    {
+        teleportCheckTimer = TELEPORTCHECKINTERVAL;
     }
 
     public void HandleLocalCamera()
@@ -221,5 +267,31 @@ public class TeleportManager : MonoBehaviour
                     break;
             }
         }
+    }
+
+    void OnGUI()
+    {
+        if ( fadeProgress == FadeProgress.Default )
+            return;
+
+        Rect r = new Rect();
+        float w = Screen.width;
+        float h = Screen.height;
+
+        r.x = 0f;
+        r.y = 0f;
+        r.width = w;
+        r.height = h;
+
+        Texture2D t = Texture2D.whiteTexture;
+
+        Color c = Color.black;
+        if (fadeProgress == FadeProgress.FadeFromBlack)
+            c.a = fadeTimer / FADETIME;
+        else if (fadeProgress == FadeProgress.FadeToBlack)
+            c.a = 1f - (teleportTimer / TELEPORTDURATION);
+        GUI.color = c;
+
+        GUI.DrawTexture(r, t);
     }
 }
