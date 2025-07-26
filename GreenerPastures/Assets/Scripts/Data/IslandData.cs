@@ -8,6 +8,7 @@ public struct TPortNodeConfig
     public PositionData location;
     public CameraManager.CameraMode cameraMode;
     public PositionData cameraPosition;
+    public bool silent;
 }
 
 public enum StructureType

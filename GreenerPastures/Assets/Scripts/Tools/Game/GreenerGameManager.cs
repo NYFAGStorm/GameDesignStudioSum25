@@ -869,17 +869,17 @@ public class GreenerGameManager : MonoBehaviour
         pos.y = 0f;
         pos.z = 0.75f;
         pos.w = 0f;
-        game.islands[0].tports[0] = IslandSystem.InitializeTeleportNode("tower", 0, pos);
+        game.islands[0].tports[0] = IslandSystem.InitializeTeleportNode("tower", 0, pos, true);
         game.islands[0].tports[0].cameraMode = CameraManager.CameraMode.Follow;
         pos.x = 1f;
         pos.y = -3.67f;
         pos.z = -2.5f;
         pos.w = 0f;
-        game.islands[0].tports[1] = IslandSystem.InitializeTeleportNode("tower", 1, pos);
+        game.islands[0].tports[1] = IslandSystem.InitializeTeleportNode("tower", 1, pos, true);
         game.islands[0].tports[1].cameraMode = CameraManager.CameraMode.PanFollow;
         // cam position offset from island location
         pos.x = 1f + game.islands[0].location.x;
-        pos.y = -1.17f + game.islands[0].location.y;
+        pos.y = -1.618f + game.islands[0].location.y;
         pos.z = -3f + game.islands[0].location.z;
         pos.w = 0f;
         game.islands[0].tports[1].cameraPosition = pos;
@@ -887,7 +887,7 @@ public class GreenerGameManager : MonoBehaviour
         pos.y = 0f;
         pos.z = -4f;
         pos.w = 0f;
-        game.islands[0].tports[2] = IslandSystem.InitializeTeleportNode("centralTport", 0, pos);
+        game.islands[0].tports[2] = IslandSystem.InitializeTeleportNode("centralTport", 0, pos, false);
         game.islands[0].structures = new StructureData[2];
         pos.x = 1f;
         pos.y = 1f;
@@ -937,22 +937,22 @@ public class GreenerGameManager : MonoBehaviour
         pos.y = 0f;
         pos.z = 4f;
         pos.w = 0f;
-        game.islands[1].tports[0] = IslandSystem.InitializeTeleportNode("centralTport", 1, pos);
+        game.islands[1].tports[0] = IslandSystem.InitializeTeleportNode("centralTport", 1, pos, false);
         pos.x = 0f;
         pos.y = 0f;
         pos.z = -1f;
         pos.w = 0f;
-        game.islands[1].tports[1] = IslandSystem.InitializeTeleportNode("market", 0, pos);
+        game.islands[1].tports[1] = IslandSystem.InitializeTeleportNode("market", 0, pos, true);
         game.islands[1].tports[1].cameraMode = CameraManager.CameraMode.Follow;
         pos.x = 0f;
         pos.y = -3.67f;
         pos.z = -2.5f;
         pos.w = 0f;
-        game.islands[1].tports[2] = IslandSystem.InitializeTeleportNode("market", 0, pos);
+        game.islands[1].tports[2] = IslandSystem.InitializeTeleportNode("market", 0, pos, true);
         game.islands[1].tports[2].cameraMode = CameraManager.CameraMode.PanFollow;
         // cam position offset from island location
         pos.x = -.381f + game.islands[1].location.x;
-        pos.y = -1.1f + game.islands[1].location.y;
+        pos.y = -1.618f + game.islands[1].location.y;
         pos.z = -3f + game.islands[1].location.z;
         pos.w = 0f;
         game.islands[1].tports[2].cameraPosition = pos;

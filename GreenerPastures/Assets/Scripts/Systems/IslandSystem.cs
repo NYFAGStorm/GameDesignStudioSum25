@@ -28,8 +28,9 @@ public class IslandSystem
     /// <param name="tPortTag">teleport node tag</param>
     /// <param name="tPortIndex">teleport node index (0 or 1 for paired nodes)</param>
     /// <param name="tPortLocation">teleport location</param>
+    /// <param name="silent">is this teleporter hidden?</param>
     /// <returns>initialized teleport node data</returns>
-    public static TPortNodeConfig InitializeTeleportNode( string tPortTag, int tPortIndex, PositionData tPortLocation )
+    public static TPortNodeConfig InitializeTeleportNode( string tPortTag, int tPortIndex, PositionData tPortLocation, bool silent )
     {
         TPortNodeConfig retTport = new TPortNodeConfig();
 
@@ -38,6 +39,7 @@ public class IslandSystem
         retTport.location = tPortLocation;
         retTport.cameraMode = CameraManager.CameraMode.Follow; // default config
         retTport.cameraPosition = new PositionData();
+        retTport.silent = silent;
 
         return retTport;
     }

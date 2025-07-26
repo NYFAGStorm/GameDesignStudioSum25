@@ -109,6 +109,8 @@ public class PlayerIntroduction : MonoBehaviour
 
     private Texture2D[] buttonTex;
 
+    private AudioManager sfxAudio;
+
     const float DEFAULTINTROTIME = 0.618f;
     const float PAUSETIME = 1f;
     const float LONGPAUSETIME = 2f;
@@ -118,6 +120,9 @@ public class PlayerIntroduction : MonoBehaviour
     void Start()
     {
         // validate
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -1279,10 +1284,22 @@ public class PlayerIntroduction : MonoBehaviour
                     vfx.transform.position = vfxPos;
                     if (vfx.GetComponentInChildren<SpriteRenderer>()!= null)
                         vfx.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
+                    GameObject sfxTemp = new GameObject();
+                    sfxTemp.name = "Teleport SFX Obj";
+                    sfxTemp.transform.position = vfxPos;
                     if (currentBeat.islandPos.w >= 0f)
+                    {
+                        // teleporter
+                        sfxAudio.StartSound("Teleport", sfxTemp, 0f, 6.18f);
+                        Destroy(sfxTemp, 2.2f);
                         Destroy(vfx, 1f);
+                    }
                     else
+                    {
+                        // magic
+                        sfxAudio.StartSound("Magic Cast 2", vfx, 0f, 6.18f);
                         Destroy(vfx, 3.81f);
+                    }
                     break;
                 case ScriptedBeatAction.ItemSpawn:
                     // item type

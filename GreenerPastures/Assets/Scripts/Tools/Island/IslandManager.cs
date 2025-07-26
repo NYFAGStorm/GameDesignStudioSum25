@@ -167,6 +167,7 @@ public class IslandManager : MonoBehaviour
             // configure to parent island
             tm.islandObj = islandObj;
             tm.islandRadius = island.location.w * 7f;
+            tm.silentTeleport = island.tports[i].silent;
             // position node
             Vector3 pos = Vector3.zero;
             pos.x = island.tports[i].location.x;

@@ -14,6 +14,7 @@ public class TeleportManager : MonoBehaviour
     public Vector3 cameraPanModePosition;
     public GameObject islandObj; // hold player to this center
     public float islandRadius = 7f;
+    public bool silentTeleport;
 
     private bool teleportActive;
     private float teleportTimer;
@@ -80,6 +81,9 @@ public class TeleportManager : MonoBehaviour
 
     void Update()
     {
+        // hide silent teleport node
+        gameObject.transform.GetChild(0).GetComponent<Renderer>().enabled = (!silentTeleport);
+
         // run teleport timer
         if (teleportTimer > 0f)
         {
@@ -178,10 +182,12 @@ public class TeleportManager : MonoBehaviour
     public void LaunchTeleportEffects()
     {
         teleportCheckTimer = 3f;
+        if (silentTeleport)
+            return;
         // vfx
         GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
         vfx.transform.position = transform.position;
-        vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = Color.yellow;
+        vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = new Color(1f, 1f,.381f,1f);
         Destroy(vfx, 1f);
         // sfx
         if (sfxAudio != null)
