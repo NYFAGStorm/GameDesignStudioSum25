@@ -34,10 +34,7 @@ public class CharacterAnimManager : MonoBehaviour
         // initialize
         if (enabled)
         {
-            type = PlayerModelType.Male;
-            pose = CharacterPose.Front;
             previousPose = pose;
-            characterLayers = new Texture2D[0];
         }
     }
 
@@ -50,17 +47,21 @@ public class CharacterAnimManager : MonoBehaviour
         HandleImageFlip();
     }
 
-    void ProcessMoveVector()
-    {
-        pose = CharacterPose.Side;
-        if (characterMoveVector.z < 0f && characterMoveVector.x == 0f) // REVIEW:
-            pose = CharacterPose.Front;
-        imageFlipped = (characterMoveVector.x < 0f && pose == CharacterPose.Side);
-    }
-
     public bool GetImageFlipped()
     {
         return imageFlipped;
+    }
+
+    void ProcessMoveVector()
+    {
+        if (characterMoveVector.z < 0f)
+            pose = CharacterPose.Front;
+        if (Mathf.Abs(characterMoveVector.x) > 0f)
+            pose = CharacterPose.Side;
+        if (imageFlipped && characterMoveVector.x > 0f)
+            imageFlipped = false;
+        if (!imageFlipped && characterMoveVector.x < 0f)
+            imageFlipped = true;
     }
 
     void UpdatePoseLayers()
@@ -100,14 +101,21 @@ public class CharacterAnimManager : MonoBehaviour
     public void ConfigureAppearance( PlayerOptions options )
     {
         if (rend == null)
-            return;
+        {
+            rend = gameObject.GetComponent<Renderer>();
+            if (rend == null)
+            {
+                Debug.LogError("--- CharacterAnimManager [ConfigureAppearance] : " + gameObject.name + " no renderer found. aborting.");
+                enabled = false;
+            }
+        }
 
         type = options.model;
 
         string artNameBase = "Wizard ";
         string charType = type.ToString() + " ";
         string poseName = pose.ToString() + " ";
-        string suffix = "128 ";
+        string suffix = "128 "; // REVIEW: revise when art update is in
         string currentArtSet = artNameBase + charType + poseName + suffix;
 
         // store layer images
@@ -129,7 +137,7 @@ public class CharacterAnimManager : MonoBehaviour
         characterLayers[10] = (Texture2D)Resources.Load(currentArtSet + "Medium");
         characterLayers[11] = (Texture2D)Resources.Load(currentArtSet + "Dark");
 
-        // apply to character art
+        // apply front pose to current character art
         currentArtSet = artNameBase + charType + poseName + suffix;
         // line (_LineArt)
         rend.material.SetTexture("_LineArt", characterLayers[0]);

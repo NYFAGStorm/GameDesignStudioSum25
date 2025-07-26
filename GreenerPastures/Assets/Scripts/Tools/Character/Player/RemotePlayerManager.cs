@@ -59,7 +59,7 @@ public class RemotePlayerManager : MonoBehaviour
             {
                 PlayerData pData = GameSystem.GetProfilePlayer(gData, profileID);
                 if (pData != null)
-                    pam.ConfigureAppearance(pData.options);
+                    ConfigureAppearance(pData.options);
             }
         }
         remotePlayerIntialized = true;
@@ -100,5 +100,13 @@ public class RemotePlayerManager : MonoBehaviour
         pos.z = playerPosition.z;
         pam.characterMoveVector = moveVector;
         gameObject.transform.position = pos;
+    }
+
+    public void ConfigureAppearance( PlayerOptions options )
+    {
+        if (pam != null)
+            pam.ConfigureAppearance(options);
+        else
+            Debug.LogWarning("--- RemotePlayerManager [ConfigureAppearance] : no character anim manager found. will ignore.");
     }
 }
