@@ -54,10 +54,17 @@ public class CharacterAnimManager : MonoBehaviour
 
     void ProcessMoveVector()
     {
+        // force characters to predominently face forward while moving to camera
+        if (characterMoveVector.z < 0f && 
+            (Mathf.Abs(characterMoveVector.x) < Mathf.Abs(characterMoveVector.z)))
+            characterMoveVector.x = 0f;
+
+        // detect pose changes
         if (characterMoveVector.z < 0f)
             pose = CharacterPose.Front;
         if (Mathf.Abs(characterMoveVector.x) > 0f)
             pose = CharacterPose.Side;
+        // detect change in facing direction
         if (imageFlipped && characterMoveVector.x > 0f)
             imageFlipped = false;
         if (!imageFlipped && characterMoveVector.x < 0f)

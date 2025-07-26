@@ -21,6 +21,7 @@ public class NPCController : MonoBehaviour
     public bool destinationReached; // readable as a call-back
 
     private Vector3 moveVector;
+    private Vector3 previousMoveVector;
     private CharacterAnimManager pam;
 
     const float MOVETARGETTHRESHOLD = 0.1f;
@@ -38,7 +39,15 @@ public class NPCController : MonoBehaviour
         // initialize
         if (enabled)
         {
-
+            // configure Eden appearance
+            PlayerOptions eden = new PlayerOptions();
+            eden.model = PlayerModelType.Female;
+            eden.hairColor = PlayerHairColor.ShadeG;
+            eden.skinColor = PlayerSkinColor.ToneG;
+            eden.accentColor = PlayerColor.ColorN;
+            eden.secondaryColor = PlayerColor.ColorF;
+            eden.mainColor = PlayerColor.ColorA;
+            pam.ConfigureAppearance(eden);
         }
     }
 
@@ -71,6 +80,8 @@ public class NPCController : MonoBehaviour
         else
             move.Normalize();
         moveVector = move * movementSpeed * Time.deltaTime;
+        // used for anim control
+        previousMoveVector = moveVector;
     }
 
     bool HandleMovement()
@@ -99,7 +110,7 @@ public class NPCController : MonoBehaviour
 
     void HandleCharacterAnimation()
     {
-        pam.characterMoveVector = moveVector;
+        pam.characterMoveVector = previousMoveVector;
     }
 
     bool IsAtTarget()
