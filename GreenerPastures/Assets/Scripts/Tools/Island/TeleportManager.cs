@@ -187,7 +187,7 @@ public class TeleportManager : MonoBehaviour
         // vfx
         GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
         vfx.transform.position = transform.position;
-        vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = new Color(1f, 1f,.381f,1f);
+        vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = new Color(1f, .9f,.381f,1f);
         Destroy(vfx, 1f);
         // sfx
         if (sfxAudio != null)
