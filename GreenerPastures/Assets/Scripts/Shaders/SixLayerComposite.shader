@@ -105,14 +105,14 @@ Shader "Unlit/Six Layer Composite"
                 alt = alt * _AltCol;
                 // apply main fill color
                 col = col * _Color;
-                // lay hair on top of main
-                col = lerp(col,har,har.a);
-                // lay skin on top of main
-                col = lerp(col,skn,skn.a);
                 // lay alt on top of main
                 col = lerp(col,alt,alt.a);
                 // lay accent on top of main
                 col = lerp(col,acc,acc.a);
+                // lay skin on top of main
+                col = lerp(col,skn,skn.a);
+                // lay hair on top of main
+                col = lerp(col,har,har.a);
                 // lay line on top of main
                 col = lerp(col,lin,lin.a);
                 // clamp add alpha from all
