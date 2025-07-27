@@ -26,6 +26,38 @@ public class ChickenRaceManager : MonoBehaviour
     }
     public RaceState raceState;
 
+    public enum ChickenAnimSet
+    {
+        Default,
+        Idle,
+        Run,
+        Win
+    }
+
+    [System.Serializable]
+    public struct ChickenFrame
+    {
+        public ChickenAnimSet anim;
+        public Texture2D[] lineFrames;
+        public Texture2D[] fillFrames;
+        public Texture2D[] colorFrames;
+        public float frameRate;
+        public float rateVariance;
+    }
+    public ChickenFrame[] chickenAnimation;
+
+    [System.Serializable]
+    public struct ChickenRunner
+    {
+        public string chickenID; // ?        
+        public ChickenAnimSet anim;
+        public int animFrame;
+        public float animTimer;
+        public Vector2 position;
+        public bool faceLeft;
+    }
+    public ChickenRunner[] chickens;
+
     public Texture2D raceDishOL;
     public Texture2D[] goldOLs;
     public int goldOLIndex;
@@ -50,7 +82,6 @@ public class ChickenRaceManager : MonoBehaviour
     private Texture2D currentBackground;
 
     private Texture2D[] buttonTex;
-
 
     // -- chicken race variables --
 
