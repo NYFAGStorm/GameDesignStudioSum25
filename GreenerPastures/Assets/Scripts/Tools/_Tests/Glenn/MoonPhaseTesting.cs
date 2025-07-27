@@ -27,6 +27,12 @@ public class MoonPhaseTesting : MonoBehaviour
     public int roundedResult;
     //
 
+    // -- sine waves
+    [Range(0f, 1f)]
+    public float percentage;
+    public float sineWaveResult;
+    //
+
     void Start()
     {
         
@@ -34,6 +40,9 @@ public class MoonPhaseTesting : MonoBehaviour
 
     void Update()
     {
+        // - sine waves
+        sineWaveResult = 1f - Mathf.Abs( Mathf.Sin((percentage) * 2f * Mathf.PI) );
+
         // - float rounding
         roundedResult = Mathf.RoundToInt((valueToRound * valueMultiplier) + 0.5f);
         roundedResult = Mathf.Clamp(roundedResult, 1, (int)valueMultiplier);

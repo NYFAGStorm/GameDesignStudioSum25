@@ -744,13 +744,15 @@ MonoBehaviour:
   dayOfMonth: 1
   moonPhase: 0
   moonRenderer: {fileID: 519996940}
-  light: 0
-  med: 0
-  heavy: 0
+  lightVal: 0
+  medVal: 0
+  heavyVal: 0
   drivingValue: 0
   valueToRound: 0
   valueMultiplier: 5
   roundedResult: 0
+  percentage: 0
+  sineWaveResult: 0
 --- !u!4 &1039133280
 Transform:
   m_ObjectHideFlags: 0

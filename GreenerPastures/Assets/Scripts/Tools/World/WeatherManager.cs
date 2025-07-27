@@ -35,13 +35,13 @@ public class WeatherManager : MonoBehaviour
     const float WINDFACTOROFFSET = 3.81f;
     const float WINDVECTOROFFSET = 0.1f;
     const float WINDCHANGEMULTIPLIER = 0.618f;
-    const float WINDWEIGHT = 0.5f; //0.0381f;
+    const float WINDWEIGHT = 0.0381f;
 
     const float CLOUDFACTORSCALE = 0.618f;
     const float CLOUDFACTOROFFSET = 6.18f;
     const float CLOUDVECTOROFFSET = 0.2f;
     const float CLOUDCHANGEMULTIPLIER = 0.381f;
-    const float CLOUDWEIGHT = 0.01f; //0.00618f;
+    const float CLOUDWEIGHT = 0.00618f;
 
     const float RAINCLOUDTHRESHOLD = 0.618f;
     const float RAINWATERINGRATE = 38.1f;
@@ -379,13 +379,15 @@ public class WeatherManager : MonoBehaviour
         cloudVector = GetProceduralResult(CLOUDFACTORSCALE, CLOUDVECTOROFFSET) - cloudFactor;
 
         // adjust wind
-        targetWeather.x = Mathf.Clamp01(targetWeather.x - WINDWEIGHT + (windVector * WINDCHANGEMULTIPLIER));
+        float variableWindWeight = WINDWEIGHT + (0.5799f * (1f - Mathf.Abs(Mathf.Sin(tim.dayProgress * 2f * Mathf.PI))));
+        targetWeather.x = Mathf.Clamp01(targetWeather.x - variableWindWeight + (windVector * WINDCHANGEMULTIPLIER));
         // calculate wind direction
         targetWeather.y = ((windFactor * 2f) - 1f) / Mathf.Abs((windFactor * 2f) - 1f);
         if (targetWeather.x == 0)
             targetWeather.y = 0f;
         // adjust cloud
-        targetWeather.z = Mathf.Clamp01(targetWeather.z - CLOUDWEIGHT + (cloudVector * CLOUDCHANGEMULTIPLIER));
+        float variableCloudWeight = CLOUDWEIGHT + (0.03192f * (1f - Mathf.Abs(Mathf.Sin(tim.dayProgress * 2f * Mathf.PI))));
+        targetWeather.z = Mathf.Clamp01(targetWeather.z - variableCloudWeight + (cloudVector * CLOUDCHANGEMULTIPLIER));
         // calculate rain (based on clouds)
         targetWeather.w = Mathf.Clamp01(targetWeather.z - RAINCLOUDTHRESHOLD) * (1f / (1f - RAINCLOUDTHRESHOLD));
 
