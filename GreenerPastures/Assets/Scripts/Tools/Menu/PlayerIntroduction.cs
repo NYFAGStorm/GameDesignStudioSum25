@@ -276,6 +276,9 @@ public class PlayerIntroduction : MonoBehaviour
 
     void FindManagedPlot()
     {
+        // find managed plot, one used during intro
+        // - and - while we're at it, tell all plots we're in the intro tutorial
+        // (show plot stats even if player hud hidden)
         PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
         for (int i = 0; i < plots.Length; i++)
         {
@@ -283,13 +286,22 @@ public class PlayerIntroduction : MonoBehaviour
                 plots[i].gameObject.transform.localPosition.z == -2f)
             {
                 managedPlot = plots[i];
-                break;
             }
+            plots[i].IntroRunning(true);
         }
         if (managedPlot == null)
         {
             Debug.LogError("--- PlayerIntroduction [FindManagedPlot] : no managed plot found at local position 2,0,-2 in scene. aborting.");
             enabled = false;
+        }
+    }
+
+    void NotifyPlotsEndIntro()
+    {
+        PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+        for (int i = 0; i < plots.Length; i++)
+        {
+            plots[i].IntroRunning(false);
         }
     }
 
@@ -1526,6 +1538,7 @@ public class PlayerIntroduction : MonoBehaviour
                     break;
                 case ScriptedBeatAction.EndIntro:
                     introRunning = false;
+                    NotifyPlotsEndIntro();
                     TakeOverHUD(false);
                     Destroy(eden.gameObject, 10f);
                     pcm.AwardXP(PlayerData.XP_COMPLETETUTORIAL);
@@ -1537,6 +1550,7 @@ public class PlayerIntroduction : MonoBehaviour
         if (currentBeatIndex >= introBeats.Length)
         {
             introRunning = false;
+            NotifyPlotsEndIntro();
             TakeOverHUD(false);
             Destroy(eden.gameObject, 10f);
             return;
@@ -1839,6 +1853,7 @@ public class PlayerIntroduction : MonoBehaviour
                 if (currentBeatIndex >= introBeats.Length)
                 {
                     introRunning = false;
+                    NotifyPlotsEndIntro();
                     TakeOverHUD(false);
                     return;
                 }

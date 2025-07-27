@@ -52,6 +52,8 @@ public class PlotManager : MonoBehaviour
 
     private AudioManager sfxAudio;
 
+    private bool introRunning;
+
     const float CURSORPULSEDURATION = 0.618f;
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
@@ -241,6 +243,11 @@ public class PlotManager : MonoBehaviour
         }
     }
 
+    public void IntroRunning( bool runningNow )
+    {
+        introRunning = runningNow;
+    }
+
     /// <summary>
     /// Progresses all plot properties by given time passage amount
     /// </summary>
@@ -397,6 +404,8 @@ public class PlotManager : MonoBehaviour
     {
         if (cursor == null)
             return;
+        if (!cursorActive && active)
+            actionProgress = 0f; // begin new plot active with zero progress
         cursorActive = active;
         SetCursorHighlight(0f);
         cursorTimer = 0f;
@@ -1016,7 +1025,7 @@ public class PlotManager : MonoBehaviour
             GUI.Label(r, s, g);
         }
 
-        if (currentPlayer == null)
+        if (currentPlayer == null || (currentPlayer.hidePlayerHUD && !introRunning))
             return;
 
         if (harvestDisplayTimer == 0f && !actionProgressDisplay)
