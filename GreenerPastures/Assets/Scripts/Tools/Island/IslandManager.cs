@@ -49,9 +49,9 @@ public class IslandManager : MonoBehaviour
             // only change color on props without light
             if (propRenderers[i].gameObject.transform.parent.GetComponentInChildren<Light>() == null)
                 propRenderers[i].material.color = c;
-            // if this prop has a 2-color layered shader, change colors
+            // if this prop has a 3-color layered shader, change colors
             // ...find player who owns the island, see their options, get colors
-            if (propRenderers[i].material.shader.name == "Unlit/Two Layer Composite")
+            if (propRenderers[i].material.shader.name == "Unlit/Three Layer Composite")
             {
                 GameObject islandObj = propRenderers[i].gameObject.transform.parent.parent.gameObject;
                 Vector3 pos = islandObj.transform.position;
@@ -68,11 +68,15 @@ public class IslandManager : MonoBehaviour
                             Color m = PlayerSystem.GetPlayerColor(playerData[n].options.mainColor);
                             m *= Mathf.Clamp01(0.381f + (0.618f * aIntensity));
                             m.a = 1f;
+                            Color s = PlayerSystem.GetPlayerColor(playerData[n].options.secondaryColor);
+                            s *= Mathf.Clamp01(0.381f + (0.618f * aIntensity));
+                            s.a = 1f;
                             Color a = PlayerSystem.GetPlayerColor(playerData[n].options.accentColor);
                             a *= Mathf.Clamp01(0.381f + (0.618f * aIntensity));
                             a.a = 1f;
                             propRenderers[i].material.SetColor("_Color", m);
-                            propRenderers[i].material.SetColor("_AltCol", a);
+                            propRenderers[i].material.SetColor("_AltCol", s);
+                            propRenderers[i].material.SetColor("_AccentCol", a);
                             break;
                         }
                     }
