@@ -28,7 +28,6 @@ public class ChickenRaceManager : MonoBehaviour
 
     public enum ChickenAnimSet
     {
-        Default,
         Idle,
         Run,
         Win
@@ -56,7 +55,7 @@ public class ChickenRaceManager : MonoBehaviour
         public Vector2 position;
         public bool faceLeft;
     }
-    public ChickenRunner[] chickens;
+    private ChickenRunner[] chickens;
 
     public Texture2D raceDishOL;
     public Texture2D[] goldOLs;
@@ -330,16 +329,49 @@ public class ChickenRaceManager : MonoBehaviour
                 // we should never be here
                 break;
             case RaceState.Entering:
-                PlayerControlManager.PlayerActions pa = currentGuest.GetPlayerActions();
-                // allow player to play or exit
-                CheckGuestEngagement(pa);
+                // instructions and option to exit here only
+                CheckGuestEngagement();
+                break;
+            case RaceState.Betting:
+                // placing bet of gold and selecting chicken (allow bet 0 to just watch race)
+                CheckGuestBet();
+                break;
+            case RaceState.PreRace:
+                // set chickens ready
+                break;
+            case RaceState.Race:
+                // chickens run race
+                UpdateChickenRun();
+                break;
+            case RaceState.PostRace:
+                // race finish, winner circle celebration
+                break;
+            case RaceState.Rewarding:
+                // bets settled, gold awarded, return to entering state
+                UpdateRewardGuest();
                 break;
             case RaceState.Exiting:
+                // leaving chicken race stall
                 break;
         }
     }
 
-    void CheckGuestEngagement( PlayerControlManager.PlayerActions pa )
+    void CheckGuestEngagement()
+    {
+        PlayerControlManager.PlayerActions pa = currentGuest.GetPlayerActions();
+    }
+
+    void CheckGuestBet()
+    {
+        PlayerControlManager.PlayerActions pa = currentGuest.GetPlayerActions();
+    }
+
+    void UpdateChickenRun()
+    {
+
+    }
+
+    void UpdateRewardGuest()
     {
 
     }
@@ -376,19 +408,20 @@ public class ChickenRaceManager : MonoBehaviour
                 {
                     float amt = RandomSystem.GaussianRandom01() * chickenAnimation[chickens[i].animIndex].rateVariance;
                     amt -= chickenAnimation[chickens[i].animIndex].rateVariance * 0.5f;
-                    chickens[i].animTimer = chickenAnimation[chickens[i].animIndex].frameTime += amt;
+                    chickens[i].animTimer = chickenAnimation[chickens[i].animIndex].frameTime + amt;
                 }
                 // set frame (loop by default)
                 chickens[i].animFrame++;
                 if (chickens[i].animFrame >= chickenAnimation[chickens[i].animIndex].lineFrames.Length)
                     chickens[i].animFrame = 0;
+                // win and idle may flip
+                if (((ChickenAnimSet)chickens[i].animIndex == ChickenAnimSet.Idle || 
+                    (ChickenAnimSet)chickens[i].animIndex == ChickenAnimSet.Win) && 
+                    RandomSystem.FlatRandom01() < 0.381f)
+                    chickens[i].faceLeft = !chickens[i].faceLeft;
                 // idle variation
                 if ((ChickenAnimSet)chickens[i].animIndex == ChickenAnimSet.Idle)
-                {
-                    if (RandomSystem.FlatRandom01() < 0.381f)
-                        chickens[i].faceLeft = !chickens[i].faceLeft;
                     chickens[i].animFrame = Random.Range(0, 3);
-                }
             }
         }
     }
@@ -474,15 +507,31 @@ public class ChickenRaceManager : MonoBehaviour
                 r.width = -r.width;
             }
 
-            t = chickenAnimation[chickens[i].animIndex-1].fillFrames[frame];
+            t = chickenAnimation[chickens[i].animIndex].fillFrames[frame];
             GUI.color = c;
             GUI.DrawTexture(r, t); // fill
 
-            //t = chickenAnimation[chickens[i].animIndex].colorFrames[frame];
-            //GUI.color = c;
-            //GUI.DrawTexture(r, t); // color
+            /*
+            t = chickenAnimation[chickens[i].animIndex].colorFrames[frame];
+            switch (i)
+            {
+                case 0:
+                    c = Color.blue;
+                    break;
+                case 1:
+                    c = Color.green;
+                    break;
+                case 2:
+                    c = Color.red;
+                    break;
+            }
+            c.a = 0.1f;
+            GUI.color = c;
+            GUI.DrawTexture(r, t); // color
+            */
 
-            t = chickenAnimation[chickens[i].animIndex-1].lineFrames[frame];
+            t = chickenAnimation[chickens[i].animIndex].lineFrames[frame];
+            c = Color.white;
             GUI.color = c;
             GUI.DrawTexture(r, t); // line
             //
