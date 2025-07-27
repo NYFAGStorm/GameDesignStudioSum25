@@ -244,8 +244,8 @@ public class MagicCraftingManager : MonoBehaviour
                     libraryState = LibraryState.Activating;
                     libraryStateTimer = LIBRARYSTATETIMERMAX;
                     // configure cauldron grid size
-                    // REVIEW: based on player level (start 2x2, goes up one per 3 levels?)
-                    sizeOfCauldronGrid = 2 + Mathf.RoundToInt((pcm.playerData.level / 3f) - .5f);
+                    // REVIEW: per player level (start 2x2 level 1, goes up one per 2 levels, up to 5)
+                    sizeOfCauldronGrid = Mathf.RoundToInt(pcm.playerData.level / 2f) + 1;
                     sizeOfCauldronGrid = Mathf.Clamp(sizeOfCauldronGrid, 2, 5);
                     cauldronGridFilled = new bool[sizeOfCauldronGrid * sizeOfCauldronGrid];
                 }
