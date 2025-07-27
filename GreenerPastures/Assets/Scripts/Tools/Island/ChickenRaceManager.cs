@@ -35,7 +35,7 @@ public class ChickenRaceManager : MonoBehaviour
     }
 
     [System.Serializable]
-    public struct ChickenFrame
+    public struct ChickenFrames
     {
         public ChickenAnimSet anim;
         public Texture2D[] lineFrames;
@@ -44,13 +44,13 @@ public class ChickenRaceManager : MonoBehaviour
         public float frameRate;
         public float rateVariance;
     }
-    public ChickenFrame[] chickenAnimation;
+    public ChickenFrames[] chickenAnimation;
 
     [System.Serializable]
     public struct ChickenRunner
     {
         public string chickenID; // ?        
-        public ChickenAnimSet anim;
+        public int animIndex; // 
         public int animFrame;
         public float animTimer;
         public Vector2 position;
@@ -136,27 +136,209 @@ public class ChickenRaceManager : MonoBehaviour
 
     bool DetectPlayerGuest()
     {
-        bool retBool = false;
+        if (guestState != GuestState.Default && guestState != GuestState.Deactivating)
+            return true; // we must already have player engaged, skip
 
-        return retBool;
+        // if no player, run player check timer
+        if (currentGuest == null && playerCheckTimer > 0f)
+        {
+            playerCheckTimer -= Time.deltaTime;
+            if (playerCheckTimer < 0f)
+            {
+                playerCheckTimer = 0f;
+                // detect player in proximity
+                PlayerControlManager[] pcms = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+                // 
+                for (int i = 0; i < pcms.Length; i++)
+                {
+                    float dist = Vector3.Distance(gameObject.transform.position, pcms[i].gameObject.transform.position);
+                    if (dist < RACEPROXIMITYRANGE)
+                    {
+                        currentGuest = pcms[i];
+                        break;
+                    }
+                }
+                // if no player, reset check timer
+                if (currentGuest == null)
+                {
+                    playerCheckTimer = PLAYERCHECKTIME;
+                    if (leavingGuest != null)
+                    {
+                        // customer has left, reset
+                        leavingGuest = null;
+                        guestState = GuestState.Default;
+                        guestStateTimer = 0f;
+                    }
+                }
+                else if (leavingGuest != null && currentGuest == leavingGuest)
+                {
+                    // REVIEW: remain active until player has left?
+                    currentGuest = null;
+                    playerCheckTimer = PLAYERCHECKTIME;
+                }
+                else
+                {
+                    // customer engagement, activate
+                    currentGuest.characterFrozen = true;
+                    currentGuest.hidePlayerNameTag = true;
+                    currentGuest.hidePlayerHUD = true;
+                    // disable almanac
+                    InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                    if (iga != null)
+                        iga.enabled = false;
+                    // disable controls display
+                    InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+                    if (igc != null)
+                        igc.enabled = false;
+                    guestState = GuestState.Activating;
+                    guestStateTimer = GUESTSTATETIMERMAX;
+                }
+            }
+        }
+
+        return (currentGuest != null);
     }
 
-    void UpdateChickenFrames()
-    {
-
-    }
 
     void HandleGuestStates()
     {
+        if (guestStateTimer == 0f)
+            return;
 
+        if (guestStateTimer > 0f)
+        {
+            guestStateTimer -= Time.deltaTime;
+            if (guestStateTimer < 0f)
+            {
+                guestStateTimer = 0f;
+                // handle state
+                switch (guestState)
+                {
+                    case GuestState.Default:
+                        // we should never be here
+                        break;
+                    case GuestState.Activating:
+                        guestState = GuestState.Active;
+                        raceDisplay = true;
+                        raceState = RaceState.Entering;
+                        raceStateTimer = RACESTATETIMERMAX;
+                        fadingOverlay = true;
+                        qoe.enabled = false;
+                        break;
+                    case GuestState.Active:
+                        currentGuest.characterFrozen = false;
+                        currentGuest.freezeCharacterActions = false;
+                        currentGuest.hidePlayerHUD = false;
+                        // re-able almanac
+                        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                        if (iga != null)
+                            iga.enabled = true;
+                        // show controls display hud item
+                        InGameControls igc = GameObject.FindFirstObjectByType<InGameControls>();
+                        if (igc != null)
+                            igc.enabled = true;
+                        guestState = GuestState.Deactivating;
+                        guestStateTimer = GUESTSTATETIMERMAX;
+                        break;
+                    case GuestState.Deactivating:
+                        if (currentGuest != null)
+                        {
+                            leavingGuest = currentGuest;
+                            currentGuest = null;
+                        }
+                        // remain in this state until leaving guest not detected
+                        playerCheckTimer = PLAYERCHECKTIME;
+                        guestStateTimer = GUESTSTATETIMERMAX;
+                        qoe.enabled = true;
+                        break;
+                    default:
+                        Debug.LogWarning("--- ChickenRaceManager [HandleGuestStates] : guest state undefined. will ignore.");
+                        break;
+                }
+            }
+        }
     }
 
     void UpdateRaceStateTimer()
     {
-
+        if (raceStateTimer > 0f)
+        {
+            raceStateTimer -= Time.deltaTime;
+            if (raceStateTimer < (RACESTATETIMERMAX / 2f))
+            {
+                // configure race background images between overlay fades
+                switch (raceState)
+                {
+                    case RaceState.Default:
+                        break;
+                    case RaceState.Entering:
+                        if (!fadingFromBlack)
+                        {
+                            if (currentBackground == null && raceBG != null)
+                                currentBackground = raceBG;
+                            if (currentBackground == null)
+                                currentBackground = Texture2D.whiteTexture; // TEMP
+                            //currentNPCFrame = 0;
+                            //npcFrameTimer = RACESTATETIMERMAX;
+                        }
+                        break;
+                    case RaceState.Exiting:
+                        if (!fadingFromBlack)
+                            currentBackground = null;
+                        break;
+                }
+                fadingFromBlack = true;
+            }
+            if (raceStateTimer < 0f)
+            {
+                raceStateTimer = 0f;
+                fadingFromBlack = false;
+                // handle race state changes
+                switch (raceState)
+                {
+                    case RaceState.Default:
+                        // we should never be here
+                        break;
+                    case RaceState.Entering:
+                        fadingOverlay = false;
+                        break;
+                    case RaceState.Exiting:
+                        guestStateTimer = (GUESTSTATETIMERMAX / 2f); // exit faster
+                        raceState = RaceState.Default;
+                        raceDisplay = false;
+                        fadingOverlay = false;
+                        break;
+                    default:
+                        Debug.LogWarning("--- ChickenRaceManager [UpdateRaceStateTimer] : race state undefined. will ignore.");
+                        break;
+                }
+            }
+        }
     }
 
     void HandleRaceStates()
+    {
+        switch (raceState)
+        {
+            case RaceState.Default:
+                // we should never be here
+                break;
+            case RaceState.Entering:
+                PlayerControlManager.PlayerActions pa = currentGuest.GetPlayerActions();
+                // allow player to play or exit
+                CheckGuestEngagement(pa);
+                break;
+            case RaceState.Exiting:
+                break;
+        }
+    }
+
+    void CheckGuestEngagement( PlayerControlManager.PlayerActions pa )
+    {
+
+    }
+
+    void UpdateChickenFrames()
     {
 
     }
@@ -186,7 +368,7 @@ public class ChickenRaceManager : MonoBehaviour
             c = Color.white;
             GUI.color = c;
             // 
-            if (raceState > RaceState.Default && raceState < RaceState.Exiting) // REVIEW:
+            if (raceState > RaceState.Default && raceState <= RaceState.Exiting) // REVIEW:
             {
                 // chickens will be able to be safely placed on top of all this
                 t = raceBG;
