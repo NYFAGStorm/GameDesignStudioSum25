@@ -44,3 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28005f210d0fbd345ae1eeee54040968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  guestState: 0
+  raceState: 0
+  raceDishOL: {fileID: 2800000, guid: 6437e3c98bec01f4fbdaaa24ae3261b1, type: 3}
+  goldOLs:
+  - {fileID: 2800000, guid: 182a4da9d4c54034cb6b759ff7574c3d, type: 3}
+  - {fileID: 2800000, guid: a3383aa5d01d2134e9c7c74d8c71a460, type: 3}
+  - {fileID: 2800000, guid: 3ed92b29a99cb13499d22b3d9c813f77, type: 3}
+  goldOLIndex: 0
+  raceOL: {fileID: 2800000, guid: d64952e59b1d78645813d531addb90c2, type: 3}
+  raceBG: {fileID: 2800000, guid: fb16584b2e8e45744b0c33be1a65c936, type: 3}
