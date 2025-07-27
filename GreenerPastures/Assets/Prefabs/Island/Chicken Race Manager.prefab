@@ -60,8 +60,8 @@ MonoBehaviour:
     - {fileID: 2800000, guid: f103482df53a6244cac623cb1742ad8d, type: 3}
     - {fileID: 2800000, guid: db55e3835dfc4104091fdb820f0f5cf4, type: 3}
     - {fileID: 2800000, guid: 5f03fc161f8118f45ad444c1e050c260, type: 3}
-    frameRate: 1
-    rateVariance: 0.381
+    frameTime: 3.81
+    rateVariance: 1
   - anim: 2
     lineFrames:
     - {fileID: 2800000, guid: fdae8b0c17d02a54690bbe6d48386f78, type: 3}
@@ -75,7 +75,7 @@ MonoBehaviour:
     - {fileID: 2800000, guid: c7b396b163a78d442873c024883459b0, type: 3}
     - {fileID: 2800000, guid: 732ca791c0ad3c0438bd8ac47b9f9290, type: 3}
     - {fileID: 2800000, guid: d0246636340523e47ac150a308df7945, type: 3}
-    frameRate: 0.381
+    frameTime: 0.618
     rateVariance: 0
   - anim: 3
     lineFrames:
@@ -90,15 +90,8 @@ MonoBehaviour:
     - {fileID: 2800000, guid: 7f2b4e0a1063c674db82cdc62fc6e8e8, type: 3}
     - {fileID: 2800000, guid: d18db1a2ee3c09e4a9187d1900b45796, type: 3}
     - {fileID: 2800000, guid: b4d607b09fd6f7e4bb8fd2eb7a2aa149, type: 3}
-    frameRate: 0.618
-    rateVariance: 0.1
-  chickens:
-  - chickenID: 
-    anim: 0
-    animFrame: 0
-    animTimer: 0
-    position: {x: 0, y: 0}
-    faceLeft: 0
+    frameTime: 1
+    rateVariance: 0.618
   raceDishOL: {fileID: 2800000, guid: 6437e3c98bec01f4fbdaaa24ae3261b1, type: 3}
   goldOLs:
   - {fileID: 2800000, guid: 182a4da9d4c54034cb6b759ff7574c3d, type: 3}

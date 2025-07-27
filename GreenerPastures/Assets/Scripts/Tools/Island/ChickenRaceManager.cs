@@ -41,7 +41,7 @@ public class ChickenRaceManager : MonoBehaviour
         public Texture2D[] lineFrames;
         public Texture2D[] fillFrames;
         public Texture2D[] colorFrames;
-        public float frameRate;
+        public float frameTime;
         public float rateVariance;
     }
     public ChickenFrames[] chickenAnimation;
@@ -49,8 +49,8 @@ public class ChickenRaceManager : MonoBehaviour
     [System.Serializable]
     public struct ChickenRunner
     {
-        public string chickenID; // ?        
-        public int animIndex; // 
+        public string chickenID;   
+        public int animIndex;
         public int animFrame;
         public float animTimer;
         public Vector2 position;
@@ -116,6 +116,12 @@ public class ChickenRaceManager : MonoBehaviour
                 buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
                 buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
             }
+
+            // test chickens init
+            chickens = new ChickenRunner[3];
+            chickens[0] = InitializeChicken("larry", new Vector2(0.175f, 0.525f));
+            chickens[1] = InitializeChicken("curly", new Vector2(0.15f, 0.6f));
+            chickens[2] = InitializeChicken("moe", new Vector2(0.125f, 0.67f));
         }
     }
 
@@ -338,9 +344,53 @@ public class ChickenRaceManager : MonoBehaviour
 
     }
 
+    ChickenRunner InitializeChicken(string name, Vector2 pos)
+    {
+        return InitializeChicken(name, ChickenAnimSet.Idle, 0, RandomSystem.FlatRandom01(), pos, false);
+    }
+
+    ChickenRunner InitializeChicken(string name, ChickenAnimSet set, int frame, float timer, Vector2 pos, bool faceLeft)
+    {
+        ChickenRunner retChicken = new ChickenRunner();
+
+        retChicken.chickenID = name;
+        retChicken.animIndex = (int)set;
+        retChicken.animFrame = frame;
+        retChicken.animTimer = timer;
+        retChicken.position = pos;
+        retChicken.faceLeft = faceLeft;
+
+        return retChicken;
+    }
+
     void UpdateChickenFrames()
     {
-
+        for (int i = 0; i < chickens.Length; i++)
+        {
+            chickens[i].animTimer -= Time.deltaTime;
+            if (chickens[i].animTimer < 0f)
+            {
+                // set timer
+                chickens[i].animTimer = chickenAnimation[chickens[i].animIndex].frameTime;
+                if (chickenAnimation[chickens[i].animIndex].rateVariance > 0f)
+                {
+                    float amt = RandomSystem.GaussianRandom01() * chickenAnimation[chickens[i].animIndex].rateVariance;
+                    amt -= chickenAnimation[chickens[i].animIndex].rateVariance * 0.5f;
+                    chickens[i].animTimer = chickenAnimation[chickens[i].animIndex].frameTime += amt;
+                }
+                // set frame (loop by default)
+                chickens[i].animFrame++;
+                if (chickens[i].animFrame >= chickenAnimation[chickens[i].animIndex].lineFrames.Length)
+                    chickens[i].animFrame = 0;
+                // idle variation
+                if ((ChickenAnimSet)chickens[i].animIndex == ChickenAnimSet.Idle)
+                {
+                    if (RandomSystem.FlatRandom01() < 0.381f)
+                        chickens[i].faceLeft = !chickens[i].faceLeft;
+                    chickens[i].animFrame = Random.Range(0, 3);
+                }
+            }
+        }
     }
 
     void OnGUI()
@@ -408,6 +458,36 @@ public class ChickenRaceManager : MonoBehaviour
 
         // ...
         // very specific race gui stuff
+
+        // draw chickens
+        for (int i = 0; i < chickens.Length; i++)
+        {
+            r.width = 0.2f * w;
+            r.height = 0.2f * w; // square
+            r.x = chickens[i].position.x * w - (r.width * 0.5f);
+            r.y = chickens[i].position.y * h - (r.width);
+
+            int frame = chickens[i].animFrame;
+            if (chickens[i].faceLeft)
+            {
+                r.x += r.width;
+                r.width = -r.width;
+            }
+
+            t = chickenAnimation[chickens[i].animIndex-1].fillFrames[frame];
+            GUI.color = c;
+            GUI.DrawTexture(r, t); // fill
+
+            //t = chickenAnimation[chickens[i].animIndex].colorFrames[frame];
+            //GUI.color = c;
+            //GUI.DrawTexture(r, t); // color
+
+            t = chickenAnimation[chickens[i].animIndex-1].lineFrames[frame];
+            GUI.color = c;
+            GUI.DrawTexture(r, t); // line
+            //
+        }
+
         // ...
 
         // exit mini-game button
