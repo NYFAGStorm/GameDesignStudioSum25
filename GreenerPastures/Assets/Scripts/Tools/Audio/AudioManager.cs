@@ -270,6 +270,11 @@ public class AudioManager : MonoBehaviour
             return;
         // create play
         int playIdx = CreatePlay(sndIdx);
+        if (plays == null || plays.Length == 0 || playIdx >= plays.Length)
+        {
+            Debug.LogWarning("--- AudioManager [StartSound] : " + gameObject.name + " created play index " + playIdx + " no longer exists. will ignore.");
+            return;
+        }
         plays[playIdx].source = gameObject.AddComponent<AudioSource>();
         InitSource(plays[playIdx].source, sounds[sndIdx].clip);
         // determine if music loop, if cross fading

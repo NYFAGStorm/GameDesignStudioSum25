@@ -22,6 +22,7 @@ public class MagicCraftingManager : MonoBehaviour
     }
 
     // NOTE: use this to refer to both grimoire recipe ingredient _and_ cauldron inventory item
+    [System.Serializable]
     public class IngredientPiece
     {
         public int cauldronInventoryIndex; // when at cauldron
@@ -370,6 +371,7 @@ public class MagicCraftingManager : MonoBehaviour
                         break;
                     case CraftState.Exiting:
                         libraryStateTimer = (LIBRARYSTATETIMERMAX/2f); // exit faster
+                        ClearCauldronInventory();
                         craftState = CraftState.Default;
                         craftingDisplay = false;
                         fadingOverlay = false;
@@ -567,9 +569,22 @@ public class MagicCraftingManager : MonoBehaviour
                     recipe.ingredients[i].plant == pcm.playerData.inventory.items[n].plant))
                 {
                     ItemData foundIngredient = pcm.playerData.inventory.items[n];
-                    cauldronInventory = InventorySystem.AddToInventory(cauldronInventory, foundIngredient);
-                    found = true;
-                    break;
+                    // confirm first-found match is not already in cauldron inventory
+                    bool alreadyIn = false;
+                    for (int t = 0; t < cauldronInventory.items.Length; t++)
+                    {
+                        if (cauldronInventory.items[t] == foundIngredient)
+                        {
+                            alreadyIn = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyIn)
+                    {
+                        cauldronInventory = InventorySystem.AddToInventory(cauldronInventory, foundIngredient);
+                        found = true;
+                        break;
+                    }
                 }
             }
             if (!found)
@@ -708,8 +723,8 @@ public class MagicCraftingManager : MonoBehaviour
 
         float floatCol = Mathf.RoundToInt(((viewport.x - leftX) / 0.075f) - 0.5f);
         // off inventory invalidation
-        if (floatCol >= 0f && floatCol <= sizeOfCauldronGrid - 1)
-            retInvSlot = (int)Mathf.Clamp(floatCol, 0f, sizeOfCauldronGrid - 1);
+        if (floatCol >= 0f && floatCol <= sizeOfInv - 1)
+            retInvSlot = (int)Mathf.Clamp(floatCol, 0f, sizeOfInv - 1);
         // invalidate if out of row
         if (viewport.y < topY || viewport.y > (topY + (0.075f * ratioToX)))
             retInvSlot = -1;
@@ -979,7 +994,7 @@ public class MagicCraftingManager : MonoBehaviour
 
             // grimoire recipe entry (cauldron inventory display)
             ItemData[] cauldronInv = new ItemData[0];
-            if (cauldronInventory != null && cauldronInventory.items.Length > 0) 
+            if (cauldronInventory != null && cauldronInventory.items != null && cauldronInventory.items.Length > 0) 
                 cauldronInv = cauldronInventory.items; // else we should not be in cauldron anymore
             r.x = 0.15f * w;
             r.y = 0.55f * h;
