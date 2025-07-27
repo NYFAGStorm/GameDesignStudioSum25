@@ -118,7 +118,7 @@ public class WeatherManager : MonoBehaviour
         }
 
         // weather sfx
-        if (sfxAudio != null && !haltWeatherSFX)
+        if (sfxAudio != null && !haltWeatherSFX && cm != null)
         {
             if (rainAmount > 0f)
             {

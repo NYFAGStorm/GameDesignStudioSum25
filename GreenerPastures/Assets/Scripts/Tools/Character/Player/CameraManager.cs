@@ -159,10 +159,28 @@ public class CameraManager : MonoBehaviour
         Vector3 pos = new Vector3((wForce * -.3f), 6.18f, -10f);
         rainShape.position = pos;
 
-        if (rainAmount > 0f && !rainVFX.isPlaying)
-            rainVFX.Play();
-        else if (rainVFX.isPlaying && rainAmount == 0f)
-            rainVFX.Stop();
+        if (mode == CameraMode.PanFollow)
+        {
+            // play no weather vfx (indoors)
+            if (rainBox != null)
+            {
+                // rain vfx config (off)
+                rainOn = rainVFX.isPlaying;
+                rainBox.SetActive(false);
+            }
+            if (wm != null)
+            {
+                // play all weather vfx as indoors
+                wm.SFXForIndoors(true);
+            }
+        }
+        else
+        {
+            if (rainAmount > 0f && !rainVFX.isPlaying)
+                rainVFX.Play();
+            else if (rainVFX.isPlaying && rainAmount == 0f)
+                rainVFX.Stop();
+        }
     }
 
     void ConfigureCamOffsets()
