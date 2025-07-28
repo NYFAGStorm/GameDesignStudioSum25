@@ -39,7 +39,8 @@ public class MagicCraftingManager : MonoBehaviour
     public CraftState craftState;
 
     public Texture2D grimoireBackground;
-    public Texture2D cauldronBackground;
+    public Texture2D cauldronBackgroundDark;
+    public Texture2D cauldronBackgroundLight;
 
     private float libraryStateTimer;
     private float craftStateTimer;
@@ -336,9 +337,19 @@ public class MagicCraftingManager : MonoBehaviour
                     case CraftState.Cauldron:
                         if (!fadingFromBlack)
                         {
-                            if (cauldronBackground != null)
-                                currentBackground = cauldronBackground;
-                            if (currentBackground != cauldronBackground)
+                            if (cauldronBackgroundDark != null)
+                                currentBackground = cauldronBackgroundDark;
+                            TimeManager tm = GameObject.FindFirstObjectByType<TimeManager>();
+                            if (tm != null)
+                            {
+                                if (tm.dayProgress > 0.25f && tm.dayProgress < 0.75f)
+                                {
+                                    if (cauldronBackgroundLight != null)
+                                        currentBackground = cauldronBackgroundLight;
+                                }
+                            }
+                            if (currentBackground != cauldronBackgroundDark &&
+                                currentBackground != cauldronBackgroundLight)
                                 currentBackground = Texture2D.whiteTexture; // TEMP
                         }
                         break;
