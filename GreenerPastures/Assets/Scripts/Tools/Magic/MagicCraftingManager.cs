@@ -330,8 +330,9 @@ public class MagicCraftingManager : MonoBehaviour
                         {
                             if (currentBackground == null && grimoireBackground != null)
                                 currentBackground = grimoireBackground;
-                            if (currentBackground == null)
-                                currentBackground = Texture2D.whiteTexture; // TEMP
+                            if (currentBackground == null || 
+                                currentBackground == cauldronBackgroundDark || currentBackground == cauldronBackgroundLight)
+                                currentBackground = Texture2D.whiteTexture;
                         }
                         break;
                     case CraftState.Cauldron:
@@ -350,7 +351,7 @@ public class MagicCraftingManager : MonoBehaviour
                             }
                             if (currentBackground != cauldronBackgroundDark &&
                                 currentBackground != cauldronBackgroundLight)
-                                currentBackground = Texture2D.whiteTexture; // TEMP
+                                currentBackground = Texture2D.whiteTexture;
                         }
                         break;
                     case CraftState.Exiting:
