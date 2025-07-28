@@ -21,6 +21,8 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     private int nextFreePlayerSlot = 0;
     private PlayerRef localPlayer;
 
+    [HideInInspector]
+    public bool waitingForHostData = false;
     public GameObject remotePlayerSpawnable;
 
     private int GetPlayerNumber(PlayerRef player)
@@ -111,6 +113,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             Debug.Log("--- FusionManager [TransferGameData] : Loading game data: " + data.gameName);
             slm.SetCurrentGameData(data);
+            waitingForHostData = false;
         }
     }
 
@@ -121,6 +124,8 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
 
         Runner = gameObject.AddComponent<NetworkRunner>();
         Runner.ProvideInput = true;
+
+        waitingForHostData = mode == GameMode.Client;
 
         //var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
         //var sceneInfo = new NetworkSceneInfo();

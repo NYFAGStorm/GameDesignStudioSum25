@@ -13,6 +13,7 @@ public class GreenerGameManager : MonoBehaviour
     // TODO: indicate the local player (client player, has main camera control)
 
     private SaveLoadManager saveMgr;
+    private FusionManager fusionMgr;
     private ArtLibraryManager alm;
 
     private bool gameDataDistributed;
@@ -44,11 +45,23 @@ public class GreenerGameManager : MonoBehaviour
     void Awake()
     {
         saveMgr = GameObject.FindFirstObjectByType<SaveLoadManager>();
+
         if (saveMgr != null)
         {
             game = saveMgr.GetCurrentGameData();
             if (noisyLogging)
                 Debug.Log("--- GreenerGameManager [Awake] : game data loaded for '" + game.gameName + "'");
+
+            fusionMgr = FindFirstObjectByType<FusionManager>();
+            if (fusionMgr != null)
+            {
+                if (fusionMgr.waitingForHostData)
+                {
+                    Debug.Log("--- GreenerGameManager [Awake] : Fusion Manager is waiting for host data. ignoring local save data check.");
+                    return;
+                }
+            }
+
             if (game == null)
             {
                 Debug.LogError("--- GreenerGameManager [Awake] : no game data. aborting.");
@@ -117,7 +130,7 @@ public class GreenerGameManager : MonoBehaviour
     void Update()
     {
         // handle game data distribution
-        if (!gameDataDistributed)
+        if (!gameDataDistributed && !fusionMgr.waitingForHostData)
         {
             // first-run establish data
             if (firstRunDetected)
@@ -171,7 +184,7 @@ public class GreenerGameManager : MonoBehaviour
             }
         }
 
-        if (!gameDataDistributed)
+        if (!gameDataDistributed || fusionMgr.waitingForHostData)
             return;
 
         // run notification delay timers (for held stack)
