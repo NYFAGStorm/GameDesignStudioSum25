@@ -695,10 +695,10 @@ public class MagicCraftingManager : MonoBehaviour
         Vector3 retVec = Vector3.zero;
 
         // based on sizeOfCauldronGrid and 0.075f * w per square grid space
-        // starting from center of grid at 0.7f * w, 0.45f * h
+        // starting from center of grid at 0.76f * w, 0.43f * h
         float ratioToX = (float)Screen.width / (float)Screen.height;
-        retVec.x = 0.7f - (sizeOfCauldronGrid * 0.075f * 0.5f);
-        retVec.y = 0.45f - (sizeOfCauldronGrid * 0.075f * ratioToX * 0.5f);
+        retVec.x = 0.76f - (sizeOfCauldronGrid * 0.075f * 0.5f);
+        retVec.y = 0.43f - (sizeOfCauldronGrid * 0.075f * ratioToX * 0.5f);
         retVec.x += col * (0.075f);
         retVec.y += row * (0.075f * ratioToX);
 
@@ -729,7 +729,7 @@ public class MagicCraftingManager : MonoBehaviour
         int sizeOfInv = cauldronInventory.items.Length;
 
         float ratioToX = ((float)Screen.width / (float)Screen.height);
-        float leftX = 0.15f;
+        float leftX = 0.0825f;
         float topY = 0.675f;
 
         float floatCol = Mathf.RoundToInt(((viewport.x - leftX) / 0.075f) - 0.5f);
@@ -757,8 +757,8 @@ public class MagicCraftingManager : MonoBehaviour
         // based on sizeOfCauldronGrid and 0.075f * w per square grid space
         // starting from center of grid at 0.7f * w, 0.45f * h
         float ratioToX = ((float)Screen.width/(float)Screen.height);
-        float leftX = 0.7f - ((sizeOfCauldronGrid * 0.075f) / 2f);
-        float topY = 0.45f - ((sizeOfCauldronGrid * 0.075f * ratioToX) / 2f);
+        float leftX = 0.76f - ((sizeOfCauldronGrid * 0.075f) / 2f);
+        float topY = 0.43f - ((sizeOfCauldronGrid * 0.075f * ratioToX) / 2f);
 
         float floatCol = Mathf.RoundToInt(( (viewport.x - leftX) / 0.075f ) - 0.5f);
         // off grid invalidation
@@ -896,6 +896,12 @@ public class MagicCraftingManager : MonoBehaviour
             r.y = 0.05f * h;
             r.width = 0.8f * w;
             r.height = 0.8f * h;
+            /*
+            r.x = 0.375f * w;
+            r.y = 0.025f * h;
+            r.width = 0.25f * w;
+            r.height = 0.075f * h;
+            */
             g = new GUIStyle(GUI.skin.box);
             g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
@@ -987,12 +993,13 @@ public class MagicCraftingManager : MonoBehaviour
         if (craftState == CraftState.Cauldron)
         {
             // caulron box overlay
-            r.x = 0.1f * w;
-            r.y = 0.05f * h;
-            r.width = 0.8f * w;
-            r.height = 0.8f * h;
+            r.x = 0.375f * w;
+            r.y = 0.025f * h;
+            r.width = 0.25f * w;
+            r.height = 0.075f * h;
             g = new GUIStyle(GUI.skin.box);
             g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
+            g.padding = new RectOffset(0, 0, 15, 0);
             g.fontStyle = FontStyle.Bold;
             s = "THE CAULDRON";
             c = Color.white;
@@ -1005,9 +1012,10 @@ public class MagicCraftingManager : MonoBehaviour
 
             // grimoire recipe entry (cauldron inventory display)
             ItemData[] cauldronInv = new ItemData[0];
-            if (cauldronInventory != null && cauldronInventory.items != null && cauldronInventory.items.Length > 0) 
+            if (cauldronInventory != null && cauldronInventory.items != null && cauldronInventory.items.Length > 0)
                 cauldronInv = cauldronInventory.items; // else we should not be in cauldron anymore
-            r.x = 0.15f * w;
+
+            r.x = 0.0825f * w;
             r.y = 0.55f * h;
             r.width = 0.3f * w;
             r.height = 0.05f * h;
@@ -1165,8 +1173,9 @@ public class MagicCraftingManager : MonoBehaviour
             // no spacing between grid squares
             // sizeOfCauldronGrid determines starting position
             // sizeOfCauldronGrid is both vertical and horizontal size (square)
-            r.x = 0.7f * w;
-            r.y = 0.45f * h;
+
+            r.x = 0.76f * w;
+            r.y = 0.43f * h;
             r.width = 0.075f * w;
             r.height = r.width; // square
             r.x -= ((sizeOfCauldronGrid * r.width) / 2f);
