@@ -47,4 +47,5 @@ MonoBehaviour:
   libraryState: 0
   craftState: 0
   grimoireBackground: {fileID: 0}
-  cauldronBackground: {fileID: 0}
+  cauldronBackground: {fileID: 2800000, guid: 6e836ffdb4c3ef34c96b261efb9accea, type: 3}
+  shapeLibrary: []
