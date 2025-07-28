@@ -73,7 +73,7 @@ public class ChickenRaceManager : MonoBehaviour
     private QuitOnEscape qoe; // disable to suspend use of start button while in market
 
     private float guestStateTimer;
-    private float raceStateTimer;
+    public float raceStateTimer;
     private bool raceDisplay;
 
     private bool fadingOverlay;
@@ -84,10 +84,24 @@ public class ChickenRaceManager : MonoBehaviour
 
     // -- chicken race variables --
 
+    private int chickenPick = -1;
+    private int betAmount;
+    private int[] otherPicks = new int[5]; // picks by other wagers
+    private int otherBets; // 1-5 other bets, each bet adds 1-OTHERWAGERMAX
+    private int totalTake; // all gold in the dish
+    private int[] eachChickenPicks = new int[3]; // each chicken has a number picks
+    private int chickenWinner;
+    private float otherWagerTimer;
+    private float rewardTimer;
+
     const float PLAYERCHECKTIME = 1f;
     const float RACEPROXIMITYRANGE = .5f;
     const float GUESTSTATETIMERMAX = 1f;
     const float RACESTATETIMERMAX = 1f;
+    const int MAXWAGERS = 5;
+    const int OTHERWAGERMAX = 25;
+    const float OTHERWAGERTIME = 1f;
+    const float REWARDTICKTIME = 0.2f;
 
 
     void Start()
@@ -124,6 +138,37 @@ public class ChickenRaceManager : MonoBehaviour
         }
     }
 
+    string EnteringRaceInstructions()
+    {
+        string retString = "";
+
+        retString = "Biomancers love to bet on the chicken races!\n";
+        retString += "Just place your bet by putting gold in the dish and picking your chicken.\n";
+        retString += "And choose wisely, as all bets are final. Then, watch the chickens race!\n";
+        retString += "If your chicken wins the race, you win all the gold in the dish! Good luck!";
+
+        return retString;
+    }
+
+    string BettingRaceInstructions()
+    {
+        string retString = "";
+
+        retString = "Pick your chicken by the lane it's in: 1, 2 or 3.\n";
+        retString += "Them, place your bet by deciding how much of your gold to wager on the race.\n";
+
+        return retString;
+    }
+    string RewardsRaceInstructions()
+    {
+        string retString = "";
+
+        retString = "Lucky winners divide all the gold in the dish.\n\n";
+        retString += "We hope you enjoyed the race no matter what.\n";
+        retString += "Biomancer luck grows with time.";
+
+        return retString;
+    }
 
     void Update()
     {
@@ -307,6 +352,41 @@ public class ChickenRaceManager : MonoBehaviour
                     case RaceState.Entering:
                         fadingOverlay = false;
                         break;
+                    case RaceState.Betting:
+                        break;
+                    case RaceState.PreRace:
+                        // reset winner
+                        chickenWinner = -1;
+                        // get chickens ready
+                        for (int i = 0; i < 3; i++)
+                        {
+                            chickens[i].animIndex = 0;
+                            chickens[i].animTimer = 0.1f;
+                            chickens[i].animFrame = 0;
+                            chickens[i].faceLeft = false;
+                        }
+                        break;
+                    case RaceState.Race:
+                        for (int i = 0; i < 3; i++)
+                        {
+                            chickens[i].animIndex = 1;
+                            chickens[i].animTimer = RandomSystem.GaussianRandom01() * 0.1f;
+                            chickens[i].animFrame = 0;
+                            chickens[i].faceLeft = false;
+                        }
+                        break;
+                    case RaceState.PostRace:
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (i == chickenWinner)
+                                chickens[i].animIndex = 2;
+                            else
+                                chickens[i].animIndex = 0;
+                        }
+                        break;
+                    case RaceState.Rewarding:
+                        rewardTimer = 2f;
+                        break;
                     case RaceState.Exiting:
                         guestStateTimer = (GUESTSTATETIMERMAX / 2f); // exit faster
                         raceState = RaceState.Default;
@@ -338,6 +418,7 @@ public class ChickenRaceManager : MonoBehaviour
                 break;
             case RaceState.PreRace:
                 // set chickens ready
+                UpdatePreRace();
                 break;
             case RaceState.Race:
                 // chickens run race
@@ -345,6 +426,7 @@ public class ChickenRaceManager : MonoBehaviour
                 break;
             case RaceState.PostRace:
                 // race finish, winner circle celebration
+                UpdatePostRace();
                 break;
             case RaceState.Rewarding:
                 // bets settled, gold awarded, return to entering state
@@ -364,16 +446,225 @@ public class ChickenRaceManager : MonoBehaviour
     void CheckGuestBet()
     {
         PlayerControlManager.PlayerActions pa = currentGuest.GetPlayerActions();
+
+        // REVIEW: should others potentially change their picks before race?
+
+        // run other wager timer
+        if (otherWagerTimer > 0f)
+        {
+            otherWagerTimer -= Time.deltaTime;
+            if (otherWagerTimer < 0f)
+                otherWagerTimer = 0f;
+        }
+
+        // include other biomancer wagers
+        if (otherBets < 1 && 
+            otherWagerTimer == 0f)
+        {
+            // always at least one other bet
+            otherPicks[otherBets] = Random.Range(0, 3);
+            otherBets = 1;
+            totalTake += GameSystem.RoundedResult(RandomSystem.GaussianRandom01(), OTHERWAGERMAX);
+        }
+        else if ((otherBets+1) < MAXWAGERS && 
+            (totalTake + betAmount) > ((otherBets-1) / OTHERWAGERMAX) && 
+            otherWagerTimer == 0f && 
+            RandomSystem.FlatRandom01() < 0.05f)
+        {
+            // check other picks, favor non-picked chickens
+            bool betPlaced = false;
+            int thisPick = -1;
+            int safety = 10;
+            while (safety > 0 && !betPlaced)
+            {
+                safety--;
+                thisPick = Random.Range(0, 3);
+                if (eachChickenPicks[thisPick] == 0)
+                    betPlaced = true;
+            }
+            // place bet
+            otherPicks[otherBets] = thisPick;
+            otherBets++;
+            // additional gold in dish
+            totalTake += GameSystem.RoundedResult(RandomSystem.GaussianRandom01(), OTHERWAGERMAX);
+        }
+
+        // reset other wager timer
+        if (otherWagerTimer == 0f)
+            otherWagerTimer = OTHERWAGERTIME;
+
+        // calculate each chicken picks
+        eachChickenPicks = new int[3];
+        if (chickenPick > -1)
+            eachChickenPicks[chickenPick]++;
+        for (int i = 0; i < otherPicks.Length; i++)
+        {
+            eachChickenPicks[otherPicks[i]]++;
+        }
+
+        // display gold in dish
+        if (totalTake + betAmount > 0)
+        {
+            goldOLIndex = 0;
+            goldOLIndex = Mathf.Clamp((totalTake + betAmount) / 10, 0, 2);
+        }
+        else
+            goldOLIndex = -1;
+    }
+
+    void UpdatePreRace()
+    {
+        // hold chickens ready
+        for (int i = 0; i < 3; i++)
+        {
+            chickens[i].animIndex = 0;
+            chickens[i].animTimer = 0.1f;
+            chickens[i].animFrame = 0;
+            chickens[i].faceLeft = false;
+        }
+        if (raceStateTimer > 0f)
+            return;
+        raceState = RaceState.Race;
+        raceStateTimer = RACESTATETIMERMAX;
     }
 
     void UpdateChickenRun()
     {
+        if (raceStateTimer > 0f)
+            return;
 
+        // all chickens run
+        float chickenMoveSpeed = 0.2f;
+
+        bool raceFinished = false;
+        for (int i=0; i < 3; i++)
+        {
+            chickenMoveSpeed = 0.2f;
+            chickenMoveSpeed += (i - 1) * 0.01f; // lane cheat fix
+            chickenMoveSpeed *= RandomSystem.GaussianRandom01();
+
+            if (chickens[i].position.x > .8f)
+            {
+                chickens[i].animIndex = 0;
+            }
+            else
+            {
+                chickens[i].animIndex = 1;
+                chickens[i].position.x += chickenMoveSpeed * Time.deltaTime;
+                // check for winner
+                if (chickens[i].position.x > 0.8f) // finish line
+                    raceFinished = true;
+            }
+        }
+        if (raceFinished && chickenWinner == -1)
+        {
+            float furthest = 0f;
+            for (int i=0; i < 3; i++)
+            {
+                if (chickens[i].position.x > furthest)
+                {
+                    furthest = chickens[i].position.x;
+                    chickenWinner = i; // winner declared
+                }
+            }
+            // let chickens run it out while timer runs
+            raceState = RaceState.PostRace;
+            raceStateTimer = RACESTATETIMERMAX;
+        }
+    }
+
+    void UpdatePostRace()
+    {
+        if (raceStateTimer > 0f)
+            return;
+
+        // winner celebrates, others idle
+        for (int i = 0; i < 3; i++)
+        {
+            if (i == chickenWinner)
+                chickens[i].animIndex = 2;
+            else
+                chickens[i].animIndex = 0;
+        }
+        raceState = RaceState.Rewarding;
+        raceStateTimer = RACESTATETIMERMAX * 2f;
     }
 
     void UpdateRewardGuest()
     {
+        if (raceStateTimer > 0f)
+            return;
 
+        // determine how much dish is divided by
+        // REVIEW: this okay to calculate every tick?
+        int numberOfWinners = 0;
+        for (int i = 0; i < otherPicks.Length; i++)
+        {
+            if (otherPicks[i] == chickenWinner)
+                numberOfWinners++;
+        }
+        if (numberOfWinners == 0)
+        {
+            ResetChickenRace();
+            return;
+        }
+        // reduce total take in dish over time
+        if (rewardTimer > 0f)
+        {
+            rewardTimer -= Time.deltaTime;
+            if (rewardTimer < 0f)
+            {
+                rewardTimer = 0f;
+                if (totalTake == 0)
+                {
+                    ResetChickenRace();
+                    return;
+                }
+                else
+                {
+                    totalTake -= numberOfWinners;
+                    if (totalTake < 0)
+                        totalTake = 0;
+                    // display gold in dish
+                    if (totalTake > 0)
+                    {
+                        goldOLIndex = 0;
+                        goldOLIndex = Mathf.Clamp(totalTake / 10, 0, 2); // REVIEW: how to reflect player bet in this when they already have it?
+                    }
+                    else
+                        goldOLIndex = -1;
+                    // if player won, give gold
+                    if (chickenWinner == chickenPick)
+                        currentGuest.playerData.gold++; // player always gets remainder
+                    if (totalTake == 0)
+                        rewardTimer = RACESTATETIMERMAX;
+                    else
+                        rewardTimer = REWARDTICKTIME;
+                }
+            }
+        }        
+    }
+
+    void ResetChickenRace()
+    {
+        // clear all picks
+        chickenPick = -1;
+        otherPicks = new int[5];
+        eachChickenPicks = new int[3];
+        // clear dish gold
+        betAmount = 0;
+        totalTake = 0;
+        goldOLIndex = -1;
+        // exit reward state, return to entering state
+        raceState = RaceState.Entering;
+        raceStateTimer = RACESTATETIMERMAX;
+        // REVIEW: reset chickens here?
+        chickens[0].position = new Vector2(0.175f, 0.525f);
+        chickens[0].animIndex = 0;
+        chickens[1].position = new Vector2(0.15f, 0.6f);
+        chickens[1].animIndex = 0;
+        chickens[2].position = new Vector2(0.125f, 0.67f);
+        chickens[2].animIndex = 0;
     }
 
     ChickenRunner InitializeChicken(string name, Vector2 pos)
@@ -483,14 +774,8 @@ public class ChickenRaceManager : MonoBehaviour
             return;
         }
 
-        if (raceStateTimer > 0f)
-            return;
-
         c = Color.white;
         GUI.color = c;
-
-        // ...
-        // very specific race gui stuff
 
         // draw chickens
         for (int i = 0; i < chickens.Length; i++)
@@ -511,6 +796,8 @@ public class ChickenRaceManager : MonoBehaviour
             GUI.color = c;
             GUI.DrawTexture(r, t); // fill
 
+            // REVIEW: color may not be the best way to identify chickens
+            // but, they are in consistent chicken lanes, so we can use those
             /*
             t = chickenAnimation[chickens[i].animIndex].colorFrames[frame];
             switch (i)
@@ -525,7 +812,7 @@ public class ChickenRaceManager : MonoBehaviour
                     c = Color.red;
                     break;
             }
-            c.a = 0.1f;
+            c.a = 0.381f;
             GUI.color = c;
             GUI.DrawTexture(r, t); // color
             */
@@ -534,10 +821,472 @@ public class ChickenRaceManager : MonoBehaviour
             c = Color.white;
             GUI.color = c;
             GUI.DrawTexture(r, t); // line
-            //
         }
 
-        // ...
+        if (raceStateTimer > 0f)
+            return;
+
+        // specific race ui
+
+        // - entering race
+        if (raceState == RaceState.Entering)
+        {
+            // title
+            r.x = 0.35f * w;
+            r.y = 0.05f * h;
+            r.width = 0.3f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "CHICKEN RACES";
+            // drop shadow
+            r.x += 0.001f * w;
+            r.y += 0.0015f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.002f * w;
+            r.y -= 0.003f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // instructions
+            r.x = 0.2f * w;
+            r.y = 0.15f * h;
+            r.width = 0.6f * w;
+            r.height = 0.2f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.alignment = TextAnchor.MiddleCenter;
+            g.wordWrap = true;
+            s = EnteringRaceInstructions();
+            // drop shadow
+            r.x += 0.00075f * w;
+            r.y += 0.001f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.0015f * w;
+            r.y -= 0.002f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // bet button
+            r.x = 0.4f * w;
+            r.y = 0.4f * h;
+            r.width = 0.2f * w;
+            r.height = 0.075f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "BET ON CHICKEN";
+            if (GUI.Button(r, s, g))
+            {
+                raceState = RaceState.Betting;
+                raceStateTimer = 0.618f; //RACESTATETIMERMAX;
+            }
+        }
+
+        // betting and selecting
+        if (raceState == RaceState.Betting)
+        {
+            // title
+            r.x = 0.35f * w;
+            r.y = 0.05f * h;
+            r.width = 0.3f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "PLACE YOUR BETS";
+            // drop shadow
+            r.x += 0.001f * w;
+            r.y += 0.0015f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.002f * w;
+            r.y -= 0.003f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // instructions
+            r.x = 0.3f * w;
+            r.y = 0.15f * h;
+            r.width = 0.4f * w;
+            r.height = 0.2f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.wordWrap = true;
+            s = BettingRaceInstructions();
+            // drop shadow
+            r.x += 0.00075f * w;
+            r.y += 0.001f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.0015f * w;
+            r.y -= 0.002f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // chicken pick label
+            r.x = 0.15f * w;
+            r.y = 0.3f * h;
+            r.width = 0.2f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.BoldAndItalic;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "Pick Your Chicken!";
+            if (chickenPick > -1)
+                s = "Chicken #" + (chickenPick + 1);
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // chicken selection buttons (lanes 1, 2, 3)
+            r.x = 0.25f * w;
+            r.y = 0.4f * h;
+            r.width = 0.075f * w;
+            r.height = 0.075f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "1";
+            if (GUI.Button(r, s, g))
+            {
+                chickenPick = 0;
+            }
+            // chicken #1 picks label
+            r.x = 0.35f * w;
+            r.y = 0.4f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            
+            s = eachChickenPicks[0] + " picks";
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            //
+            r.x = 0.25f * w;
+            r.y += .1f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "2";
+            if (GUI.Button(r, s, g))
+            {
+                chickenPick = 1;
+            }
+            // chicken #2 picks label
+            r.x = 0.35f * w;
+            r.y = 0.5f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            s = eachChickenPicks[1] + " picks";
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            //
+            r.x = 0.25f * w;
+            r.y += .1f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "3";
+            if (GUI.Button(r, s, g))
+            {
+                chickenPick = 2;
+            }            
+            // chicken #3 picks label
+            r.x = 0.35f * w;
+            r.y = 0.6f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            s = eachChickenPicks[2] + " picks";
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            //
+            // bet amount label
+            r.x = 0.5875f * w;
+            r.y = 0.3f * h;
+            r.width = 0.2f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "Your bet is\n" + betAmount + " gold";
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // betting controls ( +, - )
+            r.x = 0.6f * w;
+            r.y = 0.4f * h;
+            r.width = 0.075f * w;
+            r.height = 0.075f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "-";
+            if (GUI.Button(r, s, g))
+            {
+                betAmount--;
+                if (betAmount < 0)
+                    betAmount = 0;
+            }
+            r.x = 0.7f * w;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "+";
+            if (GUI.Button(r, s, g))
+            {
+                betAmount++;
+                if (betAmount > currentGuest.playerData.gold)
+                    betAmount = currentGuest.playerData.gold;
+            }
+            // total bets on race
+            r.x = 0.5875f * w;
+            r.y = 0.55f * h;
+            r.width = 0.2f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "Biomancers betting\nthis race: " + (otherBets + 1);
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // total in dish label
+            r.x = 0.5875f * w;
+            r.y = 0.65f * h;
+            r.width = 0.2f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "Total gold in dish:\n" + (totalTake+betAmount) + " Gold";
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // race button
+            r.x = 0.25f * w;
+            r.y = 0.8f * h;
+            r.width = 0.2f * w;
+            r.height = 0.075f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "LET'S RACE!";
+            if (GUI.Button(r, s, g))
+            {
+                raceState = RaceState.PreRace;
+                raceStateTimer = 0.618f; //RACESTATETIMERMAX;
+            }
+            // cancel button
+            r.x = 0.55f * w;
+            r.y = 0.8f * h;
+            r.width = 0.2f * w;
+            r.height = 0.075f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            // TODO: gamepad 
+            s = "CANCEL BET";
+            if (GUI.Button(r, s, g))
+            {
+                raceState = RaceState.Entering;
+                raceStateTimer = 0.618f; //RACESTATETIMERMAX;
+            }
+            // player gold display
+            r.x = 0.05f * w;
+            r.y = 0.9f * h;
+            r.width = 0.15f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            s = "GOLD: "+currentGuest.playerData.gold;
+            // drop shadow
+            r.x += 0.0006f * w;
+            r.y += 0.001f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.0012f * w;
+            r.y -= 0.002f * w;
+            c = Color.yellow;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+        }
+
+        // pre-race
+        if (raceState == RaceState.PreRace)
+        {
+            // title
+            r.x = 0.35f * w;
+            r.y = 0.05f * h;
+            r.width = 0.3f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "READY ... SET ... GO!";
+            // drop shadow
+            r.x += 0.001f * w;
+            r.y += 0.0015f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.002f * w;
+            r.y -= 0.003f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+        }
+
+        // race
+        if (raceState == RaceState.Race)
+        {
+            // REVIEW: do nothing?
+        }
+
+        // post-race
+        if (raceState == RaceState.PostRace)
+        {
+            // title
+            r.x = 0.35f * w;
+            r.y = 0.05f * h;
+            r.width = 0.3f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "WINNER WINNER!";
+            // drop shadow
+            r.x += 0.001f * w;
+            r.y += 0.0015f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.002f * w;
+            r.y -= 0.003f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+        }
+
+        // rewarding
+        if (raceState == RaceState.Rewarding)
+        {
+            // title
+            r.x = 0.35f * w;
+            r.y = 0.05f * h;
+            r.width = 0.3f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "BETTER LUCK NEXT TIME";
+            if (chickenPick == chickenWinner)
+                s = "YOUR CHICKEN WON!";
+            // drop shadow
+            r.x += 0.001f * w;
+            r.y += 0.0015f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.002f * w;
+            r.y -= 0.003f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            // instructions
+            r.x = 0.3f * w;
+            r.y = 0.15f * h;
+            r.width = 0.4f * w;
+            r.height = 0.2f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.wordWrap = true;
+            s = RewardsRaceInstructions();
+            // drop shadow
+            r.x += 0.00075f * w;
+            r.y += 0.001f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.0015f * w;
+            r.y -= 0.002f * w;
+            c = Color.white;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+
+            // player gold display
+            r.x = 0.05f * w;
+            r.y = 0.9f * h;
+            r.width = 0.15f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            s = "GOLD: " + currentGuest.playerData.gold;
+            // drop shadow
+            r.x += 0.0006f * w;
+            r.y += 0.001f * w;
+            c = Color.black;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+            r.x -= 0.0012f * w;
+            r.y -= 0.002f * w;
+            c = Color.yellow;
+            GUI.color = c;
+            GUI.Label(r, s, g);
+        }
+
+        // exiting
+        if (raceState == RaceState.Exiting)
+        {
+            // REVIEW: do nothing?
+        }
+
+        // ---
 
         // exit mini-game button
         r.x = 0.4f * w;
