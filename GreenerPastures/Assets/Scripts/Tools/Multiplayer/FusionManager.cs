@@ -60,13 +60,13 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
         slm = FindFirstObjectByType<SaveLoadManager>();
     }
     
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, InvokeLocal = true, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_SendMessage([RpcTarget] PlayerRef targ, string message)
     {
         Debug.Log(message);
     }
 
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, InvokeLocal = true, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_InitializeLocalPlayer([RpcTarget] PlayerRef targ, PlayerRef p)
     {
         localPlayer = p;
@@ -74,7 +74,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     // Request host's game data as server
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, InvokeLocal = true, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RequestGameData([RpcTarget] PlayerRef targ)
     {
         RPC_TransferGameData(PlayerRef.None, slm.GetCurrentGameData());
@@ -101,7 +101,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     // Transfer game data across network
-    [Rpc(sources: RpcSources.All, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    [Rpc(sources: RpcSources.All, targets: RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_TransferGameData([RpcTarget] PlayerRef targ, GameData data)
     {
         if (Runner.IsServer)
