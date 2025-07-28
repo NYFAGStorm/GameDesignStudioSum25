@@ -91,6 +91,7 @@ public class ChickenRaceManager : MonoBehaviour
     private int totalTake; // all gold in the dish
     private int[] eachChickenPicks = new int[3]; // each chicken has a number picks
     private int chickenWinner;
+    private int totalWinners; // how many who picked the winner
     private float otherWagerTimer;
     private float rewardTimer;
 
@@ -130,7 +131,13 @@ public class ChickenRaceManager : MonoBehaviour
                 buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
             }
 
-            // test chickens init
+            // initialize all picks
+            for (int i = 0; i < otherPicks.Length; i++)
+            {
+                otherPicks[i] = -1;
+            }
+
+            // chickens init
             chickens = new ChickenRunner[3];
             chickens[0] = InitializeChicken("larry", new Vector2(0.175f, 0.525f));
             chickens[1] = InitializeChicken("curly", new Vector2(0.15f, 0.6f));
@@ -145,7 +152,7 @@ public class ChickenRaceManager : MonoBehaviour
         retString = "Biomancers love to bet on the chicken races!\n";
         retString += "Just place your bet by putting gold in the dish and picking your chicken.\n";
         retString += "And choose wisely, as all bets are final. Then, watch the chickens race!\n";
-        retString += "If your chicken wins the race, you win all the gold in the dish! Good luck!";
+        retString += "If your chicken wins the race, you get a share of the gold from the dish!\nGood luck!";
 
         return retString;
     }
@@ -155,7 +162,8 @@ public class ChickenRaceManager : MonoBehaviour
         string retString = "";
 
         retString = "Pick your chicken by the lane it's in: 1, 2 or 3.\n";
-        retString += "Them, place your bet by deciding how much of your gold to wager on the race.\n";
+        retString += "Then, decide how much of your gold to wager on this race.\n";
+        retString += "Notice how the others have picked their chicken.";
 
         return retString;
     }
@@ -163,7 +171,9 @@ public class ChickenRaceManager : MonoBehaviour
     {
         string retString = "";
 
-        retString = "Lucky winners divide all the gold in the dish.\n\n";
+        retString = "Lucky winners divide the gold in the dish equally.\n";
+        retString += "If no one won, your gold is returned.\n";
+        retString += "Otherwise the gold you bet will be taken now.\n";
         retString += "We hope you enjoyed the race no matter what.\n";
         retString += "Biomancer luck grows with time.";
 
@@ -499,7 +509,8 @@ public class ChickenRaceManager : MonoBehaviour
             eachChickenPicks[chickenPick]++;
         for (int i = 0; i < otherPicks.Length; i++)
         {
-            eachChickenPicks[otherPicks[i]]++;
+            if (otherPicks[i] > -1)
+                eachChickenPicks[otherPicks[i]]++;
         }
 
         // display gold in dish
@@ -598,16 +609,16 @@ public class ChickenRaceManager : MonoBehaviour
         // determine how much dish is divided by
         // REVIEW: this okay to calculate every tick?
         int numberOfWinners = 0;
+        if (chickenPick == chickenWinner)
+            numberOfWinners = 1;
         for (int i = 0; i < otherPicks.Length; i++)
         {
             if (otherPicks[i] == chickenWinner)
                 numberOfWinners++;
         }
+        totalWinners = numberOfWinners;
         if (numberOfWinners == 0)
-        {
-            ResetChickenRace();
-            return;
-        }
+            betAmount = 0; // return bet amount to player
         // reduce total take in dish over time
         if (rewardTimer > 0f)
         {
@@ -622,22 +633,40 @@ public class ChickenRaceManager : MonoBehaviour
                 }
                 else
                 {
-                    totalTake -= numberOfWinners;
+                    if (numberOfWinners == 0)
+                        totalTake--;
+                    else
+                        totalTake -= numberOfWinners;
                     if (totalTake < 0)
                         totalTake = 0;
                     // display gold in dish
                     if (totalTake > 0)
                     {
                         goldOLIndex = 0;
-                        goldOLIndex = Mathf.Clamp(totalTake / 10, 0, 2); // REVIEW: how to reflect player bet in this when they already have it?
+                        goldOLIndex = Mathf.Clamp((totalTake+betAmount) / 10, 0, 2);
                     }
                     else
                         goldOLIndex = -1;
-                    // if player won, give gold
+                    // give player gold if they won, take gold if they lost
                     if (chickenWinner == chickenPick)
                         currentGuest.playerData.gold++; // player always gets remainder
+                    else
+                    {
+                        if (betAmount > 0)
+                        {
+                            betAmount--;
+                            currentGuest.playerData.gold--;
+                        }
+                    }
                     if (totalTake == 0)
+                    {
+                        if (chickenWinner != chickenPick && betAmount > 0)
+                        {
+                            currentGuest.playerData.gold -= betAmount;
+                            betAmount = 0;
+                        }
                         rewardTimer = RACESTATETIMERMAX;
+                    }
                     else
                         rewardTimer = REWARDTICKTIME;
                 }
@@ -650,9 +679,16 @@ public class ChickenRaceManager : MonoBehaviour
         // clear all picks
         chickenPick = -1;
         otherPicks = new int[5];
+        for (int i = 0; i < otherPicks.Length; i++)
+        {
+            otherPicks[i] = -1;
+        }
         eachChickenPicks = new int[3];
+        totalWinners = 0;
         // clear dish gold
+        totalTake = 0;
         betAmount = 0;
+        otherBets = 0;
         totalTake = 0;
         goldOLIndex = -1;
         // exit reward state, return to entering state
@@ -854,9 +890,9 @@ public class ChickenRaceManager : MonoBehaviour
             GUI.Label(r, s, g);
             // instructions
             r.x = 0.2f * w;
-            r.y = 0.15f * h;
+            r.y = 0.125f * h;
             r.width = 0.6f * w;
-            r.height = 0.2f * h;
+            r.height = 0.225f * h;
             g = new GUIStyle(GUI.skin.label);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
             g.alignment = TextAnchor.MiddleCenter;
@@ -919,11 +955,12 @@ public class ChickenRaceManager : MonoBehaviour
             GUI.Label(r, s, g);
             // instructions
             r.x = 0.3f * w;
-            r.y = 0.15f * h;
+            r.y = 0.125f * h;
             r.width = 0.4f * w;
-            r.height = 0.2f * h;
+            r.height = 0.225f * h;
             g = new GUIStyle(GUI.skin.label);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.alignment = TextAnchor.MiddleCenter;
             g.wordWrap = true;
             s = BettingRaceInstructions();
             // drop shadow
@@ -938,17 +975,17 @@ public class ChickenRaceManager : MonoBehaviour
             GUI.color = c;
             GUI.Label(r, s, g);
             // chicken pick label
-            r.x = 0.15f * w;
+            r.x = 0.175f * w;
             r.y = 0.3f * h;
             r.width = 0.2f * w;
-            r.height = 0.05f * h;
+            r.height = 0.1f * h;
             g = new GUIStyle(GUI.skin.label);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
             g.fontStyle = FontStyle.BoldAndItalic;
             g.alignment = TextAnchor.MiddleCenter;
             s = "Pick Your Chicken!";
             if (chickenPick > -1)
-                s = "Chicken #" + (chickenPick + 1);
+                s = "You picked\nChicken #" + (chickenPick + 1);
             GUI.color = c;
             GUI.Label(r, s, g);
             // chicken selection buttons (lanes 1, 2, 3)
@@ -1110,11 +1147,13 @@ public class ChickenRaceManager : MonoBehaviour
             g.active.textColor = Color.yellow;
             // TODO: gamepad 
             s = "LET'S RACE!";
+            GUI.enabled = (chickenPick > -1);
             if (GUI.Button(r, s, g))
             {
                 raceState = RaceState.PreRace;
                 raceStateTimer = 0.618f; //RACESTATETIMERMAX;
             }
+            GUI.enabled = true;
             // cancel button
             r.x = 0.55f * w;
             r.y = 0.8f * h;
@@ -1130,8 +1169,7 @@ public class ChickenRaceManager : MonoBehaviour
             s = "CANCEL BET";
             if (GUI.Button(r, s, g))
             {
-                raceState = RaceState.Entering;
-                raceStateTimer = 0.618f; //RACESTATETIMERMAX;
+                ResetChickenRace();
             }
             // player gold display
             r.x = 0.05f * w;
@@ -1140,15 +1178,16 @@ public class ChickenRaceManager : MonoBehaviour
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
             s = "GOLD: "+currentGuest.playerData.gold;
             // drop shadow
-            r.x += 0.0006f * w;
-            r.y += 0.001f * w;
+            r.x += 0.001f * w;
+            r.y += 0.0015f * w;
             c = Color.black;
             GUI.color = c;
             GUI.Label(r, s, g);
-            r.x -= 0.0012f * w;
-            r.y -= 0.002f * w;
+            r.x -= 0.002f * w;
+            r.y -= 0.003f * w;
             c = Color.yellow;
             GUI.color = c;
             GUI.Label(r, s, g);
@@ -1227,6 +1266,8 @@ public class ChickenRaceManager : MonoBehaviour
             s = "BETTER LUCK NEXT TIME";
             if (chickenPick == chickenWinner)
                 s = "YOUR CHICKEN WON!";
+            else if (totalWinners == 0)
+                s = "ALL GOLD RETURNED";
             // drop shadow
             r.x += 0.001f * w;
             r.y += 0.0015f * w;
@@ -1240,11 +1281,12 @@ public class ChickenRaceManager : MonoBehaviour
             GUI.Label(r, s, g);
             // instructions
             r.x = 0.3f * w;
-            r.y = 0.15f * h;
+            r.y = 0.125f * h;
             r.width = 0.4f * w;
-            r.height = 0.2f * h;
+            r.height = 0.225f * h;
             g = new GUIStyle(GUI.skin.label);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.alignment = TextAnchor.MiddleCenter;
             g.wordWrap = true;
             s = RewardsRaceInstructions();
             // drop shadow
@@ -1266,15 +1308,16 @@ public class ChickenRaceManager : MonoBehaviour
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
             s = "GOLD: " + currentGuest.playerData.gold;
             // drop shadow
-            r.x += 0.0006f * w;
-            r.y += 0.001f * w;
+            r.x += 0.001f * w;
+            r.y += 0.0015f * w;
             c = Color.black;
             GUI.color = c;
             GUI.Label(r, s, g);
-            r.x -= 0.0012f * w;
-            r.y -= 0.002f * w;
+            r.x -= 0.002f * w;
+            r.y -= 0.003f * w;
             c = Color.yellow;
             GUI.color = c;
             GUI.Label(r, s, g);
