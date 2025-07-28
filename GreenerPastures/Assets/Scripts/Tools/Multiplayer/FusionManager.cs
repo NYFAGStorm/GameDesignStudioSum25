@@ -117,7 +117,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     // Use GameMode.Host and GameMode.Client to determine join type
     public async void StartMultiplayerGame(GameMode mode, string code)
     {
-        Debug.Log("--- FusionManager [StartMultiplayerGame] : Starting multiplayer session...");
+        Debug.Log("--- FusionManager [StartMultiplayerGame] : Starting multiplayer session with code: " + code.ToUpper() + ".");
 
         Runner = gameObject.AddComponent<NetworkRunner>();
         Runner.ProvideInput = true;
@@ -129,7 +129,7 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
         await Runner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
-            SessionName = code,
+            SessionName = code.ToUpper(),
             PlayerCount = 8,
             IsOpen = true,
             IsVisible = false
