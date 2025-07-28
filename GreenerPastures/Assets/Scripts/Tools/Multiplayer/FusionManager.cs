@@ -11,6 +11,10 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     // Handles all things connected to network management
 
     private NetworkRunner Runner;
+    private int playerCount = 0;
+    private PlayerRef host;
+    private GameData currentGame;
+    private string[] playerNames;
 
     private void Start()
     {
@@ -19,9 +23,29 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_PassMessage([RpcTarget] PlayerRef targ, string message)
+    public void RPC_SendMessage([RpcTarget] PlayerRef targ, string message)
     {
         Debug.Log(message);
+    }
+
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_RequestGameData([RpcTarget] PlayerRef targ)
+    {
+        RPC_TransferGameData(PlayerRef.None, FindFirstObjectByType<SaveLoadManager>().GetCurrentGameData());
+    }
+
+    [Rpc(sources: RpcSources.All, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_TransferGameData([RpcTarget] PlayerRef targ, GameData data)
+    {
+        if (Runner.IsServer)
+        {
+            RPC_SendMessage(host, "--- FusionManager [SendMessage] : Server has successfully received game data.");
+            currentGame = data;
+        }
+        else
+        {
+            FindFirstObjectByType<SaveLoadManager>().SetCurrentGameData(data);
+        }
     }
 
     // Use GameMode.Host and GameMode.Client to determine join type
@@ -49,15 +73,32 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (Runner.IsServer)
         {
-            RPC_PassMessage(player, "You are connected as " + player);
+            RPC_SendMessage(player, "--- FusionManager [SendMessage] : You have successfully connected as " + player + ".");
+            
+            playerCount++;
+
+            if (playerCount > 1)
+            {
+                RPC_SendMessage(player, "--- FusionManager [SendMessage] : You are a client. Getting save data from server...");
+                
+                RPC_TransferGameData(player, currentGame);
+            }
+            else
+            {
+                RPC_SendMessage(player, "--- FusionManager [SendMessage] : You are the host. Sending your save data to server...");
+                
+                host = player;
+                RPC_RequestGameData(host);
+            }
         }
     }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         if (Runner.IsServer)
         {
-            //players[plrCount] = PlayerRef.None;
-            //plrCount--;
+            RPC_SendMessage(player, "--- FusionManager [SendMessage] : " + player + " has left.");
+            
+            playerCount--;
         }
     }
 
