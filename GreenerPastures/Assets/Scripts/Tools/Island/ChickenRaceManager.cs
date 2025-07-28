@@ -54,8 +54,11 @@ public class ChickenRaceManager : MonoBehaviour
         public float animTimer;
         public Vector2 position;
         public bool faceLeft;
+        public Vector2 resetVector;
+        public float startX;
+        public float finishX;
     }
-    private ChickenRunner[] chickens;
+    public ChickenRunner[] chickens;
 
     public Texture2D raceDishOL;
     public Texture2D[] goldOLs;
@@ -139,9 +142,9 @@ public class ChickenRaceManager : MonoBehaviour
 
             // chickens init
             chickens = new ChickenRunner[3];
-            chickens[0] = InitializeChicken("larry", new Vector2(0.175f, 0.525f));
-            chickens[1] = InitializeChicken("curly", new Vector2(0.15f, 0.6f));
-            chickens[2] = InitializeChicken("moe", new Vector2(0.125f, 0.67f));
+            chickens[0] = InitializeChicken("larry", new Vector2(0.17f, 0.525f), 0.175f, 0.78f);
+            chickens[1] = InitializeChicken("curly", new Vector2(0.09f, 0.6f), 0.15f, 0.81f);
+            chickens[2] = InitializeChicken("moe", new Vector2(0.2f, 0.67f), 0.125f, 0.835f);
         }
     }
 
@@ -374,6 +377,9 @@ public class ChickenRaceManager : MonoBehaviour
                             chickens[i].animTimer = 0.1f;
                             chickens[i].animFrame = 0;
                             chickens[i].faceLeft = false;
+                            Vector3 pos = chickens[i].position;
+                            pos.x = chickens[i].startX;
+                            chickens[i].position = pos;
                         }
                         break;
                     case RaceState.Race:
@@ -381,7 +387,7 @@ public class ChickenRaceManager : MonoBehaviour
                         {
                             chickens[i].animIndex = 1;
                             chickens[i].animTimer = RandomSystem.GaussianRandom01() * 0.1f;
-                            chickens[i].animFrame = 0;
+                            chickens[i].animFrame = Random.Range(0,2);
                             chickens[i].faceLeft = false;
                         }
                         break;
@@ -529,9 +535,12 @@ public class ChickenRaceManager : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             chickens[i].animIndex = 0;
-            chickens[i].animTimer = 0.1f;
+            chickens[i].animTimer = 1f;
             chickens[i].animFrame = 0;
             chickens[i].faceLeft = false;
+            Vector3 pos = chickens[i].position;
+            pos.x = chickens[i].startX;
+            chickens[i].position = pos;
         }
         if (raceStateTimer > 0f)
             return;
@@ -546,24 +555,29 @@ public class ChickenRaceManager : MonoBehaviour
 
         // all chickens run
         float chickenMoveSpeed = 0.2f;
+        // find lane #1 length between start and finish
+        float baseLaneLength = chickens[0].finishX - chickens[0].startX;
+        float lengthChickenRuns; // each chicken lane length
+        float laneCheatMultiplier = 1f; // (length/base)
 
         bool raceFinished = false;
         for (int i=0; i < 3; i++)
         {
-            chickenMoveSpeed = 0.2f;
-            chickenMoveSpeed += (i - 1) * 0.01f; // lane cheat fix
-            chickenMoveSpeed *= RandomSystem.GaussianRandom01();
+            lengthChickenRuns = chickens[i].finishX - chickens[i].startX;
+            laneCheatMultiplier = (lengthChickenRuns / baseLaneLength);
 
-            if (chickens[i].position.x > .8f)
-            {
-                chickens[i].animIndex = 0;
-            }
+            chickenMoveSpeed = 0.2f;
+            chickenMoveSpeed *= RandomSystem.GaussianRandom01();
+            chickenMoveSpeed *= laneCheatMultiplier;
+
+            if (chickens[i].position.x > chickens[i].finishX)
+                chickens[i].animIndex = 0; // chicken chill
             else
             {
                 chickens[i].animIndex = 1;
                 chickens[i].position.x += chickenMoveSpeed * Time.deltaTime;
                 // check for winner
-                if (chickens[i].position.x > 0.8f) // finish line
+                if (chickens[i].position.x > chickens[i].finishX) // finish line
                     raceFinished = true;
             }
         }
@@ -694,21 +708,22 @@ public class ChickenRaceManager : MonoBehaviour
         // exit reward state, return to entering state
         raceState = RaceState.Entering;
         raceStateTimer = RACESTATETIMERMAX;
-        // REVIEW: reset chickens here?
-        chickens[0].position = new Vector2(0.175f, 0.525f);
-        chickens[0].animIndex = 0;
-        chickens[1].position = new Vector2(0.15f, 0.6f);
-        chickens[1].animIndex = 0;
-        chickens[2].position = new Vector2(0.125f, 0.67f);
-        chickens[2].animIndex = 0;
+        // reset chickens here
+        for (int i = 0; i < 3; i++)
+        {
+            chickens[i].position = chickens[i].resetVector;
+            chickens[i].animIndex = 0;
+            chickens[i].animFrame = 0;
+            chickens[i].animTimer = 0.1f;
+        }
     }
 
-    ChickenRunner InitializeChicken(string name, Vector2 pos)
+    ChickenRunner InitializeChicken(string name, Vector2 pos, float startLine, float finishLine )
     {
-        return InitializeChicken(name, ChickenAnimSet.Idle, 0, RandomSystem.FlatRandom01(), pos, false);
+        return InitializeChicken(name, ChickenAnimSet.Idle, 0, RandomSystem.FlatRandom01(), pos, false, startLine, finishLine);
     }
 
-    ChickenRunner InitializeChicken(string name, ChickenAnimSet set, int frame, float timer, Vector2 pos, bool faceLeft)
+    ChickenRunner InitializeChicken(string name, ChickenAnimSet set, int frame, float timer, Vector2 pos, bool faceLeft, float start, float finish)
     {
         ChickenRunner retChicken = new ChickenRunner();
 
@@ -718,6 +733,9 @@ public class ChickenRaceManager : MonoBehaviour
         retChicken.animTimer = timer;
         retChicken.position = pos;
         retChicken.faceLeft = faceLeft;
+        retChicken.resetVector = pos;
+        retChicken.startX = start;
+        retChicken.finishX = finish;
 
         return retChicken;
     }
