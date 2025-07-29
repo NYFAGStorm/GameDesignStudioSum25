@@ -131,14 +131,14 @@ public static class PlayerSystem
                 retColor.b = .1f;
                 break;
             case PlayerHairColor.ShadeC:
-                retColor.r = .618f;
-                retColor.g = .381f;
-                retColor.b = .2f;
-                break;
-            case PlayerHairColor.ShadeD:
                 retColor.r = .381f;
                 retColor.g = .2f;
                 retColor.b = .1f;
+                break;
+            case PlayerHairColor.ShadeD:
+                retColor.r = .618f;
+                retColor.g = .381f;
+                retColor.b = .2f;
                 break;
             case PlayerHairColor.ShadeE:
                 retColor.r = .8f;
@@ -151,7 +151,7 @@ public static class PlayerSystem
                 retColor.b = .618f;
                 break;
             case PlayerHairColor.ShadeG:
-                retColor.r = 1f;
+                retColor.r = .8f;
                 retColor.g = .381f;
                 retColor.b = .381f;
                 break;
@@ -173,37 +173,37 @@ public static class PlayerSystem
                 retColor.b = 1f;
                 break;
             case PlayerSkinColor.ToneA:
-                retColor.r = 0.3f;
+                retColor.r = 0.381f;
                 retColor.g = 0.25f;
                 retColor.b = 0.175f;
                 break;
             case PlayerSkinColor.ToneB:
-                retColor.r = 0.45f;
+                retColor.r = 0.618f;
                 retColor.g = 0.381f;
                 retColor.b = 0.27f;
                 break;
             case PlayerSkinColor.ToneC:
-                retColor.r = 0.55f;
+                retColor.r = 0.618f;
                 retColor.g = 0.45f;
                 retColor.b = 0.333f;
                 break;
             case PlayerSkinColor.ToneD:
-                retColor.r = 0.67f;
-                retColor.g = 0.575f;
+                retColor.r = 0.8f;
+                retColor.g = 0.618f;
                 retColor.b = 0.45f;
                 break;
             case PlayerSkinColor.ToneE:
-                retColor.r = 0.7f;
-                retColor.g = 0.6f;
+                retColor.r = 0.8f;
+                retColor.g = 0.618f;
                 retColor.b = 0.5f;
                 break;
             case PlayerSkinColor.ToneF:
                 retColor.r = 0.725f;
-                retColor.g = 0.67f;
+                retColor.g = 0.618f;
                 retColor.b = 0.55f;
                 break;
             case PlayerSkinColor.ToneG:
-                retColor.r = 0.75f;
+                retColor.r = 0.8f;
                 retColor.g = 0.7f;
                 retColor.b = 0.618f;
                 break;
@@ -235,69 +235,69 @@ public static class PlayerSystem
                 retColor.b = 0.618f;
                 break;
             case PlayerColor.ColorC:
+                retColor.r = 0.618f;
+                retColor.g = 0.381f;
+                retColor.b = 0.381f;
+                break;
+            case PlayerColor.ColorD:
                 retColor.r = 0.8f;
                 retColor.g = 0.3f;
                 retColor.b = 0.3f;
                 break;
-            case PlayerColor.ColorD:
-                retColor.r = 0.55f;
+            case PlayerColor.ColorE:
+                retColor.r = 0.618f;
+                retColor.g = 0.2f;
+                retColor.b = 0.381f;
+                break;
+            case PlayerColor.ColorF:
+                retColor.r = 0.381f;
+                retColor.g = 0.2f;
+                retColor.b = 0.618f;
+                break;
+            case PlayerColor.ColorG:
+                retColor.r = 0.618f;
                 retColor.g = 0.5f;
                 retColor.b = 0.8f;
                 break;
-            case PlayerColor.ColorE:
-                retColor.r = 0.3f;
-                retColor.g = 0.7f;
-                retColor.b = 0.8f;
-                break;
-            case PlayerColor.ColorF:
-                retColor.r = 0.125f;
-                retColor.g = 0.618f;
-                retColor.b = 0.3f;
-                break;
-            case PlayerColor.ColorG:
-                retColor.r = 0.8f;
-                retColor.g = 0.618f;
-                retColor.b = 0.381f;
-                break;
             case PlayerColor.ColorH:
                 retColor.r = 0.381f;
-                retColor.g = 0.8f;
-                retColor.b = 0.1f;
+                retColor.g = 0.618f;
+                retColor.b = 0.8f;
                 break;
-            case PlayerColor.ColorI:
-                retColor.r = 0.1f;
+            case PlayerColor.ColorI: // I
+                retColor.r = 0.2f;
                 retColor.g = 0.381f;
                 retColor.b = 0.8f;
                 break;
             case PlayerColor.ColorJ:
-                retColor.r = 0.618f;
-                retColor.g = 0.1f;
+                retColor.r = 0.1f;
+                retColor.g = 0.618f;
                 retColor.b = 0.381f;
                 break;
             case PlayerColor.ColorK:
-                retColor.r = 0.8f;
-                retColor.g = 0.381f;
-                retColor.b = 0.1f;
+                retColor.r = 0.381f;
+                retColor.g = 0.618f;
+                retColor.b = 0.381f;
                 break;
             case PlayerColor.ColorL:
                 retColor.r = 0.381f;
-                retColor.g = 0.1f;
-                retColor.b = 0.8f;
+                retColor.g = 0.618f;
+                retColor.b = 0.1f;
                 break;
             case PlayerColor.ColorM:
-                retColor.r = 0.381f;
-                retColor.g = 0.8f;
-                retColor.b = 0.381f;
-                break;
-            case PlayerColor.ColorN:
                 retColor.r = 0.8f;
                 retColor.g = 0.8f;
                 retColor.b = 0.1f;
                 break;
-            case PlayerColor.ColorO:
+            case PlayerColor.ColorN:
                 retColor.r = 0.8f;
                 retColor.g = 0.618f;
-                retColor.b = 0.618f;
+                retColor.b = 0.381f;
+                break;
+            case PlayerColor.ColorO:
+                retColor.r = 0.8f;
+                retColor.g = 0.381f;
+                retColor.b = 0.2f;
                 break;
         }
         retColor.a = 1f;
