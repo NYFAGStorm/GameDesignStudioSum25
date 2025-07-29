@@ -23,6 +23,21 @@ public enum StructureType
 public enum StructureEffect
 {
     Default,
+    TowerColorA,
+    TowerColorB,
+    TowerColorC,
+    TowerColorD,
+    TowerColorE,
+    TowerColorF,
+    TowerColorG,
+    TowerColorH,
+    TowerColorI,
+    TowerColorJ,
+    TowerColorK,
+    TowerColorL,
+    TowerColorM,
+    TowerColorN,
+    TowerColorO,
     EffectA,
     EffectB,
     EffectC,
@@ -78,6 +93,8 @@ public class PropData
 public enum IslandEffect
 {
     Default,
+    SpellStarbloomBurst,
+    SpellFogOfWar,
     EffectA,
     EffectB,
     EffectC,

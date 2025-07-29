@@ -18,11 +18,21 @@ public enum PlotEffect
     FastGrowI,
     SummonWaterI,
     BlessI,
+    DaylightI,
+    SeedingEcho,
+    FastGrowII,
     MalnutritionI,
     ProsperousI,
+    TheGreatHarvest,
+    SummonWaterII,
     LesionI,
+    TheReaper,
     EclipseI,
-    GoldenThumbI
+    GoldenThumbI,
+    BlessedSpring,
+    MalnutritionII,
+    BlessII,
+    ProsperousII
 }
 
 [System.Serializable]
