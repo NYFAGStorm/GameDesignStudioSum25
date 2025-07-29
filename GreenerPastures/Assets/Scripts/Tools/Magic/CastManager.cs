@@ -142,19 +142,124 @@ public class CastManager : MonoBehaviour
         // REVIEW: the assumption is that most spells alter plots
         //  if not, we need to form lists of affected elements to operate on within switch
 
+        float dist;
+
         // Spells not affecting plots
 
         // Structure effects
         // splaturn
-
         // Island effects
         // starbloom burst, fog of war
+        if (spellType == SpellType.Splaturn ||
+            spellType == SpellType.StarbloomBurst ||
+            spellType == SpellType.FogOfWar)
+        {
+            IslandManager islandMgr = GameObject.FindFirstObjectByType<IslandManager>();
+            if (islandMgr != null)
+            {
+                for (int i = 0; i < islandMgr.islands.Length; i++)
+                {
+                    if (spellType == SpellType.Splaturn)
+                    {
+                        for (int n = 0; n < islandMgr.islands[i].structures.Length; n++)
+                        {
+                            if (islandMgr.islands[i].structures[n].type != StructureType.WizardTower)
+                                continue;
+                            Vector3 towerPosition = GameSystem.GetVector(islandMgr.islands[i].location);
+                            towerPosition += GameSystem.GetVector(islandMgr.islands[i].structures[n].location);
+                            dist = Vector3.Distance(towerPosition, positionEffect); // pad AoE a little (structure size)
+                            if (dist > areaOfEffect + 3.81f)
+                                continue;
+                            // do it
+                            casts[index].islandIndex = i;
+                        }
+                    }
+                    else
+                    {
+                        Vector3 islandPosition = GameSystem.GetVector(islandMgr.islands[i].location);
+                        dist = Vector3.Distance(islandPosition, positionEffect); // also use island range (.w)
+                        if (dist > (areaOfEffect + islandMgr.islands[i].location.w))
+                            continue;
+                        // do it
+                        casts[index].islandIndex = i;
+                    }
+                }
+            }
+        }
 
         // Player effects
-        // mirror mirror, gilded wordsI, color trailI-III, swiftness, light work, gilded wordsII, rabbit hole
+        // mirror mirror, gilded wordsI, color trailI-III, swiftness, light work, gilded wordsII
+        if (spellType == SpellType.MirrorMirror ||
+            spellType == SpellType.GildedWordsI ||
+            spellType == SpellType.ColorTrailI ||
+            spellType == SpellType.ColorTrailII ||
+            spellType == SpellType.ColorTrailIII||
+            spellType == SpellType.Swiftness ||
+            spellType == SpellType.LightWork ||
+            spellType == SpellType.GildedWordsII)
+        {
+            PlayerControlManager[] players = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < players.Length; i++)
+            {
+                dist = Vector3.Distance(players[i].gameObject.transform.position, positionEffect);
+                if (dist > areaOfEffect)
+                    continue;
+                // do it
+                GameData gData = GameObject.FindFirstObjectByType<GreenerGameManager>().game;
+                casts[index].profileID = GameSystem.GetProfileIDOfPlayer(gData, players[i].playerData.playerName);
+                switch (spellType)
+                {
+                    case SpellType.MirrorMirror:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellMirrorMirror);
+                        break;
+                    case SpellType.GildedWordsI:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellGildedWordsI);
+                        break;
+                    case SpellType.ColorTrailI:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellColorTrailI);
+                        break;
+                    case SpellType.ColorTrailII:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellColorTrailII);
+                        break;
+                    case SpellType.ColorTrailIII:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellColorTrailIII);
+                        break;
+                    case SpellType.Swiftness:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellSwiftness);
+                        break;
+                    case SpellType.LightWork:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellLightWork);
+                        break;
+                    case SpellType.GildedWordsII:
+                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellGildedWordsII);
+                        break;
+                }
+            }
+        }
+        // rabbit hole
+        if (spellType == SpellType.RabbitHole)
+        {
+            RemotePlayerManager[] rPlayers = GameObject.FindObjectsByType<RemotePlayerManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < rPlayers.Length; i++)
+            {
+                dist = Vector3.Distance(rPlayers[i].gameObject.transform.position, positionEffect);
+                if (dist > areaOfEffect)
+                    continue;
+                // do it
+                GameData gData = GameObject.FindFirstObjectByType<GreenerGameManager>().game;
+                casts[index].profileID = GameSystem.GetProfileIDOfPlayer(gData, rPlayers[i].playerName);
+                for (int n = 0; n < gData.players.Length; n++)
+                {
+                    if (gData.players[n].profileID == casts[index].profileID)
+                    {
+                        gData.players[n] = PlayerSystem.AddPlayerEffect(gData.players[n], PlayerEffect.SpellRabbitHole);
+                        break;
+                    }
+                }
+            }
+        }
 
-
-        float dist;
+        // Plot effects
         PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
         for (int i = 0; i < plots.Length; i++)
         {
@@ -305,16 +410,84 @@ public class CastManager : MonoBehaviour
         // REVIEW: the assumption is that most spells alter plots
         //  if not, we need to form lists of affected elements to operate on within switch
 
+        float dist;
+
         // Spells not affecting plots
 
         // Island effects
         // starbloom burst, fog of war
+        if (spellType == SpellType.StarbloomBurst ||
+            spellType == SpellType.FogOfWar)
+        {
+            // use island index
+            IslandManager islandMgr = GameObject.FindFirstObjectByType<IslandManager>();
+            if (islandMgr != null)
+            {
+                if (spellType == SpellType.StarbloomBurst)
+                    islandMgr.islands[casts[index].islandIndex] = IslandSystem.RemoveIslandEffect(islandMgr.islands[casts[index].islandIndex], IslandEffect.SpellStarbloomBurst);
+                else if (spellType == SpellType.FogOfWar)
+                    islandMgr.islands[casts[index].islandIndex] = IslandSystem.RemoveIslandEffect(islandMgr.islands[casts[index].islandIndex], IslandEffect.SpellFogOfWar);
+
+                return;
+            }
+        }
 
         // Player effects
         // gilded wordsI, color trailI-III, swiftness, light work, gilded wordsII, rabbit hole
+        if (spellType == SpellType.MirrorMirror ||
+            spellType == SpellType.GildedWordsI ||
+            spellType == SpellType.ColorTrailI ||
+            spellType == SpellType.ColorTrailII ||
+            spellType == SpellType.ColorTrailIII ||
+            spellType == SpellType.Swiftness ||
+            spellType == SpellType.LightWork ||
+            spellType == SpellType.GildedWordsII ||
+            spellType == SpellType.RabbitHole)
+        {
+            // use profile ID
+            GameData gData = GameObject.FindFirstObjectByType<GreenerGameManager>().game;
+            // access player data
+            for (int i = 0; i < gData.players.Length; i++)
+            {
+                if (gData.players[i].profileID == casts[index].profileID)
+                {
+                    switch (spellType)
+                    {
+                        case SpellType.MirrorMirror:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellMirrorMirror);
+                            break;
+                        case SpellType.GildedWordsI:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellGildedWordsI);
+                            break;
+                        case SpellType.ColorTrailI:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellColorTrailI);
+                            break;
+                        case SpellType.ColorTrailII:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellColorTrailII);
+                            break;
+                        case SpellType.ColorTrailIII:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellColorTrailIII);
+                            break;
+                        case SpellType.Swiftness:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellSwiftness);
+                            break;
+                        case SpellType.LightWork:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellLightWork);
+                            break;
+                        case SpellType.GildedWordsII:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellGildedWordsII);
+                            break;
+                        case SpellType.RabbitHole:
+                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellRabbitHole);
+                            break;
+                    }
+                }
+            }
+            
+            return;
+        }
 
-
-        float dist;
+        // Plot effects
         PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
         for (int i = 0; i < plots.Length; i++)
         {

@@ -123,6 +123,8 @@ public class CastData
     public float posY;
     public float posZ;
     public float rangeAOE;
+    public int islandIndex; // island effect to remove
+    public string profileID; // player effect to remove
 }
 
 // magic is one player's current magic, including learned spells and casts in effect
