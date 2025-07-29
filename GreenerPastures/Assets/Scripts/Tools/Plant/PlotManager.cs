@@ -54,6 +54,11 @@ public class PlotManager : MonoBehaviour
 
     private bool introRunning;
 
+    private bool hasDaylightVFX;
+    private bool autoHarvestOnce;
+    private bool autoUprootOnce;
+    private bool forceReFruit;
+
     const float CURSORPULSEDURATION = 0.618f;
     // temp use time manager multiplier
     const float WATERDRAINRATE = 0.25f;
@@ -132,8 +137,28 @@ public class PlotManager : MonoBehaviour
         }
     }
 
+    public void LaunchTheGreatHarvest()
+    {
+        autoHarvestOnce = true;
+    }
+
+    public void LaunchTheReaper()
+    {
+        autoUprootOnce = true;
+    }
+
+    public void ForceReFruit( bool reFruit )
+    {
+        forceReFruit = reFruit;
+    }
+
     void Update()
     {
+        if (autoHarvestOnce)
+            HarvestPlant();
+        if (autoUprootOnce)
+            UprootPlot();
+
         if (!cursorActive)
         {
             actionProgress = 0f;
@@ -192,16 +217,40 @@ public class PlotManager : MonoBehaviour
                         data.soil = Mathf.Clamp01(data.soil - (data.plant.growth * data.plant.vitality * SOILDEGRADERATE * MASTERPLANTPROGRESSRATE * PLOTCHECKINTERVAL));
                 }
                 // PLOT EFFECTS:
-                if (FarmSystem.PlotHasEffect(data, PlotEffect.SummonWaterI))
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.DaylightI))
+                    data.sun = 1f;
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.SummonWaterI) ||
+                    FarmSystem.PlotHasEffect(data, PlotEffect.SummonWaterII))
                     data.water = 1f;
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.EclipseI))
                     data.sun = Mathf.Clamp( (data.sun * 0.5f), 0f, 0.5f );
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.DaylightII))
+                    data.sun = 1f; // daylight II overrides eclipse
 
                 // update season values
                 seasonValues.x = tim.GetAmountOfSeason(WorldSeason.Spring);
                 seasonValues.y = tim.GetAmountOfSeason(WorldSeason.Summer);
                 seasonValues.z = tim.GetAmountOfSeason(WorldSeason.Fall);
                 seasonValues.w = tim.GetAmountOfSeason(WorldSeason.Winter);
+
+                // SPELL DAYLIGHT I  & II
+                if (!hasDaylightVFX && 
+                    (FarmSystem.PlotHasEffect(data, PlotEffect.DaylightI) ||
+                    FarmSystem.PlotHasEffect(data, PlotEffect.DaylightII)))
+                {
+                    GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Daylight"));
+                    vfx.name = "Daylight VFX";
+                    vfx.transform.position = gameObject.transform.position;
+                    vfx.transform.parent = gameObject.transform;
+                    hasDaylightVFX = true;
+                }
+                else if (hasDaylightVFX &&
+                    (!FarmSystem.PlotHasEffect(data, PlotEffect.DaylightI) &&
+                    !FarmSystem.PlotHasEffect(data, PlotEffect.DaylightII)))
+                {
+                    Destroy(gameObject.transform.Find("Daylight VFX"));
+                    hasDaylightVFX = false;
+                }
             }
         }
 
@@ -379,7 +428,8 @@ public class PlotManager : MonoBehaviour
     void UpdatePlotHazards()
     {
         // PLOT EFFECTS:
-        if (FarmSystem.PlotHasEffect(data, PlotEffect.BlessI))
+        if (FarmSystem.PlotHasEffect(data, PlotEffect.BlessI) || 
+            FarmSystem.PlotHasEffect(data, PlotEffect.BlessII))
             return;
         
         // TODO: implement hazards update
@@ -467,6 +517,9 @@ public class PlotManager : MonoBehaviour
         }
         // progress step
         actionProgressStep = 1f / (actionLimit / ACTIONHOLDSTEPINTERVAL);
+        // SPELL LIGHT WORK
+        if (PlayerSystem.PlayerHasEffect(currentPlayer.playerData, PlayerEffect.SpellLightWork))
+            actionProgress += actionProgressStep; // x2 work rate
         actionProgress += actionProgressStep;
         actionStepTimer = ACTIONHOLDSTEPINTERVAL;
         actionDrainTimer = ACTIONDRAINDELAYDURATION;
@@ -587,8 +640,12 @@ public class PlotManager : MonoBehaviour
                 // PLOT EFFECTS:
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.FastGrowI))
                     data.plant.adjustedGrowthRate += 0.33f;
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.FastGrowII))
+                    data.plant.adjustedGrowthRate += 0.67f;
                 if (FarmSystem.PlotHasEffect(data, PlotEffect.MalnutritionI))
-                    data.plant.adjustedGrowthRate -= 0.1f;
+                    data.plant.adjustedGrowthRate -= 0.33f;
+                if (FarmSystem.PlotHasEffect(data, PlotEffect.MalnutritionII))
+                    data.plant.adjustedGrowthRate -= 0.67f;
                 // PLANT EFFECTS:
                 if (data.plant.type == PlantType.WalkingStick)
                 {
@@ -639,26 +696,30 @@ public class PlotManager : MonoBehaviour
 
     public void HarvestPlant()
     {
-        if (actionDirty)
+        if (!autoHarvestOnce && actionDirty)
             return;
 
-        if (actionCompleteTimer > 0f && !actionClear)
+        if (!autoHarvestOnce && actionCompleteTimer > 0f && !actionClear)
             return;
 
         // cannot harvest unless a plant exists, plant at 100% growth and not yet harvested
-        if (plant == null || data.plant.growth < 1f || (data.plant.isHarvested && !data.plant.canReFruit))
+        if (!autoHarvestOnce && 
+            (plant == null || data.plant.growth < 1f || (data.plant.isHarvested && !data.plant.canReFruit)))
             return;
 
-        if (action != CurrentAction.Harvesting && action != CurrentAction.None)
+        if (!autoHarvestOnce && action != CurrentAction.Harvesting && action != CurrentAction.None)
             return;
 
         action = CurrentAction.Harvesting;
 
-        if (!ActionComplete(HARVESTWINDOW,"HARVESTING..."))
+        if (!autoHarvestOnce && !ActionComplete(HARVESTWINDOW,"HARVESTING..."))
             return;
 
         if ( data.condition == PlotCondition.Growing )
         {
+            if (autoHarvestOnce)
+                autoHarvestOnce = false; // just once
+
             // harvest if plant is 100% grown and not yet harvested
             if (data.plant.growth < 1f)
                 return;
@@ -683,17 +744,18 @@ public class PlotManager : MonoBehaviour
                     if (harvestNumber > 1)
                         harvestNumber = Random.Range(0, harvestNumber) + 1;
                     // PLOT EFFECTS:
-                    if (FarmSystem.PlotHasEffect(data, PlotEffect.ProsperousI) && 
-                        RandomSystem.FlatRandom01() < .1f)
+                    if (FarmSystem.PlotHasEffect(data, PlotEffect.ProsperousI))
                         harvestNumber *= 2;
+                    if (FarmSystem.PlotHasEffect(data, PlotEffect.ProsperousII))
+                        harvestNumber *= 3;
                     // iterate to harvest multiple
                     for ( int i = 0; i < harvestNumber; i++ )
                     {
                         // PLOT EFFECTS:
                         if (FarmSystem.PlotHasEffect(data, PlotEffect.LesionI))
-                            data.plant.quality -= 0.05f;
+                            data.plant.quality -= 0.5f;
                         if (FarmSystem.PlotHasEffect(data, PlotEffect.GoldenThumbI))
-                            data.plant.quality += 0.1f;
+                            data.plant.quality += 0.5f;
                         // check if empty inventory slot availbale on player, drop loose if not
                         if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
                         {
@@ -762,8 +824,11 @@ public class PlotManager : MonoBehaviour
                         }
                     }
                     // harvesting may drop seed
-                    if (RandomSystem.FlatRandom01() < data.plant.seedPotential)
+                    if (FarmSystem.PlotHasEffect(data, PlotEffect.SeedingEcho) || RandomSystem.FlatRandom01() < data.plant.seedPotential)
                     {
+                        // PLOT EFFECTS: (complete after just one harvest)
+                        if (FarmSystem.PlotHasEffect(data, PlotEffect.SeedingEcho))
+                            FarmSystem.RemovePlotEffect(data, PlotEffect.SeedingEcho);
                         // calculate number of seed items
                         int numberOfSeeds = 1;
                         if (data.plant.seedPotential > 0.5f)
@@ -813,8 +878,10 @@ public class PlotManager : MonoBehaviour
                 harvestDisplayTimer = HARVESTDISPLAYDURATION;
                 harvestQualityValue = data.plant.quality;
                 // plants that can re-fruit reset growth to 20%
-                if (data.plant.canReFruit)
+                if (forceReFruit || data.plant.canReFruit)
                     data.plant.growth = .2f;
+                // PLOT EFFECT: BLESSED SPRING
+                plant.GetComponent<PlantManager>().SetForceReFruit(forceReFruit);
                 // set proper plant art
                 plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
             }
@@ -823,18 +890,18 @@ public class PlotManager : MonoBehaviour
 
     public void UprootPlot()
     {
-        if (actionDirty)
+        if (!autoUprootOnce && actionDirty)
             return;
 
-        if (actionCompleteTimer > 0f && !actionClear)
+        if (!autoUprootOnce && actionCompleteTimer > 0f && !actionClear)
             return;
 
-        if (action != CurrentAction.Uprooting && action != CurrentAction.None)
+        if (!autoUprootOnce && action != CurrentAction.Uprooting && action != CurrentAction.None)
             return;
 
         action = CurrentAction.Uprooting;
 
-        if (!ActionComplete(UPROOTWINDOW, "DIGGING..."))
+        if (!autoUprootOnce && !ActionComplete(UPROOTWINDOW, "DIGGING..."))
             return;
 
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();

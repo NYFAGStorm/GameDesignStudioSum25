@@ -16,6 +16,8 @@ public class RemotePlayerManager : MonoBehaviour
     private Vector3 moveVector; // used for character anim mgr
     private CharacterAnimManager pam;
 
+    private PlayerData playerData; // access for color and player effects (read-only)
+
     private bool remotePlayerIntialized;
 
     const float LERPDISTANCETHRESHOLD = 1f;
@@ -59,7 +61,10 @@ public class RemotePlayerManager : MonoBehaviour
             {
                 PlayerData pData = GameSystem.GetProfilePlayer(gData, profileID);
                 if (pData != null)
+                {
                     ConfigureAppearance(pData.options);
+                    playerData = pData;
+                }
             }
         }
         remotePlayerIntialized = true;
@@ -85,6 +90,71 @@ public class RemotePlayerManager : MonoBehaviour
         playerPosition = pos;
     }
 
+    void DoColorTrail(Vector3 pos)
+    {
+        // REVIEW: cleanup
+
+        // SPELL COLOR TRAIL I, II, II
+        if (Time.time % 1f < 0.05f)
+        {
+            GameObject lightingFolderObject = GameObject.Find("Lighting");
+            if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellColorTrailI))
+            {
+                Color c = PlayerSystem.GetPlayerColor(playerData.options.mainColor);
+                GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Color Trail"));
+                vfx.transform.position = pos;
+                Vector3 offset = Vector3.zero;
+                offset.x = RandomSystem.GaussianRandom01() - 0.5f;
+                offset.z = RandomSystem.GaussianRandom01() - 0.5f;
+                offset *= 0.381f;
+                vfx.transform.position += offset;
+                Vector3 scl = Vector3.one;
+                scl *= RandomSystem.GaussianRandom01();
+                vfx.transform.localScale = scl;
+                vfx.name = "VFX Color Trail I";
+                vfx.transform.parent = lightingFolderObject.transform;
+                vfx.GetComponent<Renderer>().material.color = c;
+                Destroy(vfx, 3.81f);
+            }
+            if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellColorTrailII))
+            {
+                Color c = PlayerSystem.GetPlayerColor(playerData.options.secondaryColor);
+                GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Color Trail"));
+                vfx.transform.position = pos;
+                Vector3 offset = Vector3.zero;
+                offset.x = RandomSystem.GaussianRandom01() - 0.5f;
+                offset.z = RandomSystem.GaussianRandom01() - 0.5f;
+                offset *= 0.381f;
+                vfx.transform.position += offset;
+                Vector3 scl = Vector3.one;
+                scl *= RandomSystem.GaussianRandom01();
+                vfx.transform.localScale = scl;
+                vfx.name = "VFX Color Trail II";
+                vfx.transform.parent = lightingFolderObject.transform;
+                vfx.GetComponent<Renderer>().material.color = c;
+                Destroy(vfx, 3.81f);
+            }
+            if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellColorTrailIII))
+            {
+                Color c = PlayerSystem.GetPlayerColor(playerData.options.accentColor);
+                GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Color Trail"));
+                vfx.transform.position = pos;
+                Vector3 offset = Vector3.zero;
+                offset.x = RandomSystem.GaussianRandom01() - 0.5f;
+                offset.z = RandomSystem.GaussianRandom01() - 0.5f;
+                offset *= 0.381f;
+                vfx.transform.position += offset;
+                Vector3 scl = Vector3.one;
+                scl *= RandomSystem.GaussianRandom01();
+                vfx.transform.localScale = scl;
+                vfx.name = "VFX Color Trail III";
+                vfx.transform.parent = lightingFolderObject.transform;
+                vfx.GetComponent<Renderer>().material.color = c;
+                Destroy(vfx, 3.81f);
+            }
+        }
+    }
+
     void UpdatePlayerPosition()
     {
         // REVIEW: perform some lerp if distance is great?
@@ -98,6 +168,7 @@ public class RemotePlayerManager : MonoBehaviour
         pos.x = playerPosition.x;
         pos.y = playerPosition.y;
         pos.z = playerPosition.z;
+        DoColorTrail(pos);
         pam.characterMoveVector = moveVector;
         gameObject.transform.position = pos;
     }

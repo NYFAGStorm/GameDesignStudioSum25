@@ -111,6 +111,8 @@ public class PlayerIntroduction : MonoBehaviour
 
     private AudioManager sfxAudio;
 
+    private bool mirrormirror;
+
     const float DEFAULTINTROTIME = 0.618f;
     const float PAUSETIME = 1f;
     const float LONGPAUSETIME = 2f;
@@ -288,6 +290,15 @@ public class PlayerIntroduction : MonoBehaviour
         {
             plots[i].IntroRunning(false);
         }
+    }
+
+    public void SetMirrorMirrorActive()
+    {
+        // mirror mirror spell re-activates player character customization popup
+        pcm.characterFrozen = true;
+        pcm.freezeCharacterActions = true;
+        introPop = true;
+        mirrormirror = true;
     }
 
     void TeleporterControl( bool turnOn, string teleporterTag )
@@ -1666,7 +1677,7 @@ public class PlayerIntroduction : MonoBehaviour
 
     void OnGUI()
     {
-        if ((helpMessage == 0 && !introRunning) || (!canSkipIntro && !introPop && !dialogPop))
+        if ((introPop && mirrormirror) || (helpMessage == 0 && !introRunning) || (!canSkipIntro && !introPop && !dialogPop))
             return;
 
         Rect r = new Rect();
@@ -1853,7 +1864,7 @@ public class PlayerIntroduction : MonoBehaviour
         if (!introPop)
             return;
 
-        // INTRODUCTION POP UP
+        // PLAYER CHARACTER CUSTOMIZATION
         r.x = 0.1f * w;
         r.y = 0.1f * h;
         r.width = 0.8f * w;
@@ -2186,6 +2197,14 @@ public class PlayerIntroduction : MonoBehaviour
             introPop = false;
             // confirm player options
             TryConfigPlayerInScene(configOptions);
+            // end mirror mirror spell (if active)
+            if (mirrormirror)
+            {
+                pcm.characterFrozen = false;
+                pcm.freezeCharacterActions = false;
+                mirrormirror = false;
+                return;
+            }
             // reveal player character
             if (pcm != null)
             {

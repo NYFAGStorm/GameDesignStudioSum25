@@ -88,6 +88,8 @@ public class PlayerControlManager : MonoBehaviour
     private PostOfficeManager pom;
     private SaveLoadManager saveMgr;
 
+    private bool inARabbitHole;
+
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
     const bool ALLOWPLAYERDATALOAD = true; // set false for testing only
@@ -237,6 +239,12 @@ public class PlayerControlManager : MonoBehaviour
             }
         }
 
+        // SPELL RABBIT HOLE
+        if (inARabbitHole && !PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellRabbitHole))
+            FallInRabbitHole(false);
+        if (!inARabbitHole && PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellRabbitHole))
+            FallInRabbitHole(true);
+
         if (!freezeCharacterActions)
         {
             // check action input
@@ -325,6 +333,16 @@ public class PlayerControlManager : MonoBehaviour
             if (!mm.EnterSpellCastMode())
                 ggm.AddNotification("You have no spell charges in your spell book. Craft more charges to cast.");
         }
+    }
+
+    void FallInRabbitHole( bool inHole )
+    {
+        inARabbitHole = inHole;
+        characterFrozen = inHole;
+        freezeCharacterActions = inHole;
+        hidePlayerHUD = inHole;
+        hidePlayerNameTag = inHole;
+        pam.GetComponent<Renderer>().enabled = !inHole;
     }
 
     public void ConfigureAppearance( PlayerOptions options )
@@ -977,10 +995,80 @@ public class PlayerControlManager : MonoBehaviour
         }
     }
 
+    void DoColorTrail( Vector3 pos )
+    {
+        // REVIEW: cleanup
+
+        // SPELL COLOR TRAIL I, II, II
+        if (Time.time % 1f < 0.05f)
+        {
+            GameObject lightingFolderObject = GameObject.Find("Lighting");
+            if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellColorTrailI))
+            {
+                Color c = PlayerSystem.GetPlayerColor(playerData.options.mainColor);
+                GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Color Trail"));
+                vfx.transform.position = pos;
+                Vector3 offset = Vector3.zero;
+                offset.x = RandomSystem.GaussianRandom01() - 0.5f;
+                offset.z = RandomSystem.GaussianRandom01() - 0.5f;
+                offset *= 0.381f;
+                vfx.transform.position += offset;
+                Vector3 scl = Vector3.one;
+                scl *= RandomSystem.GaussianRandom01();
+                vfx.transform.localScale = scl;
+                vfx.name = "VFX Color Trail I";
+                vfx.transform.parent = lightingFolderObject.transform;
+                vfx.GetComponent<Renderer>().material.color = c;
+                Destroy(vfx, 3.81f);
+            }
+            if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellColorTrailII))
+            {
+                Color c = PlayerSystem.GetPlayerColor(playerData.options.secondaryColor);
+                GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Color Trail"));
+                vfx.transform.position = pos;
+                Vector3 offset = Vector3.zero;
+                offset.x = RandomSystem.GaussianRandom01() - 0.5f;
+                offset.z = RandomSystem.GaussianRandom01() - 0.5f;
+                offset *= 0.381f;
+                vfx.transform.position += offset;
+                Vector3 scl = Vector3.one;
+                scl *= RandomSystem.GaussianRandom01();
+                vfx.transform.localScale = scl;
+                vfx.name = "VFX Color Trail II";
+                vfx.transform.parent = lightingFolderObject.transform;
+                vfx.GetComponent<Renderer>().material.color = c;
+                Destroy(vfx, 3.81f);
+            }
+            if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellColorTrailIII))
+            {
+                Color c = PlayerSystem.GetPlayerColor(playerData.options.accentColor);
+                GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Color Trail"));
+                vfx.transform.position = pos;
+                Vector3 offset = Vector3.zero;
+                offset.x = RandomSystem.GaussianRandom01() - 0.5f;
+                offset.z = RandomSystem.GaussianRandom01() - 0.5f;
+                offset *= 0.381f;
+                vfx.transform.position += offset;
+                Vector3 scl = Vector3.one;
+                scl *= RandomSystem.GaussianRandom01();
+                vfx.transform.localScale = scl;
+                vfx.name = "VFX Color Trail III";
+                vfx.transform.parent = lightingFolderObject.transform;
+                vfx.GetComponent<Renderer>().material.color = c;
+                Destroy(vfx, 3.81f);
+            }
+        }
+    }
+
     void DoCharacterMove()
     {
         Vector3 pos = gameObject.transform.position;
+        // SPELL COLOR TRAIL
+        DoColorTrail(pos);
         pos += characterMove;
+        // SPELL SWIFTNESS
+        if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellSwiftness))
+            pos += (characterMove * 0.5f); // 150% movement rate
         pam.characterMoveVector = characterMove;
         gameObject.transform.position = pos;
     }
@@ -1161,6 +1249,19 @@ public class PlayerControlManager : MonoBehaviour
 
     void OnGUI()
     {
+        // SPELL RABBIT HOLE
+        if (inARabbitHole)
+        {
+            Rect rabbitHole = new Rect();
+            rabbitHole.x = 0f;
+            rabbitHole.y = 0f;
+            rabbitHole.width = 1f;
+            rabbitHole.height = 1f;
+            GUI.color = Color.black;
+            GUI.DrawTexture(rabbitHole, Texture2D.blackTexture);
+            return;
+        }
+        
         if (hidePlayerHUD || playerInventory == null)
             return;
 

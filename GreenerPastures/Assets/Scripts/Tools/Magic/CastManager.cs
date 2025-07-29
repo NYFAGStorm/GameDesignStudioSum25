@@ -138,10 +138,6 @@ public class CastManager : MonoBehaviour
         SpellType spellType = casts[index].type;
         Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
         float areaOfEffect = casts[index].rangeAOE;
-
-        // REVIEW: the assumption is that most spells alter plots
-        //  if not, we need to form lists of affected elements to operate on within switch
-
         float dist;
 
         // Spells not affecting plots
@@ -210,7 +206,10 @@ public class CastManager : MonoBehaviour
                 switch (spellType)
                 {
                     case SpellType.MirrorMirror:
-                        players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellMirrorMirror);
+                        //players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellMirrorMirror);
+                        PlayerIntroduction playerIntro = GameObject.FindFirstObjectByType<PlayerIntroduction>();
+                        if (playerIntro != null)
+                            playerIntro.SetMirrorMirrorActive();
                         break;
                     case SpellType.GildedWordsI:
                         players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellGildedWordsI);
@@ -288,37 +287,29 @@ public class CastManager : MonoBehaviour
                     plots[i].data.soil += 0.5f;
                     plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil);
                     break;
-                case SpellType.MirrorMirror:
-                    // Change your appearance
-                    break;
                 case SpellType.BlessI:
                     // Plots of land immune to hazards for one day
                     plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.BlessI);
                     break;
                 case SpellType.DaylightI:
                     // Summon sunlight on a plot for one day
-                    break;
-                case SpellType.GildedWordsI:
-                    // Make yourself charming (-25% off market prices)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.DaylightI);
                     break;
                 case SpellType.SeedingEcho:
                     // Harvest from plants guaranteed to drop seed
-                    break;
-                case SpellType.ColorTrailI:
-                    // Leave a trail of your primary color behind you
-                    break;
-                case SpellType.ColorTrailII:
-                    // Leave a trail of your secondary color behind you
-                    break;
-                case SpellType.ColorTrailIII:
-                    // Leave a trail of your accent color behind you
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.SeedingEcho);
                     break;
                 case SpellType.FastGrowII:
                     // Plants grow faster for two days (+67 %)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.FastGrowII);
+                    if (plots[i].plant != null)
+                        plots[i].data.plant.adjustedGrowthRate += 0.67f;
                     break;
                 case SpellType.MalnutritionI:
                     // Plants grow slower for one day (-33%)
                     plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.MalnutritionI);
+                    if (plots[i].plant != null)
+                        plots[i].data.plant.adjustedGrowthRate -= 0.33f;
                     break;
                 case SpellType.ProsperousI:
                     // Plant harvest yields twice as much
@@ -326,12 +317,11 @@ public class CastManager : MonoBehaviour
                     break;
                 case SpellType.TheGreatHarvest:
                     // Harvest several plots immediately
-                    break;
-                case SpellType.Splaturn:
-                    // Change the color of your tower
+                    plots[i].LaunchTheGreatHarvest();
                     break;
                 case SpellType.SummonWaterII:
                     // Plots of land stay hydrated for two days
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.SummonWaterII);
                     break;
                 case SpellType.LesionI:
                     // Decrease harvest quality (-50%)
@@ -339,21 +329,11 @@ public class CastManager : MonoBehaviour
                     break;
                 case SpellType.TheReaper:
                     // Dig up several plots, leaving holes and destroying seedlings
-                    break;
-                case SpellType.Swiftness:
-                    // Move faster (150%)
-                    break;
-                case SpellType.LightWork:
-                    // Farm work goes faster (200%)
-                    break;
-                case SpellType.StarbloomBurst:
-                    // Cast continuous fireworks into the sky
+                    plots[i].LaunchTheReaper();
                     break;
                 case SpellType.SoiledItII:
                     // Instantly maximize soil quality (100%)
-                    break;
-                case SpellType.GildedWordsII:
-                    // Make yourself charming (-50% off market prices)
+                    plots[i].data.soil = 1f;
                     break;
                 case SpellType.EclipseI:
                     // Block sunlight from plots for one day
@@ -365,27 +345,30 @@ public class CastManager : MonoBehaviour
                     break;
                 case SpellType.DullEarth:
                     // Decrease soil quality of several plots (-50%)
-                    break;
-                case SpellType.FogOfWar:
-                    // Summon cloud over an area
+                    plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil - .5f);
                     break;
                 case SpellType.BlessedSpring:
                     // Force multiple plants to re-fruit
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.BlessedSpring);
+                    plots[i].ForceReFruit(true);
                     break;
                 case SpellType.MalnutritionII:
                     // Plants grow slower for two days (-67%)
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.MalnutritionII);
+                    if (plots[i].plant != null)
+                        plots[i].data.plant.adjustedGrowthRate -= 0.67f;
                     break;
                 case SpellType.BlessII:
                     // Plots of land immune to hazards for three days
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.BlessII);
                     break;
                 case SpellType.ProsperousII:
                     // Plant harvest yields three times as much
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.ProsperousII);
                     break;
                 case SpellType.DaylightII:
                     // Summon sunlight on plots for three days
-                    break;
-                case SpellType.RabbitHole:
-                    // Another player is trapped for one day
+                    plots[i].data = FarmSystem.AddPlotEffect(plots[i].data, PlotEffect.DaylightII);
                     break;
                 default:
                     Debug.LogWarning("--- CastManager [HandleCastBirth] : spell type effect not found for cast index " + index + ". will ignore.");
@@ -406,10 +389,6 @@ public class CastManager : MonoBehaviour
         SpellType spellType = casts[index].type;
         Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
         float areaOfEffect = casts[index].rangeAOE;
-
-        // REVIEW: the assumption is that most spells alter plots
-        //  if not, we need to form lists of affected elements to operate on within switch
-
         float dist;
 
         // Spells not affecting plots
@@ -434,8 +413,7 @@ public class CastManager : MonoBehaviour
 
         // Player effects
         // gilded wordsI, color trailI-III, swiftness, light work, gilded wordsII, rabbit hole
-        if (spellType == SpellType.MirrorMirror ||
-            spellType == SpellType.GildedWordsI ||
+        if (spellType == SpellType.GildedWordsI ||
             spellType == SpellType.ColorTrailI ||
             spellType == SpellType.ColorTrailII ||
             spellType == SpellType.ColorTrailIII ||
@@ -453,9 +431,6 @@ public class CastManager : MonoBehaviour
                 {
                     switch (spellType)
                     {
-                        case SpellType.MirrorMirror:
-                            gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellMirrorMirror);
-                            break;
                         case SpellType.GildedWordsI:
                             gData.players[i] = PlayerSystem.RemovePlayerEffect(gData.players[i], PlayerEffect.SpellGildedWordsI);
                             break;
@@ -514,33 +489,23 @@ public class CastManager : MonoBehaviour
                     // Instantly increase soil quality (+50%)
                     // no plot effect
                     break;
-                case SpellType.MirrorMirror:
-                    // Change your appearance
-                    break;
                 case SpellType.BlessI:
                     // Plots of land immune to hazards for one day
                     plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.BlessI);
                     break;
                 case SpellType.DaylightI:
                     // Summon sunlight on a plot for one day
-                    break;
-                case SpellType.GildedWordsI:
-                    // Make yourself charming (-25% off market prices)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.DaylightI);
                     break;
                 case SpellType.SeedingEcho:
                     // Harvest from plants guaranteed to drop seed
-                    break;
-                case SpellType.ColorTrailI:
-                    // Leave a trail of your primary color behind you
-                    break;
-                case SpellType.ColorTrailII:
-                    // Leave a trail of your secondary color behind you
-                    break;
-                case SpellType.ColorTrailIII:
-                    // Leave a trail of your accent color behind you
+                    // (removed at plot upon harvest)
                     break;
                 case SpellType.FastGrowII:
-                    // Plants grow faster for two days (+67 %)
+                    // Plants grow faster for two days (+67%)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.FastGrowI);
+                    if (plots[i].plant != null)
+                        plots[i].data.plant.adjustedGrowthRate -= 0.67f;
                     break;
                 case SpellType.MalnutritionI:
                     // Plants grow slower for one day (-33%)
@@ -552,12 +517,11 @@ public class CastManager : MonoBehaviour
                     break;
                 case SpellType.TheGreatHarvest:
                     // Harvest several plots immediately
-                    break;
-                case SpellType.Splaturn:
-                    // Change the color of your tower
+                    // (already done, just once)
                     break;
                 case SpellType.SummonWaterII:
                     // Plots of land stay hydrated for two days
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.SummonWaterII);
                     break;
                 case SpellType.LesionI:
                     // Decrease harvest quality (-50%)
@@ -565,21 +529,11 @@ public class CastManager : MonoBehaviour
                     break;
                 case SpellType.TheReaper:
                     // Dig up several plots, leaving holes and destroying seedlings
-                    break;
-                case SpellType.Swiftness:
-                    // Move faster (150%)
-                    break;
-                case SpellType.LightWork:
-                    // Farm work goes faster (200%)
-                    break;
-                case SpellType.StarbloomBurst:
-                    // Cast continuous fireworks into the sky
+                    // (already done, just once)
                     break;
                 case SpellType.SoiledItII:
                     // Instantly maximize soil quality (100%)
-                    break;
-                case SpellType.GildedWordsII:
-                    // Make yourself charming (-50% off market prices)
+                    // no plot effect
                     break;
                 case SpellType.EclipseI:
                     // Block sunlight from plots for one day
@@ -592,26 +546,28 @@ public class CastManager : MonoBehaviour
                 case SpellType.DullEarth:
                     // Decrease soil quality of several plots (-50%)
                     break;
-                case SpellType.FogOfWar:
-                    // Summon cloud over an area
-                    break;
                 case SpellType.BlessedSpring:
                     // Force multiple plants to re-fruit
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.BlessedSpring);
+                    plots[i].ForceReFruit(false);
                     break;
                 case SpellType.MalnutritionII:
                     // Plants grow slower for two days (-67%)
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.MalnutritionII);
+                    if (plots[i].plant != null)
+                        plots[i].data.plant.adjustedGrowthRate += 0.67f;
                     break;
                 case SpellType.BlessII:
                     // Plots of land immune to hazards for three days
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.BlessI);
                     break;
                 case SpellType.ProsperousII:
                     // Plant harvest yields three times as much
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.ProsperousII);
                     break;
                 case SpellType.DaylightII:
                     // Summon sunlight on plots for three days
-                    break;
-                case SpellType.RabbitHole:
-                    // Another player is trapped for one day
+                    plots[i].data = FarmSystem.RemovePlotEffect(plots[i].data, PlotEffect.DaylightII);
                     break;
                 default:
                     Debug.LogWarning("--- CastManager [HandleCastExpiration] : spell type effect not found for cast index " + index + ". will ignore.");

@@ -9,6 +9,8 @@ public class PlantManager : MonoBehaviour
     private Renderer plantImage;
     private PlotManager plot;
 
+    private bool forceReFruit;
+
     private AudioManager sfxAudio;
 
     // temp (use time manager multiplier)
@@ -104,6 +106,11 @@ public class PlantManager : MonoBehaviour
         }
     }
 
+    public void SetForceReFruit( bool reFruit )
+    {
+        forceReFruit = reFruit;
+    }
+
     /// <summary>
     /// Calls the routine to set this plant image based on given growth amount
     /// </summary>
@@ -121,7 +128,7 @@ public class PlantManager : MonoBehaviour
     {
         int growNumber = Mathf.RoundToInt(pData.growth * 4f);
         // if a re-fruiting plant, and has harvested, keep image near top end
-        if (pData.canReFruit && pData.isHarvested)
+        if ((pData.canReFruit || forceReFruit) && pData.isHarvested)
             growNumber = Mathf.Clamp(growNumber, 3, 4);
 
         string plantTextureName = "";
@@ -153,7 +160,7 @@ public class PlantManager : MonoBehaviour
                 plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant04");
                 break;
         }
-        if (pData.isHarvested && !pData.canReFruit)
+        if (pData.isHarvested && !pData.canReFruit && !forceReFruit)
         {
             plantTextureName = "Stalk_";
             plantTextureName += pData.rarity.ToString() + "_";

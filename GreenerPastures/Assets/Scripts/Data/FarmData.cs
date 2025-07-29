@@ -32,7 +32,8 @@ public enum PlotEffect
     BlessedSpring,
     MalnutritionII,
     BlessII,
-    ProsperousII
+    ProsperousII,
+    DaylightII
 }
 
 [System.Serializable]
