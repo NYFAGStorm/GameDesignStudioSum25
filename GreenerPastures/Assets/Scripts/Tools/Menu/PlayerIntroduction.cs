@@ -209,38 +209,23 @@ public class PlayerIntroduction : MonoBehaviour
     void InitializeCharacterTextures()
     {
         characterLines = new Texture2D[2];
-        characterLines[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Line");
-        characterLines[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Line");
+        characterLines[0] = (Texture2D)Resources.Load("Wizard Male Front Line");
+        characterLines[1] = (Texture2D)Resources.Load("Wizard Female Front Line");
         characterHairs = new Texture2D[2];
-        characterHairs[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Hair");
-        characterHairs[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Hair");
+        characterHairs[0] = (Texture2D)Resources.Load("Wizard Male Front Hair");
+        characterHairs[1] = (Texture2D)Resources.Load("Wizard Female Front Hair");
         characterSkins = new Texture2D[2];
-        characterSkins[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Skin");
-        characterSkins[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Skin");
+        characterSkins[0] = (Texture2D)Resources.Load("Wizard Male Front Skin");
+        characterSkins[1] = (Texture2D)Resources.Load("Wizard Female Front Skin");
         characterAccents = new Texture2D[2];
-        characterAccents[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Light");
-        characterAccents[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Light");
+        characterAccents[0] = (Texture2D)Resources.Load("Wizard Male Front Light");
+        characterAccents[1] = (Texture2D)Resources.Load("Wizard Female Front Light");
         characterSecondaries = new Texture2D[2];
-        characterSecondaries[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Medium");
-        characterSecondaries[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Medium");
+        characterSecondaries[0] = (Texture2D)Resources.Load("Wizard Male Front Medium");
+        characterSecondaries[1] = (Texture2D)Resources.Load("Wizard Female Front Medium");
         characterFills = new Texture2D[2];
-        characterFills[0] = (Texture2D)Resources.Load("Wizard Male Front 128 Dark");
-        characterFills[1] = (Texture2D)Resources.Load("Wizard Female Front 128 Dark");
-
-        /*
-        characterLines = new Texture2D[2];
-        characterLines[0] = (Texture2D)Resources.Load("ProtoWizard_LineArt");
-        characterLines[1] = (Texture2D)Resources.Load("ProtoWizardF_LineArt");
-        characterSkins = new Texture2D[2];
-        characterSkins[0] = (Texture2D)Resources.Load("ProtoWizard_FillSkin");
-        characterSkins[1] = (Texture2D)Resources.Load("ProtoWizardF_FillSkin");
-        characterAccents = new Texture2D[2];
-        characterAccents[0] = (Texture2D)Resources.Load("ProtoWizard_FillAccent");
-        characterAccents[1] = (Texture2D)Resources.Load("ProtoWizardF_FillAccent");
-        characterFills = new Texture2D[2];
-        characterFills[0] = (Texture2D)Resources.Load("ProtoWizard_FillMain");
-        characterFills[1] = (Texture2D)Resources.Load("ProtoWizardF_FillMain");
-        */
+        characterFills[0] = (Texture2D)Resources.Load("Wizard Male Front Dark");
+        characterFills[1] = (Texture2D)Resources.Load("Wizard Female Front Dark");
     }
 
     void InitializeCharacterColors()

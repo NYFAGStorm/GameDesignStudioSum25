@@ -125,7 +125,7 @@ public class CharacterAnimManager : MonoBehaviour
         string artNameBase = "Wizard ";
         string charType = type.ToString() + " ";
         string poseName = pose.ToString() + " ";
-        string suffix = "128 "; // REVIEW: revise when art update is in
+        string suffix = "";
         string currentArtSet = artNameBase + charType + poseName + suffix;
 
         // store layer images
