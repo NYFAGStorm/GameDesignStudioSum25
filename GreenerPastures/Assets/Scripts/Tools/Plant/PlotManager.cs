@@ -1100,12 +1100,15 @@ public class PlotManager : MonoBehaviour
         {
             r.x = (disp.x - 0.05f) * w;
             r.y = disp.y * h;
-            r.y -= 0.3f * h;
+            if (plant == null)
+                r.y -= 0.3f * h;
+            else
+                r.y -= 0.35f * h;
             r.width = 0.1f * w;
             if (plant == null)
-                r.height = 0.08f * h;
+                r.height = 0.105f * h;
             else
-                r.height = 0.175f * h;
+                r.height = 0.2f * h;
 
             // display stats background
             c = Color.gray;
@@ -1118,9 +1121,9 @@ public class PlotManager : MonoBehaviour
             // plot stats display
             r.x += 0.01f * w;
             if (plant == null)
-                r.y -= 0.025f * h;
+                r.y -= 0.03625f * h;
             else
-                r.y -= 0.0625f * h;
+                r.y -= 0.075f * h;
             g.fontSize = Mathf.RoundToInt(10f * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
             g.alignment = TextAnchor.MiddleLeft;
@@ -1144,6 +1147,10 @@ public class PlotManager : MonoBehaviour
                 //g.alignment = TextAnchor.MiddleLeft;
             }
 
+            s = data.condition.ToString();
+            GUI.Label(r, s, g);
+
+            r.y += 0.025f * h;
             s = "Sun      : " + (data.sun * 100f).ToString("00.0") + "%";
             GUI.Label(r, s, g);
 
@@ -1168,9 +1175,9 @@ public class PlotManager : MonoBehaviour
 
             // reset to top to draw text again
             if (plant == null)
-                r.y -= 0.05f * h;
+                r.y -= 0.075f * h;
             else
-                r.y -= 0.125f * h;
+                r.y -= 0.15f * h;
             GUI.color = Color.white;
             r.x -= 0.001f * w;
             r.y -= 0.002f * h;
@@ -1185,6 +1192,10 @@ public class PlotManager : MonoBehaviour
                 //g.alignment = TextAnchor.MiddleLeft;
             }
 
+            s = data.condition.ToString();
+            GUI.Label(r, s, g);
+
+            r.y += 0.025f * h;
             s = "Sun      : " + (data.sun * 100f).ToString("00.0") + "%";
             GUI.Label(r, s, g);
 
