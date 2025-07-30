@@ -129,7 +129,7 @@ public class PlantManager : MonoBehaviour
         int growNumber = Mathf.RoundToInt(pData.growth * 4f);
         // if a re-fruiting plant, and has harvested, keep image near top end
         if ((pData.canReFruit || forceReFruit) && pData.isHarvested)
-            growNumber = Mathf.Clamp(growNumber, 3, 4);
+            growNumber = Mathf.Clamp(growNumber, 2, 4);
 
         string plantTextureName = "";
         bool plantHadTexture = (plantImage.material.mainTexture.name != "Util_Clear");
@@ -160,7 +160,9 @@ public class PlantManager : MonoBehaviour
                 plantImage.material.mainTexture = (Texture2D)Resources.Load("ProtoPlant04");
                 break;
         }
-        if (pData.isHarvested && !pData.canReFruit && !forceReFruit)
+        // show 'stalk' if re-fruiting plant is harvested (instead of 'shoot')
+        if ((pData.isHarvested && !pData.canReFruit && !forceReFruit) ||
+            (pData.isHarvested && (pData.canReFruit || forceReFruit) && growNumber == 2))
         {
             plantTextureName = "Stalk_";
             plantTextureName += pData.rarity.ToString() + "_";

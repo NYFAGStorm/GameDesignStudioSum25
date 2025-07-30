@@ -214,7 +214,7 @@ public class CastManager : MonoBehaviour
                         //players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellMirrorMirror);
                         PlayerIntroduction playerIntro = GameObject.FindFirstObjectByType<PlayerIntroduction>();
                         if (playerIntro != null)
-                            playerIntro.SetMirrorMirrorActive();
+                            playerIntro.SetMirrorMirrorActive(players[i]);
                         break;
                     case SpellType.GildedWordsI:
                         players[i].playerData = PlayerSystem.AddPlayerEffect(players[i].playerData, PlayerEffect.SpellGildedWordsI);

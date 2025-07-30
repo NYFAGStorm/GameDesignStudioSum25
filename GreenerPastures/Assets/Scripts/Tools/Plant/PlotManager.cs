@@ -1041,6 +1041,7 @@ public class PlotManager : MonoBehaviour
         {
             // graft succeeded, delete fruit from player inventory, change stalk
             data.plant = newPlant;
+            data.plant.growth = .4f; // show 'stalk' growth upon successful graft
             plotPlantName = newPlant.plantName;
             plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
             // using data, remove from player inventory

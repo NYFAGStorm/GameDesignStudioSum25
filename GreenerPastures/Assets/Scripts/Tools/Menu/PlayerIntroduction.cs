@@ -292,8 +292,10 @@ public class PlayerIntroduction : MonoBehaviour
         }
     }
 
-    public void SetMirrorMirrorActive()
+    public void SetMirrorMirrorActive(PlayerControlManager pControlMgr)
     {
+        if (pcm == null)
+            pcm = pControlMgr;
         // mirror mirror spell re-activates player character customization popup
         pcm.characterFrozen = true;
         pcm.freezeCharacterActions = true;
@@ -1677,7 +1679,7 @@ public class PlayerIntroduction : MonoBehaviour
 
     void OnGUI()
     {
-        if ((introPop && mirrormirror) || (helpMessage == 0 && !introRunning) || (!canSkipIntro && !introPop && !dialogPop))
+        if ( !mirrormirror && ((helpMessage == 0 && !introRunning) || (!canSkipIntro && !introPop && !dialogPop)))
             return;
 
         Rect r = new Rect();
