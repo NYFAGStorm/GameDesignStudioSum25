@@ -405,6 +405,7 @@ public static class PlayerSystem
         if (WillPlayerLevelUp(retData, amount))
         {
             retData.level++;
+            retData.arcana++;
             retData = AwardPlayerForLevelUp(retData);
             // player control manager also calls GetLevelUpNotifications()
         }
@@ -515,99 +516,121 @@ public static class PlayerSystem
                 // welcome to the game
                 break;
             case 1:
-                retNotifications = new string[4];
+                retNotifications = new string[7];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 1";
-                retNotifications[1] = "Magic Crafting\nUNLOCKED";
-                retNotifications[2] = "New spell in Grimoire:\nFast Grow I";
-                retNotifications[3] = "New spell in Grimoire:\nSummon Water I";
-                retNotifications[2] = "New spell in Grimoire:\nSoiled It I";
-                retNotifications[3] = "New spell in Grimoire:\nMirror Mirror";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "Magic Crafting\nUNLOCKED";
+                retNotifications[3] = "New spell in Grimoire:\nFast Grow I";
+                retNotifications[4] = "New spell in Grimoire:\nSummon Water I";
+                retNotifications[5] = "New spell in Grimoire:\nSoiled It I";
+                retNotifications[6] = "New spell in Grimoire:\nMirror Mirror";
                 break;
             case 2:
-                retNotifications = new string[4];
+                retNotifications = new string[11];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 2";
-                retNotifications[1] = "Plant Grafting\nUNLOCKED";
-                retNotifications[2] = "UNCOMMON plants at market\nAVAILABLE";
-                retNotifications[3] = "New spell in Grimoire:\nBless I";
-                retNotifications[2] = "New spell in Grimoire:\nDaylight I";
-                retNotifications[3] = "New spell in Grimoire:\nGilded Words I";
-                retNotifications[2] = "New spell in Grimoire:\nSeeding Echo";
-                retNotifications[3] = "New spell in Grimoire:\nColor Trail I";
-                retNotifications[2] = "New spell in Grimoire:\nColor Trail II";
-                retNotifications[3] = "New spell in Grimoire:\nColor Trail III";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "Plant Grafting\nUNLOCKED";
+                retNotifications[3] = "UNCOMMON plants at market\nAVAILABLE";
+                retNotifications[4] = "New spell in Grimoire:\nBless I";
+                retNotifications[5] = "New spell in Grimoire:\nDaylight I";
+                retNotifications[6] = "New spell in Grimoire:\nGilded Words I";
+                retNotifications[7] = "New spell in Grimoire:\nSeeding Echo";
+                retNotifications[8] = "New spell in Grimoire:\nColor Trail I";
+                retNotifications[9] = "New spell in Grimoire:\nColor Trail II";
+                retNotifications[10] = "New spell in Grimoire:\nColor Trail III";
                 break;
             case 3:
-                retNotifications = new string[4];
+                retNotifications = new string[8];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 3";
-                retNotifications[1] = "Magic Crafting Cauldron\nUPGRADED";
-                retNotifications[2] = "New spell in Grimoire:\nFast Grow II";
-                retNotifications[2] = "New spell in Grimoire:\nMalnutrition I";
-                retNotifications[3] = "New spell in Grimoire:\nProsperous I";
-                retNotifications[2] = "New spell in Grimoire:\nThe Great HArvest";
-                retNotifications[2] = "New spell in Grimoire:\nSplaturn";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "Magic Crafting Cauldron\nUPGRADED";
+                retNotifications[3] = "New spell in Grimoire:\nFast Grow II";
+                retNotifications[4] = "New spell in Grimoire:\nMalnutrition I";
+                retNotifications[5] = "New spell in Grimoire:\nProsperous I";
+                retNotifications[6] = "New spell in Grimoire:\nThe Great HArvest";
+                retNotifications[7] = "New spell in Grimoire:\nSplaturn";
                 break;
             case 4:
-                retNotifications = new string[2];
+                retNotifications = new string[8];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 4";
+                retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "New spell in Grimoire:\nSummon Water II";
-                retNotifications[1] = "New spell in Grimoire:\nLesion I";
-                retNotifications[2] = "New spell in Grimoire:\nThe Reaper";
-                retNotifications[2] = "New spell in Grimoire:\nSwiftness";
-                retNotifications[2] = "New spell in Grimoire:\nLight Work";
-                retNotifications[2] = "New spell in Grimoire:\nStarbloom Burst";
+                retNotifications[3] = "New spell in Grimoire:\nLesion I";
+                retNotifications[4] = "New spell in Grimoire:\nThe Reaper";
+                retNotifications[5] = "New spell in Grimoire:\nSwiftness";
+                retNotifications[6] = "New spell in Grimoire:\nLight Work";
+                retNotifications[7] = "New spell in Grimoire:\nStarbloom Burst";
                 break;
             case 5:
-                retNotifications = new string[5];
+                retNotifications = new string[11];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 5";
-                retNotifications[1] = "RARE plants at market\nAVAILABLE";
-                retNotifications[2] = "Magic Crafting Cauldron\nUPGRADED";
-                retNotifications[2] = "New spell in Grimoire:\nSoiled IT II";
-                retNotifications[2] = "New spell in Grimoire:\nGilded Words II";
-                retNotifications[3] = "New spell in Grimoire:\nEclipse I";
-                retNotifications[4] = "New spell in Grimoire:\nGolden Thumb I";
-                retNotifications[2] = "New spell in Grimoire:\nDull Earth";
-                retNotifications[2] = "New spell in Grimoire:\nFog Of War";
-                retNotifications[2] = "New spell in Grimoire:\nBlessed Spring";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "RARE plants at market\nAVAILABLE";
+                retNotifications[3] = "Magic Crafting Cauldron\nUPGRADED";
+                retNotifications[4] = "New spell in Grimoire:\nSoiled IT II";
+                retNotifications[5] = "New spell in Grimoire:\nGilded Words II";
+                retNotifications[6] = "New spell in Grimoire:\nEclipse I";
+                retNotifications[7] = "New spell in Grimoire:\nGolden Thumb I";
+                retNotifications[8] = "New spell in Grimoire:\nDull Earth";
+                retNotifications[9] = "New spell in Grimoire:\nFog Of War";
+                retNotifications[10] = "New spell in Grimoire:\nBlessed Spring";
                 break;
             case 6:
-                retNotifications = new string[1];
+                retNotifications = new string[5];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 6";
+                retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "New spell in Grimoire:\nMalnutrition II";
-                retNotifications[2] = "New spell in Grimoire:\nBless II";
-                retNotifications[2] = "New spell in Grimoire:\nProsperous II";
+                retNotifications[3] = "New spell in Grimoire:\nBless II";
+                retNotifications[4] = "New spell in Grimoire:\nProsperous II";
                 break;
             case 7:
-                retNotifications = new string[2];
+                retNotifications = new string[5];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 7";
-                retNotifications[1] = "Magic Crafting Cauldron\nUPGRADED";
-                retNotifications[2] = "New spell in Grimoire:\nDaylight II";
-                retNotifications[2] = "New spell in Grimoire:\nRabbit Hole I";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "Magic Crafting Cauldron\nUPGRADED";
+                retNotifications[3] = "New spell in Grimoire:\nDaylight II";
+                retNotifications[4] = "New spell in Grimoire:\nRabbit Hole I";
                 break;
             case 8:
-                retNotifications = new string[2];
+                retNotifications = new string[3];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 8";
+                retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[1] = "SPECIAL plants at market\nAVAILABLE";
                 break;
             case 9:
+                retNotifications = new string[2];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 9";
+                retNotifications[1] = "You recieve\none ARCANA";
                 break;
             case 10:
+                retNotifications = new string[2];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 10";
+                retNotifications[1] = "You recieve\none ARCANA";
                 break;
             case 11:
+                retNotifications = new string[2];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 11";
+                retNotifications[1] = "You recieve\none ARCANA";
                 break;
             case 12:
+                retNotifications = new string[2];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 12";
+                retNotifications[1] = "You recieve\none ARCANA";
                 break;
             case 13:
+                retNotifications = new string[2];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 13";
+                retNotifications[1] = "You recieve\none ARCANA";
                 break;
             case 14:
+                retNotifications = new string[2];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 14";
+                retNotifications[1] = "You recieve\none ARCANA";
                 break;
             case 15:
+                retNotifications = new string[2];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 15";
+                retNotifications[1] = "You recieve\none ARCANA";
                 break;
         }
 
