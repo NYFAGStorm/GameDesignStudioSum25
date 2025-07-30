@@ -49,4 +49,13 @@ MonoBehaviour:
   grimoireBackground: {fileID: 0}
   cauldronBackgroundDark: {fileID: 2800000, guid: 753ae5f491234ea42869ed3755f4d594, type: 3}
   cauldronBackgroundLight: {fileID: 2800000, guid: cca914ebf387d7d4ea9fda464d403773, type: 3}
+  cauldronBubbles:
+  - {fileID: 2800000, guid: 3ed02bec2f14f4b4eb96d4c7b26b7c63, type: 3}
+  - {fileID: 2800000, guid: ecf992714f1ce2742bcab75d1440ccd3, type: 3}
+  - {fileID: 2800000, guid: f951b860a239677469966a1b7bf6e74c, type: 3}
+  - {fileID: 2800000, guid: 07719be46bacbe848a9abf2059596a08, type: 3}
+  - {fileID: 2800000, guid: b81df37142cde9a4b8b5548cada072f4, type: 3}
+  - {fileID: 2800000, guid: def48d171fa0c84499713dc754a05569, type: 3}
+  - {fileID: 2800000, guid: cdb64d98a0be2534e88139d0468e58ef, type: 3}
+  - {fileID: 2800000, guid: b9d10e39688522f4985894515c16ac3a, type: 3}
   shapeLibrary: []

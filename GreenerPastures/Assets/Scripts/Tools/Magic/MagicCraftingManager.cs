@@ -42,6 +42,11 @@ public class MagicCraftingManager : MonoBehaviour
     public Texture2D cauldronBackgroundDark;
     public Texture2D cauldronBackgroundLight;
 
+    public Texture2D[] cauldronBubbles; // 2 sets of 4
+    private int cauldronBubbleFrame = -1;
+    private Vector2 cauldronBubblePosition;
+    private float cauldronBubbleTimer;
+
     private float libraryStateTimer;
     private float craftStateTimer;
     private float checkTimer;
@@ -90,6 +95,7 @@ public class MagicCraftingManager : MonoBehaviour
     const float CRAFTSTATETIMERMAX = 1f;
     const float PLAYERCHECKTIME = 1f;
     const float PROXIMITYCHECKRADIUS = 0.381f;
+    const float CAULDRONBUBBLETIME = 0.1f;
 
 
     void Start()
@@ -352,6 +358,8 @@ public class MagicCraftingManager : MonoBehaviour
                             if (currentBackground != cauldronBackgroundDark &&
                                 currentBackground != cauldronBackgroundLight)
                                 currentBackground = Texture2D.whiteTexture;
+                            cauldronBubbleTimer = 0f; // reset cauldron bubble
+                            cauldronBubbleFrame = -1;
                         }
                         break;
                     case CraftState.Exiting:
@@ -453,6 +461,36 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 break;
             case CraftState.Cauldron:
+                // run cauldron bubble timer
+                if (cauldronBubbleTimer > 0f)
+                {
+                    cauldronBubbleTimer -= Time.deltaTime;
+                    if (cauldronBubbleTimer < 0f)
+                    {
+                        cauldronBubbleTimer = CAULDRONBUBBLETIME;
+                        cauldronBubbleFrame++;
+                        if(cauldronBubbleFrame == 4 || cauldronBubbleFrame == 8)
+                        {
+                            cauldronBubbleTimer = 0f; // reset
+                            cauldronBubbleFrame = -1;
+                        }
+                    }
+                }
+                else if (craftStateTimer == 0f && RandomSystem.FlatRandom01() < 0.01f)
+                {
+                    Vector2 bubble = Vector2.zero;
+                    bubble.x = 0.71f;
+                    bubble.y = 0.36f;
+                    bubble.x += (RandomSystem.GaussianRandom01() * 0.2f) - .1f;
+                    bubble.y += (RandomSystem.GaussianRandom01() * 0.25f) - .125f;
+                    cauldronBubblePosition = bubble;
+                    if (RandomSystem.FlatRandom01() < 0.5f)
+                        cauldronBubbleFrame = 0;
+                    else
+                        cauldronBubbleFrame = 4;
+                    cauldronBubbleTimer = CAULDRONBUBBLETIME;
+                }
+                // gamepad for cauldron
                 if (padMgr != null && padMgr.gamepads[0].isActive)
                 {
                     ItemData[] cauldronInv = cauldronInventory.items;
@@ -473,7 +511,7 @@ public class MagicCraftingManager : MonoBehaviour
                     padIngredientSelection = Mathf.Clamp(padIngredientSelection, 0, cauldronInv.Length - 1);
 
                     // use only for drag-and-drop of ingredients (a button hold and release)
-                    if (!padDragOn && 
+                    if (!padDragOn &&
                         !isAmongPlacedPieces(padIngredientSelection) &&
                         padMgr.gPadDown[0].aButton)
                     {
@@ -504,7 +542,7 @@ public class MagicCraftingManager : MonoBehaviour
                     {
                         padDragPos.y += Time.deltaTime * padDragSpeed;
                     }
-                    padDragPos.y = Mathf.Clamp(padDragPos.y,0.05f,0.85f);
+                    padDragPos.y = Mathf.Clamp(padDragPos.y, 0.05f, 0.85f);
                     if (padMgr.gamepads[0].XaxisL < 0f)
                     {
                         padDragPos.x -= Time.deltaTime * padDragSpeed;
@@ -518,6 +556,8 @@ public class MagicCraftingManager : MonoBehaviour
                 }
                 break;
             case CraftState.Exiting:
+                cauldronBubbleTimer = 0f; // reset
+                cauldronBubbleFrame = -1;
                 break;
         }
     }
@@ -869,6 +909,20 @@ public class MagicCraftingManager : MonoBehaviour
         {
             t = currentBackground;
             c = Color.white;
+            GUI.color = c;
+            GUI.DrawTexture(r, t);
+        }
+
+        // cauldron bubbles vfx
+        if (craftState == CraftState.Cauldron && cauldronBubbleFrame > -1)
+        {
+            r.x = cauldronBubblePosition.x * w;
+            r.y = cauldronBubblePosition.y * h;
+            r.width = .1f * w;
+            r.height = .1f * w; // square
+            t = cauldronBubbles[cauldronBubbleFrame];
+            c = Color.white;
+            c.a = 0.618f;
             GUI.color = c;
             GUI.DrawTexture(r, t);
         }
