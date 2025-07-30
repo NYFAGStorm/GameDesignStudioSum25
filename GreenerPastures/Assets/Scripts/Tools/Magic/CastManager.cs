@@ -168,6 +168,7 @@ public class CastManager : MonoBehaviour
                                 continue;
                             // do it
                             casts[index].islandIndex = i;
+                            islandMgr.InvokeSplaturnSpell(i, n);
                         }
                     }
                     else
@@ -178,6 +179,10 @@ public class CastManager : MonoBehaviour
                             continue;
                         // do it
                         casts[index].islandIndex = i;
+                        if (spellType == SpellType.StarbloomBurst)
+                            islandMgr.islands[i] = IslandSystem.AddIslandEffect(islandMgr.islands[i], IslandEffect.SpellStarbloomBurst);
+                        else if (spellType == SpellType.FogOfWar)
+                            islandMgr.islands[i] = IslandSystem.AddIslandEffect(islandMgr.islands[i], IslandEffect.SpellFogOfWar);
                     }
                 }
             }
@@ -406,7 +411,6 @@ public class CastManager : MonoBehaviour
                     islandMgr.islands[casts[index].islandIndex] = IslandSystem.RemoveIslandEffect(islandMgr.islands[casts[index].islandIndex], IslandEffect.SpellStarbloomBurst);
                 else if (spellType == SpellType.FogOfWar)
                     islandMgr.islands[casts[index].islandIndex] = IslandSystem.RemoveIslandEffect(islandMgr.islands[casts[index].islandIndex], IslandEffect.SpellFogOfWar);
-
                 return;
             }
         }

@@ -83,6 +83,60 @@ public class IslandManager : MonoBehaviour
                 }
             }
         }
+
+        for (int i = 0; i < islands.Length; i++)
+        {
+            if (islands[i].effects.Length > 0)
+            {
+                // check for island effect for magic vfx spells
+                for (int n = 0; n < islands[i].effects.Length; n++)
+                {
+                    if (islands[i].effects[n] == IslandEffect.SpellStarbloomBurst ||
+                        islands[i].effects[n] == IslandEffect.SpellFogOfWar)
+                    {
+                        // REVIEW: confirm particular island positoin?
+                        // check casts for matching spell and get position
+                        CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
+                        if (cm != null)
+                        {
+                            GameObject lightingObject = GameObject.Find("Lighting");
+                            for (int t = 0; t < cm.casts.Length; t++)
+                            {
+                                if (cm.casts[t].type == SpellType.StarbloomBurst)
+                                {
+                                    GameObject burstVFX = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Starbloom Burst"));
+                                    burstVFX.name = "VFX Spell Starbloom Burst";
+                                    Vector3 pos = Vector3.zero;
+                                    pos.x = cm.casts[t].posX;
+                                    pos.y = cm.casts[t].posY;
+                                    pos.z = cm.casts[t].posZ;
+                                    burstVFX.transform.position = pos;
+                                    burstVFX.transform.parent = lightingObject.transform;
+                                    Destroy(burstVFX, 5f);
+                                }
+                                if (cm.casts[t].type == SpellType.FogOfWar)
+                                {
+                                    GameObject burstVFX = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Fog Of War"));
+                                    burstVFX.name = "VFX Spell Fog Of War";
+                                    Vector3 pos = Vector3.zero;
+                                    pos.x = cm.casts[t].posX;
+                                    pos.y = cm.casts[t].posY;
+                                    pos.z = cm.casts[t].posZ;
+                                    burstVFX.transform.position = pos;
+                                    burstVFX.transform.parent = lightingObject.transform;
+                                    Destroy(burstVFX, 5f);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void InvokeSplaturnSpell( int islandIndex, int structureIndex )
+    {
+        // TODO:
     }
 
     /// <summary>
