@@ -37,6 +37,8 @@ public class NPCGoldFairy : MonoBehaviour
     private GreenerGameManager ggm;
     private ItemSpawnManager ism;
 
+    private AudioManager sfxAudio;
+
     const float MAXMOVESPEED = 6.18f;
     const float ZIPFACTOR = 0.618f;
     const float ZIPRANGE = 3.81f;
@@ -63,6 +65,9 @@ public class NPCGoldFairy : MonoBehaviour
             Debug.LogError("--- NPC GoldFairy [Start] : no item spawn manager found. aborting.");
             enabled = false;
         }
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -268,6 +273,9 @@ public class NPCGoldFairy : MonoBehaviour
                 newTarget.z += RandomSystem.GaussianRandom01() * fairyRange.y;
                 newTarget.z -= fairyRange.y * 0.5f;
                 moveTarget = newTarget;
+                // sfx
+                if (sfxAudio != null)
+                    sfxAudio.StartSound("NPC Fairy Zip", gameObject, 1f, 3.81f);
             }
         }
 

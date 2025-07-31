@@ -1491,6 +1491,46 @@ MonoBehaviour:
     pitchVariance: 0
     volume: 0
     volumeVariance: 0
+  - name: Player Level Up
+    clip: {fileID: 8300000, guid: 92d725c5bc84aa94681e8a3042f58dc2, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: UI Splash Transition
+    clip: {fileID: 8300000, guid: a44ed9d118b0c5f48874bb322c4b098d, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: UI Menu Transition
+    clip: {fileID: 8300000, guid: 09561993d85844049a358d9865ddcb8e, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: NPC Fairy Zip
+    clip: {fileID: 8300000, guid: a0b3b37fc059e924994d98a54f7bfddb, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.1
+    volumeVariance: 0
   musicCrossFadeTime: 3.81
 --- !u!1001 &918166386300932168
 PrefabInstance:

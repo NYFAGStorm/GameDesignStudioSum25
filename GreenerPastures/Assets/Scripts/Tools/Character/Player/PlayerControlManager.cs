@@ -87,6 +87,7 @@ public class PlayerControlManager : MonoBehaviour
     private TimeManager tim;
     private PostOfficeManager pom;
     private SaveLoadManager saveMgr;
+    private AudioManager sfxAudio;
 
     private bool inARabbitHole;
 
@@ -149,6 +150,9 @@ public class PlayerControlManager : MonoBehaviour
             Debug.LogWarning("--- PlayerControlManager [Start] : " + gameObject.name + " no save load manager found in scene. aborting.");
             //enabled = false; // temp - keep enabled for prototype testing
         }
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -630,7 +634,11 @@ public class PlayerControlManager : MonoBehaviour
 
         XPDisplayTimer = XPDISPLAYTIME;
         if (retBool)
+        {
+            if (sfxAudio != null)
+                sfxAudio.StartSound("Player Level Up");
             levelUpDisplayTimer = LEVELUPDISPLAYTIME;
+        }
 
         return retBool;
     }

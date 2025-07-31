@@ -101,6 +101,8 @@ public class MainMenu : MonoBehaviour
     private string codeHostSentViaDiscordToFriend; // (btw)
     //
 
+    private AudioManager sfxAudio;
+
     private Texture2D[] buttonTex;
 
     const float POPUPTIME = 1f;
@@ -129,6 +131,9 @@ public class MainMenu : MonoBehaviour
             Debug.LogError("--- MainMenu [Start] : no Fusion manager found in scene. aborting.");
             enabled = false;
         }
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -570,6 +575,8 @@ public class MainMenu : MonoBehaviour
                         // profile state update
                         saveMgr.GetCurrentProfile().state = ProfileState.Connecting;
                         // little cinematic menu fun
+                        if (sfxAudio != null)
+                            sfxAudio.StartSound("UI Menu Transition");
                         GameObject.FindAnyObjectByType<MenuLayerManager>().LaunchGameAnimation();
                         sceneSwitchName = buttons[i].sceneName;
                         sceneSwitchTimer = 4f;

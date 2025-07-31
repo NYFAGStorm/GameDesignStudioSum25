@@ -55,6 +55,7 @@ public class SplashScreen : MonoBehaviour
     private bool splashLaunched;
 
     private SaveLoadManager saveMgr;
+    private AudioManager sfxAudio;
 
     private Texture2D[] buttonTex;
 
@@ -74,6 +75,9 @@ public class SplashScreen : MonoBehaviour
             Debug.LogError("--- SplashScreen [Start] : no save load manager found in scene. aborting.");
             enabled = false;
         }
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -207,6 +211,8 @@ public class SplashScreen : MonoBehaviour
             padMgr != null && padMgr.gPadDown[0].aButton)
         {
             // little cinematic menu fun
+            if (sfxAudio != null)
+                sfxAudio.StartSound("UI Splash Transition");
             GameObject.FindAnyObjectByType<MenuLayerManager>().targetKey = 1;
             splashLaunched = true;
         }

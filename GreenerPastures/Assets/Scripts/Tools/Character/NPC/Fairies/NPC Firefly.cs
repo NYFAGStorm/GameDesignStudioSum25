@@ -27,6 +27,8 @@ public class NPCFirefly : MonoBehaviour
     private float targetTimer;
     private Vector2 fireflyRange;
 
+    private AudioManager sfxAudio;
+
     const float MAXMOVESPEED = 6.18f;
     const float ZIPFACTOR = 0.618f;
 
@@ -40,6 +42,9 @@ public class NPCFirefly : MonoBehaviour
             Debug.LogError("--- NPC Firefly [Start] : no renderer found on this object. aborting.");
             enabled = false;
         }
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -106,6 +111,9 @@ public class NPCFirefly : MonoBehaviour
                 newTarget.y = RandomSystem.GaussianRandom01() * fireflyRange.y;
                 newTarget.y -= fireflyRange.y * 0.5f;
                 moveTarget = newTarget;
+                // sfx
+                if (sfxAudio != null)
+                    sfxAudio.StartSound("NPC Fairy Zip");
             }
         }
 
