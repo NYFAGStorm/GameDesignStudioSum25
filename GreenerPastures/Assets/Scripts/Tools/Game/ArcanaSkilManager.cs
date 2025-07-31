@@ -8,8 +8,9 @@ public class ArcanaSkilManager : MonoBehaviour
     // This also manages communication to magic manager for purposes of 'casting' active magic skills
 
     // TODO: same engagement and state manaement pattern used in crafting, market, chicken race
+    // (... this lives on Eden?)
 
-    public bool testGrabPlayer;
+    public bool testGrabPlayer; // until the player engagement mechanics are in place, use this
 
     public PlayerControlManager currentPlayer;
     public bool skillPurchasing;
@@ -169,12 +170,16 @@ public class ArcanaSkilManager : MonoBehaviour
         {
             testGrabPlayer = false;
             currentPlayer = GameObject.FindFirstObjectByType<PlayerControlManager>();
+            currentPlayer.freezeCharacterActions = true;
+            currentPlayer.characterFrozen = true;
+            currentPlayer.hidePlayerNameTag = true;
         }
 
         // detect skill purchasing
         if (skillPurchasing && currentPlayer != null)
         {
             InitializeNodes();
+            currentSkillNode = 0;
             displaySkillTree = true;
         }
         else if (displaySkillTree)
@@ -182,6 +187,23 @@ public class ArcanaSkilManager : MonoBehaviour
 
         if (!displaySkillTree)
             return;
+
+        // keyboard purchase of skill
+        // enter
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (nodes[currentSkillNode].acquired)
+                return;
+            if (currentPlayer.playerData.arcana < skillTree.skills[currentSkillNode].arcanaCost)
+                return;
+
+            // TODO: confirm popup
+
+            currentPlayer.playerData.arcana -= skillTree.skills[currentSkillNode].arcanaCost;
+            PlayerSystem.AddPlayerEffect(currentPlayer.playerData, SkillSystem.GetSkillPlayerEffect(skillTree, nodes[currentSkillNode].name));
+            InitializeNodes();
+            return;
+        }
 
         // keybvoard navigation of skill tree
         // WASD
@@ -385,6 +407,9 @@ public class ArcanaSkilManager : MonoBehaviour
         {
             skillPurchasing = false;
             displaySkillTree = false;
+            currentPlayer.freezeCharacterActions = false;
+            currentPlayer.characterFrozen = false;
+            currentPlayer.hidePlayerNameTag = false;
             currentPlayer = null;
         }
     }
