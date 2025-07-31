@@ -1679,7 +1679,7 @@ MonoBehaviour:
     spaceBlend: 0
     pitch: 0
     pitchVariance: 0
-    volume: 0
+    volume: 0.618
     volumeVariance: 0
   - name: UI Splash Transition
     clip: {fileID: 8300000, guid: a44ed9d118b0c5f48874bb322c4b098d, type: 3}

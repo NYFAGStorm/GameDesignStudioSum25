@@ -1147,7 +1147,12 @@ public class PlotManager : MonoBehaviour
                 //g.alignment = TextAnchor.MiddleLeft;
             }
 
-            s = data.condition.ToString();
+            if (plant != null && data.plant != null &&
+                !data.plant.canReFruit && data.plant.isHarvested &&
+                !FarmSystem.PlotHasEffect(data, PlotEffect.BlessedSpring))
+                s = "is Harvested";
+            else
+                s = data.condition.ToString();
             GUI.Label(r, s, g);
 
             r.y += 0.025f * h;
@@ -1192,7 +1197,12 @@ public class PlotManager : MonoBehaviour
                 //g.alignment = TextAnchor.MiddleLeft;
             }
 
-            s = data.condition.ToString();
+            if (plant != null && data.plant != null &&
+                !data.plant.canReFruit && data.plant.isHarvested &&
+                !FarmSystem.PlotHasEffect(data, PlotEffect.BlessedSpring))
+                s = "is Harvested";
+            else
+                s = data.condition.ToString();
             GUI.Label(r, s, g);
 
             r.y += 0.025f * h;
