@@ -5,6 +5,14 @@ public class ArcanaSkilManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles acquisition of player skills (unique player effects) via Arcana purchase
     // This also manages the skill tree, a node network of skills with one parent each
+    // This also manages communication to magic manager for purposes of 'casting' active magic skills
+
+    // TODO: same engagement and state manaement pattern used in crafting, market, chicken race
+
+    public bool testGrabPlayer;
+
+    public PlayerControlManager currentPlayer;
+    public bool skillPurchasing;
 
     public SkillTree skillTree;
 
@@ -98,28 +106,61 @@ public class ArcanaSkilManager : MonoBehaviour
 
     void Update()
     {
-        
+        // test
+        if (testGrabPlayer)
+        {
+            testGrabPlayer = false;
+            currentPlayer = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        }
+
+        // detect skill purchasing
+        if (skillPurchasing && currentPlayer != null)
+        {
+            displaySkillTree = true;
+        }
+        else if (displaySkillTree)
+            displaySkillTree = false;
     }
 
     void OnGUI()
     {
-        if (!displaySkillTree)
+        if (!displaySkillTree || currentPlayer == null)
             return;
 
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;
 
-        r.x = 0.5f * w;
-        r.y = 0.5f * h;
+        r.x = 0.05f * w;
+        r.y = 0.15f * h;
         r.width = .9f * w;
-        r.height = .9f * h;
+        r.height = .825f * h;
         GUIStyle g = new GUIStyle(GUI.skin.box);
+        g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+        g.fontStyle = FontStyle.Bold;
+        g.padding = new RectOffset(0, 0, 20, 0);
         Texture2D t = Texture2D.whiteTexture; // bg tbd
         string s = "ARCANA SKILL TREE";
-
         GUI.Box(r, s, g);
 
         // tree nodes
+
+        // cancel button
+        r.x = 0.4f * w;
+        r.y = 0.9f * h;
+        r.width = 0.2f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.yellow;
+        s = "EXIT SKILL TREE";
+        if (GUI.Button(r,s,g))
+        {
+            skillPurchasing = false;
+            displaySkillTree = false;
+            currentPlayer = null;
+        }
     }
 }
