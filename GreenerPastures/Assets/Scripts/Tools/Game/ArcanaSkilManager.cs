@@ -31,6 +31,13 @@ public class ArcanaSkilManager : MonoBehaviour
 
     private bool displaySkillTree;
 
+    private float playerCheckTimer;
+    private PlayerControlManager foundPlayer;
+
+    const float PLAYERCHECKTIME = 1f;
+    const float PLAYERPROXIMITY = 1f;
+
+
 
     void Start()
     {
@@ -41,6 +48,8 @@ public class ArcanaSkilManager : MonoBehaviour
             // build test tree
             InitializeSkillTree();
             InitializeNodes();
+
+            playerCheckTimer = PLAYERCHECKTIME;
         }
     }
 
@@ -165,22 +174,38 @@ public class ArcanaSkilManager : MonoBehaviour
 
     void Update()
     {
-        // test
-        if (testGrabPlayer)
+        // run player check timer
+        if (playerCheckTimer > 0f)
         {
-            testGrabPlayer = false;
-            currentPlayer = GameObject.FindFirstObjectByType<PlayerControlManager>();
-            currentPlayer.freezeCharacterActions = true;
-            currentPlayer.characterFrozen = true;
-            currentPlayer.hidePlayerNameTag = true;
+            playerCheckTimer -= Time.deltaTime;
+            if (playerCheckTimer < 0f)
+            {
+                float closest = 999f;
+                foundPlayer = null;
+                PlayerControlManager[] pcms = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+                for (int i = 0; i < pcms.Length; i++)
+                {
+                    float dist = Vector3.Distance(gameObject.transform.position, pcms[i].gameObject.transform.position);
+                    if (dist < PLAYERPROXIMITY && dist < closest)
+                    {
+                        closest = dist;
+                        foundPlayer = pcms[i];
+                    }
+                }
+                playerCheckTimer = PLAYERCHECKTIME;
+                currentPlayer = foundPlayer;
+            }
         }
 
         // detect skill purchasing
         if (skillPurchasing && currentPlayer != null)
         {
-            InitializeNodes();
-            currentSkillNode = 0;
-            displaySkillTree = true;
+            if (!displaySkillTree)
+            {
+                InitializeNodes();
+                currentSkillNode = 0;
+                displaySkillTree = true;
+            }
         }
         else if (displaySkillTree)
             displaySkillTree = false;
@@ -259,12 +284,40 @@ public class ArcanaSkilManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (!displaySkillTree || currentPlayer == null)
+        if (currentPlayer == null)
             return;
 
         Rect r = new Rect();
         float w = Screen.width;
         float h = Screen.height;
+
+        if (!skillPurchasing)
+        {        
+            // skill tree activation button
+            r.x = 0.4f * w;
+            r.y = 0.9f * h;
+            r.width = 0.2f * w;
+            r.height = 0.05f * h;
+            GUIStyle gs = new GUIStyle(GUI.skin.button);
+            gs.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+            gs.normal.textColor = Color.white;
+            gs.hover.textColor = Color.white;
+            gs.active.textColor = Color.yellow;
+            string ls = "ENTER SKILL TREE";
+            if (GUI.Button(r, ls, gs))
+            {
+                skillPurchasing = true;
+                currentPlayer.characterFrozen = true;
+                currentPlayer.freezeCharacterActions = true;
+                currentPlayer.hidePlayerNameTag = true;
+                playerCheckTimer = 0f;
+            }
+        }
+
+        if (!displaySkillTree)
+            return;
+
+        // arcana skill tree display
 
         r.x = 0.05f * w;
         r.y = 0.15f * h;
@@ -411,6 +464,7 @@ public class ArcanaSkilManager : MonoBehaviour
             currentPlayer.characterFrozen = false;
             currentPlayer.hidePlayerNameTag = false;
             currentPlayer = null;
+            playerCheckTimer = PLAYERCHECKTIME;
         }
     }
 }
