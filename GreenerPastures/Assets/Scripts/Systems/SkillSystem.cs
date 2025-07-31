@@ -50,6 +50,25 @@ public class SkillSystem
     }
 
     /// <summary>
+    /// Adds a given skill data to the given skill tree data, given the parent node name to add to (or "root" if root skill)
+    /// </summary>
+    /// <param name="skillTree">skill tree data</param>
+    /// <param name="skillData">skill data</param>
+    /// <param name="parentSkillName">parent skill name or "root" if this is to be a root skill</param>
+    /// <returns>skill tree data with added skill, if given parent name exists in skill tree</returns>
+    public static SkillTree AddTreeNode(SkillTree skillTree, SkillData skillData, string parentSkillName)
+    {
+        SkillTree retTree = skillTree;
+
+        if (parentSkillName == "root")
+            retTree = AddTreeNode(skillTree, skillData, -1);
+        else
+            retTree = AddTreeNode(skillTree, skillData, GetSkillIndex(skillTree, parentSkillName));
+
+        return retTree;
+    }
+
+    /// <summary>
     /// Adds a given skill data to the given skill tree data, given the parent node to connect to (-1 if root skill)
     /// </summary>
     /// <param name="skillTree">skill tree data</param>
@@ -63,11 +82,11 @@ public class SkillSystem
         // validate only one skill is associated with any given player effect
         bool found = false;
         string otherSkillName = "";
-        for (int i = 0; i < skillTree.skills.Length; i++)
+        for (int i = 0; i < retTree.skills.Length; i++)
         {
-            if (skillTree.skills[i].playerSkill == skillData.playerSkill)
+            if (retTree.skills[i].playerSkill == skillData.playerSkill)
             {
-                otherSkillName = skillTree.skills[i].name;
+                otherSkillName = retTree.skills[i].name;
                 found = true;
                 break;
             }
@@ -78,7 +97,7 @@ public class SkillSystem
             return retTree;
         }
         // will add, use this skill node index
-        int thisIndex = skillTree.skills.Length;
+        int thisIndex = retTree.skills.Length;
         // assign parent and connect to tree
         skillData.parent = parentNode;
         int[] tmp = new int[0];
@@ -86,30 +105,40 @@ public class SkillSystem
         if (parentNode == -1)
         {
             // add to list of root skills
-            tmp = new int[skillTree.rootSkills.Length + 1];
-            for (int i = 0; i < skillTree.rootSkills.Length; i++)
+            tmp = new int[retTree.rootSkills.Length + 1];
+            for (int i = 0; i < retTree.rootSkills.Length; i++)
             {
-                tmp[i] = skillTree.rootSkills[i];
+                tmp[i] = retTree.rootSkills[i];
             }
-            tmp[skillTree.rootSkills.Length] = thisIndex;
-            skillTree.rootSkills = tmp;
-            return retTree;
+            tmp[retTree.rootSkills.Length] = thisIndex;
+            retTree.rootSkills = tmp;
         }
-        // validate parent skill exists
-        if (parentNode < 0 || parentNode >= skillTree.skills.Length || !IsValidSkill(skillTree.skills[parentNode]))
+        else if (parentNode < 0 || parentNode >= retTree.skills.Length || !IsValidSkill(retTree.skills[parentNode]))
         {
+            // validate parent skill exists
             UnityEngine.Debug.LogWarning("--- SkillSystem [AddTreeNode] : parent index does not exist in tree. will ignore.");
             return retTree;
         }
-        // search tree, update children list
-        tmp = new int[skillTree.skills[parentNode].children.Length + 1];
-        int count = 0;
-        for (int i = 0; i < skillTree.skills.Length; i++)
+        if (parentNode > -1)
         {
-            if (skillTree.skills[i].parent == parentNode)
-                tmp[count++] = i;
+            // search tree, update children list on this parent
+            tmp = new int[retTree.skills[parentNode].children.Length + 1];
+            int count = 0;
+            for (int i = 0; i < retTree.skills.Length; i++)
+            {
+                if (retTree.skills[i].parent == parentNode)
+                    tmp[count++] = i;
+            }
+            retTree.skills[parentNode].children = tmp;
         }
-        skillTree.skills[parentNode].children = tmp;
+        // add skill to tree
+        SkillData[] tmpSkills = new SkillData[retTree.skills.Length + 1];
+        for (int i = 0; i < retTree.skills.Length; i++)
+        {
+            tmpSkills[i] = retTree.skills[i];
+        }
+        tmpSkills[retTree.skills.Length] = skillData;
+        retTree.skills = tmpSkills;
 
         return retTree;
     }
@@ -123,6 +152,32 @@ public class SkillSystem
     {
         // TODO: if (skill.playerSkill.ToString().StartsWith("Skill"))
         return (skill != null && skill.name != "" && skill.playerSkill != PlayerEffect.Default);
+    }
+
+    /// <summary>
+    /// Returns the index of the given skill name in the given skill tree
+    /// </summary>
+    /// <param name="skillTree">skill tree data</param>
+    /// <param name="skillName">skill name</param>
+    /// <returns>index of skill in skill tree, or -1 if not found</returns>
+    public static int GetSkillIndex(SkillTree skillTree, string skillName)
+    {
+        int retIndex = -1;
+
+        bool found = false;
+        for (int i = 0; i < skillTree.skills.Length; i++)
+        {
+            if (skillTree.skills[i].name == skillName)
+            {
+                retIndex = i;
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            UnityEngine.Debug.LogWarning("--- SkillSystem [GetSkillIndex] : no skill '" + skillName + "' found in tree. will return index of -1.");
+
+        return retIndex;
     }
 
     /// <summary>
