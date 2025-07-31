@@ -213,6 +213,185 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edae5d2d49b64c642bc39e601032ac08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &289760970
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 289760971}
+  - component: {fileID: 289760973}
+  - component: {fileID: 289760972}
+  m_Layer: 0
+  m_Name: AudioMgr ChickRace SFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &289760971
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289760970}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 435026383}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &289760972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289760970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb2949f4ca392f94a85ce209b7cf865a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &289760973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289760970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c84ee89b53e7d06479daf259d5fd914c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: Race Idle 1
+    clip: {fileID: 8300000, guid: b250f72f8b4fd314ab112e914862fbd1, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.1
+    volumeVariance: 0
+  - name: Race Idle 2
+    clip: {fileID: 8300000, guid: 7ce5a0fecd174094ebd48d4a1beb49e5, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.1
+    volumeVariance: 0
+  - name: Race Idle 3
+    clip: {fileID: 8300000, guid: 542f4edda5d6d6a41a937635a0a91233, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.1
+    volumeVariance: 0
+  - name: Race Idle 4
+    clip: {fileID: 8300000, guid: 86df0b9cd4d58024a9be4be2ad5e7cf5, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.1
+    volumeVariance: 0
+  - name: Coin Drop 1
+    clip: {fileID: 8300000, guid: a158f7c3ef193944193c4e10f6fa65f8, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Coin Drop 2
+    clip: {fileID: 8300000, guid: 65b786113d2b8cc498790ee432eb668f, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Coin Drop 3
+    clip: {fileID: 8300000, guid: 570c5a0f6e8f9ba4aba48d8d66ae499f, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Coin Drop 4
+    clip: {fileID: 8300000, guid: 7a43caa4ee573004e83b97e527afd80e, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0
+    volumeVariance: 0
+  - name: Cheer 1
+    clip: {fileID: 8300000, guid: b7383a763b9ba514b9d70b3b3a9126cd, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.381
+    volumeVariance: 0
+  - name: Cheer 2
+    clip: {fileID: 8300000, guid: b77cf2f6580e8b640a019f4ec08caf9d, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.381
+    volumeVariance: 0
+  - name: Finish
+    clip: {fileID: 8300000, guid: 8d8d66300e0375f48a14ee1992b83273, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.381
+    volumeVariance: 0
+  - name: Run Loop
+    clip: {fileID: 8300000, guid: eac58678f37d0c1458472626b709993a, type: 3}
+    type: 1
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0
+    volume: 0.1
+    volumeVariance: 0
+  musicCrossFadeTime: 2
 --- !u!1 &315054321
 GameObject:
   m_ObjectHideFlags: 0
@@ -368,6 +547,7 @@ Transform:
   - {fileID: 1651088193}
   - {fileID: 2073833400}
   - {fileID: 1322618448}
+  - {fileID: 289760971}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &465892697
