@@ -318,7 +318,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
+    pitchVariance: 0.2
     volume: 0
     volumeVariance: 0
   - name: Coin Drop 2
@@ -328,7 +328,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
+    pitchVariance: 0.1
     volume: 0
     volumeVariance: 0
   - name: Coin Drop 3
@@ -338,7 +338,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
+    pitchVariance: 0.1
     volume: 0
     volumeVariance: 0
   - name: Coin Drop 4
@@ -348,7 +348,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
+    pitchVariance: 0.1
     volume: 0
     volumeVariance: 0
   - name: Cheer 1
@@ -358,9 +358,9 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
-    volume: 0.381
-    volumeVariance: 0
+    pitchVariance: 0.1
+    volume: 0.3
+    volumeVariance: 0.081
   - name: Cheer 2
     clip: {fileID: 8300000, guid: b77cf2f6580e8b640a019f4ec08caf9d, type: 3}
     type: 0
@@ -368,9 +368,9 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
-    volume: 0.381
-    volumeVariance: 0
+    pitchVariance: 0.1
+    volume: 0.3
+    volumeVariance: 0.081
   - name: Finish
     clip: {fileID: 8300000, guid: 8d8d66300e0375f48a14ee1992b83273, type: 3}
     type: 0
@@ -378,9 +378,9 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
-    volume: 0.381
-    volumeVariance: 0
+    pitchVariance: 0.1
+    volume: 0.281
+    volumeVariance: 0.1
   - name: Run Loop
     clip: {fileID: 8300000, guid: eac58678f37d0c1458472626b709993a, type: 3}
     type: 1

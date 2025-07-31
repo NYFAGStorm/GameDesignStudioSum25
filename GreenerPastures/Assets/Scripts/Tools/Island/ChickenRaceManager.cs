@@ -98,6 +98,10 @@ public class ChickenRaceManager : MonoBehaviour
     private float otherWagerTimer;
     private float rewardTimer;
 
+    private AudioManager sfxAudio;
+    private int currentIdleLoop;
+    private bool finishSFX;
+
     const float PLAYERCHECKTIME = 1f;
     const float RACEPROXIMITYRANGE = .5f;
     const float GUESTSTATETIMERMAX = 1f;
@@ -120,6 +124,9 @@ public class ChickenRaceManager : MonoBehaviour
             Debug.LogError("--- ChickenRaceManager [Start] : no quit on escape found in scene. aborting.");
             enabled = false;
         }
+        GameObject sfxObj = GameObject.Find("AudioMgr ChickRace SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -188,6 +195,8 @@ public class ChickenRaceManager : MonoBehaviour
         if (!DetectPlayerGuest())
             return;
 
+        UpdateSFX();
+
         UpdateChickenFrames();
 
         HandleGuestStates();
@@ -195,6 +204,77 @@ public class ChickenRaceManager : MonoBehaviour
         UpdateRaceStateTimer();
 
         HandleRaceStates();
+    }
+
+    void UpdateSFX()
+    {
+        if (sfxAudio == null)
+            return;
+
+        if (raceState < RaceState.PreRace)
+        {
+            // idle sfx
+            if (sfxAudio.IsSoundPlaying("Race Idle 1"))
+                currentIdleLoop = 1;
+            else if (sfxAudio.IsSoundPlaying("Race Idle 2"))
+                currentIdleLoop = 2;
+            else if (sfxAudio.IsSoundPlaying("Race Idle 3"))
+                currentIdleLoop = 3;
+            else if (sfxAudio.IsSoundPlaying("Race Idle 4"))
+                currentIdleLoop = 4;
+            else
+            {
+                // play different idle sfx
+                string idleSFX = "Race Idle ";
+                int rnd = currentIdleLoop;
+                int safety = 10;
+                while (safety > 0 && rnd == currentIdleLoop)
+                {
+                    safety--;
+                    rnd = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 4);
+                }
+                sfxAudio.StartSound(idleSFX + rnd.ToString());
+                currentIdleLoop = rnd;
+            }
+            finishSFX = false;
+        }
+        else if (currentIdleLoop > -1)
+        {
+            sfxAudio.StopSound("Race Idle "+currentIdleLoop.ToString());
+            currentIdleLoop = -1;
+        }
+        // race loop
+        if (raceState == RaceState.Race && raceStateTimer == 0f)
+        {
+            if (!sfxAudio.IsSoundPlaying("Run Loop"))
+                sfxAudio.StartSound("Run Loop");
+        }
+        else if (sfxAudio.IsSoundPlaying("Run Loop"))
+            sfxAudio.StopSound("Run Loop");
+        // race finish
+        if (raceState == RaceState.PostRace)
+        {
+            // crowd
+            if (!sfxAudio.IsSoundPlaying("Cheer 1") &&
+                !sfxAudio.IsSoundPlaying("Cheer 2"))
+            {
+                if (RandomSystem.FlatRandom01() < .5f)
+                    sfxAudio.StartSound("Cheer 1");
+                else
+                    sfxAudio.StartSound("Cheer 2");
+            }
+        }
+        // winner sfx
+        if (raceState == RaceState.Rewarding)
+        {
+            if (!finishSFX)
+            {
+                // chicken winner
+                if (!sfxAudio.IsSoundPlaying("Finish"))
+                    sfxAudio.StartSound("Finish");
+                finishSFX = true;
+            }
+        }
     }
 
     bool DetectPlayerGuest()
@@ -481,6 +561,8 @@ public class ChickenRaceManager : MonoBehaviour
             otherPicks[otherBets] = Random.Range(0, 3);
             otherBets = 1;
             totalTake += GameSystem.RoundedResult(RandomSystem.GaussianRandom01(), OTHERWAGERMAX);
+            if (sfxAudio != null)
+                sfxAudio.StartSound("Coin Drop 1");
         }
         else if ((otherBets+1) < MAXWAGERS && 
             (totalTake + betAmount) > ((otherBets-1) / OTHERWAGERMAX) && 
@@ -503,6 +585,15 @@ public class ChickenRaceManager : MonoBehaviour
             otherBets++;
             // additional gold in dish
             totalTake += GameSystem.RoundedResult(RandomSystem.GaussianRandom01(), OTHERWAGERMAX);
+            if (sfxAudio != null)
+            {
+                if (totalTake > 30)
+                    sfxAudio.StartSound("Coin Drop 4");
+                else if (totalTake <= 30 && totalTake > 20)
+                    sfxAudio.StartSound("Coin Drop 3");
+                else
+                    sfxAudio.StartSound("Coin Drop 2");
+            }
         }
 
         // reset other wager timer
@@ -1127,6 +1218,8 @@ public class ChickenRaceManager : MonoBehaviour
                 betAmount++;
                 if (betAmount > currentGuest.playerData.gold)
                     betAmount = currentGuest.playerData.gold;
+                if (sfxAudio != null)
+                    sfxAudio.StartSound("Coin Drop 1");
             }
             // total bets on race
             r.x = 0.5875f * w;
@@ -1165,7 +1258,7 @@ public class ChickenRaceManager : MonoBehaviour
             g.active.textColor = Color.yellow;
             // TODO: gamepad 
             s = "LET'S RACE!";
-            GUI.enabled = (chickenPick > -1);
+            GUI.enabled = (chickenPick > -1 && betAmount > 0);
             if (GUI.Button(r, s, g))
             {
                 raceState = RaceState.PreRace;
