@@ -35,10 +35,15 @@ public class ArcanaSkilManager : MonoBehaviour
     private string skillInstructions;
     private float feedbackTimer;
 
+    private bool confirmSlideDown;
+    private float confirmPopTimer;
+    private AnimationCurve popCurve;
+
     const float PLAYERCHECKTIME = 1f;
     const float PLAYERPROXIMITY = 1f;
     const string DEFAULTINSTRUCTIONS = "WASD to explore skills\nPress ENTER to purchase";
     const float FEEDBACKTIME = 3f;
+    const float CONFIRMPOPTIME = 1f;
 
 
 
@@ -54,6 +59,7 @@ public class ArcanaSkilManager : MonoBehaviour
 
             playerCheckTimer = PLAYERCHECKTIME;
             skillInstructions = DEFAULTINSTRUCTIONS;
+            popCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         }
     }
 
@@ -219,6 +225,20 @@ public class ArcanaSkilManager : MonoBehaviour
         if (!displaySkillTree)
             return;
 
+        // run confirm pop timer
+        if (confirmPopTimer > 0f)
+        {
+            confirmPopTimer -= Time.deltaTime;
+            if (confirmPopTimer < 0f)
+            {
+                confirmPopTimer = 0f;
+                if (confirmSlideDown)
+                    confirmSlideDown = false; // reset
+                else
+                    confirmSlideDown = true;
+            }
+        }
+
         // run feedback timer
         if (feedbackTimer > 0f)
         {
@@ -229,6 +249,9 @@ public class ArcanaSkilManager : MonoBehaviour
                 skillInstructions = DEFAULTINSTRUCTIONS;
             }
         }
+
+        if (confirmSlideDown || confirmPopTimer > 0f)
+            return; // hold player control during confirm
 
         // keyboard purchase of skill
         // enter
@@ -247,34 +270,9 @@ public class ArcanaSkilManager : MonoBehaviour
                 return;
             }
 
-            // TODO: confirm popup
+            // launch confirm popup
+            confirmPopTimer = CONFIRMPOPTIME;
 
-            currentPlayer.playerData.arcana -= skillTree.skills[currentSkillNode].arcanaCost;
-            PlayerSystem.AddPlayerEffect(currentPlayer.playerData, SkillSystem.GetSkillPlayerEffect(skillTree, nodes[currentSkillNode].name));
-            // active magic skills add a permanently ready spell in player's spell book
-            if (currentSkillNode >= 10 && currentSkillNode < 15)
-            {
-                MagicManager mm = currentPlayer.gameObject.GetComponent<MagicManager>();
-                switch (currentSkillNode)
-                {
-                    case 10:
-                        mm.AddActiveMagicSkill(SpellType.SkillWasteManagement);
-                        break;
-                    case 11:
-                        mm.AddActiveMagicSkill(SpellType.SkillCleanup);
-                        break;
-                    case 12:
-                        mm.AddActiveMagicSkill(SpellType.SkillTBD);
-                        break;
-                    case 13:
-                        mm.AddActiveMagicSkill(SpellType.SkillCashIn);
-                        break;
-                    case 14:
-                        mm.AddActiveMagicSkill(SpellType.SkillTakeMeHome);
-                        break;
-                }
-            }
-            InitializeNodes();
             return;
         }
 
@@ -330,6 +328,36 @@ public class ArcanaSkilManager : MonoBehaviour
         }
     }
 
+    void PurchaseSkill( int nodeIndex )
+    {
+        currentPlayer.playerData.arcana -= skillTree.skills[currentSkillNode].arcanaCost;
+        PlayerSystem.AddPlayerEffect(currentPlayer.playerData, SkillSystem.GetSkillPlayerEffect(skillTree, nodes[currentSkillNode].name));
+        // active magic skills add a permanently ready spell in player's spell book
+        if (currentSkillNode >= 10 && currentSkillNode < 15)
+        {
+            MagicManager mm = currentPlayer.gameObject.GetComponent<MagicManager>();
+            switch (currentSkillNode)
+            {
+                case 10:
+                    mm.AddActiveMagicSkill(SpellType.SkillWasteManagement);
+                    break;
+                case 11:
+                    mm.AddActiveMagicSkill(SpellType.SkillCleanup);
+                    break;
+                case 12:
+                    mm.AddActiveMagicSkill(SpellType.SkillTBD);
+                    break;
+                case 13:
+                    mm.AddActiveMagicSkill(SpellType.SkillCashIn);
+                    break;
+                case 14:
+                    mm.AddActiveMagicSkill(SpellType.SkillTakeMeHome);
+                    break;
+            }
+        }
+        InitializeNodes();
+    }
+
     void OnGUI()
     {
         if (currentPlayer == null)
@@ -366,6 +394,8 @@ public class ArcanaSkilManager : MonoBehaviour
             return;
 
         // arcana skill tree display
+
+        GUI.enabled = (!confirmSlideDown && confirmPopTimer == 0f);
 
         r.x = 0.05f * w;
         r.y = 0.15f * h;
@@ -426,7 +456,7 @@ public class ArcanaSkilManager : MonoBehaviour
                 g.hover.textColor = Color.white;
                 g.active.textColor = Color.white;
             }
-            if (currentSkillNode == i)
+            if (currentSkillNode == i && (confirmPopTimer == 0f && !confirmSlideDown))
             {
                 g.normal.textColor = Color.yellow;
                 g.hover.textColor = Color.yellow;
@@ -511,7 +541,75 @@ public class ArcanaSkilManager : MonoBehaviour
         g.active.textColor = Color.white;
         GUI.Label(r, s, g);
 
-        // cancel button
+        // confirm popup
+        if (confirmPopTimer > 0f || confirmSlideDown)
+        {
+            GUI.enabled = true;
+
+            float progress = 0f;
+            if (confirmSlideDown)
+            {
+                if (confirmPopTimer > 0f)
+                    progress = 1f - popCurve.Evaluate(confirmPopTimer / CONFIRMPOPTIME);
+                else
+                    progress = 0f;
+            }
+            else
+                progress = popCurve.Evaluate(confirmPopTimer / CONFIRMPOPTIME);
+
+            // box
+            r.x = 0.25f * w;
+            r.y = (0.3f * h) + (progress * 0.8f * h);
+            r.width = .5f * w;
+            r.height = .4f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.padding = new RectOffset(0, 0, 30, 0);
+            s = "CONFIRM SKILL PURCHASE";
+            GUI.Box(r, s, g);
+            // message label
+            r.x = .3f * w;
+            r.y = (0.35f * h) + (progress * 0.8f * h);
+            r.width = .4f * w;
+            r.height = .2f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(24 * (w / 1024));
+            g.fontStyle = FontStyle.Italic;
+            s = "Would you like to spend " + skillTree.skills[currentSkillNode].arcanaCost + " Arcana\n";
+            s += "to acquire the skill '" + skillTree.skills[currentSkillNode].name + "'?";
+            GUI.Label(r, s, g);
+            // confirm button
+            r.x = 0.35f * w;
+            r.y = (0.6f * h) + (progress * 0.8f * h);
+            r.width = .1f * w;
+            r.height = .05f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            s = "CONFIRM";
+            GUI.enabled = (confirmPopTimer == 0f);
+            if (GUI.Button(r, s, g))
+            {
+                PurchaseSkill(currentSkillNode);
+                confirmPopTimer = CONFIRMPOPTIME;
+            }
+            // cancel button
+            r.x = 0.55f * w;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            s = "CANCEL";
+            if (GUI.Button(r, s, g))
+            {
+                confirmPopTimer = CONFIRMPOPTIME;
+            }
+        }
+
+        // exit button
         r.x = 0.4f * w;
         r.y = 0.9f * h;
         r.width = 0.2f * w;
@@ -522,6 +620,7 @@ public class ArcanaSkilManager : MonoBehaviour
         g.hover.textColor = Color.white;
         g.active.textColor = Color.yellow;
         s = "EXIT SKILL TREE";
+        GUI.enabled = (!confirmSlideDown && confirmPopTimer == 0f);
         if (GUI.Button(r,s,g))
         {
             skillPurchasing = false;
