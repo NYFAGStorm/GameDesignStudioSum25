@@ -566,22 +566,41 @@ public class MagicCraftingManager : MonoBehaviour
     {
         bool retBool = true;
 
-        // in all entry ingredients, if default plant, any type; otherwise specific item needed
+        // NOTE: this needs to account for taking the ingredient and counting it only once
+        int[] invItemsUsed = new int[entry.ingredients.Length];
+        // initialize items used (none)
+        for (int i = 0; i < invItemsUsed.Length; i++)
+        {
+            invItemsUsed[i] = -1;
+        }
+        // in all entry ingredients, find match item in player inventory
         for ( int i = 0; i < entry.ingredients.Length; i++ )
         {
             bool found = false;
             for (int n = 0; n < pcm.playerData.inventory.items.Length; n++)
             {
+                bool alreadyUsed = false;
+                // check inventory item not already used
+                for (int t = 0; t < invItemsUsed.Length; t++)
+                {
+                    if (invItemsUsed[t] == n)
+                        alreadyUsed = true;
+                }
+                if (alreadyUsed)
+                    continue;
+                // check item matches ingredient need
+                // if default plant, any type; otherwise specific item needed
                 if ((entry.ingredients[i].plant == PlantType.Default && 
                     pcm.playerData.inventory.items[n].type == entry.ingredients[i].item) ||
                     (entry.ingredients[i].item == pcm.playerData.inventory.items[n].type && 
                     entry.ingredients[i].plant == pcm.playerData.inventory.items[n].plant))
                 {
                     found = true;
+                    // store as inv item used
+                    invItemsUsed[i] = n;
                     break;
                 }
             }
-
             if (!found)
             {
                 retBool = false;

@@ -165,8 +165,8 @@ public class CastManager : MonoBehaviour
                 ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
                 if (ism != null)
                 {
-                    float facing = loosey.gameObject.transform.GetChild(0).GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
-                    Vector3 pos = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject.transform.position;
+                    float facing = loosey.gameObject.GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
+                    Vector3 pos = loosey.gameObject.transform.position + (Vector3.down * .25f);
                     Vector3 targ = pos + (facing * Vector3.right);
                     int maybeRarePlantType = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 41);
                     PlantType pt = (PlantType)(maybeRarePlantType);

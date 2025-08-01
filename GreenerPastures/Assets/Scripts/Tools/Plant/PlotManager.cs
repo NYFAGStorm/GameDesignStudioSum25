@@ -159,6 +159,8 @@ public class PlotManager : MonoBehaviour
             HarvestPlant();
         if (autoUprootOnce)
             UprootPlot();
+        if (autoPlantOnce)
+            WorkLand();
 
         if (!cursorActive)
         {
@@ -547,17 +549,21 @@ public class PlotManager : MonoBehaviour
     /// </summary>
     public void WorkLand()
     {
-        if (actionDirty)
+        if (!autoPlantOnce && actionDirty)
             return;
 
-        if (actionCompleteTimer > 0f && !actionClear)
+        if (!autoPlantOnce && actionCompleteTimer > 0f && !actionClear)
             return;
 
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         ItemData iData = pcm.GetPlayerCurrentItemSelection();
 
-        if (data.condition == PlotCondition.Tilled)
+        if (!autoPlantOnce && data.condition == PlotCondition.Tilled)
         {
+            // ARCANA SKILL : Cover Crop
+            if (autoPlantOnce)
+                action = CurrentAction.Planting;
+
             if (action == CurrentAction.Planting && (iData == null || 
                 iData.type != ItemType.Seed))
             {
@@ -570,7 +576,7 @@ public class PlotManager : MonoBehaviour
                 return;
             action = CurrentAction.Planting;
 
-            if (!ActionComplete(PLANTWINDOW, "PLANTING..."))
+            if (!autoPlantOnce && !ActionComplete(PLANTWINDOW, "PLANTING..."))
                 return;
 
             // PLAYER STATS:
@@ -592,6 +598,12 @@ public class PlotManager : MonoBehaviour
                 return;
 
             pcm.AwardXP(PlayerData.XP_WORKTHEPLOT);
+        }
+
+        if (autoPlantOnce)
+        {
+            autoPlantOnce = false; // just once
+            print("auto planting with " + iData.name + " plant type = " + iData.plant.ToString());
         }
 
         switch (data.condition)
@@ -664,7 +676,7 @@ public class PlotManager : MonoBehaviour
                 break;
             default:
                 break;
-        }       
+        }
     }
 
     /// <summary>
@@ -996,6 +1008,7 @@ public class PlotManager : MonoBehaviour
             if (autoPlantOnce)
             {
                 // set condition of plot to tilled
+                plotTexture.material.mainTexture = (Texture2D)Resources.Load("Plot_Tilled");
                 data.condition = PlotCondition.Tilled;
                 // immediately plant selected seed
                 WorkLand();
