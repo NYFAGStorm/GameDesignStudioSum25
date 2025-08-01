@@ -820,22 +820,6 @@ public class PlotManager : MonoBehaviour
                                     iData.effects[0] = ItemEffect.ScrollRandomSpellCharge;
                                 }
                             }
-                            // ARCANA SKILL : Midas Biomancer
-                            if (true)
-                            {
-                                // collect gold sack filled with x2 market value of total fruit harvested
-                                int marketValue = 0;
-                                MarketManager mm = GameObject.FindFirstObjectByType<MarketManager>();
-                                if (mm != null)
-                                    marketValue = mm.GetFinalMarketSellValue(iData);
-                                marketValue *= 2;
-                                iData.type = ItemType.GoldSack;
-                                iData.plant = PlantType.Default;
-                                for (int n = 0; n < marketValue; n++)
-                                {
-
-                                }
-                            }
                             currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
                         }
                         else
@@ -845,7 +829,7 @@ public class PlotManager : MonoBehaviour
                             target.z -= 0.01f; // in front of plant
                             // harvesting drops fruit
                             LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
-                            // (unless plant has a special effect)
+                            // (unless player or plant has a special effect)
                             if (!dropGold && (data.plant.plantEffects.Length == 0 || data.plant.plantEffects[0] != PlantEffect.WalkingStickScrollHarvest))
                             { 
                                 // transfer properties of fruit to item (revise item data)
