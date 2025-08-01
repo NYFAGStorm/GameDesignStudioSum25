@@ -90,6 +90,8 @@ public class PlayerControlManager : MonoBehaviour
     private AudioManager sfxAudio;
 
     private bool inARabbitHole;
+    private string groceryList;
+    private float groceryListTimer;
 
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
@@ -97,6 +99,7 @@ public class PlayerControlManager : MonoBehaviour
     const float XPDISPLAYTIME = 1f;
     const float LEVELUPDISPLAYTIME = 4f;
     const float LETTERPOPUPTIME = 0.618f;
+    const float GROCERYLISTTIME = 60f;
 
 
     // REFACTOR: the entire validation and intialization happens when game manager called SetPlayerData()
@@ -242,6 +245,16 @@ public class PlayerControlManager : MonoBehaviour
                 }
             }
         }
+        // run grocery list timer
+        if (groceryListTimer > 0f)
+        {
+            groceryListTimer -= Time.deltaTime;
+            if (groceryListTimer < 0f)
+            {
+                groceryListTimer = 0f;
+                groceryList = "";
+            }
+        }
 
         // SPELL RABBIT HOLE
         if (inARabbitHole && !PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellRabbitHole))
@@ -337,6 +350,20 @@ public class PlayerControlManager : MonoBehaviour
             if (!mm.EnterSpellCastMode())
                 ggm.AddNotification("You have no spell charges in your spell book. Craft more charges to cast.");
         }
+    }
+
+    public void MakeGroceryList( GrimoireData recipe )
+    {
+        // ARCANA SKILL : Grocery List
+        // Spell Name : Ingredient, Ingredient, Ingredient, Ingredient, Ingredient
+        groceryList = recipe.name + " : ";
+        for (int i = 0; i < recipe.ingredients.Length; i++)
+        {
+            groceryList += recipe.ingredients[i].name;
+            if (i < recipe.ingredients.Length - 1)
+                groceryList += ", ";
+        }
+        groceryListTimer = GROCERYLISTTIME;
     }
 
     void FallInRabbitHole( bool inHole )
@@ -1589,6 +1616,29 @@ public class PlayerControlManager : MonoBehaviour
             GUI.Label(r, s, g);
 
             GUI.depth = guiDepth;
+        }
+        else if (groceryList != "")
+        {
+            // ARCANA SKILL : Grocery List
+            // grocery list display
+            r.x = 0.2f * w;
+            r.y = 0.9f * h;
+            r.width = 0.6f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Italic;
+            g.wordWrap = true;
+            s = groceryList;
+            r.x += 0.0005f * w;
+            r.y += 0.0008f * w;
+            GUI.color = Color.black;
+            GUI.Label(r, s, g);
+            r.x -= 0.001f * w;
+            r.y -= 0.0016f * w;
+            GUI.color = Color.white;
+            GUI.Label(r, s, g);
         }
 
         if (currentInventorySelection >= playerInventory.items.Length)

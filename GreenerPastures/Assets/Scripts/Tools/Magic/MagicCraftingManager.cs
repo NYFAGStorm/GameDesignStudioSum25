@@ -432,6 +432,9 @@ public class MagicCraftingManager : MonoBehaviour
                         topOfRecipeList = currentGrimoireEntry;
                     if (currentGrimoireEntry > topOfRecipeList + 3)
                         topOfRecipeList = currentGrimoireEntry - 3;
+                    // ARCANA SKILL : Grocery List
+                    if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillGroceryList))
+                        pcm.MakeGroceryList(pcm.playerData.magic.library.grimoire[currentGrimoireEntry]);
                 }
                 if (currentGrimoireEntry != -1)
                 {
