@@ -520,10 +520,16 @@ public class PlotManager : MonoBehaviour
         }
         // progress step
         actionProgressStep = 1f / (actionLimit / ACTIONHOLDSTEPINTERVAL);
+        actionProgress += actionProgressStep;
         // SPELL LIGHT WORK
         if (PlayerSystem.PlayerHasEffect(currentPlayer.playerData, PlayerEffect.SpellLightWork))
             actionProgress += actionProgressStep; // x2 work rate
-        actionProgress += actionProgressStep;
+        // ARCANA SKILL : Focus Flow
+        if (PlayerSystem.PlayerHasEffect(currentPlayer.playerData, PlayerEffect.SkillFocusFlow))
+        {
+            if (currentPlayer.IsPlayerFocusFlowing(action))
+                actionProgress = Mathf.Clamp01(actionProgress + actionProgressStep); // x2 work rate
+        }
         actionStepTimer = ACTIONHOLDSTEPINTERVAL;
         actionDrainTimer = ACTIONDRAINDELAYDURATION;
         // detect completion

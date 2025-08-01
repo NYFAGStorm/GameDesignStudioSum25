@@ -90,8 +90,11 @@ public class PlayerControlManager : MonoBehaviour
     private AudioManager sfxAudio;
 
     private bool inARabbitHole;
+
+    private float focusFlowTimer;
     private string groceryList;
     private float groceryListTimer;
+    
 
     const float PROXIMITYRANGE = 0.381f;
     const float ISLANDTETHERSTRENGTH = 1f;
@@ -99,6 +102,7 @@ public class PlayerControlManager : MonoBehaviour
     const float XPDISPLAYTIME = 1f;
     const float LEVELUPDISPLAYTIME = 4f;
     const float LETTERPOPUPTIME = 0.618f;
+    const float FOCUSFLOWTIME = 2f;
     const float GROCERYLISTTIME = 60f;
 
 
@@ -352,6 +356,44 @@ public class PlayerControlManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns true if player is within focus flow time window and performing same action
+    /// </summary>
+    /// <param name="action">plot action</param>
+    /// <returns>true if within window and performing same farm work action</returns>
+    public bool IsPlayerFocusFlowing( PlotManager.CurrentAction action )
+    {
+        // ARCANA SKILL : Focus Flow
+        bool retBool = false;
+
+        if (focusFlowTimer > 0f)
+        {
+            if ((characterActions.actionA || characterActions.actionADown) &&
+                action == PlotManager.CurrentAction.Working || 
+                action == PlotManager.CurrentAction.Planting)
+                retBool = true;
+            if ((characterActions.actionB || characterActions.actionBDown) &&
+                action == PlotManager.CurrentAction.Watering)
+                retBool = true;
+            if ((characterActions.actionC || characterActions.actionCDown) &&
+                action == PlotManager.CurrentAction.Harvesting)
+                retBool = true;
+            if ((characterActions.actionD || characterActions.actionDDown) &&
+                action == PlotManager.CurrentAction.Uprooting)
+                retBool = true;
+            if ((characterActions.graftPlant) && action == PlotManager.CurrentAction.Grafting)
+                retBool = true;
+        }
+        if (retBool)
+            focusFlowTimer = FOCUSFLOWTIME; // reset flow timer
+
+        return retBool;
+    }
+    
+    /// <summary>
+    /// Fills HUD display of ingredient list for most recently viewed grimoire recipe
+    /// </summary>
+    /// <param name="recipe">grimoire data</param>
     public void MakeGroceryList( GrimoireData recipe )
     {
         // ARCANA SKILL : Grocery List
