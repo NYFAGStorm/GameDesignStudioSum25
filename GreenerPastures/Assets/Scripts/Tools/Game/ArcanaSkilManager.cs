@@ -342,10 +342,10 @@ public class ArcanaSkilManager : MonoBehaviour
                     mm.AddActiveMagicSkill(SpellType.SkillWasteManagement);
                     break;
                 case 11:
-                    mm.AddActiveMagicSkill(SpellType.SkillCleanup);
+                    mm.AddActiveMagicSkill(SpellType.SkillCleanUp);
                     break;
                 case 12:
-                    mm.AddActiveMagicSkill(SpellType.SkillTBD);
+                    mm.AddActiveMagicSkill(SpellType.SkillLightenUp);
                     break;
                 case 13:
                     mm.AddActiveMagicSkill(SpellType.SkillCashIn);

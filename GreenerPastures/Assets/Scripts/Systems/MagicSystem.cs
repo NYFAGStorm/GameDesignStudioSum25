@@ -358,14 +358,14 @@ public static class MagicSystem
                 retSpell.castDuration = .1f;
                 retSpell.castAOE = .5f; // 1x1 plot range
                 break;
-            case SpellType.SkillCleanup:
+            case SpellType.SkillCleanUp:
                 retSpell.name = "Clean Up";
                 retSpell.cooldownDuration = 0.1f;
                 retSpell.castDuration = 1f;
                 retSpell.castAOE = 2f; // 3x3 plot range
                 break;
-            case SpellType.SkillTBD:
-                retSpell.name = "TBD Active Magic";
+            case SpellType.SkillLightenUp:
+                retSpell.name = "Lighten Up";
                 retSpell.cooldownDuration = 0.1f;
                 retSpell.castDuration = 1f;
                 retSpell.castAOE = 2f; // 3x3 plot range

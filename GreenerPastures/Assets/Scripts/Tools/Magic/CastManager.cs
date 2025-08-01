@@ -511,7 +511,7 @@ public class CastManager : MonoBehaviour
         SpellType spellType = casts[index].type;
         Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
         float areaOfEffect = casts[index].rangeAOE;
-        float dist;
+        //float dist;
 
         // Arcana skill 'spells'
 
