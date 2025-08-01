@@ -249,7 +249,7 @@ public class GreenerGameManager : MonoBehaviour
             }
         }
 
-        // run gold fair help pause timer
+        // run gold fairy help pause timer
         if (goldFairHelpPauseTimer > 0f)
         {
             goldFairHelpPauseTimer -= Time.deltaTime;
@@ -315,13 +315,44 @@ public class GreenerGameManager : MonoBehaviour
                 if (!foundItem)
                 {
                     // player is out of economy (send gold fairy)
-                    GameObject fairy = GameObject.Instantiate((GameObject)Resources.Load("NPC Gold Fairy"));
-                    fairy.GetComponent<NPCGoldFairy>().ActivateFairy(game.players[i].playerIsland, minimumGold + Mathf.RoundToInt(RandomSystem.GaussianRandom01() * 5));
-                    Debug.Log("--- GreenerGameManager [Update] : player detected stuck (no gold, no plants, no items). sending gold fairy.");
+                    GoldFairyVisit(game.players[i].playerIsland, minimumGold);
                     goldFairHelpPauseTimer = GOLDFAIRYHELPPAUSE;
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// This tick represents a new day (midnight)
+    /// </summary>
+    public void MidnightTick()
+    {
+        // ARCANA SKILL : Friends of the Gold Fairy
+        // local player only
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm != null)
+        {
+            if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillFriendsGoldFairy))
+            {
+                if (RandomSystem.FlatRandom01() < 0.618f)
+                {
+                    GameObject fairy = GoldFairyVisit(pcm.playerData.playerIsland,
+                        GameSystem.RoundedResult(RandomSystem.GaussianRandom01(), 22));
+                    Destroy(fairy, 60f); // gone in an hour
+                }
+            }
+        }
+    }
+
+    GameObject GoldFairyVisit( int playerIsland, int minimumGold )
+    {
+        if (goldFairHelpPauseTimer > 0f)
+            return null;
+        GameObject fairy = GameObject.Instantiate((GameObject)Resources.Load("NPC Gold Fairy"));
+        fairy.GetComponent<NPCGoldFairy>().ActivateFairy(playerIsland, minimumGold + Mathf.RoundToInt(RandomSystem.GaussianRandom01() * 5));
+        //Debug.Log("--- GreenerGameManager [GoldFariyVisit] : player detected stuck (no gold, no plants, no items). sending gold fairy.");
+        goldFairHelpPauseTimer = GOLDFAIRYHELPPAUSE;
+        return fairy;
     }
 
     // this function could easily live on another tool, if that makes sense

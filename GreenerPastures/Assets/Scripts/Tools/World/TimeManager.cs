@@ -53,6 +53,8 @@ public class TimeManager : MonoBehaviour
 
     private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
 
+    private int previousDayOfMonth; // check for midnight tick
+
     const float ABSOLUTEMINIMUMFLOAT = -999999999999999f; // used for timestamp difference
 
     const float SUNLIGHTINTENSITY = 1f;
@@ -212,6 +214,14 @@ public class TimeManager : MonoBehaviour
             UpdatePostOffice();
         else
             dailyDelivery = false;
+
+        if (previousDayOfMonth != dayOfMonth)
+        {
+            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+            if (ggm != null)
+                ggm.MidnightTick();
+        }
+        previousDayOfMonth = dayOfMonth;
     }
 
     void UpdateAmbientLighting()
