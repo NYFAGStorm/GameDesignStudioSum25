@@ -68,8 +68,8 @@ public enum SpellType
     DaylightII, // level seven
     RabbitHole,
     SkillWasteManagement,   // ARCANA SKILL : Waste Management
-    SkillCleanup,           // ARCANA SKILL : Clean Up
-    SkillTBD,               // ARCANA SKILL : TBD Active Magic
+    SkillCleanUp,           // ARCANA SKILL : Clean Up
+    SkillLightenUp,         // ARCANA SKILL : Lighten Up
     SkillCashIn,            // ARCANA SKILL : Cash In
     SkillTakeMeHome         // ARCANA SKILL : Take Me Home
 }

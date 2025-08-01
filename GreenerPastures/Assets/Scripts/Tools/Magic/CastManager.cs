@@ -141,7 +141,7 @@ public class CastManager : MonoBehaviour
         float dist;
 
         // Arcana skill 'spells'
-        // skill waste management
+        // ARCANA SKILL : Waste Management
         if (spellType == SpellType.SkillWasteManagement)
         {
             float closest = 999f;
@@ -181,9 +181,87 @@ public class CastManager : MonoBehaviour
             }
         }
         // skill clean up
-        // skill tbd
+        if (spellType == SpellType.SkillCleanUp)
+        {
+            // launch black hole for plant items
+        }
+        // skill lighten up
+        if (spellType == SpellType.SkillLightenUp)
+        {
+            // find closest local player character, set point light
+            // REVIEW: use for remote player as well?
+            PlayerControlManager[] players = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < players.Length; i++)
+            {
+                dist = Vector3.Distance(players[i].gameObject.transform.position, positionEffect);
+                if (dist > areaOfEffect)
+                    continue;
+
+                GameObject light = new GameObject();
+                light.name = "VFX player light";
+                light.transform.position = players[i].transform.position + Vector3.up;
+                light.transform.parent = players[i].transform;
+                Light l = light.AddComponent<Light>();
+                l.range = 3.81f;
+                l.intensity = .618f;
+                l.bounceIntensity = 0f;
+                l.shadows = LightShadows.Hard;
+                Destroy(light, 180f); // 3 in-game hour duration
+            }
+        }
         // skill cash in
+        if (spellType == SpellType.SkillCashIn)
+        {
+            // launch black hole for market value items
+        }
         // skill take me home
+        if (spellType == SpellType.SkillTakeMeHome)
+        {
+            // find player
+            PlayerControlManager[] players = GameObject.FindObjectsByType<PlayerControlManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < players.Length; i++)
+            {
+                dist = Vector3.Distance(players[i].gameObject.transform.position, positionEffect);
+                if (dist > areaOfEffect)
+                    continue;
+
+                // find center of all plots on player farm
+                Vector3 centerOfFarm = Vector3.zero;
+                for (int n = 0; n < players[i].playerData.farm.plots.Length; n++)
+                {
+                    centerOfFarm += GameSystem.GetVector(players[i].playerData.farm.plots[n].location);
+                }
+                centerOfFarm /= players[i].playerData.farm.plots.Length; // average position
+                GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+                AudioManager sfxAudio = null;
+                GameObject tPortSFXObjA = new GameObject();
+                GameObject tPortSFXObjB = new GameObject();
+                tPortSFXObjA.transform.position = players[i].gameObject.transform.position;
+                tPortSFXObjB.transform.position = centerOfFarm;
+                Destroy(tPortSFXObjA, 2f);
+                Destroy(tPortSFXObjB, 2f);
+                if (sfxObj != null)
+                    sfxAudio = sfxObj.GetComponent<AudioManager>();
+                if (sfxAudio != null)
+                {
+                    // teleport sfx
+                    sfxAudio.StartSound("Teleport", tPortSFXObjA, 1f, 6.18f);
+                    sfxAudio.StartSound("Teleport", tPortSFXObjB, 1f, 6.18f);
+                }
+                // teleport vfx
+                GameObject vfxA = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+                GameObject vfxB = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+                vfxA.name = "VFX Teleport Flash";
+                vfxB.name = "VFX Teleport Flash";
+                vfxA.transform.position = tPortSFXObjA.transform.position;
+                vfxB.transform.position = tPortSFXObjB.transform.position;
+                Destroy(vfxA, 1.1f);
+                Destroy(vfxB, 1.1f);
+                // teleport
+                // REVIEW: graceful timing
+                players[i].transform.position = centerOfFarm;
+            }
+        }
 
         // Spells not affecting plots
 
@@ -427,10 +505,27 @@ public class CastManager : MonoBehaviour
         }
     }
 
-    // REVIEW: handle cast effects per frame?
+    // handle cast effects per frame
     void UpdateCastEffect( int index )
     {
+        SpellType spellType = casts[index].type;
+        Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
+        float areaOfEffect = casts[index].rangeAOE;
+        float dist;
 
+        // Arcana skill 'spells'
+
+        // ARCANA SKILL : Clean Up
+        if (spellType == SpellType.SkillCleanUp)
+        {
+            // (black hole for plant type items)
+        }
+
+        // ARCANA SKILL : Cash In
+        if (spellType == SpellType.SkillCashIn)
+        {
+            // (black hole for items with market value)
+        }
     }
 
     // remove cast effects from plots (and plants, items, players?)
@@ -442,6 +537,18 @@ public class CastManager : MonoBehaviour
         float dist;
 
         // Arcana skill 'spells'
+
+        // ARCANA SKILL : Clean Up
+        if (spellType == SpellType.SkillCleanUp)
+        {
+            // find closest compost bin
+        }
+
+        // ARCANA SKILL : Cash In
+        if (spellType == SpellType.SkillCashIn)
+        {
+            // exchange items for gold pouch of sum market value
+        }
 
         // Spells not affecting plots
 
