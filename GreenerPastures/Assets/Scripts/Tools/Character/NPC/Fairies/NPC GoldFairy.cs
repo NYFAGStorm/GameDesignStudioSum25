@@ -4,6 +4,7 @@ public class NPCGoldFairy : MonoBehaviour
 {
     // Author: Glenn Storm
     // This handles a gold fairy sent to help a player down on their luck
+    // (alt configuration for seed fairy)
 
     public float wingFrameTime = 0.02f;
     public Texture2D[] wingFrames;
@@ -38,6 +39,8 @@ public class NPCGoldFairy : MonoBehaviour
     private ItemSpawnManager ism;
 
     private AudioManager sfxAudio;
+
+    private bool isSeedFairy;
 
     const float MAXMOVESPEED = 6.18f;
     const float ZIPFACTOR = 0.618f;
@@ -86,6 +89,8 @@ public class NPCGoldFairy : MonoBehaviour
         // validate
         islandIndex = island;
         goldToDrop = gold;
+        if (isSeedFairy)
+            goldToDrop = 1; // just one seed
         if (ggm == null)
             ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
         if (ggm == null || ggm.game == null || ggm.game.islands == null)
@@ -147,6 +152,11 @@ public class NPCGoldFairy : MonoBehaviour
         playerNear = false;
     }
 
+    public void MakeSeedFairy()
+    {
+        isSeedFairy = true;
+    }
+
     void Update()
     {
         if (fairyActive)
@@ -192,8 +202,15 @@ public class NPCGoldFairy : MonoBehaviour
                     Vector3 targetPos = spawnPos;
                     targetPos.x += -0.5f + RandomSystem.GaussianRandom01();
                     targetPos.z += -0.5f + RandomSystem.GaussianRandom01();
-                    ism.SpawnNewItem(ItemType.GoldCoin, spawnPos, targetPos, true);
-                    // TODO: find this item ref and attach gold sparkleys
+                    if (isSeedFairy)
+                    {
+                        LooseItemData seed = InventorySystem.CreateItem(ItemType.Seed);
+                        int rnd = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(),9);
+                        seed.inv.items[0].plant = (PlantType)(41 + rnd);
+                        ism.SpawnItem(seed, spawnPos, targetPos, true);
+                    }
+                    else
+                        ism.SpawnNewItem(ItemType.GoldCoin, spawnPos, targetPos, true);
                 }
             }
 

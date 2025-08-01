@@ -315,7 +315,7 @@ public class GreenerGameManager : MonoBehaviour
                 if (!foundItem)
                 {
                     // player is out of economy (send gold fairy)
-                    GoldFairyVisit(game.players[i].playerIsland, minimumGold);
+                    GoldFairyVisit(game.players[i].playerIsland, minimumGold, false);
                     goldFairHelpPauseTimer = GOLDFAIRYHELPPAUSE;
                 }
             }
@@ -337,14 +337,88 @@ public class GreenerGameManager : MonoBehaviour
                 if (RandomSystem.FlatRandom01() < 0.618f)
                 {
                     GameObject fairy = GoldFairyVisit(pcm.playerData.playerIsland,
-                        GameSystem.RoundedResult(RandomSystem.GaussianRandom01(), 22));
+                        GameSystem.RoundedResult(RandomSystem.GaussianRandom01(), 22), false);
                     Destroy(fairy, 60f); // gone in an hour
                 }
             }
         }
     }
 
-    GameObject GoldFairyVisit( int playerIsland, int minimumGold )
+    /// <summary>
+    /// This tick represents a new morning (dawn)
+    /// </summary>
+    public void MorningTick()
+    {
+        // ARCANA SKILL : Mystic Forager
+        // local player only
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm != null)
+        {
+            if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillMysticForager))
+            {
+                if (RandomSystem.FlatRandom01() < 0.05f)
+                {
+                    // sfx (foraging 'sense')
+                    GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+                    if (sfxObj != null)
+                        sfxObj.GetComponent<AudioManager>().StartSound("UI Menu Transition");
+                    // spawn wild plot on their island
+                    IslandManager iMgr = GameObject.FindFirstObjectByType<IslandManager>();
+                    if (iMgr != null)
+                    {
+                        GameObject wildPlot = GameObject.Instantiate((GameObject)Resources.Load("Plot"));
+                        wildPlot.name = "Mystic Forager's wild plot";
+                        Vector3 pos = GameSystem.GetVector(iMgr.islands[pcm.playerData.playerIsland].location);
+                        float range = iMgr.islands[pcm.playerData.playerIsland].location.w;
+                        Vector2 hide = Random.insideUnitCircle.normalized;
+                        pos.x += hide.x * (range - 1f);
+                        pos.z += hide.y * (range - 1f);
+                        wildPlot.transform.position = pos; // REVIEW: on the edge of the island?
+                        // seedling growing , weighted random type
+                        PlotManager plot = wildPlot.GetComponent<PlotManager>();
+                        int rnd = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(),50);
+                        GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
+                        plantObj.transform.parent = wildPlot.transform;
+                        plantObj.transform.position = wildPlot.transform.position;
+                        plot.data.plant = PlantSystem.InitializePlant((PlantType)rnd);
+                        plot.data.plant.growth = 0f;
+                        plot.data.plant.quality = 0f;
+                        plot.data.condition = PlotCondition.Growing;
+                        //
+                        Destroy(wildPlot, 720f); // gone in half a day
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// This tick represents a end of day (dusk)
+    /// </summary>
+    public void EveningTick()
+    {
+        // local player only
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm != null)
+        {
+            // ARCANA SKILL : Seed Fairy Magnet
+            if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillFriendsGoldFairy))
+            {
+                TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
+                if (tim != null)
+                {
+                    if (tim.dayOfMonth % 7 == 1) // first day of the week
+                    {
+                        // actually seed fairy
+                        GameObject fairy = GoldFairyVisit(pcm.playerData.playerIsland, 1, true);
+                        Destroy(fairy, 60f); // gone in an hour
+                    }
+                }
+            }
+        }
+    }
+
+    GameObject GoldFairyVisit( int playerIsland, int minimumGold, bool isSeedFairy )
     {
         if (goldFairHelpPauseTimer > 0f)
             return null;
