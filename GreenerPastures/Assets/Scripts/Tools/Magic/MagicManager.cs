@@ -121,6 +121,9 @@ public class MagicManager : MonoBehaviour
                 if (sBookData.cooldown > 0f)
                 {
                     sBookData.cooldown -= Time.deltaTime;
+                    // ARCANA SKILLS: Cool Cat
+                    if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillCoolCat))
+                        sBookData.cooldown -= Time.deltaTime; // x2
                     if (sBookData.cooldown < 0f)
                     {
                         sBookData.cooldown = 0f;
@@ -186,6 +189,17 @@ public class MagicManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Adds an arcana active magic skill to the player's spell book as permanent ability
+    /// </summary>
+    /// <param name="skill">spell type of active magic skill</param>
+    public void AddActiveMagicSkill( SpellType skill )
+    {
+        if (skill < SpellType.SkillWasteManagement || skill > SpellType.SkillTakeMeHome)
+            return; // not an arcana skill
+        pcm.playerData.magic.library = MagicSystem.AddChargeToSpellBook(skill, pcm.playerData.magic.library);
+    }
+
+    /// <summary>
     /// Casts a spell charge into the world given spell type and world position
     /// </summary>
     /// <param name="spell">spell type</param>
@@ -226,6 +240,9 @@ public class MagicManager : MonoBehaviour
                         else
                             sfxAudio.StartSound("Magic Cast 2");
                     }
+                    // ARCANA SKILL : Archmage (AoE x2)
+                    if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillArchmage))
+                        cData.rangeAOE *= 2f;
                     castMgr.AcquireNewCast(cData);
                     pcm.AwardXP(PlayerData.XP_CASTMAGIC);
                     retBool = true;
@@ -331,6 +348,9 @@ public class MagicManager : MonoBehaviour
         // AOE circle scale (child object)
         Vector3 lScale = Vector3.one;
         float aoe = pcm.playerData.magic.library.spellBook[selectedSpellCharge].castAOE;
+        // ARCANA SKILL : Archmage (x2 AoE size)
+        if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillArchmage))
+            aoe *= 2f;
         lScale.x = Mathf.Max(1f, aoe * 2f);
         lScale.y = Mathf.Max(1f, aoe * 2f);
         castingCursor.transform.GetChild(0).transform.localScale = lScale;

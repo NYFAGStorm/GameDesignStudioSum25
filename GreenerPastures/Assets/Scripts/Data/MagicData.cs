@@ -66,7 +66,12 @@ public enum SpellType
     MalnutritionII,
     BlessII,
     DaylightII, // level seven
-    RabbitHole
+    RabbitHole,
+    SkillWasteManagement,   // ARCANA SKILL : Waste Management
+    SkillCleanup,           // ARCANA SKILL : Clean Up
+    SkillTBD,               // ARCANA SKILL : TBD Active Magic
+    SkillCashIn,            // ARCANA SKILL : Cash In
+    SkillTakeMeHome         // ARCANA SKILL : Take Me Home
 }
 
 // spell recipe ingredients may include any item type, and if plant, any plant variety

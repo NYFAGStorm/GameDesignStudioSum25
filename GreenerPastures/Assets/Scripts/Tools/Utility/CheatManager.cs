@@ -343,8 +343,8 @@ public class CheatManager : MonoBehaviour
                     float facing = pcm.gameObject.transform.GetChild(0).GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
                     Vector3 pos = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject.transform.position;
                     Vector3 targ = pos + (facing * Vector3.right);
-                    float maybeRarePlantType = RandomSystem.WeightedRandom01() * 41f;
-                    PlantType pt = (PlantType)(((int)maybeRarePlantType+1));
+                    int maybeRarePlantType = GameSystem.RoundedResult( RandomSystem.WeightedRandom01(), 41 );
+                    PlantType pt = (PlantType)(maybeRarePlantType);
                     PlantData p = PlantSystem.InitializePlant(pt);
                     LooseItemData seed = InventorySystem.CreateItem(ItemType.Seed);
                     seed.inv.items[0] = InventorySystem.SetItemAsPlant(seed.inv.items[0],p);

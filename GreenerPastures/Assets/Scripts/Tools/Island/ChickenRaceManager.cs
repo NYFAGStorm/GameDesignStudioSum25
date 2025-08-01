@@ -553,6 +553,10 @@ public class ChickenRaceManager : MonoBehaviour
                 otherWagerTimer = 0f;
         }
 
+        float chanceOfMoreBets = 0.05f;
+        // ARCANA SKILL : Friends Of The Chicken (x2 chance of bets in gold dish)
+        if (PlayerSystem.PlayerHasEffect(currentGuest.playerData, PlayerEffect.SkillFriendsChicken))
+            chanceOfMoreBets *= 2f;
         // include other biomancer wagers
         if (otherBets < 1 && 
             otherWagerTimer == 0f)
@@ -567,7 +571,7 @@ public class ChickenRaceManager : MonoBehaviour
         else if ((otherBets+1) < MAXWAGERS && 
             (totalTake + betAmount) > ((otherBets-1) / OTHERWAGERMAX) && 
             otherWagerTimer == 0f && 
-            RandomSystem.FlatRandom01() < 0.05f)
+            RandomSystem.FlatRandom01() < chanceOfMoreBets)
         {
             // check other picks, favor non-picked chickens
             bool betPlaced = false;

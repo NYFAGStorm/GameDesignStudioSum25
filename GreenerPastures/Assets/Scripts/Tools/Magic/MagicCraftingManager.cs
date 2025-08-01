@@ -1458,6 +1458,9 @@ public class MagicCraftingManager : MonoBehaviour
                 string spellName = gData.name;
                 pcm.playerData.magic.library = 
                     MagicSystem.AddChargeToSpellBook(gData.type, pcm.playerData.magic.library);
+                // ARCANA SKILL : So Crafty (x2 charges)
+                if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillSoCrafty))
+                    pcm.playerData.magic.library = MagicSystem.AddChargeToSpellBook(gData.type, pcm.playerData.magic.library);
                 // sfx
                 if (sfxAudio != null)
                     sfxAudio.StartSound("Magic Cauldron Charge Crafted");

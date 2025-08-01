@@ -226,6 +226,29 @@ public class ArcanaSkilManager : MonoBehaviour
 
             currentPlayer.playerData.arcana -= skillTree.skills[currentSkillNode].arcanaCost;
             PlayerSystem.AddPlayerEffect(currentPlayer.playerData, SkillSystem.GetSkillPlayerEffect(skillTree, nodes[currentSkillNode].name));
+            // active magic skills add a permanently ready spell in player's spell book
+            if (currentSkillNode >= 10 && currentSkillNode < 15)
+            {
+                MagicManager mm = currentPlayer.gameObject.GetComponent<MagicManager>();
+                switch (currentSkillNode)
+                {
+                    case 10:
+                        mm.AddActiveMagicSkill(SpellType.SkillWasteManagement);
+                        break;
+                    case 11:
+                        mm.AddActiveMagicSkill(SpellType.SkillCleanup);
+                        break;
+                    case 12:
+                        mm.AddActiveMagicSkill(SpellType.SkillTBD);
+                        break;
+                    case 13:
+                        mm.AddActiveMagicSkill(SpellType.SkillCashIn);
+                        break;
+                    case 14:
+                        mm.AddActiveMagicSkill(SpellType.SkillTakeMeHome);
+                        break;
+                }
+            }
             InitializeNodes();
             return;
         }

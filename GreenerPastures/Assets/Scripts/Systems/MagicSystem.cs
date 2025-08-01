@@ -87,7 +87,9 @@ public static class MagicSystem
                 {
                     if (retLibrary.spellBook[i].chargesAvailable > 0)
                     {
-                        retLibrary.spellBook[i].chargesAvailable--;
+                        // ARCANA SKILLS : active magic skills never lose their charge
+                        if (spell < SpellType.SkillWasteManagement || spell > SpellType.SkillTakeMeHome)
+                            retLibrary.spellBook[i].chargesAvailable--;
                         chargefound = true;
                         retBool = true; // spell cast from book
                     }
@@ -349,6 +351,36 @@ public static class MagicSystem
                 retSpell.cooldownDuration = 720f;
                 retSpell.castDuration = 1440f;
                 retSpell.castAOE = .5f; // other player
+                break;
+            case SpellType.SkillWasteManagement: // ARCANA SKILLS
+                retSpell.name = "Waste Management";
+                retSpell.cooldownDuration = 0.1f;
+                retSpell.castDuration = .1f;
+                retSpell.castAOE = .5f; // 1x1 plot range
+                break;
+            case SpellType.SkillCleanup:
+                retSpell.name = "Clean Up";
+                retSpell.cooldownDuration = 0.1f;
+                retSpell.castDuration = 1f;
+                retSpell.castAOE = 2f; // 3x3 plot range
+                break;
+            case SpellType.SkillTBD:
+                retSpell.name = "TBD Active Magic";
+                retSpell.cooldownDuration = 0.1f;
+                retSpell.castDuration = 1f;
+                retSpell.castAOE = 2f; // 3x3 plot range
+                break;
+            case SpellType.SkillCashIn:
+                retSpell.name = "Cash In";
+                retSpell.cooldownDuration = 0.1f;
+                retSpell.castDuration = .1f;
+                retSpell.castAOE = 2f; // 3x3 plot range
+                break;
+            case SpellType.SkillTakeMeHome:
+                retSpell.name = "Take Me Home";
+                retSpell.cooldownDuration = 0.1f;
+                retSpell.castDuration = .1f;
+                retSpell.castAOE = .5f; // self
                 break;
             default:
                 UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureSpellBookEntry] : spell type undefined. will ignore.");

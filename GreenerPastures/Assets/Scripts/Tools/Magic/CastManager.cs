@@ -140,6 +140,51 @@ public class CastManager : MonoBehaviour
         float areaOfEffect = casts[index].rangeAOE;
         float dist;
 
+        // Arcana skill 'spells'
+        // skill waste management
+        if (spellType == SpellType.SkillWasteManagement)
+        {
+            float closest = 999f;
+            LooseItemManager loosey = null;
+            LooseItemManager[] looseItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < looseItems.Length; i++)
+            {
+                dist = Vector3.Distance(looseItems[i].gameObject.transform.position, positionEffect);
+                if (dist < areaOfEffect)
+                {
+                    if (dist < closest)
+                    {
+                        closest = dist;
+                        loosey = looseItems[i];
+                    }
+                }
+            }
+            if (loosey != null)
+            {
+                // drop potentially rare seed
+                ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+                if (ism != null)
+                {
+                    float facing = loosey.gameObject.transform.GetChild(0).GetComponent<Renderer>().material.GetTextureScale("_MainTex").x;
+                    Vector3 pos = GameObject.FindFirstObjectByType<PlayerControlManager>().gameObject.transform.position;
+                    Vector3 targ = pos + (facing * Vector3.right);
+                    int maybeRarePlantType = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 41);
+                    PlantType pt = (PlantType)(maybeRarePlantType);
+                    PlantData p = PlantSystem.InitializePlant(pt);
+                    LooseItemData seed = InventorySystem.CreateItem(ItemType.Seed);
+                    seed.inv.items[0] = InventorySystem.SetItemAsPlant(seed.inv.items[0], p);
+                    seed.inv.items[0].name = "Seed (" + p.plantName + ")";
+                    seed.inv.items[0].plant = pt;
+                    ism.SpawnItem(seed, pos, targ, true);
+                    Destroy(loosey.gameObject);
+                }
+            }
+        }
+        // skill clean up
+        // skill tbd
+        // skill cash in
+        // skill take me home
+
         // Spells not affecting plots
 
         // Structure effects
@@ -395,6 +440,8 @@ public class CastManager : MonoBehaviour
         Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
         float areaOfEffect = casts[index].rangeAOE;
         float dist;
+
+        // Arcana skill 'spells'
 
         // Spells not affecting plots
 

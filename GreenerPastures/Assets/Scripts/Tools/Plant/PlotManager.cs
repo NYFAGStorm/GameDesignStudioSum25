@@ -58,6 +58,7 @@ public class PlotManager : MonoBehaviour
     private bool autoHarvestOnce;
     private bool autoUprootOnce;
     private bool forceReFruit;
+    private bool autoPlantOnce;
 
     const float CURSORPULSEDURATION = 0.618f;
     // temp use time manager multiplier
@@ -884,6 +885,24 @@ public class PlotManager : MonoBehaviour
                 plant.GetComponent<PlantManager>().SetForceReFruit(forceReFruit);
                 // set proper plant art
                 plant.GetComponent<PlantManager>().ForceGrowthImage(data.plant);
+                // ARCANA SKILL : Cover Crop
+                if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillCoverCrop))
+                {
+                    // if player has seed selected, if plant being harvested is not re-fruiting
+                    if (!data.plant.canReFruit && !forceReFruit)
+                    {
+                        ItemData seed = pcm.GetPlayerCurrentItemSelection();
+                        if (seed != null)
+                        {
+                            // uproot automatically
+                            autoUprootOnce = true;
+                            // plant seed automatically
+                            autoPlantOnce = true;
+                            // immediately uproot and plant
+                            UprootPlot();
+                        }
+                    }
+                }
             }
         }
     }
@@ -970,6 +989,18 @@ public class PlotManager : MonoBehaviour
         data.condition = PlotCondition.Uprooted;
         plotPlantName = "";
         uprootedTimer = UPROOTEDPLOTPAUSE; // disallow plant drop in hole for a short time
+        if (autoUprootOnce)
+        {
+            autoUprootOnce = false; // just once
+            // ARCANA SKILL : Cover Crop
+            if (autoPlantOnce)
+            {
+                // set condition of plot to tilled
+                data.condition = PlotCondition.Tilled;
+                // immediately plant selected seed
+                WorkLand();
+            }
+        }
     }
 
     public void GraftPlant()
