@@ -777,13 +777,18 @@ public class PlotManager : MonoBehaviour
                     // iterate to harvest multiple
                     for ( int i = 0; i < harvestNumber; i++ )
                     {
+                        // ARCANA SKILL : Midas Biomancer
+                        bool dropGold = (PlayerSystem.PlayerHasEffect(currentPlayer.playerData, PlayerEffect.SkillMidasBiomancer) &&
+                            !PlantSystem.PlantHasEffect(data.plant, PlantEffect.WalkingStickScrollHarvest) &&
+                            RandomSystem.FlatRandom01() < 0.05f);
+
                         // PLOT EFFECTS:
                         if (FarmSystem.PlotHasEffect(data, PlotEffect.LesionI))
                             data.plant.quality -= 0.5f;
                         if (FarmSystem.PlotHasEffect(data, PlotEffect.GoldenThumbI))
                             data.plant.quality += 0.5f;
                         // check if empty inventory slot availbale on player, drop loose if not
-                        if (currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
+                        if (!dropGold && currentPlayer != null && InventorySystem.InvHasSlot(currentPlayer.playerData.inventory))
                         {
                             // TODO: unify the item data creation routine
                             // harvesting gives fruit
@@ -815,6 +820,22 @@ public class PlotManager : MonoBehaviour
                                     iData.effects[0] = ItemEffect.ScrollRandomSpellCharge;
                                 }
                             }
+                            // ARCANA SKILL : Midas Biomancer
+                            if (true)
+                            {
+                                // collect gold sack filled with x2 market value of total fruit harvested
+                                int marketValue = 0;
+                                MarketManager mm = GameObject.FindFirstObjectByType<MarketManager>();
+                                if (mm != null)
+                                    marketValue = mm.GetFinalMarketSellValue(iData);
+                                marketValue *= 2;
+                                iData.type = ItemType.GoldSack;
+                                iData.plant = PlantType.Default;
+                                for (int n = 0; n < marketValue; n++)
+                                {
+
+                                }
+                            }
                             currentPlayer.playerData.inventory = InventorySystem.AddToInventory(currentPlayer.playerData.inventory, iData);
                         }
                         else
@@ -825,7 +846,7 @@ public class PlotManager : MonoBehaviour
                             // harvesting drops fruit
                             LooseItemData loose = InventorySystem.CreateItem(ItemType.Fruit);
                             // (unless plant has a special effect)
-                            if ( data.plant.plantEffects.Length == 0 || data.plant.plantEffects[0] != PlantEffect.WalkingStickScrollHarvest)
+                            if (!dropGold && (data.plant.plantEffects.Length == 0 || data.plant.plantEffects[0] != PlantEffect.WalkingStickScrollHarvest))
                             { 
                                 // transfer properties of fruit to item (revise item data)
                                 loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
@@ -833,7 +854,7 @@ public class PlotManager : MonoBehaviour
                                 loose.inv.items[0].quality = data.plant.quality;
                                 ism.SpawnItem(loose, gameObject.transform.position, target, true);
                             }
-                            else
+                            else if (!dropGold)
                             {
                                 loose = InventorySystem.CreateItem(ItemType.Scroll);
                                 if (loose == null)
@@ -846,6 +867,25 @@ public class PlotManager : MonoBehaviour
                                     loose.inv.items[0].effects[0] = ItemEffect.ScrollRandomSpellCharge;
                                     ism.SpawnItem(loose, gameObject.transform.position, target, true);
                                 }
+                            }
+                            else
+                            {
+                                // ARCANA SKILL : Midas Biomancer
+                                // collect gold sack filled with x2 market value of total fruit harvested
+                                int marketValue = 0;
+                                MarketManager mm = GameObject.FindFirstObjectByType<MarketManager>();
+                                if (mm != null)
+                                    marketValue = mm.GetFinalMarketSellValue(loose.inv.items[0]);
+                                marketValue *= 2;
+                                loose.inv.items[0].type = ItemType.GoldSack;
+                                loose.inv.items[0].size = 1f;
+                                loose.inv.items[0].quality = 1f;
+                                for (int n = 0; n < marketValue; n++)
+                                {
+                                    loose.inv = InventorySystem.AddToInventory(loose.inv, InventorySystem.InitializeItem(ItemType.GoldCoin));
+                                }
+                                ism.SpawnItem(loose, gameObject.transform.position, target, true);
+                                dropGold = false; // reset
                             }
                         }
                     }
