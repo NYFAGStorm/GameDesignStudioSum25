@@ -75,6 +75,7 @@ public enum PlantEffect
     Default,
     DayNightPlant, // a variety of plant that is always 100% sun
     WalkingStickScrollHarvest, //walking stick special harvest
+    DarkBiomagePlanted, // ARCANA SKILL : Dark Biomage
     EffectA,
     EffectB,
     EffectC,

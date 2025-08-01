@@ -58,6 +58,9 @@ public class PlantManager : MonoBehaviour
                 float moonPhaseLight = 1f;
                 if (tm != null)
                     moonPhaseLight = tm.moonPhase;
+                // ARCANA SKILL : Dark Biomage
+                if (PlantSystem.PlantHasEffect(plot.data.plant, PlantEffect.DarkBiomagePlanted))
+                    moonPhaseLight = 1f; // full moon light regardless of phase
 
                 // find resources amount as an average of sun, water and soil quality
                 // if even a little (25%) sun is available, this counts as 100% sun resource

@@ -653,6 +653,10 @@ public class PlotManager : MonoBehaviour
                 // configure plant from seed to size = 0f (growth) and quality = 0f
                 data.plant.growth = 0f;
                 data.plant.quality = 0f;
+                // ARCANA SKILL : Dark Biomage
+                if (PlantSystem.IsDarkPlant(data.plant.type) && 
+                    PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillDarkBiomage))
+                    data.plant = PlantSystem.AddPlantEffect(data.plant, PlantEffect.DarkBiomagePlanted);
                 // using data, remove from player inventory
                 pcm.DeleteCurrentItemSelection();
                 data.condition = PlotCondition.Growing;

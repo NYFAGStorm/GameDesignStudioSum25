@@ -53,6 +53,83 @@ public static class PlantSystem
     }
 
     /// <summary>
+    /// Returns true if given plant type is a dark plant
+    /// </summary>
+    /// <param name="type">plant type</param>
+    /// <returns>true if configured as dark plant</returns>
+    public static bool IsDarkPlant( PlantType type )
+    {
+        PlantData pd = InitializePlant(type);
+        return (pd.isDarkPlant || PlantHasEffect(pd, PlantEffect.DayNightPlant));
+    }
+
+    public static PlantData AddPlantEffect( PlantData data, PlantEffect effect )
+    {
+        PlantData pData = data;
+
+        // validate does not exist
+        bool found = false;
+        for (int i = 0; i < pData.plantEffects.Length; i++)
+        {
+            if (pData.plantEffects[i] == effect)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+        {
+            UnityEngine.Debug.LogWarning("--- PlantSystem [AddPlantEffect] : plant effect already exists. will ignore.");
+            return pData;
+        }
+        // add
+        PlantEffect[] tmp = new PlantEffect[pData.plantEffects.Length + 1];
+        for (int i = 0; i < pData.plantEffects.Length; i++)
+        {
+            tmp[i] = pData.plantEffects[i];
+        }
+        tmp[pData.plantEffects.Length] = effect;
+        pData.plantEffects = tmp;
+
+        return pData;
+    }
+
+    public static PlantData RemovePlantEffect( PlantData data, PlantEffect effect )
+    {
+        PlantData pData = data;
+
+        // validate does exist
+        bool found = false;
+        for (int i = 0; i < pData.plantEffects.Length; i++)
+        {
+            if (pData.plantEffects[i] == effect)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            UnityEngine.Debug.LogWarning("--- PlantSystem [RemovePlantEffect] : plant effect does not exist. will ignore.");
+            return pData;
+        }
+        // remove
+        PlantEffect[] tmp = new PlantEffect[pData.plantEffects.Length - 1];
+        int count = 0;
+        for (int i = 0; i < pData.plantEffects.Length; i++)
+        {
+            if (pData.plantEffects[i] != effect)
+            {
+                tmp[count] = pData.plantEffects[i];
+                count++;
+            }
+        }
+        pData.plantEffects = tmp;
+
+        return pData;
+    }
+
+    /// <summary>
     /// Configures plant data given initialized plant data and a plant type
     /// </summary>
     /// <param name="data">plant data</param>
