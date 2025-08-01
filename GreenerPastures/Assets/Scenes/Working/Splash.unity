@@ -1707,8 +1707,8 @@ MonoBehaviour:
     delay: 0
     maxDelay: 0
     spaceBlend: 0
-    pitch: 0
-    pitchVariance: 0
+    pitch: 1.1
+    pitchVariance: 0.1
     volume: 0.1
     volumeVariance: 0
   musicCrossFadeTime: 3.81
