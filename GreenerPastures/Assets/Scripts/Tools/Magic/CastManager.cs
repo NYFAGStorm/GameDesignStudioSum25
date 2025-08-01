@@ -511,7 +511,7 @@ public class CastManager : MonoBehaviour
         SpellType spellType = casts[index].type;
         Vector3 positionEffect = new Vector3(casts[index].posX, casts[index].posY, casts[index].posZ);
         float areaOfEffect = casts[index].rangeAOE;
-        //float dist;
+        float dist;
 
         // Arcana skill 'spells'
 
@@ -519,12 +519,45 @@ public class CastManager : MonoBehaviour
         if (spellType == SpellType.SkillCleanUp)
         {
             // (black hole for plant type items)
+            LooseItemManager[] looseItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < looseItems.Length; i++)
+            {
+                if (looseItems[i].looseItem.inv.items[0].plant == PlantType.Default)
+                    continue;
+                dist = Vector3.Distance(looseItems[i].gameObject.transform.position, positionEffect);
+                Vector3 moveVector = Vector3.zero;
+                if (dist < areaOfEffect)
+                {
+                    moveVector = positionEffect - looseItems[i].gameObject.transform.position;
+                    moveVector *= 0.381f;
+                    looseItems[i].gameObject.transform.position += moveVector;
+                }
+            }
         }
 
         // ARCANA SKILL : Cash In
         if (spellType == SpellType.SkillCashIn)
         {
             // (black hole for items with market value)
+            LooseItemManager[] looseItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < looseItems.Length; i++)
+            {
+                if (looseItems[i].looseItem.inv.items[0].plant == PlantType.Default && 
+                    (looseItems[i].looseItem.inv.items[0].type != ItemType.Scroll ||
+                    looseItems[i].looseItem.inv.items[0].type != ItemType.Potion))
+                    continue;
+                if (looseItems[i].looseItem.inv.items[0].plant != PlantType.Default &&
+                    looseItems[i].looseItem.inv.items[0].type == ItemType.Stalk)
+                    continue;
+                dist = Vector3.Distance(looseItems[i].gameObject.transform.position, positionEffect);
+                Vector3 moveVector = Vector3.zero;
+                if (dist < areaOfEffect)
+                {
+                    moveVector = positionEffect - looseItems[i].gameObject.transform.position;
+                    moveVector *= 0.381f;
+                    looseItems[i].gameObject.transform.position += moveVector;
+                }
+            }
         }
     }
 
@@ -542,12 +575,100 @@ public class CastManager : MonoBehaviour
         if (spellType == SpellType.SkillCleanUp)
         {
             // find closest compost bin
+            CompostManager[] compostBins = GameObject.FindObjectsByType<CompostManager>(FindObjectsSortMode.None);
+            float closestDist = 999f;
+            CompostManager closeBin = null;
+            for (int i = 0; i < compostBins.Length; i++)
+            {
+                float d = Vector3.Distance(compostBins[i].transform.position, positionEffect);
+                if (d < closestDist)
+                {
+                    closestDist = d;
+                    closeBin = compostBins[i];
+                }
+            }
+            // teleport effects
+            GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+            AudioManager sfxAudio = null;
+            GameObject tPortSFXObj = new GameObject();
+            tPortSFXObj.transform.position = positionEffect;
+            Destroy(tPortSFXObj, 2f);
+            if (sfxObj != null)
+                sfxAudio = sfxObj.GetComponent<AudioManager>();
+            if (sfxAudio != null)
+            {
+                // teleport sfx
+                sfxAudio.StartSound("Teleport", tPortSFXObj, 1f, 6.18f);
+            }
+            // teleport vfx
+            GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+            vfx.name = "VFX Teleport Flash";
+            vfx.transform.position = positionEffect;
+            Destroy(vfx, 1.1f);
+            // teleport all loose items to compost bin
+            LooseItemManager[] looseItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < looseItems.Length; i++)
+            {
+                if (looseItems[i].looseItem.inv.items[0].plant == PlantType.Default)
+                    continue;
+                dist = Vector3.Distance(looseItems[i].gameObject.transform.position, positionEffect);
+                if (dist < 1f) // now at center?
+                    looseItems[i].gameObject.transform.position = closeBin.transform.position;
+            }
         }
 
         // ARCANA SKILL : Cash In
         if (spellType == SpellType.SkillCashIn)
         {
+            // teleport effects
+            GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+            AudioManager sfxAudio = null;
+            GameObject tPortSFXObj = new GameObject();
+            tPortSFXObj.transform.position = positionEffect;
+            Destroy(tPortSFXObj, 2f);
+            if (sfxObj != null)
+                sfxAudio = sfxObj.GetComponent<AudioManager>();
+            if (sfxAudio != null)
+            {
+                // teleport sfx
+                sfxAudio.StartSound("Teleport", tPortSFXObj, 1f, 6.18f);
+            }
+            // teleport vfx
+            GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+            vfx.name = "VFX Teleport Flash";
+            vfx.transform.position = positionEffect;
+            Destroy(vfx, 1.1f);
             // exchange items for gold pouch of sum market value
+            int marketValue = 0;
+            MarketManager mm = GameObject.FindFirstObjectByType<MarketManager>();
+            LooseItemManager[] looseItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < looseItems.Length; i++)
+            {
+                if (looseItems[i].looseItem.inv.items[0].plant == PlantType.Default &&
+                    (looseItems[i].looseItem.inv.items[0].type != ItemType.Scroll ||
+                    looseItems[i].looseItem.inv.items[0].type != ItemType.Potion))
+                    continue;
+                if (looseItems[i].looseItem.inv.items[0].plant != PlantType.Default &&
+                    looseItems[i].looseItem.inv.items[0].type == ItemType.Stalk)
+                    continue;
+                dist = Vector3.Distance(looseItems[i].gameObject.transform.position, positionEffect);
+                if (dist < 1f) // now at center?
+                {
+                    if (mm != null)
+                        marketValue += mm.GetFinalMarketSellValue(looseItems[i].looseItem.inv.items[0]);
+                }
+            }
+            ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+            if (ism != null)
+            {
+                // spawn gold pouch, put gold in it, drop at cast position
+                LooseItemData goldPouch = InventorySystem.CreateItem(ItemType.GoldSack);
+                for (int i = 0; i < marketValue; i++)
+                {
+                    goldPouch.inv = InventorySystem.AddToInventory(goldPouch.inv, InventorySystem.InitializeItem(ItemType.GoldCoin));
+                }
+                ism.SpawnItem(goldPouch, positionEffect, positionEffect, true);
+            }
         }
 
         // Spells not affecting plots
