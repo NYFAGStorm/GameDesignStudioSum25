@@ -29,6 +29,7 @@ public class ItemSpawnManager : MonoBehaviour
     private AudioManager sfxAudio;
 
     private bool darkBiomagePlanted; // broadcasting dark biomage
+    private bool plantDoctorPlanted; // broadcasting plant doctor
 
     const float DROPTIME = 1f;
     const float VERTICALORIGIN = 0.25f;
@@ -167,21 +168,27 @@ public class ItemSpawnManager : MonoBehaviour
                         // seed dropped in empty tilled plot
                         if (looseD.looseItem.inv.items[0].type == ItemType.Seed)
                         {
-                            // ARCANA SKILL : Dark Biomage
-                            // if dark plant, if dropped by local player, has Dark Biomage skill
-                            if (!drops[i].remoteDrop &&
-                                PlantSystem.IsDarkPlant(looseD.looseItem.inv.items[0].plant))
+                            if (!drops[i].remoteDrop)
                             {
                                 PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
                                 if (pcm != null)
                                 {
-                                    if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillDarkBiomage))
-                                        darkBiomagePlanted = true;
+                                    // ARCANA SKILL : Dark Biomage
+                                    // if dark plant, if dropped by local player, has Dark Biomage skill
+                                    if (PlantSystem.IsDarkPlant(looseD.looseItem.inv.items[0].plant))
+                                    {
+                                        if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillDarkBiomage))
+                                            darkBiomagePlanted = true;
+                                    }
+                                    // ARCANA SKILL : Plant Doctor
+                                    if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillPlantDoctor))
+                                        plantDoctorPlanted = true;
                                 }
                             }
                             if (CheckSeedDrop(i, looseD.looseItem.inv.items[0].plant))
                                 looseD.looseItem.deleteMe = true;
                             darkBiomagePlanted = false; // reset
+                            plantDoctorPlanted = false; // reset
                         }
                         // stalk or plant dropped in uprooted plot
                         if (looseD.looseItem.inv.items[0].type == ItemType.Stalk ||
@@ -300,7 +307,10 @@ public class ItemSpawnManager : MonoBehaviour
                 plots[i].data.plant.quality = 0f;
                 // ARCANA SKILL : Dark Biomage
                 if (darkBiomagePlanted)
-                    PlantSystem.AddPlantEffect(plots[i].data.plant, PlantEffect.DarkBiomagePlanted);
+                    plots[i].data.plant = PlantSystem.AddPlantEffect(plots[i].data.plant, PlantEffect.DarkBiomagePlanted);
+                // ARCANA SKILL : Plant Doctor
+                if (plantDoctorPlanted)
+                    plots[i].data.plant = PlantSystem.AddPlantEffect(plots[i].data.plant, PlantEffect.PlantDoctorPlanted);
                 plots[i].data.condition = PlotCondition.Growing;
                 retBool = true;
                 if (!drops[index].remoteDrop)

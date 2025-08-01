@@ -657,6 +657,9 @@ public class PlotManager : MonoBehaviour
                 if (PlantSystem.IsDarkPlant(data.plant.type) && 
                     PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillDarkBiomage))
                     data.plant = PlantSystem.AddPlantEffect(data.plant, PlantEffect.DarkBiomagePlanted);
+                // ARCANA SKILL : Plant Doctor
+                if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillPlantDoctor))
+                    data.plant = PlantSystem.AddPlantEffect(data.plant, PlantEffect.PlantDoctorPlanted);
                 // using data, remove from player inventory
                 pcm.DeleteCurrentItemSelection();
                 data.condition = PlotCondition.Growing;

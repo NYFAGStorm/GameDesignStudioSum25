@@ -1,7 +1,6 @@
 // REVIEW: necessary namespaces
 
 // if there are classes of plants that follow separate rules
-using static System.Net.Mime.MediaTypeNames;
 
 public enum PlantType
 {
@@ -73,9 +72,10 @@ public enum PlantRarity
 public enum PlantEffect
 {
     Default,
-    DayNightPlant, // a variety of plant that is always 100% sun
-    WalkingStickScrollHarvest, //walking stick special harvest
-    DarkBiomagePlanted, // ARCANA SKILL : Dark Biomage
+    DayNightPlant,              // a variety of plant that is always 100% sun
+    WalkingStickScrollHarvest,  //walking stick special harvest
+    DarkBiomagePlanted,         // ARCANA SKILL : Dark Biomage
+    PlantDoctorPlanted,         // ARCANA SKILL : Plant Doctor
     EffectA,
     EffectB,
     EffectC,

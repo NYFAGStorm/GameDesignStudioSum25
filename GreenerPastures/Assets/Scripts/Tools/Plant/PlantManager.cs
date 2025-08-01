@@ -61,7 +61,7 @@ public class PlantManager : MonoBehaviour
                 // ARCANA SKILL : Dark Biomage
                 if (PlantSystem.PlantHasEffect(plot.data.plant, PlantEffect.DarkBiomagePlanted))
                     moonPhaseLight = 1f; // full moon light regardless of phase
-
+                
                 // find resources amount as an average of sun, water and soil quality
                 // if even a little (25%) sun is available, this counts as 100% sun resource
                 float sunResource = Mathf.Clamp01(plot.data.sun * 4f);
@@ -82,8 +82,12 @@ public class PlantManager : MonoBehaviour
                 float resources = (sunResource + plot.data.water + plot.data.soil) / 3f;
                 // calculate vitality delta             
                 float vitalityDelta = (0.667f - resources) * -0.1f;
-                // adjust vitality for current season
-                vitalityDelta *= plot.GetPlantSeasonalVitality();
+                // ARCANA SKILL : Plant Doctor (always 100% seasonal vitality)
+                if (!PlantSystem.PlantHasEffect(plot.data.plant, PlantEffect.PlantDoctorPlanted))
+                {
+                    // adjust vitality for current season
+                    vitalityDelta *= plot.GetPlantSeasonalVitality();
+                }
                 // calculate current vitality
                 plot.data.plant.vitality = Mathf.Clamp01(plot.data.plant.vitality + vitalityDelta);
                 // calculate health
