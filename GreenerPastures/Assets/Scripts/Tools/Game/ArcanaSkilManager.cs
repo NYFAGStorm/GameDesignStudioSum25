@@ -10,13 +10,11 @@ public class ArcanaSkilManager : MonoBehaviour
     // TODO: same engagement and state manaement pattern used in crafting, market, chicken race
     // (... this lives on Eden?)
 
-    public bool testGrabPlayer; // until the player engagement mechanics are in place, use this
+    private PlayerControlManager currentPlayer;
+    private bool skillPurchasing;
+    private int currentSkillNode;
 
-    public PlayerControlManager currentPlayer;
-    public bool skillPurchasing;
-    public int currentSkillNode;
-
-    public SkillTree skillTree;
+    private SkillTree skillTree;
 
     public struct SkillNode
     {
@@ -34,8 +32,13 @@ public class ArcanaSkilManager : MonoBehaviour
     private float playerCheckTimer;
     private PlayerControlManager foundPlayer;
 
+    private string skillInstructions;
+    private float feedbackTimer;
+
     const float PLAYERCHECKTIME = 1f;
     const float PLAYERPROXIMITY = 1f;
+    const string DEFAULTINSTRUCTIONS = "WASD to explore skills\nPress ENTER to purchase";
+    const float FEEDBACKTIME = 3f;
 
 
 
@@ -50,6 +53,7 @@ public class ArcanaSkilManager : MonoBehaviour
             InitializeNodes();
 
             playerCheckTimer = PLAYERCHECKTIME;
+            skillInstructions = DEFAULTINSTRUCTIONS;
         }
     }
 
@@ -204,6 +208,8 @@ public class ArcanaSkilManager : MonoBehaviour
             {
                 InitializeNodes();
                 currentSkillNode = 0;
+                feedbackTimer = 0f;
+                skillInstructions = DEFAULTINSTRUCTIONS;
                 displaySkillTree = true;
             }
         }
@@ -213,14 +219,33 @@ public class ArcanaSkilManager : MonoBehaviour
         if (!displaySkillTree)
             return;
 
+        // run feedback timer
+        if (feedbackTimer > 0f)
+        {
+            feedbackTimer -= Time.deltaTime;
+            if (feedbackTimer < 0f)
+            {
+                feedbackTimer = 0f;
+                skillInstructions = DEFAULTINSTRUCTIONS;
+            }
+        }
+
         // keyboard purchase of skill
         // enter
         if (Input.GetKeyDown(KeyCode.Return))
         {
             if (nodes[currentSkillNode].acquired)
+            {
+                skillInstructions = "Skill '" + nodes[currentSkillNode].name + "'\nalready acquired";
+                feedbackTimer = FEEDBACKTIME;
                 return;
+            }
             if (currentPlayer.playerData.arcana < skillTree.skills[currentSkillNode].arcanaCost)
+            {
+                skillInstructions = "Not enough Arcana to\npurchase '"+ nodes[currentSkillNode].name + "'.";
+                feedbackTimer = FEEDBACKTIME;
                 return;
+            }
 
             // TODO: confirm popup
 
@@ -466,6 +491,24 @@ public class ArcanaSkilManager : MonoBehaviour
         g.normal.textColor = Color.yellow;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.yellow;
+        GUI.Label(r, s, g);
+
+        // instructions display
+        r.x = 0.7f * w;
+        r.y = 0.875f * h;
+        r.width = 0.25f * w;
+        r.height = 0.1f * h;
+        g = new GUIStyle(GUI.skin.label);
+        g.alignment = TextAnchor.MiddleCenter;
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        g.fontStyle = FontStyle.Normal;
+        g.wordWrap = true;
+        s = "";
+        if (currentPlayer != null)
+            s = skillInstructions;
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.white;
         GUI.Label(r, s, g);
 
         // cancel button
