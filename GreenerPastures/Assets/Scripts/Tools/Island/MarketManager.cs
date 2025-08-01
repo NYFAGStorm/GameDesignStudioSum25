@@ -646,7 +646,23 @@ public class MarketManager : MonoBehaviour
                     if (found)
                     {
                         currentCustomer.playerData.gold += value;
-                        currentCustomer.DeleteCurrentItemSelection();
+                        // ARCANA SKILL : Friends of the Merchant
+                        if (PlayerSystem.PlayerHasEffect(currentCustomer.playerData, PlayerEffect.SkillFriendsMerchant) &&
+                            !InventorySystem.InvHasItemOfType(currentCustomer.playerData.inventory, ItemType.Coupon) &&
+                            RandomSystem.FlatRandom01() < .05f)
+                        {
+                            // REVIEW: should just add to inventory after deleting sold item?
+                            // replace sold item with coupon
+                            ItemData coupon = InventorySystem.InitializeItem(ItemType.Coupon);
+                            coupon.quality = 1f; // 100% off one item
+                            currentCustomer.playerData.inventory.items[currentCustomer.GetPlayerCurrentItemSelectionIndex()] = coupon;
+                            // notify coupon reward
+                            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                            if (ggm != null)
+                                ggm.AddNotification("You received a coupon!\n100% off one item!");
+                        }
+                        else
+                            currentCustomer.DeleteCurrentItemSelection();
                         // PLAYER STATS:
                         currentCustomer.playerData.stats.totalGoldEarned += value;
                         currentCustomer.AwardXP(PlayerData.XP_SELLTOSHOP);
