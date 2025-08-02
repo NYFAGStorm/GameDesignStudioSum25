@@ -802,89 +802,28 @@ public class PlayerControlManager : MonoBehaviour
                         break;
                     case ItemEffect.ScrollRandomSpellCharge:
                         // weighted random spell type
-                        // NOTE: until the magic revision designs are ready, we have to get around the missing spells
-                        scrollCharge = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 8);
-                        switch (scrollCharge)
-                        {
-                            case 1:
-                                scrollAddsCharge = SpellType.FastGrowI;
-                                break;
-                            case 2:
-                                scrollAddsCharge = SpellType.SummonWaterI;
-                                break;
-                            case 3:
-                                scrollAddsCharge = SpellType.BlessI;
-                                break;
-                            case 4:
-                                scrollAddsCharge = SpellType.MalnutritionI;
-                                break;
-                            case 5:
-                                scrollAddsCharge = SpellType.ProsperousI;
-                                break;
-                            case 6:
-                                scrollAddsCharge = SpellType.LesionI;
-                                break;
-                            case 7:
-                                scrollAddsCharge = SpellType.EclipseI;
-                                break;
-                            case 8:
-                                scrollAddsCharge = SpellType.GoldenThumbI;
-                                break;
-                        }
-                        //scrollCharge = Mathf.RoundToInt((RandomSystem.WeightedRandom01() * System.Enum.GetNames(typeof(SpellType)).Length));
-                        //scrollAddsCharge = (SpellType)scrollCharge;
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 33) + 1;
+                        scrollAddsCharge = (SpellType)scrollCharge;
                         break;
                     case ItemEffect.ScrollLevelOneSpellCharge:
-                        scrollCharge = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 2);
-                        switch (scrollCharge)
-                        {
-                            case 1:
-                                scrollAddsCharge = SpellType.FastGrowI;
-                                break;
-                            case 2:
-                                scrollAddsCharge = SpellType.SummonWaterI;
-                                break;
-                        }
-                        //scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 4) - 1;
-                        //scrollAddsCharge = (SpellType)(scrollCharge + 1); // level one spells start at 1
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 4) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 1); // level one spells start at 1
                         break;
                     case ItemEffect.ScrollLevelTwoSpellCharge:
-                        scrollAddsCharge = SpellType.BlessI;
-                        //scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 7) - 1;
-                        //scrollAddsCharge = (SpellType)(scrollCharge + 5); // level two spells start at 5
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 7) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 5); // level two spells start at 5
                         break;
                     case ItemEffect.ScrollLevelThreeSpellCharge:
-                        scrollCharge = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 2);
-                        switch (scrollCharge)
-                        {
-                            case 1:
-                                scrollAddsCharge = SpellType.MalnutritionI;
-                                break;
-                            case 2:
-                                scrollAddsCharge = SpellType.ProsperousI;
-                                break;
-                        }
-                        //scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 5) - 1;
-                        //scrollAddsCharge = (SpellType)(scrollCharge + 12); // level three spells start at 12
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 5) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 12); // level three spells start at 12
                         break;
                     case ItemEffect.ScrollLevelFourSpellCharge:
-                        scrollAddsCharge = SpellType.LesionI;
-                        //scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 6) - 1;
-                        //scrollAddsCharge = (SpellType)(scrollCharge + 17); // level four spells start at 17
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 6) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 17); // level four spells start at 17
                         break;
                     case ItemEffect.ScrollLevelFiveSpellCharge:
-                        scrollCharge = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 2);
-                        switch (scrollCharge)
-                        {
-                            case 1:
-                                scrollAddsCharge = SpellType.EclipseI;
-                                break;
-                            case 2:
-                                scrollAddsCharge = SpellType.GoldenThumbI;
-                                break;
-                        }
-                        //scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 7) - 1;
-                        //scrollAddsCharge = (SpellType)(scrollCharge + 23); // level five spells start at 23
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 7) - 1;
+                        scrollAddsCharge = (SpellType)(scrollCharge + 23); // level five spells start at 23
                         break;
                     case ItemEffect.ScrollLevelSixSpellCharge:
                         scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 3) - 1;
