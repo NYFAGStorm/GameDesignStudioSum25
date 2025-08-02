@@ -774,7 +774,17 @@ public class PlayerControlManager : MonoBehaviour
                 skipPickup = true;
                 break;
             case ItemType.GoldSack:
-                unpackLooseItem = true;
+                if (activeItem.looseItem.inv.items.Length > 25)
+                {
+                    // with so many gold coins, just collect gold directly
+                    playerData.gold += activeItem.looseItem.inv.items.Length - 1;
+                    // REVIEW : sfx collect gold (not gold drop sfx)
+                    GameObject sfxGoldObj = GameObject.Find("AudioMgr ChickRace SFX");
+                    if (sfxGoldObj != null)
+                        sfxGoldObj.GetComponent<AudioManager>().StartSound("Coin Drop 4");
+                }
+                else
+                    unpackLooseItem = true;
                 skipPickup = true;
                 break;
             case ItemType.Package:

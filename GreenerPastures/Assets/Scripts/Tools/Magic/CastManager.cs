@@ -617,7 +617,7 @@ public class CastManager : MonoBehaviour
                     continue;
                 dist = Vector3.Distance(looseItems[i].gameObject.transform.position, positionEffect);
                 if (dist < 1f) // now at center?
-                    looseItems[i].gameObject.transform.position = closeBin.transform.position;
+                    looseItems[i].gameObject.transform.position = closeBin.transform.position + (Vector3.up * .25f);
             }
             return;
         }
@@ -747,7 +747,6 @@ public class CastManager : MonoBehaviour
                     }
                 }
             }
-            
             return;
         }
 

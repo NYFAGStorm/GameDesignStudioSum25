@@ -466,7 +466,10 @@ public class MagicManager : MonoBehaviour
         playerCanCancel = false;
         CastingPresentation();
         modeChangeTimer = CASTMODECHANGETIME;
-        castData = MagicSystem.InitializeCast(pcm.playerData.magic.library.spellBook[selectedSpellCharge], castingCursor.transform.position);
+        if (castingCursor == null)
+            Debug.LogWarning("--- MagicManager [PerformCast] : casting cursor missing. will ignore.");
+        else
+            castData = MagicSystem.InitializeCast(pcm.playerData.magic.library.spellBook[selectedSpellCharge], castingCursor.transform.position);
         if (!CastSpell(castData.type, castingCursor.transform.position))
             Debug.LogWarning("--- MagicManager [PerformCast] : unable to cast spell (invalid or no charges). will ignore.");
         if (castingCursor != null)
