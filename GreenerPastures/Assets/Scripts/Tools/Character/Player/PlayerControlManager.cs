@@ -92,6 +92,7 @@ public class PlayerControlManager : MonoBehaviour
     private bool inARabbitHole;
 
     private float focusFlowTimer;
+    private PlayerActions flowAction; // most recent action performed
     private string groceryList;
     private float groceryListTimer;
     
@@ -259,6 +260,13 @@ public class PlayerControlManager : MonoBehaviour
                 groceryList = "";
             }
         }
+        // run focus flow timer
+        if (focusFlowTimer > 0f)
+        {
+            focusFlowTimer -= Time.deltaTime;
+            if (focusFlowTimer < 0f)
+                focusFlowTimer = 0f;
+        }
 
         // SPELL RABBIT HOLE
         if (inARabbitHole && !PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellRabbitHole))
@@ -346,6 +354,8 @@ public class PlayerControlManager : MonoBehaviour
                 !characterActions.actionC && !characterActions.actionD &&
                 !characterActions.graftPlant)
                 activePlot.ActionClear();
+            else
+                flowAction = characterActions; // store latest action
         }
 
         // cast magic is last considered
@@ -368,26 +378,34 @@ public class PlayerControlManager : MonoBehaviour
 
         if (focusFlowTimer > 0f)
         {
-            if ((characterActions.actionA || characterActions.actionADown) &&
-                action == PlotManager.CurrentAction.Working || 
+
+            if ((flowAction.actionA || flowAction.actionADown) &&
+                action == PlotManager.CurrentAction.Working ||
                 action == PlotManager.CurrentAction.Planting)
                 retBool = true;
-            if ((characterActions.actionB || characterActions.actionBDown) &&
+            if ((flowAction.actionB || flowAction.actionBDown) &&
                 action == PlotManager.CurrentAction.Watering)
                 retBool = true;
-            if ((characterActions.actionC || characterActions.actionCDown) &&
+            if ((flowAction.actionC || flowAction.actionCDown) &&
                 action == PlotManager.CurrentAction.Harvesting)
                 retBool = true;
-            if ((characterActions.actionD || characterActions.actionDDown) &&
+            if ((flowAction.actionD || flowAction.actionDDown) &&
                 action == PlotManager.CurrentAction.Uprooting)
                 retBool = true;
-            if ((characterActions.graftPlant) && action == PlotManager.CurrentAction.Grafting)
+            if ((flowAction.graftPlant) && action == PlotManager.CurrentAction.Grafting)
                 retBool = true;
         }
+
         if (retBool)
             focusFlowTimer = FOCUSFLOWTIME; // reset flow timer
 
         return retBool;
+    }
+
+    public void FocusFlowActionComplete( PlotManager.CurrentAction action )
+    {
+        //flowPlotAction = action;
+        focusFlowTimer = FOCUSFLOWTIME;
     }
     
     /// <summary>

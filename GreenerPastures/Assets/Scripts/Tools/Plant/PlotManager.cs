@@ -544,6 +544,8 @@ public class PlotManager : MonoBehaviour
             actionStepTimer = 0f;
             actionDrainTimer = 0f;
             //
+            // ARCANA SKILL : Focus Flow
+            currentPlayer.FocusFlowActionComplete(action); // sets focus flow timer
             retBool = true;
         }
 
@@ -564,7 +566,7 @@ public class PlotManager : MonoBehaviour
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         ItemData iData = pcm.GetPlayerCurrentItemSelection();
 
-        if (!autoPlantOnce && data.condition == PlotCondition.Tilled)
+        if (data.condition == PlotCondition.Tilled)
         {
             // ARCANA SKILL : Cover Crop
             if (autoPlantOnce)
