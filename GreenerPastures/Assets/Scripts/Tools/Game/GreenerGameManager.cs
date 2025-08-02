@@ -36,6 +36,15 @@ public class GreenerGameManager : MonoBehaviour
 
     private AudioManager sfxAudio;
 
+    public enum Test
+    {
+        MidnightTick,
+        MorningTick,
+        EveningTick
+    }
+    public bool testRun;
+    public Test testThis;
+
     const float HOSTPINGINTERVAL = 1f;
     const float NOTIFICATIONHOLDTIME = 8f;
     const float NOTIFICATIONDELAYINTERVAL = 1f;
@@ -129,6 +138,19 @@ public class GreenerGameManager : MonoBehaviour
 
     void Update()
     {
+        // temp
+        if (testRun)
+        {
+            testRun = false;
+            // do testing
+            if (testThis == Test.MidnightTick)
+                MidnightTick();
+            else if (testThis == Test.MorningTick)
+                MorningTick();
+            else
+                EveningTick();
+        }
+
         // handle game data distribution
         if (!gameDataDistributed && !fusionMgr.waitingForHostData)
         {
@@ -327,6 +349,59 @@ public class GreenerGameManager : MonoBehaviour
     /// </summary>
     public void MidnightTick()
     {
+        // everyone likes rocks (spawn rocks on islands)
+        LooseItemManager[] looseItms = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+        TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
+        IslandManager iMgr = GameObject.FindFirstObjectByType<IslandManager>();
+        float roughDate = 0f;
+        if (tim != null)
+            roughDate = tim.dayOfMonth + ((int)tim.monthOfYear * 30);
+        int rocks = 0;
+        float oldestAge = 0;
+        LooseItemManager oldestRock = null;
+        for (int i = 0; i < looseItms.Length; i++)
+        {
+            // identify rocks
+            if (looseItms[i].looseItem.inv.items[0].type == ItemType.Rock)
+            {
+                rocks++;
+                if (roughDate - looseItms[i].looseItem.inv.items[0].quality > oldestAge)
+                {
+                    oldestAge = roughDate - looseItms[i].looseItem.inv.items[0].quality;
+                    oldestRock = looseItms[i];
+                }
+            }
+        }
+        // ensure rocks (everyone likes rocks)
+        if (iMgr != null && (rocks < iMgr.islands.Length || 
+            RandomSystem.FlatRandom01() < 0.01f))
+        {
+            // make rock
+            int islandForRock = Random.Range(0, iMgr.islands.Length);
+            LooseItemData rockData = InventorySystem.CreateItem(ItemType.Rock);
+            if (tim != null) // imprecise geologic dating
+                rockData.inv.items[0].quality = roughDate;
+            rockData.flipped = RandomSystem.FlatRandom01() < .5f;
+            Vector3 pos = GameSystem.GetVector(iMgr.islands[islandForRock].location);
+            Vector2 home = Random.insideUnitCircle.normalized;
+            float range = ((iMgr.islands[islandForRock].location.w * 7f) * RandomSystem.GaussianRandom01());
+            home *= range;
+            pos.x += home.x;
+            pos.z += home.y;
+            // final rock resting place (welcome home, rock)
+            ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
+            if (ism != null)
+            {
+                ism.SpawnItem(rockData, pos, pos, true);
+            }
+        }
+        else
+        {
+            // consider removing oldest rock (they had a good run)
+            if (oldestRock != null && RandomSystem.FlatRandom01() < (oldestAge * 0.01f))
+                Destroy(oldestRock.gameObject);
+        }
+
         // ARCANA SKILL : Friends of the Gold Fairy
         // local player only
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
@@ -369,7 +444,7 @@ public class GreenerGameManager : MonoBehaviour
                         GameObject wildPlot = GameObject.Instantiate((GameObject)Resources.Load("Plot"));
                         wildPlot.name = "Mystic Forager's wild plot";
                         Vector3 pos = GameSystem.GetVector(iMgr.islands[pcm.playerData.playerIsland].location);
-                        float range = iMgr.islands[pcm.playerData.playerIsland].location.w;
+                        float range = 7f * iMgr.islands[pcm.playerData.playerIsland].location.w;
                         Vector2 hide = Random.insideUnitCircle.normalized;
                         pos.x += hide.x * (range - 1f);
                         pos.z += hide.y * (range - 1f);
