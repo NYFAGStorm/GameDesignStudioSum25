@@ -279,18 +279,18 @@ public class PlotManager : MonoBehaviour
         }
 
         // run harvest display timer
-        if ( harvestDisplayTimer > 0f )
+        if (harvestDisplayTimer > 0f)
         {
             harvestDisplayTimer -= Time.deltaTime;
-            if ( harvestDisplayTimer < 0f )
+            if (harvestDisplayTimer < 0f)
                 harvestDisplayTimer = 0f;
         }
 
         // run uprooted timer
-        if ( uprootedTimer > 0f )
+        if (uprootedTimer > 0f)
         {
             uprootedTimer -= Time.deltaTime;
-            if ( uprootedTimer < 0f )
+            if (uprootedTimer < 0f)
                 uprootedTimer = 0f;
         }
     }
@@ -607,10 +607,7 @@ public class PlotManager : MonoBehaviour
         }
 
         if (autoPlantOnce)
-        {
             autoPlantOnce = false; // just once
-            print("auto planting with " + iData.name + " plant type = " + iData.plant.ToString());
-        }
 
         switch (data.condition)
         {
@@ -941,7 +938,7 @@ public class PlotManager : MonoBehaviour
                     if (!data.plant.canReFruit && !forceReFruit)
                     {
                         ItemData seed = pcm.GetPlayerCurrentItemSelection();
-                        if (seed != null)
+                        if (seed != null && seed.type == ItemType.Seed)
                         {
                             // uproot automatically
                             autoUprootOnce = true;
