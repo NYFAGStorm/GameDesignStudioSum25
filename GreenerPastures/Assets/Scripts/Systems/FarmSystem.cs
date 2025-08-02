@@ -49,12 +49,25 @@ public static class FarmSystem
     {
         PlotData retPlot = plot;
 
-        PlotEffect[] tmp = new PlotEffect[plot.plotEffects.Length+1];
-        for ( int i = 0; i < plot.plotEffects.Length; i++ )
+        // validate does not exist
+        bool found = false;
+        for (int i = 0; i < retPlot.plotEffects.Length; i++)
         {
-            tmp[i] = plot.plotEffects[i];
+            if (retPlot.plotEffects[i] == effect)
+            {
+                found = true;
+                break;
+            }
         }
-        tmp[plot.plotEffects.Length] = effect;
+        if (found)
+            return retPlot;
+        // add
+        PlotEffect[] tmp = new PlotEffect[retPlot.plotEffects.Length+1];
+        for ( int i = 0; i < retPlot.plotEffects.Length; i++ )
+        {
+            tmp[i] = retPlot.plotEffects[i];
+        }
+        tmp[retPlot.plotEffects.Length] = effect;
         retPlot.plotEffects = tmp;
 
         return retPlot;
@@ -70,22 +83,28 @@ public static class FarmSystem
     {
         PlotData retPlot = plot;
 
-        // validate
-        if (plot.plotEffects.Length == 0)
-            return plot;
-
-        int count = 0;
+        // validate exists
         bool found = false;
-        PlotEffect[] tmp = new PlotEffect[plot.plotEffects.Length - 1];
-        for (int i = 0; i < plot.plotEffects.Length; i++)
+        for (int i = 0; i < retPlot.plotEffects.Length; i++)
         {
-            if (plot.plotEffects[i] != effect || found)
+            if (retPlot.plotEffects[i] == effect)
             {
-                tmp[count] = plot.plotEffects[i];
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return retPlot;
+        // remove
+        PlotEffect[] tmp = new PlotEffect[retPlot.plotEffects.Length - 1];
+        int count = 0;
+        for (int i = 0; i < retPlot.plotEffects.Length; i++)
+        {
+            if (retPlot.plotEffects[i] != effect)
+            {
+                tmp[count] = retPlot.plotEffects[i];
                 count++;
             }
-            else
-                found = true;
         }
         retPlot.plotEffects = tmp;
 

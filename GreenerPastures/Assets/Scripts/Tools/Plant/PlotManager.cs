@@ -643,6 +643,9 @@ public class PlotManager : MonoBehaviour
                 data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
                 break;
             case PlotCondition.Tilled:
+                // skip if no seed
+                if (iData == null || iData.type != ItemType.Seed)
+                    return;
                 // plant seed with seed item selected in player inventory
                 plant = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                 plant.transform.parent = transform;
