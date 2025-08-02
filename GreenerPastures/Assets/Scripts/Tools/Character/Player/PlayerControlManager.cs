@@ -802,7 +802,7 @@ public class PlayerControlManager : MonoBehaviour
                         break;
                     case ItemEffect.ScrollRandomSpellCharge:
                         // weighted random spell type
-                        scrollCharge = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 33) + 1;
+                        scrollCharge = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(), 34);
                         scrollAddsCharge = (SpellType)scrollCharge;
                         break;
                     case ItemEffect.ScrollLevelOneSpellCharge:
