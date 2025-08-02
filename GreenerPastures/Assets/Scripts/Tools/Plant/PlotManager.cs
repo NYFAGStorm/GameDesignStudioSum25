@@ -251,7 +251,7 @@ public class PlotManager : MonoBehaviour
                     (!FarmSystem.PlotHasEffect(data, PlotEffect.DaylightI) &&
                     !FarmSystem.PlotHasEffect(data, PlotEffect.DaylightII)))
                 {
-                    Destroy(gameObject.transform.Find("Daylight VFX"));
+                    Destroy(gameObject.transform.Find("Daylight VFX").gameObject);
                     hasDaylightVFX = false;
                 }
             }
