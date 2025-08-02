@@ -63,6 +63,7 @@ public class MarketManager : MonoBehaviour
 
     private ArtLibraryManager alm;
     private QuitOnEscape qoe; // disable to suspend use of start button while in market
+    private PostOfficeManager pom;
 
     public Texture2D marketUIOL;
     public Texture2D marketBookOL;
@@ -98,6 +99,8 @@ public class MarketManager : MonoBehaviour
 
     private Texture2D[] buttonTex;
 
+    private ItemData[] packingItems;
+
     const float PLAYERCHECKTIME = 1f;
     const float MARKETPROXIMITYRANGE = .5f;
     const float REJECTFLASHTIME = 1f;
@@ -125,6 +128,12 @@ public class MarketManager : MonoBehaviour
             Debug.LogError("--- MarketManager [Start] : no quit on escape found in scene. aborting.");
             enabled = false;
         }
+        pom = GameObject.FindFirstObjectByType<PostOfficeManager>();
+        if (pom == null)
+        {
+            Debug.LogError("--- MarketManager [Start] : no post office manager found in scene. aborting.");
+            enabled = false;
+        }
         // initialize
         if ( enabled )
         {
@@ -134,6 +143,7 @@ public class MarketManager : MonoBehaviour
             marketInstructions = "Welcome, Biomancer!\nE=BUY F=SELL";
             if (padMgr != null && padMgr.gamepads[0].isActive)
                 marketInstructions = "Welcome, Biomancer!\nA=BUY B=SELL";
+            packingItems = new ItemData[0];
 
             // GUI Button Textures for build
             if (!Application.isEditor)
@@ -348,6 +358,18 @@ public class MarketManager : MonoBehaviour
                         customerStateTimer = CUSTOMERSTATETIMERMAX;
                         break;
                     case CustomerState.Deactivating:
+                        // send any packed items via post office
+                        if (packingItems.Length > 0)
+                        {
+                            pom.SendPackage("Mr. Sells Alat",
+                                currentCustomer.playerData.playerName,
+                                packingItems);
+                            packingItems = new ItemData[0]; // reset
+                            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                            if (ggm != null)
+                                ggm.AddNotification("Your package is has been\nsent to your mailbox.");
+                        }
+                        // handle customer as leaving
                         if (currentCustomer != null)
                         {
                             leavingCustomer = currentCustomer;
@@ -524,7 +546,7 @@ public class MarketManager : MonoBehaviour
                         currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;
                     currentCustomer.AwardXP(PlayerData.XP_BUYFROMSHOP);
 
-                    // try place in inventory, spawn to the side if fail
+                    // try place in inventory, (do not spawn to the side)
                     if (InventorySystem.InvHasSlot(currentCustomer.playerData.inventory))
                     {
                         ItemData iData = InventorySystem.InitializeItem(menuItems[menuItemSelection].itemType);
@@ -552,20 +574,35 @@ public class MarketManager : MonoBehaviour
                     }
                     else
                     {
-                        Vector3 pos = gameObject.transform.position;
-                        pos += purchaseOffset;
-                        Vector3 targ = (currentCustomer.transform.position - gameObject.transform.position) * 4f;
-                        targ += pos;
-                        ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
-                        LooseItemData loose = InventorySystem.CreateItem(menuItems[menuItemSelection].itemType);
-                        loose.inv.items[0].plant = menuItems[menuItemSelection].plantType;
-                        if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
-                            menuItems[menuItemSelection].itemType == ItemType.Fruit)
+                        // gather items bought with no inventory room
+                        // upon exiting market, send package to player mailbox
+
+                        // add to packing items
+                        ItemData[] tmp = new ItemData[packingItems.Length + 1];
+                        for (int i = 0; i < packingItems.Length; i++)
                         {
-                            PlantType p = loose.inv.items[0].plant;
-                            loose.inv.items[0].name += " (" + p.ToString() + ")";
+                            tmp[i] = packingItems[i];
                         }
-                        ism.SpawnItem(loose, pos, targ, true);
+                        tmp[packingItems.Length] = InventorySystem.InitializeItem(menuItems[menuItemSelection].itemType);
+                        if (menuItems[menuItemSelection].plantType != PlantType.Default)
+                        {
+                            // plant config
+                            PlantData pData = PlantSystem.InitializePlant(menuItems[menuItemSelection].plantType);
+                            tmp[packingItems.Length] = InventorySystem.SetItemAsPlant(tmp[packingItems.Length], pData);
+                        }
+                        if (menuItems[menuItemSelection].itemType == ItemType.Scroll ||
+                            menuItems[menuItemSelection].itemType == ItemType.Potion)
+                        {
+                            // magic item config
+                            tmp[packingItems.Length].name = menuItems[menuItemSelection].itemName;
+                            tmp[packingItems.Length].effects = new ItemEffect[1];
+                            tmp[packingItems.Length].effects[0] = menuItems[menuItemSelection].effect;
+                        }
+                        packingItems = tmp;
+                        // notify about packed items
+                        GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                        if (ggm != null)
+                            ggm.AddNotification(packingItems[packingItems.Length-1].name + "\nis packed for shipping.");
                     }
                 }
                 else
