@@ -15,7 +15,7 @@ public class ShapeLibraryManager : MonoBehaviour
     [Tooltip("Each entry represents the shape of one ingredient. The nine booleans represent a 3x3 grid; 0-2 on top row, 3-5 middle row, 6-8 bottom row. True means this shape includes this square.")]
     public IngredientShapeType[] ingredientShapes;
 
-    const int TOTALINGREDIENTSHAPETYPES = 210;
+    const int TOTALINGREDIENTSHAPETYPES = 206;
 
 
     void Start()
@@ -82,7 +82,7 @@ public class ShapeLibraryManager : MonoBehaviour
         for (int i = 0; i < ingredientShapes.Length; i++)
         {
             ingredientShapes[i].pieces = new bool[9];
-            if (i < 6)
+            if (i < 7)
             {
                 switch ((ItemType)i)
                 {
@@ -147,8 +147,8 @@ public class ShapeLibraryManager : MonoBehaviour
         // 
         for (int i = 0; i < 50; i++)
         {
-            int idx = 6 + (i * 4);
-            PlantType pt = (PlantType)(i+1);
+            int idx = 7 + (i * 4);
+            PlantType pt = (PlantType)(i+1); // skip default plant type
             ingredientShapes[idx].item = ItemType.Seed;
             ingredientShapes[idx].plant = pt;
             ingredientShapes[idx].pieces[4] = true;
