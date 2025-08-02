@@ -607,7 +607,8 @@ public class CastManager : MonoBehaviour
             GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
             vfx.name = "VFX Teleport Flash";
             vfx.transform.position = positionEffect;
-            Destroy(vfx, 1.1f);
+            vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = new Color(1f, .9f, .381f, 1f);
+            Destroy(vfx, 1f);
             // teleport all loose items to compost bin
             LooseItemManager[] looseItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
             for (int i = 0; i < looseItems.Length; i++)
@@ -641,7 +642,8 @@ public class CastManager : MonoBehaviour
             GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
             vfx.name = "VFX Teleport Flash";
             vfx.transform.position = positionEffect;
-            Destroy(vfx, 1.1f);
+            vfx.transform.Find("VFX Sprite").GetComponent<SpriteRenderer>().material.color = new Color(1f, .9f, .381f, 1f);
+            Destroy(vfx, 1f);
             // exchange items for gold pouch of sum market value
             int marketValue = 0;
             MarketManager mm = GameObject.FindFirstObjectByType<MarketManager>();
@@ -660,6 +662,8 @@ public class CastManager : MonoBehaviour
                 {
                     if (mm != null)
                         marketValue += mm.GetFinalMarketSellValue(looseItems[i].looseItem.inv.items[0]);
+                    // remove item
+                    Destroy(looseItems[i].gameObject, 0.01f);
                 }
             }
             ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
