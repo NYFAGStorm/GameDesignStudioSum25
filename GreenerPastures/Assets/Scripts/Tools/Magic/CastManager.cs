@@ -257,6 +257,14 @@ public class CastManager : MonoBehaviour
                 Destroy(vfxA, 1.1f);
                 Destroy(vfxB, 1.1f);
                 // teleport
+
+                // ensure camera follows appropriately
+                CameraManager cam = GameObject.FindFirstObjectByType<CameraManager>();
+                cam.SetCameraFollowMode();
+                // ensure island setting is configured for player island
+                IslandManager iMgr = GameObject.FindFirstObjectByType<IslandManager>();
+                players[i].playerData.island = iMgr.islands[players[i].playerData.playerIsland].location;
+                players[i].playerData.island.w = iMgr.islands[players[i].playerData.playerIsland].location.w * 7f;
                 // REVIEW: graceful timing
                 players[i].transform.position = centerOfFarm;
             }
