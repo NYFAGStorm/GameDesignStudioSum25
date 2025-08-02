@@ -298,7 +298,7 @@ public class CastManager : MonoBehaviour
                     {
                         Vector3 islandPosition = GameSystem.GetVector(islandMgr.islands[i].location);
                         dist = Vector3.Distance(islandPosition, positionEffect); // also use island range (.w)
-                        if (dist > (areaOfEffect + islandMgr.islands[i].location.w))
+                        if (dist > (areaOfEffect + (islandMgr.islands[i].location.w * 7f)))
                             continue;
                         // do it
                         casts[index].islandIndex = i;
@@ -309,6 +309,7 @@ public class CastManager : MonoBehaviour
                     }
                 }
             }
+            return;
         }
 
         // Player effects

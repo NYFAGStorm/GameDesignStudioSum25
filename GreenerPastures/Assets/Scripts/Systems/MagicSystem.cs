@@ -715,8 +715,8 @@ public static class MagicSystem
                 retSpell.ingredients = new IngredientData[4];
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Plant, PlantType.Underbloom);
                 retSpell.ingredients[1] = InitializeIngredient(ItemType.Plant, PlantType.Corn);
-                retSpell.ingredients[0] = InitializeIngredient(ItemType.Fruit, PlantType.Rose);
-                retSpell.ingredients[1] = InitializeIngredient(ItemType.Fruit, PlantType.Rose);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Fruit, PlantType.Rose);
+                retSpell.ingredients[3] = InitializeIngredient(ItemType.Fruit, PlantType.Rose);
                 break;
             case SpellType.EclipseI:
                 retSpell.name = "Eclipse I";
