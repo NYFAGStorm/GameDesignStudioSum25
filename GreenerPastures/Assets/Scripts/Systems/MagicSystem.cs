@@ -625,7 +625,7 @@ public static class MagicSystem
                 retSpell.description = "Plants grow slower for one day (-33%)";
                 retSpell.ingredients = new IngredientData[3];
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Fruit, PlantType.Chrystalia);
-                retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.EclipseFlower);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Plant, PlantType.EclipseFlower);
                 retSpell.ingredients[2] = InitializeIngredient(ItemType.Seed, PlantType.Apple);
                 break;
             case SpellType.ProsperousI:
@@ -658,7 +658,7 @@ public static class MagicSystem
                 retSpell.description = "Change the color of your tower";
                 retSpell.ingredients = new IngredientData[2];
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Fruit, PlantType.Apple);
-                retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Lotus);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Plant, PlantType.Lotus);
                 break;
             case SpellType.LesionI:
                 retSpell.name = "Lesion I";
@@ -770,7 +770,7 @@ public static class MagicSystem
                 retSpell.ingredients = new IngredientData[5];
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Plant, PlantType.Banana);
                 retSpell.ingredients[1] = InitializeIngredient(ItemType.Fruit, PlantType.Nightshade);
-                retSpell.ingredients[2] = InitializeIngredient(ItemType.Stalk, PlantType.Lotus);
+                retSpell.ingredients[2] = InitializeIngredient(ItemType.Plant, PlantType.Lotus);
                 retSpell.ingredients[3] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
                 retSpell.ingredients[4] = InitializeIngredient(ItemType.Fertilizer, PlantType.Default);
                 break;
