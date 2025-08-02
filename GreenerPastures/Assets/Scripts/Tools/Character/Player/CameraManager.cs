@@ -165,7 +165,7 @@ public class CameraManager : MonoBehaviour
             if (rainBox != null)
             {
                 // rain vfx config (off)
-                rainOn = rainVFX.isPlaying;
+                rainOn = rainVFX.isPlaying; // REVIEW:
                 rainBox.SetActive(false);
             }
             if (wm != null)
@@ -181,6 +181,7 @@ public class CameraManager : MonoBehaviour
             else if (rainVFX.isPlaying && rainAmount == 0f)
                 rainVFX.Stop();
         }
+        rainOn = rainAmount > 0f;
     }
 
     void ConfigureCamOffsets()
