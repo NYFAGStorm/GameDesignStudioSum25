@@ -24,11 +24,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AccentFill:
-        m_Texture: {fileID: 2800000, guid: 2d5cac9b4a2323a468592b8f88cb25ed, type: 3}
+        m_Texture: {fileID: 2800000, guid: ae8991b5bbe6174429ab7afe83bd0ec1, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _AltFill:
-        m_Texture: {fileID: 2800000, guid: f4671313b1af79d40a5300cc18de2157, type: 3}
+        m_Texture: {fileID: 2800000, guid: b2ae590a67484fe4fa19e3db8e600002, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _BumpMap:
@@ -52,15 +52,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HairFill:
-        m_Texture: {fileID: 2800000, guid: 0898ddaf81384794e8e21d703ca73d97, type: 3}
+        m_Texture: {fileID: 2800000, guid: 80e72be63fd875c42a9d15b45f884920, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _LineArt:
-        m_Texture: {fileID: 2800000, guid: 593aee9aaf86dd44294ac5a1e56e620f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 358bc57a146c1ef4ebdb3594fdb50bb4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 939a7502ca12760409acc0d3830ea230, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9d59d39186d870242ba01f7f96bca647, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _MetallicGlossMap:
@@ -76,7 +76,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SkinFill:
-        m_Texture: {fileID: 2800000, guid: 34107353d853d844a961488644398b5b, type: 3}
+        m_Texture: {fileID: 2800000, guid: f56689fa082f9f148925786f5af794f5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []

@@ -866,6 +866,7 @@ public class PlotManager : MonoBehaviour
                                 loose.inv.items[0].type = ItemType.GoldSack;
                                 loose.inv.items[0].size = 1f;
                                 loose.inv.items[0].quality = 1f;
+                                loose.inv.maxSlots += marketValue;
                                 for (int n = 0; n < marketValue; n++)
                                 {
                                     loose.inv = InventorySystem.AddToInventory(loose.inv, InventorySystem.InitializeItem(ItemType.GoldCoin));

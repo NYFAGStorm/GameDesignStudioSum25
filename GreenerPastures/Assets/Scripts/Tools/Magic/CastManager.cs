@@ -179,11 +179,13 @@ public class CastManager : MonoBehaviour
                     Destroy(loosey.gameObject);
                 }
             }
+            return;
         }
         // skill clean up
         if (spellType == SpellType.SkillCleanUp)
         {
             // launch black hole for plant items
+            return;
         }
         // skill lighten up
         if (spellType == SpellType.SkillLightenUp)
@@ -197,22 +199,19 @@ public class CastManager : MonoBehaviour
                 if (dist > areaOfEffect)
                     continue;
 
-                GameObject light = new GameObject();
+                GameObject light = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Skill Lighten Up"));
                 light.name = "VFX player light";
-                light.transform.position = players[i].transform.position + Vector3.up;
+                light.transform.position = players[i].transform.position + (Vector3.up * 1.25f);
                 light.transform.parent = players[i].transform;
-                Light l = light.AddComponent<Light>();
-                l.range = 3.81f;
-                l.intensity = .618f;
-                l.bounceIntensity = 0f;
-                l.shadows = LightShadows.Hard;
                 Destroy(light, 180f); // 3 in-game hour duration
             }
+            return;
         }
         // skill cash in
         if (spellType == SpellType.SkillCashIn)
         {
             // launch black hole for market value items
+            return;
         }
         // skill take me home
         if (spellType == SpellType.SkillTakeMeHome)
@@ -261,6 +260,7 @@ public class CastManager : MonoBehaviour
                 // REVIEW: graceful timing
                 players[i].transform.position = centerOfFarm;
             }
+            return;
         }
 
         // Spells not affecting plots
@@ -363,6 +363,7 @@ public class CastManager : MonoBehaviour
                         break;
                 }
             }
+            return;
         }
         // rabbit hole
         if (spellType == SpellType.RabbitHole)
@@ -385,6 +386,7 @@ public class CastManager : MonoBehaviour
                     }
                 }
             }
+            return;
         }
 
         // Plot effects
@@ -529,7 +531,7 @@ public class CastManager : MonoBehaviour
                 Vector3 moveVector = Vector3.zero;
                 if (dist < areaOfEffect)
                 {
-                    moveVector = positionEffect - looseItems[i].gameObject.transform.position;
+                    moveVector = (positionEffect + (Vector3.up * 0.25f)) - looseItems[i].gameObject.transform.position;
                     moveVector *= 0.381f;
                     looseItems[i].gameObject.transform.position += moveVector;
                 }
@@ -554,7 +556,7 @@ public class CastManager : MonoBehaviour
                 Vector3 moveVector = Vector3.zero;
                 if (dist < areaOfEffect)
                 {
-                    moveVector = positionEffect - looseItems[i].gameObject.transform.position;
+                    moveVector = (positionEffect + (Vector3.up * 0.25f)) - looseItems[i].gameObject.transform.position;
                     moveVector *= 0.381f;
                     looseItems[i].gameObject.transform.position += moveVector;
                 }
@@ -616,6 +618,7 @@ public class CastManager : MonoBehaviour
                 if (dist < 1f) // now at center?
                     looseItems[i].gameObject.transform.position = closeBin.transform.position;
             }
+            return;
         }
 
         // ARCANA SKILL : Cash In
@@ -664,12 +667,14 @@ public class CastManager : MonoBehaviour
             {
                 // spawn gold pouch, put gold in it, drop at cast position
                 LooseItemData goldPouch = InventorySystem.CreateItem(ItemType.GoldSack);
+                goldPouch.inv.maxSlots += marketValue;
                 for (int i = 0; i < marketValue; i++)
                 {
                     goldPouch.inv = InventorySystem.AddToInventory(goldPouch.inv, InventorySystem.InitializeItem(ItemType.GoldCoin));
                 }
                 ism.SpawnItem(goldPouch, positionEffect, positionEffect, true);
             }
+            return;
         }
 
         // Spells not affecting plots

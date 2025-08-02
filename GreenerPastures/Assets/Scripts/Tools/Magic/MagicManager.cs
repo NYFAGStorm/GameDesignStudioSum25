@@ -341,7 +341,7 @@ public class MagicManager : MonoBehaviour
             return;
         }
         castingCursor.transform.position = gameObject.transform.position;
-        castingCursor.transform.position += (0.004f * Vector3.up);
+        castingCursor.transform.position += (0.01f * Vector3.up);
         castingCursor.transform.parent = null;
         castingCursor.name = "Casting Cursor";
         castingCursor.GetComponent<Renderer>().material.color = Color.blue;
