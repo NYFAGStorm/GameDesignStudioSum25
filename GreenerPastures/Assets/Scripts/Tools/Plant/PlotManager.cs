@@ -731,8 +731,7 @@ public class PlotManager : MonoBehaviour
             return;
 
         // cannot harvest unless a plant exists, plant at 100% growth and not yet harvested
-        if (!autoHarvestOnce && 
-            (plant == null || data.plant.growth < 1f || (data.plant.isHarvested && !data.plant.canReFruit)))
+        if (plant == null || data.plant.growth < 1f || (data.plant.isHarvested && !data.plant.canReFruit))
             return;
 
         if (!autoHarvestOnce && action != CurrentAction.Harvesting && action != CurrentAction.None)
@@ -754,7 +753,8 @@ public class PlotManager : MonoBehaviour
             if (!data.plant.isHarvested || data.plant.canReFruit)
             {
                 // PLAYER STATS:
-                currentPlayer.playerData.stats.totalHarvested++;
+                if (currentPlayer != null)
+                    currentPlayer.playerData.stats.totalHarvested++;
 
                 PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
                 pcm.AwardXP(PlayerData.XP_HARVESTPLANT);
@@ -780,7 +780,7 @@ public class PlotManager : MonoBehaviour
                     for ( int i = 0; i < harvestNumber; i++ )
                     {
                         // ARCANA SKILL : Midas Biomancer
-                        bool dropGold = (PlayerSystem.PlayerHasEffect(currentPlayer.playerData, PlayerEffect.SkillMidasBiomancer) &&
+                        bool dropGold = (currentPlayer != null && PlayerSystem.PlayerHasEffect(currentPlayer.playerData, PlayerEffect.SkillMidasBiomancer) &&
                             !PlantSystem.PlantHasEffect(data.plant, PlantEffect.WalkingStickScrollHarvest) &&
                             RandomSystem.FlatRandom01() < 0.05f);
 

@@ -595,7 +595,7 @@ public static class PlayerSystem
                 retNotifications = new string[3];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 8";
                 retNotifications[1] = "You recieve\none ARCANA";
-                retNotifications[1] = "SPECIAL plants at market\nAVAILABLE";
+                retNotifications[2] = "SPECIAL plants at market\nAVAILABLE";
                 break;
             case 9:
                 retNotifications = new string[2];
