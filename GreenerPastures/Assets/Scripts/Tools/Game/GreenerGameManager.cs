@@ -472,11 +472,11 @@ public class GreenerGameManager : MonoBehaviour
     /// </summary>
     public void EveningTick()
     {
+        // ARCANA SKILL : Seed Fairy Magnet
         // local player only
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         if (pcm != null)
         {
-            // ARCANA SKILL : Seed Fairy Magnet
             if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillFriendsGoldFairy))
             {
                 TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
@@ -498,6 +498,8 @@ public class GreenerGameManager : MonoBehaviour
         if (goldFairHelpPauseTimer > 0f)
             return null;
         GameObject fairy = GameObject.Instantiate((GameObject)Resources.Load("NPC Gold Fairy"));
+        if (isSeedFairy)
+            fairy.GetComponent<NPCGoldFairy>().MakeSeedFairy();
         fairy.GetComponent<NPCGoldFairy>().ActivateFairy(playerIsland, minimumGold + Mathf.RoundToInt(RandomSystem.GaussianRandom01() * 5));
         //Debug.Log("--- GreenerGameManager [GoldFariyVisit] : player detected stuck (no gold, no plants, no items). sending gold fairy.");
         goldFairHelpPauseTimer = GOLDFAIRYHELPPAUSE;

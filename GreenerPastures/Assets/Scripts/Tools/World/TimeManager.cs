@@ -216,7 +216,7 @@ public class TimeManager : MonoBehaviour
         else
             dailyDelivery = false;
 
-        if (previousDayOfMonth != dayOfMonth)
+        if (previousDayProgress > 0.9f && dayProgress <= 0.1f)
         {
             GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
             if (ggm != null)
