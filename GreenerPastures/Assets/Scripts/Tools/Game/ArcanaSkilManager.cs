@@ -90,7 +90,7 @@ public class ArcanaSkilManager : MonoBehaviour
             "Your bet attracts more wagers to the gold dish.", PlayerEffect.SkillFriendsChicken, 1);
         skillTree = SkillSystem.AddTreeNode(skillTree, skill, "root");
         skill = SkillSystem.InitializeSkill("Friends of the Merchant",
-            "Selling at the market every 25 times earns you a 100% off coupon for a single item purchase.", PlayerEffect.SkillFriendsMerchant, 1);
+            "Selling at the market gives you a chance at a 100% off coupon for a single item purchase.", PlayerEffect.SkillFriendsMerchant, 1);
         skillTree = SkillSystem.AddTreeNode(skillTree, skill, "Friends of the Chicken");
         skill = SkillSystem.InitializeSkill("Friends of the Gold Fairy",
             "The Gold Fairy visits your farm most nights.", PlayerEffect.SkillFriendsGoldFairy, 1);
