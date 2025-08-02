@@ -525,9 +525,9 @@ public class MarketManager : MonoBehaviour
             }
             // continue to lower prices (increase discount) if player has gilded words I or II
             if (PlayerSystem.PlayerHasEffect(currentCustomer.playerData, PlayerEffect.SpellGildedWordsI))
-                discountBuy -= Mathf.Clamp01(discountBuy - .25f); // 25% off
+                discountBuy = Mathf.Clamp01(discountBuy - .25f); // 25% off
             if (PlayerSystem.PlayerHasEffect(currentCustomer.playerData, PlayerEffect.SpellGildedWordsII))
-                discountBuy -= Mathf.Clamp01(discountBuy - .5f); // 50% off
+                discountBuy = Mathf.Clamp01(discountBuy - .5f); // 50% off
             // allow player to buy item
             if (Input.GetKeyDown(currentCustomer.actionAKey) || 
                 (padMgr != null && padMgr.gamepads[0].isActive && 
