@@ -119,6 +119,9 @@ public class CharacterAnimManager : MonoBehaviour
                 enabled = false;
             }
         }
+        // un-flip to configure appearance
+        imageFlipped = false;
+        HandleImageFlip();
 
         type = options.model;
 
