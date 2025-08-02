@@ -192,7 +192,7 @@ public class NPCGoldFairy : MonoBehaviour
                     {
                         goldDropTimer = 0f;
                         fairyActive = false;
-                        Destroy(gameObject, 10f);
+                        Destroy(gameObject, 30f);
                     }
                     else
                         goldDropTimer = RandomSystem.GaussianRandom01();
