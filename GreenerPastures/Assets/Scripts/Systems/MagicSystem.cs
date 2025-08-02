@@ -578,7 +578,7 @@ public static class MagicSystem
                 retSpell.description = "Summon sunlight on a plot for one day";
                 retSpell.ingredients = new IngredientData[2];
                 retSpell.ingredients[0] = InitializeIngredient(ItemType.Stalk, PlantType.Sunflower);
-                retSpell.ingredients[1] = InitializeIngredient(ItemType.Stalk, PlantType.Marigold);
+                retSpell.ingredients[1] = InitializeIngredient(ItemType.Plant, PlantType.Marigold);
                 break;
             case SpellType.GildedWordsI:
                 retSpell.name = "Gilded Words I";
