@@ -52,7 +52,7 @@ public class MarketManager : MonoBehaviour
 
     private int[] maxMenuListPerLevel = new int[11];
     
-    int generalItems = 9; // fertilizer + 6 scrolls + 2 potions
+    int generalItems = 11; // fertilizer + 8 scrolls + 2 potions
     int plantItemTypes = 3; // seed, fruit, plant
 
     int commonPlants = 10;
@@ -910,17 +910,15 @@ public class MarketManager : MonoBehaviour
         SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Four)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 120, 60);
         SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Five)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 150, 75);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Six)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 200, 100);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Seven)");
 
         menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 30, 20);
         SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearOneCooldown, " (Grey)");
         menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 75, 50);
         SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearAllCooldowns, " (White)");
-
-        // TODO: reset general item count when able to implement spell revision
-        //menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 150, 75);
-        //SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Six)");
-        //menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 200, 100);
-        //SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Seven)");
 
         menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
 

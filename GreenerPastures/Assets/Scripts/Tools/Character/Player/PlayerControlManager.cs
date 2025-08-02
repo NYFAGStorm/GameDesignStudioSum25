@@ -1032,9 +1032,10 @@ public class PlayerControlManager : MonoBehaviour
     void DoColorTrail( Vector3 pos )
     {
         // REVIEW: cleanup
+        pos += (Vector3.up * 0.01f);
 
         // SPELL COLOR TRAIL I, II, II
-        if (Time.time % 1f < 0.05f)
+        if (RandomSystem.FlatRandom01() < 0.1f)
         {
             GameObject lightingFolderObject = GameObject.Find("Lighting");
             if (PlayerSystem.PlayerHasEffect(playerData, PlayerEffect.SpellColorTrailI))
