@@ -50,6 +50,8 @@ public class MagicManager : MonoBehaviour
     private bool castInstructionsDisplay;
     private bool playerCanCancel;
     private int selectedSpellCharge;
+    private int selectedSpellColumn;
+    private int selectedSpellRow;
     private GameObject castingCursor;
     private float castCursorSpeed = 3.81f;
     private CastData castData;
@@ -62,6 +64,8 @@ public class MagicManager : MonoBehaviour
 
     const float CASTMODECHANGETIME = 1f;
     const float SELECTIONINVALIDTIME = 1.5f;
+    const int SPELLLISTCOLUMNMAX = 2;
+    const int SPELLLISTROWMAX = 15;
 
 
     void Start()
@@ -367,7 +371,7 @@ public class MagicManager : MonoBehaviour
         int min = 0;
         int max = pcm.playerData.magic.library.spellBook.Length-1;
 
-        // up-down controls
+        // up-down-left-right controls
         if (Input.GetKeyDown(pcm.upKey) || (padMgr != null &&
             padMgr.gamepads[0].isActive && padMgr.gPadDown[0].YaxisL > 0f))
         {
@@ -381,6 +385,22 @@ public class MagicManager : MonoBehaviour
             selectedSpellCharge++;
             if (selectedSpellCharge > max)
                 selectedSpellCharge = 0;
+        }
+        // if two columns
+        if (max >= SPELLLISTROWMAX)
+        {
+            if (Input.GetKeyDown(pcm.leftKey) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padMgr.gPadDown[0].XaxisL < 0f))
+            {
+                if (selectedSpellCharge - SPELLLISTROWMAX >= 0)
+                    selectedSpellCharge -= SPELLLISTROWMAX;
+            }
+            if (Input.GetKeyDown(pcm.rightKey) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padMgr.gPadDown[0].XaxisL > 0f))
+            {
+                if (selectedSpellCharge + SPELLLISTROWMAX <= max)
+                    selectedSpellCharge += SPELLLISTROWMAX;
+            }
         }
         selectedSpellCharge = Mathf.Clamp(selectedSpellCharge, min, max);
 
@@ -523,10 +543,10 @@ public class MagicManager : MonoBehaviour
 
         Color c = Color.white;
 
-        r.x = 0.2f * w;
+        r.x = 0.15f * w;
         r.y = 0.05f * h;
-        r.width = 0.6f * w;
-        r.height = 0.4f * h;
+        r.width = 0.7f * w;
+        r.height = 0.925f * h;
 
         GUI.color = c;
         GUI.Box(r, s, g);
@@ -576,12 +596,26 @@ public class MagicManager : MonoBehaviour
             c = Color.white;
             GUI.color = c;
             s = "Up - Down = Select, A Button to Target";
+            bool twoColumn = (pcm.playerData.magic.library.spellBook.Length - 1) >= SPELLLISTROWMAX;
+
+            if (twoColumn)
+                s = "Up - Down - Left - Right = Select, A Button to Target";
 
             GUI.Label(r, s, g);
+            r.x = 0.35f * w;
             r.y += 0.05f * h;
+            r.width = 0.3f * w;
+
+            if (twoColumn)
+                r.x = 0.15f * w;
 
             for ( int i = 0; i < pcm.playerData.magic.library.spellBook.Length; i++ )
             {
+                if (i == SPELLLISTROWMAX)
+                {
+                    r.x = 0.55f * w;
+                    r.y = 0.15f * h;
+                }
                 c = Color.white;
                 if (i != selectedSpellCharge &&
                     pcm.playerData.magic.library.spellBook[i].chargesAvailable == 0)
@@ -608,7 +642,7 @@ public class MagicManager : MonoBehaviour
                     s += " (COOLDOWN "+DisplayCooldownTime(pcm.playerData.magic.library.spellBook[i].cooldown) +"min)";
 
                 GUI.Label(r, s, g);
-                r.y += 0.0375f * h;
+                r.y += 0.05f * h;
             }
         }
 
