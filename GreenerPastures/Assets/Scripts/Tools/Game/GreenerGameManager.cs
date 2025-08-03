@@ -36,15 +36,6 @@ public class GreenerGameManager : MonoBehaviour
 
     private AudioManager sfxAudio;
 
-    public enum Test
-    {
-        MidnightTick,
-        MorningTick,
-        EveningTick
-    }
-    public bool testRun;
-    public Test testThis;
-
     const float HOSTPINGINTERVAL = 1f;
     const float NOTIFICATIONHOLDTIME = 8f;
     const float NOTIFICATIONDELAYINTERVAL = 1f;
@@ -138,19 +129,6 @@ public class GreenerGameManager : MonoBehaviour
 
     void Update()
     {
-        // temp
-        if (testRun)
-        {
-            testRun = false;
-            // do testing
-            if (testThis == Test.MidnightTick)
-                MidnightTick();
-            else if (testThis == Test.MorningTick)
-                MorningTick();
-            else
-                EveningTick();
-        }
-
         // handle game data distribution
         if (!gameDataDistributed && !fusionMgr.waitingForHostData)
         {
