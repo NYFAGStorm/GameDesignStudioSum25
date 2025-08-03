@@ -822,7 +822,6 @@ public static class MagicSystem
                 retSpell.ingredients[2] = InitializeIngredient(ItemType.Stalk, PlantType.Yarrow);
                 retSpell.ingredients[3] = InitializeIngredient(ItemType.Plant, PlantType.Lotus);
                 retSpell.ingredients[4] = InitializeIngredient(ItemType.Plant, PlantType.Chrystalia);
-                retSpell.ingredients[5] = InitializeIngredient(ItemType.Plant, PlantType.WaterLily);
                 break;
             default:
                 UnityEngine.Debug.LogWarning("--- MagicSystem [ConfigureGrimoireEntry] : spell type undefined. will ignore.");

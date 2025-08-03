@@ -477,7 +477,7 @@ public class GreenerGameManager : MonoBehaviour
         PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         if (pcm != null)
         {
-            if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillFriendsGoldFairy))
+            if (PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillSeedFairy))
             {
                 TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
                 if (tim != null)

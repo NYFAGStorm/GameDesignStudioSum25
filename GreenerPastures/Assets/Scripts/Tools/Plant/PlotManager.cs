@@ -861,9 +861,13 @@ public class PlotManager : MonoBehaviour
                                 // collect gold sack filled with x2 market value of total fruit harvested
                                 int marketValue = 0;
                                 MarketManager mm = GameObject.FindFirstObjectByType<MarketManager>();
+                                loose.inv.items[0] = InventorySystem.SetItemAsPlant(loose.inv.items[0], data.plant);
+                                loose.inv.items[0].size = data.plant.growth;
+                                loose.inv.items[0].quality = data.plant.quality;
                                 if (mm != null)
                                     marketValue = mm.GetFinalMarketSellValue(loose.inv.items[0]);
                                 marketValue *= 2;
+                                loose.inv.items[0].name = "Gold Sack";
                                 loose.inv.items[0].type = ItemType.GoldSack;
                                 loose.inv.items[0].size = 1f;
                                 loose.inv.items[0].quality = 1f;
