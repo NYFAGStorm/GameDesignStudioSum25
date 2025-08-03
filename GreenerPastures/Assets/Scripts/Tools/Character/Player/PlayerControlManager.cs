@@ -327,13 +327,17 @@ public class PlayerControlManager : MonoBehaviour
         }
         // NOTE: if loose item active, skip plot activity altogether
 
+        bool hadActivePlot = (activePlot != null);
         // clear active plot if moving
         ClearActivePlot();
         // check near plot
         CheckNearPlot();
 
         // handle player tag display
-        hidePlayerNameTag = activePlot != null;
+        if (!hidePlayerNameTag && activePlot != null)
+            hidePlayerNameTag = true;
+        else if (hadActivePlot && activePlot == null)
+            hidePlayerNameTag = false;
 
         // temp (a = work land, b = water plot , c = harvest plant, d = uproot plot)
         // temp (hold-type control detection)
