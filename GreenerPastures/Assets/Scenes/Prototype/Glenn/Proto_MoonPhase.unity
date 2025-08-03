@@ -759,6 +759,22 @@ MonoBehaviour:
   season: 0
   gameSeedTime: 133986375570139304
   globalTimeProgress: 133986375570139324
+  seasonProgress: 0
+  daysAhead: 89.5
+  goForward: 0
+  future:
+    worldTimeOfDay: 0.5
+    worldDayOfMonth: 1
+    worldMonth: 2
+    worldSeason: 0
+    annualProgress: 0
+    baseTemperature: 0
+    dawnTime: 0
+    duskTime: 0
+    windAmount: 0
+    windDirection: 0
+    cloudAmount: 0
+    rainAmount: 0
 --- !u!4 &1039133280
 Transform:
   m_ObjectHideFlags: 0

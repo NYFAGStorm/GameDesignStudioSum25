@@ -90,6 +90,7 @@ public class MoonPhaseTesting : MonoBehaviour
             moonRenderer.material.SetFloat("_MoonPhase", ((float)dayOfMonth / 30f));
         }
 
+        // - calendar testing -
         dayProgress += Time.deltaTime * (WORLDTIMEMULTIPLIER * cheatTimeScale) * (1f / (60f * 60f * 24f));
         if (dayProgress > 1f)
         {
@@ -119,6 +120,15 @@ public class MoonPhaseTesting : MonoBehaviour
             goForward = false;
             future.worldMonth += Mathf.RoundToInt((daysAhead / 30f));
             future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);
+            future.worldSeason = WorldSeason.Winter;
+            if (future.worldMonth > WorldMonth.Feb)
+                future.worldSeason = WorldSeason.Spring;
+            if (future.worldMonth > WorldMonth.May)
+                future.worldSeason = WorldSeason.Summer;
+            if (future.worldMonth > WorldMonth.Aug)
+                future.worldSeason = WorldSeason.Fall;
+            if (future.worldMonth > WorldMonth.Nov)
+                future.worldSeason = WorldSeason.Winter;
         }
 
     }
