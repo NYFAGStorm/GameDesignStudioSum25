@@ -94,7 +94,7 @@ public class PostOfficeManager : MonoBehaviour
 
     void InitializeTimedMessages()
     {
-        timedMessages = new ScheduledMessage[8];
+        timedMessages = new ScheduledMessage[11];
         int idx = 0;
 
         timedMessages[idx].day = 1;
@@ -128,7 +128,7 @@ public class PostOfficeManager : MonoBehaviour
         timedMessages[idx].day = 5;
         timedMessages[idx].month = WorldMonth.Mar;
         timedMessages[idx].sender = "Eden";
-        timedMessages[idx].message = "You Are Loved,\n\nYou are appreciated and recognized. You have more to offer the world. Please create and share. Be well, do good, have fun and take care.\n\nLove, Eden\n\nP.S. - Remember to pay the tax man at the end of the month.";
+        timedMessages[idx].message = "You Are Loved,\n\nYou are appreciated and recognized. You have more to offer the world. Please create and share. Be well, do good, have fun and take care.\n\nLove, Eden\n\nP.S. - Remember the traveling salesman visits each month.";
         timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterFive;
         idx++;
 
@@ -144,6 +144,30 @@ public class PostOfficeManager : MonoBehaviour
         timedMessages[idx].sender = "Eden";
         timedMessages[idx].message = "Grace of the Genesis Tree be with you,\n\nKeep in mind that you can hold the fruit of one plant, and graft it to the stalk of another.\n\nIf they are compatible, you'll have a new more rare plant. Happy grafting!\n\nLove, Eden";
         timedMessages[idx].requiredPlayerEffect = PlayerEffect.EdenLetterSeven;
+        idx++;
+
+        timedMessages[idx].day = 30;
+        timedMessages[idx].month = WorldMonth.Feb;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Wishing you the all the joy that Spring time has to offer.\n\nMay all your plants be healthy and happy all season long.\n\nHappy Spring!\n\nLove, Eden";
+        idx++;
+
+        timedMessages[idx].day = 30;
+        timedMessages[idx].month = WorldMonth.May;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Summer time is the brightest time of the year.\n\nWishing you a bountiful season and happy days.\n\nEnjoy the Summer!\n\nLove, Eden";
+        idx++;
+
+        timedMessages[idx].day = 30;
+        timedMessages[idx].month = WorldMonth.Aug;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Colorful days ahead this Fall and you deserve it all.\n\nReceive the fullest harvests and all the joy that comes with them.\n\nHave a wonderful Fall season!\n\nLove, Eden";
+        idx++;
+
+        timedMessages[idx].day = 30;
+        timedMessages[idx].month = WorldMonth.Nov;
+        timedMessages[idx].sender = "Eden";
+        timedMessages[idx].message = "Winter time approaches and that's the perfect time to renew and replenish.\n\nThe bounty of the year is yours to savor now.\n\nEnjoy the Winter season!\n\nLove, Eden";
         idx++;
     }
 
