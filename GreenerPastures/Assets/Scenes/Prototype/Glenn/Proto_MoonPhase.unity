@@ -753,6 +753,12 @@ MonoBehaviour:
   roundedResult: 0
   percentage: 0
   sineWaveResult: 0
+  dayProgress: 0
+  cheatTimeScale: 1
+  monthOfYear: 2
+  season: 0
+  gameSeedTime: 133986375570139304
+  globalTimeProgress: 133986375570139324
 --- !u!4 &1039133280
 Transform:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MoonPhaseTesting : MonoBehaviour
 {
@@ -32,6 +33,24 @@ public class MoonPhaseTesting : MonoBehaviour
     public float percentage;
     public float sineWaveResult;
     //
+
+    [Range(0f, 1f)]
+    public float dayProgress;
+    //public int dayOfMonth;
+    public float cheatTimeScale = 1f;
+    public WorldMonth monthOfYear;
+    public WorldSeason season;
+    public long gameSeedTime;
+    public long globalTimeProgress;
+    public float seasonProgress;
+    public float daysAhead;
+    public bool goForward;
+    [SerializeField]
+    public WorldData future;
+
+
+    const float WORLDTIMEMULTIPLIER = 60f; // default time rate
+
 
     void Start()
     {
@@ -70,5 +89,37 @@ public class MoonPhaseTesting : MonoBehaviour
             moonPhase = 1f - moonPhase; // makes 15th new moon, 30th full moon
             moonRenderer.material.SetFloat("_MoonPhase", ((float)dayOfMonth / 30f));
         }
+
+        dayProgress += Time.deltaTime * (WORLDTIMEMULTIPLIER * cheatTimeScale) * (1f / (60f * 60f * 24f));
+        if (dayProgress > 1f)
+        {
+            dayProgress = 0f;
+            dayOfMonth++;
+            if (dayOfMonth > 30)
+            {
+                dayOfMonth = 1;
+                monthOfYear++;
+                if ((int)monthOfYear == 2 || (int)monthOfYear == 5 ||
+                    (int)monthOfYear == 8 || (int)monthOfYear == 11)
+                {
+                    season++;
+                    if ((int)season > 3)
+                        season = 0;
+                }
+                if ((int)monthOfYear > 11)
+                {
+                    monthOfYear = 0;
+                }
+            }
+        }
+        seasonProgress = ((1 / 30) + (((dayProgress + dayOfMonth) / 30) + (int)monthOfYear)) / 12;
+        //
+        if (goForward)
+        {
+            goForward = false;
+            future.worldMonth += Mathf.RoundToInt((daysAhead / 30f));
+            future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);
+        }
+
     }
 }
