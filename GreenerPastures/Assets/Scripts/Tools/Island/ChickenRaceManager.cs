@@ -74,6 +74,8 @@ public class ChickenRaceManager : MonoBehaviour
     private PlayerControlManager leavingGuest;
 
     private MultiGamepad padMgr;
+    private int padButtonSelection = -1;
+    private int padMaxButton = 1;
 
     private QuitOnEscape qoe; // disable to suspend use of start button while in market
 
@@ -197,6 +199,8 @@ public class ChickenRaceManager : MonoBehaviour
         if (!DetectPlayerGuest())
             return;
 
+        UpdateGamepadInput();
+
         UpdateSFX();
 
         UpdateChickenFrames();
@@ -206,6 +210,101 @@ public class ChickenRaceManager : MonoBehaviour
         UpdateRaceStateTimer();
 
         HandleRaceStates();
+    }
+
+    void UpdateGamepadInput()
+    {
+        if (padMgr == null || !padMgr.gamepads[0].isActive)
+            return;
+
+        // manage max selection
+        // handle control selection
+
+        if (raceState == RaceState.Default || raceState == RaceState.Exiting)
+        {
+            padMaxButton = 0;
+            padButtonSelection = -1;
+        }
+
+        // Entering,       // instructions and option to exit here only
+        if (raceState == RaceState.Entering)
+        {
+            padMaxButton = 0;
+            if (padMgr.gPadDown[0].YaxisL != 0f)
+                padButtonSelection = 0;
+        }
+
+        // Betting,        // placing bet of gold and selecting chicken
+        if (raceState == RaceState.Betting)
+        {
+            padMaxButton = 6;
+            int move = -1;
+            if (padMgr.gPadDown[0].YaxisL > 0f)
+                move = 0; // up
+            if (padMgr.gPadDown[0].YaxisL < 0f)
+                move = 1; // down
+            if (padMgr.gPadDown[0].XaxisL < 0f)
+                move = 2; // left
+            if (padMgr.gPadDown[0].XaxisL > 0f)
+                move = 3; // right
+            if (move == -1)
+                return;
+            else if (padButtonSelection == -1)
+            {
+                padButtonSelection = 0;
+                return;
+            }
+            // handle selection movement
+            if (padButtonSelection < 3)
+            {
+                if (move == 0)
+                    padButtonSelection--;
+                if (move == 1)
+                    padButtonSelection++;
+                if (padButtonSelection < 0)
+                    padButtonSelection = 0;
+                if (padButtonSelection > 2)
+                {
+                    if (move == 1 && chickenPick > -1 && betAmount > 0)
+                        padButtonSelection = 5;
+                    else if (move == 1)
+                        padButtonSelection = 6;
+                }
+                if (move == 3)
+                    padButtonSelection = 3;
+            }
+            else if (padButtonSelection > 2 && padButtonSelection < 5)
+            {
+                if (move == 2 && padButtonSelection == 3)
+                    padButtonSelection = 0;
+                else
+                    padButtonSelection = 3;
+                if (move == 3 && padButtonSelection == 3)
+                    padButtonSelection = 4;
+                if (move == 1 && chickenPick > -1 && betAmount > 0)
+                    padButtonSelection = 5;
+                else if (move == 1)
+                    padButtonSelection = 6;
+            }
+            else if (padButtonSelection > 4)
+            {
+                if (move == 0)
+                    padButtonSelection = 3;
+                else if (chickenPick == -1 || betAmount == 0)
+                    padButtonSelection = 6;
+                else if (move == 2 && padButtonSelection == 6)
+                    padButtonSelection = 5;
+                else if (move == 2 && padButtonSelection == 5)
+                    padButtonSelection = 0;
+                else if (move == 3)
+                    padButtonSelection = 6;
+            }
+        }
+
+        // PreRace,        // set chickens ready
+        // Race,           // chickens run race
+        // PostRace,       // race finish, winner circle celebration
+        // Rewarding,      // bets settled, gold awarded, return to entering state
     }
 
     void UpdateSFX()
@@ -1054,12 +1153,20 @@ public class ChickenRaceManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 0)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "BET ON CHICKEN";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 0 &&
+                padMgr.gPadDown[0].aButton))
             {
                 raceState = RaceState.Betting;
                 raceStateTimer = 0.618f; //RACESTATETIMERMAX;
+                padButtonSelection = -1;
             }
         }
 
@@ -1134,9 +1241,16 @@ public class ChickenRaceManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 0)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "1";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 0 &&
+                padMgr.gPadDown[0].aButton))
             {
                 chickenPick = 0;
             }
@@ -1160,9 +1274,16 @@ public class ChickenRaceManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 1)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "2";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 1 &&
+                padMgr.gPadDown[0].aButton))
             {
                 chickenPick = 1;
             }
@@ -1185,9 +1306,16 @@ public class ChickenRaceManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 2)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "3";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 2 &&
+                padMgr.gPadDown[0].aButton))
             {
                 chickenPick = 2;
             }            
@@ -1224,27 +1352,49 @@ public class ChickenRaceManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 3)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "-";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 3 &&
+                padMgr.gPadDown[0].aButton))
             {
                 betAmount--;
                 if (betAmount < 0)
                     betAmount = 0;
+
+                // REVIEW: why do I need to consume input on gPadDown?
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    padMgr.gPadDown[0].aButton = false;
             }
             r.x = 0.7f * w;
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 4)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "+";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 4 &&
+                padMgr.gPadDown[0].aButton))
             {
                 betAmount++;
                 if (betAmount > currentGuest.playerData.gold)
                     betAmount = currentGuest.playerData.gold;
                 if (sfxAudio != null)
                     sfxAudio.StartSound("Coin Drop 1");
+
+                // REVIEW: why do I need to consume input on gPadDown?
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    padMgr.gPadDown[0].aButton = false;
             }
             // total bets on race
             r.x = 0.5875f * w;
@@ -1281,13 +1431,21 @@ public class ChickenRaceManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 5)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "LET'S RACE!";
             GUI.enabled = (chickenPick > -1 && betAmount > 0);
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 5 &&
+                padMgr.gPadDown[0].aButton))
             {
                 raceState = RaceState.PreRace;
                 raceStateTimer = 0.618f; //RACESTATETIMERMAX;
+                padButtonSelection = -1;
             }
             GUI.enabled = true;
             // cancel button
@@ -1301,11 +1459,19 @@ public class ChickenRaceManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
-            // TODO: gamepad 
+            if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 6)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "CANCEL BET";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padButtonSelection == 6 &&
+                padMgr.gPadDown[0].aButton))
             {
                 ResetChickenRace();
+                padButtonSelection = -1;
             }
             // player gold display
             r.x = 0.05f * w;
