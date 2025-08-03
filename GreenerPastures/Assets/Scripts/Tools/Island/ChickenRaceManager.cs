@@ -57,6 +57,8 @@ public class ChickenRaceManager : MonoBehaviour
         public Vector2 resetVector;
         public float startX;
         public float finishX;
+        public float lengthToFinish;
+        public float speedMultiplier;
     }
     public ChickenRunner[] chickens;
 
@@ -149,9 +151,9 @@ public class ChickenRaceManager : MonoBehaviour
 
             // chickens init
             chickens = new ChickenRunner[3];
-            chickens[0] = InitializeChicken("larry", new Vector2(0.17f, 0.525f), 0.175f, 0.78f);
-            chickens[1] = InitializeChicken("curly", new Vector2(0.09f, 0.6f), 0.15f, 0.81f);
-            chickens[2] = InitializeChicken("moe", new Vector2(0.2f, 0.67f), 0.125f, 0.835f);
+            chickens[0] = InitializeChicken("larry", new Vector2(0.17f, 0.525f), 0.175f, 0.8f);
+            chickens[1] = InitializeChicken("curly", new Vector2(0.09f, 0.6f), 0.15f, 0.8225f);
+            chickens[2] = InitializeChicken("moe", new Vector2(0.2f, 0.67f), 0.127f, 0.8525f);
         }
     }
 
@@ -308,6 +310,10 @@ public class ChickenRaceManager : MonoBehaviour
                     if (leavingGuest != null)
                     {
                         // customer has left, reset
+                        // ensure leaving customer not stuck
+                        leavingGuest.characterFrozen = false;
+                        leavingGuest.hidePlayerNameTag = false;
+                        leavingGuest.hidePlayerHUD = false;
                         leavingGuest = null;
                         guestState = GuestState.Default;
                         guestStateTimer = 0f;
@@ -341,7 +347,6 @@ public class ChickenRaceManager : MonoBehaviour
 
         return (currentGuest != null);
     }
-
 
     void HandleGuestStates()
     {
@@ -665,6 +670,9 @@ public class ChickenRaceManager : MonoBehaviour
             chickenMoveSpeed *= RandomSystem.GaussianRandom01();
             chickenMoveSpeed *= laneCheatMultiplier;
 
+            chickens[i].lengthToFinish = chickens[i].finishX - chickens[i].position.x;
+            chickens[i].speedMultiplier = laneCheatMultiplier;
+
             if (chickens[i].position.x > chickens[i].finishX)
                 chickens[i].animIndex = 0; // chicken chill
             else
@@ -681,9 +689,22 @@ public class ChickenRaceManager : MonoBehaviour
             float furthest = 0f;
             for (int i=0; i < 3; i++)
             {
-                if (chickens[i].position.x > furthest)
+                // PHOTO FINISH ACCURACY
+                // if all we do is check furthest, lane #3 will win more often
+                // lane #3 has the largest speed multiplier (lane cheat)
+                // so, it's x position is furthest, and technically ...
+                // even measuring distance past finish line will favor #3
+
+                // but, ...
+                // if we measure distance past finish line and then normalize for multiplier,
+                // we can find actual winner
+                float distancePastFinishLine = chickens[i].position.x - chickens[i].finishX;
+                distancePastFinishLine /= chickens[i].speedMultiplier;
+                // now normalized for speed multiplier
+
+                if (distancePastFinishLine > furthest)
                 {
-                    furthest = chickens[i].position.x;
+                    furthest = distancePastFinishLine;
                     chickenWinner = i; // winner declared
                 }
             }
