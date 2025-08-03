@@ -50,8 +50,6 @@ public class MagicManager : MonoBehaviour
     private bool castInstructionsDisplay;
     private bool playerCanCancel;
     private int selectedSpellCharge;
-    private int selectedSpellColumn;
-    private int selectedSpellRow;
     private GameObject castingCursor;
     private float castCursorSpeed = 3.81f;
     private CastData castData;
@@ -64,8 +62,7 @@ public class MagicManager : MonoBehaviour
 
     const float CASTMODECHANGETIME = 1f;
     const float SELECTIONINVALIDTIME = 1.5f;
-    const int SPELLLISTCOLUMNMAX = 2;
-    const int SPELLLISTROWMAX = 15;
+    const int SPELLLISTROWMAX = 14;
 
 
     void Start()
@@ -589,33 +586,46 @@ public class MagicManager : MonoBehaviour
         {
             // individual spell charges
             r.x = 0.25f * w;
-            r.y = 0.1f * h;
+            r.y = 0.1125f * h;
             r.width = 0.5f * w;
             r.height = 0.05f * h;
 
             c = Color.white;
             GUI.color = c;
             s = "Up - Down = Select, A Button to Target";
-            bool twoColumn = (pcm.playerData.magic.library.spellBook.Length - 1) >= SPELLLISTROWMAX;
 
-            if (twoColumn)
+            // dynamic layout for larger spell lists
+            int columns = 1;
+            int numberOfEntries = (pcm.playerData.magic.library.spellBook.Length - 1);
+            if (numberOfEntries >= SPELLLISTROWMAX)
+                columns = 2;
+            if (numberOfEntries >= SPELLLISTROWMAX * 2)
+                columns = 3;
+            if (columns > 1)
                 s = "Up - Down - Left - Right = Select, A Button to Target";
 
             GUI.Label(r, s, g);
-            r.x = 0.35f * w;
-            r.y += 0.05f * h;
-            r.width = 0.3f * w;
 
-            if (twoColumn)
-                r.x = 0.15f * w;
+            r.x = 0.4f * w;
+            r.y += 0.0625f * h;
+            r.width = 0.2f * w;
+
+            if (columns == 2)
+                r.x = 0.3f * w;
+            if (columns == 3)
+                r.x = 0.2f * w;
 
             for ( int i = 0; i < pcm.playerData.magic.library.spellBook.Length; i++ )
             {
-                if (i == SPELLLISTROWMAX)
-                {
+                if (i == SPELLLISTROWMAX || i == SPELLLISTROWMAX * 2)
+                    r.y = 0.175f * h;
+                if (columns == 2 && i == SPELLLISTROWMAX )
                     r.x = 0.55f * w;
-                    r.y = 0.15f * h;
-                }
+                if (columns == 3 && i == SPELLLISTROWMAX )
+                    r.x = 0.4f * w;
+                if (columns == 3 && i == SPELLLISTROWMAX * 2)
+                    r.x = 0.6f * w;
+
                 c = Color.white;
                 if (i != selectedSpellCharge &&
                     pcm.playerData.magic.library.spellBook[i].chargesAvailable == 0)
