@@ -448,19 +448,21 @@ public class GreenerGameManager : MonoBehaviour
                         Vector2 hide = Random.insideUnitCircle.normalized;
                         pos.x += hide.x * (range - 1f);
                         pos.z += hide.y * (range - 1f);
-                        wildPlot.transform.position = pos; // REVIEW: on the edge of the island?
+                        wildPlot.transform.position = pos;
                         // seedling growing , weighted random type
                         PlotManager plot = wildPlot.GetComponent<PlotManager>();
                         int rnd = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(),50);
                         GameObject plantObj = GameObject.Instantiate((GameObject)Resources.Load("Plant"));
                         plantObj.transform.parent = wildPlot.transform;
                         plantObj.transform.position = wildPlot.transform.position;
+                        plot.plant = plantObj;
                         plot.data.plant = PlantSystem.InitializePlant((PlantType)rnd);
                         plot.data.plant.growth = 0f;
                         plot.data.plant.quality = 0f;
                         plot.data.condition = PlotCondition.Growing;
+                        plot.data.soil = 0.5f;
                         //
-                        Destroy(wildPlot, 720f); // gone in half a day
+                        Destroy(wildPlot, 1440f); // gone in a day (stays overnight for dark plants)
                     }
                 }
             }

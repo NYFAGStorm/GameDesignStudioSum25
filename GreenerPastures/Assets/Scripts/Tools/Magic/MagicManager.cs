@@ -264,6 +264,9 @@ public class MagicManager : MonoBehaviour
     {
         bool retBool = false;
 
+        // validate not already held in place for another action (crafting, martket, etc)
+        if (pcm.characterFrozen || pcm.freezeCharacterActions)
+            return retBool;
         // validate has at least one spell charge in spell book
         if ( pcm.playerData.magic.library.spellBook == null || pcm.playerData.magic.library.spellBook.Length == 0 )
             return retBool;
