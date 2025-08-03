@@ -112,7 +112,7 @@ public class IslandManager : MonoBehaviour
                                     pos.z = cm.casts[t].posZ;
                                     burstVFX.transform.position = pos;
                                     burstVFX.transform.parent = lightingObject.transform;
-                                    Destroy(burstVFX, 5f);
+                                    Destroy(burstVFX, 8f);
                                 }
                                 if (cm.casts[t].type == SpellType.FogOfWar)
                                 {
@@ -124,7 +124,7 @@ public class IslandManager : MonoBehaviour
                                     pos.z = cm.casts[t].posZ;
                                     burstVFX.transform.position = pos;
                                     burstVFX.transform.parent = lightingObject.transform;
-                                    Destroy(burstVFX, 5f);
+                                    Destroy(burstVFX, 8f);
                                 }
                             }
                         }

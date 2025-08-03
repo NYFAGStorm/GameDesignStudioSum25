@@ -540,7 +540,8 @@ public class MarketManager : MonoBehaviour
                     {
                         currentCustomer.playerData.gold -= Mathf.RoundToInt(menuItems[menuItemSelection].buyItemValue * discountBuy);
                         // take coupon
-                        currentCustomer.playerData.inventory = InventorySystem.RemoveItemFromInventory(currentCustomer.playerData.inventory, currentCustomer.GetPlayerCurrentItemSelection() );
+                        if (coupon != null && coupon.type == ItemType.Coupon)
+                            currentCustomer.playerData.inventory = InventorySystem.RemoveItemFromInventory(currentCustomer.playerData.inventory, currentCustomer.GetPlayerCurrentItemSelection() );
                     }
                     else
                         currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;

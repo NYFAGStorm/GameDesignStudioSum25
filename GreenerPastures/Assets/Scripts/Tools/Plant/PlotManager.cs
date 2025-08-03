@@ -731,7 +731,8 @@ public class PlotManager : MonoBehaviour
             return;
 
         // cannot harvest unless a plant exists, plant at 100% growth and not yet harvested
-        if (plant == null || data.plant.growth < 1f || (data.plant.isHarvested && !data.plant.canReFruit))
+        if (plant == null || data.plant.growth < 1f || 
+            (data.plant.isHarvested && !data.plant.canReFruit && !FarmSystem.PlotHasEffect(data,PlotEffect.BlessedSpring)))
             return;
 
         if (!autoHarvestOnce && action != CurrentAction.Harvesting && action != CurrentAction.None)
@@ -750,7 +751,7 @@ public class PlotManager : MonoBehaviour
             // harvest if plant is 100% grown and not yet harvested
             if (data.plant.growth < 1f)
                 return;
-            if (!data.plant.isHarvested || data.plant.canReFruit)
+            if (!data.plant.isHarvested || data.plant.canReFruit || FarmSystem.PlotHasEffect(data, PlotEffect.BlessedSpring))
             {
                 // PLAYER STATS:
                 if (currentPlayer != null)

@@ -672,6 +672,10 @@ public class CastManager : MonoBehaviour
                         marketValue += mm.GetFinalMarketSellValue(looseItems[i].looseItem.inv.items[0]);
                     // remove item
                     Destroy(looseItems[i].gameObject, 0.01f);
+                    // xp award for selling to market
+                    PlayerControlManager localPlayer = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                    if (localPlayer != null)
+                        localPlayer.AwardXP(PlayerData.XP_SELLTOSHOP);
                 }
             }
             ItemSpawnManager ism = GameObject.FindFirstObjectByType<ItemSpawnManager>();
