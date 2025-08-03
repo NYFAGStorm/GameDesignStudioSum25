@@ -1270,7 +1270,7 @@ public class MarketManager : MonoBehaviour
 
             if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
                 continue;
-            if (i > maxMenuListPerLevel[currentCustomer.playerData.level])
+            if (i > maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level, 0, 9)])
                 continue;
 
             c = new Color(0.381f, 0.381f, 0.381f, 0.618f);

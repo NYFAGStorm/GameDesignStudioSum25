@@ -328,6 +328,7 @@ public class PlayerControlManager : MonoBehaviour
         // NOTE: if loose item active, skip plot activity altogether
 
         bool hadActivePlot = (activePlot != null);
+        
         // clear active plot if moving
         ClearActivePlot();
         // check near plot
