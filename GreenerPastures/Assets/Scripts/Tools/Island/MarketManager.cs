@@ -1450,7 +1450,7 @@ public class MarketManager : MonoBehaviour
         r.height = 0.05f * h;
         g = new GUIStyle(GUI.skin.button);
         if (padMgr != null && padMgr.gamepads[0].isActive)
-            g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
+            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
         else
             g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
@@ -1467,7 +1467,8 @@ public class MarketManager : MonoBehaviour
             s += "\n[BACK BUTTON]";
 
         GUI.enabled = (customerMode == CustomerMode.Default);
-        if (GUI.Button(r,s,g))
+        if (GUI.Button(r,s,g) || (padMgr != null &&
+            padMgr.gamepads[0].isActive && padMgr.gPadDown[0].backButton))
         {
             marketState = MarketState.Exiting;
             marketStateTimer = MARKETSTATETIMERMAX;

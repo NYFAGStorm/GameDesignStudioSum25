@@ -39,9 +39,15 @@ public class ArcanaSkilManager : MonoBehaviour
     private float confirmPopTimer;
     private AnimationCurve popCurve;
 
+    private MultiGamepad padMgr;
+    private int popSelectionButton;
+
+    private Texture2D[] buttonTex;
+
     const float PLAYERCHECKTIME = 1f;
     const float PLAYERPROXIMITY = 1f;
     const string DEFAULTINSTRUCTIONS = "WASD to explore skills\nPress ENTER to purchase";
+    const string DEFAULTGPADINSTRUCTIONS = "Left stick to explore skills\nPress A button to purchase";
     const float FEEDBACKTIME = 3f;
     const float CONFIRMPOPTIME = 1f;
 
@@ -50,6 +56,9 @@ public class ArcanaSkilManager : MonoBehaviour
     void Start()
     {
         // validate
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if (padMgr == null)
+            Debug.LogWarning("--- ArcanaSkillManager [Start] : no multi gamepad found. will ignore.");
         // initialize
         if (enabled)
         {
@@ -59,7 +68,18 @@ public class ArcanaSkilManager : MonoBehaviour
 
             playerCheckTimer = PLAYERCHECKTIME;
             skillInstructions = DEFAULTINSTRUCTIONS;
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                skillInstructions = DEFAULTGPADINSTRUCTIONS;
             popCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+            // GUI Button Textures for build
+            if (!Application.isEditor)
+            {
+                buttonTex = new Texture2D[3];
+                buttonTex[0] = (Texture2D)Resources.Load("Button_Normal");
+                buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
+                buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
+            }
         }
     }
 
@@ -216,6 +236,8 @@ public class ArcanaSkilManager : MonoBehaviour
                 currentSkillNode = 0;
                 feedbackTimer = 0f;
                 skillInstructions = DEFAULTINSTRUCTIONS;
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    skillInstructions = DEFAULTGPADINSTRUCTIONS;
                 displaySkillTree = true;
             }
         }
@@ -250,12 +272,25 @@ public class ArcanaSkilManager : MonoBehaviour
             }
         }
 
+        if (confirmPopTimer > 0f || confirmSlideDown)
+        {
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+            {
+                if (padMgr.gPadDown[0].XaxisL < 0f)
+                    popSelectionButton = 0;
+                if (padMgr.gPadDown[0].XaxisL > 0f)
+                    popSelectionButton = 1;
+            }
+            return;
+        }
+
         if (confirmSlideDown || confirmPopTimer > 0f)
             return; // hold player control during confirm
 
         // keyboard purchase of skill
         // enter
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) || (padMgr != null && 
+            padMgr.gamepads[0].isActive && padMgr.gPadDown[0].aButton))
         {
             if (nodes[currentSkillNode].acquired)
             {
@@ -272,13 +307,25 @@ public class ArcanaSkilManager : MonoBehaviour
 
             // launch confirm popup
             confirmPopTimer = CONFIRMPOPTIME;
+            popSelectionButton = -1;
 
             return;
         }
 
         // keybvoard navigation of skill tree
-        // WASD
+        // Gamepad or WASD
         int move = -1;
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+        {
+            if (padMgr.gPadDown[0].YaxisL > 0f)
+                move = 0;
+            if (padMgr.gPadDown[0].YaxisL < 0f)
+                move = 1;
+            if (padMgr.gPadDown[0].XaxisL < 0f)
+                move = 2;
+            if (padMgr.gPadDown[0].XaxisL > 0f)
+                move = 3;
+        }
         if (Input.GetKeyDown(KeyCode.W))
             move = 0;
         if (Input.GetKeyDown(KeyCode.S))
@@ -375,12 +422,18 @@ public class ArcanaSkilManager : MonoBehaviour
             r.width = 0.2f * w;
             r.height = 0.05f * h;
             GUIStyle gs = new GUIStyle(GUI.skin.button);
-            gs.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                gs.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+            else
+                gs.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
             gs.normal.textColor = Color.white;
             gs.hover.textColor = Color.white;
             gs.active.textColor = Color.yellow;
             string ls = "ENTER SKILL TREE";
-            if (GUI.Button(r, ls, gs))
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                ls += "\n[A BUTTON]";
+            if (GUI.Button(r, ls, gs) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && padMgr.gPadDown[0].aButton))
             {
                 skillPurchasing = true;
                 currentPlayer.characterFrozen = true;
@@ -586,26 +639,47 @@ public class ArcanaSkilManager : MonoBehaviour
             r.width = .1f * w;
             r.height = .05f * h;
             g = new GUIStyle(GUI.skin.button);
-            g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+            else
+                g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
+            if (padMgr != null && padMgr.gamepads[0].isActive && popSelectionButton == 0)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "CONFIRM";
             GUI.enabled = (confirmPopTimer == 0f);
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && popSelectionButton == 0 &&
+                padMgr.gPadDown[0].aButton))
             {
                 PurchaseSkill(currentSkillNode);
                 confirmPopTimer = CONFIRMPOPTIME;
+                popSelectionButton = -1;
             }
             // cancel button
             r.x = 0.55f * w;
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.yellow;
+            if (padMgr != null && padMgr.gamepads[0].isActive && popSelectionButton == 1)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "CANCEL";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive && popSelectionButton == 1 && 
+                padMgr.gPadDown[0].aButton))
             {
                 confirmPopTimer = CONFIRMPOPTIME;
+                popSelectionButton = -1;
             }
         }
 
@@ -615,13 +689,25 @@ public class ArcanaSkilManager : MonoBehaviour
         r.width = 0.2f * w;
         r.height = 0.05f * h;
         g = new GUIStyle(GUI.skin.button);
-        g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        else
+            g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.white;
         g.active.textColor = Color.yellow;
+        if (!Application.isEditor)
+        {
+            g.normal.background = buttonTex[0];
+            g.hover.background = buttonTex[1];
+            g.active.background = buttonTex[2];
+        }
         s = "EXIT SKILL TREE";
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            s += "\n[BACK BUTTON]";
         GUI.enabled = (!confirmSlideDown && confirmPopTimer == 0f);
-        if (GUI.Button(r,s,g))
+        if (GUI.Button(r,s,g) || (padMgr != null &&
+            padMgr.gamepads[0].isActive && padMgr.gPadDown[0].backButton))
         {
             skillPurchasing = false;
             displaySkillTree = false;

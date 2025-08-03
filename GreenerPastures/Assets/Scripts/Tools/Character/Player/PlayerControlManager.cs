@@ -1194,7 +1194,7 @@ public class PlayerControlManager : MonoBehaviour
             characterActions.rBump = padMgr.gamepads[0].RBump;
             characterActions.rBumpDown = padMgr.gPadDown[0].RBump;
             // REVIEW: cast magic control on gamepad is pressing D pad down
-            characterActions.castMagic = padMgr.gPadDown[0].DpadPress;
+            characterActions.castMagic = padMgr.gPadDown[0].DpadLeft;
         }
     }
 

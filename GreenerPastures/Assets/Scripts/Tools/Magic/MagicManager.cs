@@ -467,7 +467,7 @@ public class MagicManager : MonoBehaviour
             return;
         // detect player control signal to cancel
         if ( Input.GetKeyDown(pcm.castKey) || (padMgr != null && 
-            padMgr.gamepads[0].isActive && padMgr.gPadDown[0].DpadPress) )
+            padMgr.gamepads[0].isActive && padMgr.gPadDown[0].DpadLeft) )
             CancelCasting();
     }
 
@@ -566,7 +566,7 @@ public class MagicManager : MonoBehaviour
         GUI.color = c;
         if (padMgr != null && padMgr.gamepads[0].isActive)
         {
-            g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+            g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
             s = "CANCEL CAST\n[BACK BUTTON]";
         }
         GUI.enabled = (playerCanCancel);
