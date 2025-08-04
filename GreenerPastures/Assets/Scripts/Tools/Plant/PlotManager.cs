@@ -82,7 +82,7 @@ public class PlotManager : MonoBehaviour
     // 
     const float ACTIONCOMPLETEDURATION = 0.618f;
     const float HARVESTDISPLAYDURATION = 2f;
-    const float SOILBUFFDISPLAYDURATION = 2f;
+    const float SOILBUFFDISPLAYDURATION = 3f;
     const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
 
     const float MASTERPLANTPROGRESSRATE = 0.000618f;
