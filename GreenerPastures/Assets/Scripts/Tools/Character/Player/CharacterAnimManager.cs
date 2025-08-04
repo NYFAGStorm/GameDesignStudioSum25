@@ -5,6 +5,13 @@ public class CharacterAnimManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles the animation of a character, as directed by character control
 
+    public enum NPC
+    {
+        Default,
+        Eden,
+        Salesman
+    }
+
     public enum CharacterPose
     {
         Default,
@@ -15,10 +22,13 @@ public class CharacterAnimManager : MonoBehaviour
     public PlayerModelType type;
     public CharacterPose pose;
     public Vector3 characterMoveVector; // animation operates from this updated move vector
+
+    public bool singleLayerCharacter;
+    public NPC character;
     
     private bool imageFlipped;
     private Renderer rend;
-    private Texture2D[] characterLayers;
+    public Texture2D[] characterLayers;
     private CharacterPose previousPose;
 
 
@@ -79,6 +89,15 @@ public class CharacterAnimManager : MonoBehaviour
         if (previousPose == pose)
             return;
 
+        if (singleLayerCharacter)
+        {
+            int posIndex = 0;
+            if (pose == CharacterPose.Side)
+                posIndex = 1;
+            rend.material.SetTexture("_MainTex", characterLayers[posIndex]);
+            return;
+        }
+
         int idx = 0;
         if (pose == CharacterPose.Side)
             idx += 6;
@@ -108,7 +127,7 @@ public class CharacterAnimManager : MonoBehaviour
         rend.material.SetTextureScale("_MainTex", flipVec);
     }
 
-    public void ConfigureAppearance( PlayerOptions options )
+    public void ConfigureAppearance(PlayerOptions options)
     {
         if (rend == null)
         {
@@ -122,6 +141,26 @@ public class CharacterAnimManager : MonoBehaviour
         // un-flip to configure appearance
         imageFlipped = false;
         HandleImageFlip();
+
+        if (singleLayerCharacter)
+        {
+            characterLayers = new Texture2D[2];
+            if (character == NPC.Eden)
+            {
+                characterLayers[0] = (Texture2D)Resources.Load("Eden/NPC_Eden_Front");
+                characterLayers[1] = (Texture2D)Resources.Load("Eden/NPC_Eden_Side");
+                rend.material.SetTexture("_MainTex", characterLayers[0]);
+                rend.material.SetColor("_Color", Color.white);
+            }
+            if (character == NPC.Salesman)
+            {
+                characterLayers[0] = (Texture2D)Resources.Load("Salesman/NPC_Salesman_Front");
+                characterLayers[1] = (Texture2D)Resources.Load("Salesman/NPC_Salesman_Side");
+                rend.material.SetTexture("_MainTex", characterLayers[0]);
+                rend.material.SetColor("_Color", Color.white);
+            }
+            return;
+        }
 
         type = options.model;
 

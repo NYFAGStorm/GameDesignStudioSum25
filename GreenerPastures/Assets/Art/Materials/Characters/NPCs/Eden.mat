@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Eden
-  m_Shader: {fileID: 4800000, guid: ed358c81f60c6994a9bf3d930f87b36b, type: 3}
+  m_Shader: {fileID: 4800000, guid: 9b11bdf1272ed2b4ea08e40785873c24, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -60,7 +60,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 9d59d39186d870242ba01f7f96bca647, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9918d2770b08952498be404f3114a14a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: -0.01}
     - _MetallicGlossMap:
@@ -100,7 +100,7 @@ Material:
     m_Colors:
     - _AccentCol: {r: 0.9, g: 0.9, b: 0.618, a: 1}
     - _AltCol: {r: 0.618, g: 0.8, b: 0.618, a: 1}
-    - _Color: {r: 0, g: 0.618, b: 0.381, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HairCol: {r: 0.95, g: 0.95, b: 0.8, a: 1}
     - _SkinCol: {r: 0.95, g: 0.9, b: 0.8, a: 1}

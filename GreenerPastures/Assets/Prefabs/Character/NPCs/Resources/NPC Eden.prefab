@@ -149,4 +149,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85931b8183899594a9544231b04ed4b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageFlipped: 0
+  type: 0
+  pose: 0
+  characterMoveVector: {x: 0, y: 0, z: 0}
+  singleLayerCharacter: 1
+  character: 1
+  characterLayers: []
