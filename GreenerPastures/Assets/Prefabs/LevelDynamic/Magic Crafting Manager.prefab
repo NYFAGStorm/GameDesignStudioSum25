@@ -47,8 +47,8 @@ MonoBehaviour:
   libraryState: 0
   craftState: 0
   grimoireBackground: {fileID: 0}
-  cauldronBackgroundDark: {fileID: 2800000, guid: 753ae5f491234ea42869ed3755f4d594, type: 3}
-  cauldronBackgroundLight: {fileID: 2800000, guid: cca914ebf387d7d4ea9fda464d403773, type: 3}
+  cauldronBackgroundDark: {fileID: 2800000, guid: 948a9d9c852534d42aefbac3f7a42f1a, type: 3}
+  cauldronBackgroundLight: {fileID: 2800000, guid: ccd6488cb6e986941b82f2273c64d701, type: 3}
   cauldronBubbles:
   - {fileID: 2800000, guid: 3ed02bec2f14f4b4eb96d4c7b26b7c63, type: 3}
   - {fileID: 2800000, guid: ecf992714f1ce2742bcab75d1440ccd3, type: 3}
