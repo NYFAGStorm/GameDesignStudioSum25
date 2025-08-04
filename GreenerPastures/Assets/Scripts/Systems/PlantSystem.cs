@@ -217,14 +217,12 @@ public static class PlantSystem
             case PlantType.Lotus:
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = .75f;
-                retData.canReFruit = true;
                 retData.fallVitality = .5f;
                 retData.winterVitality = .5f;
                 break;
             case PlantType.Marigold:
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = .75f;
-                retData.canReFruit = true;
                 retData.fallVitality = .75f;
                 retData.winterVitality = .5f;
                 break;
@@ -256,7 +254,6 @@ public static class PlantSystem
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = .75f;
                 retData.isDarkPlant = true;
-                retData.canReFruit = true;
                 retData.springVitality = .75f;
                 retData.summerVitality = .75f;
                 retData.fallVitality = 1f;
@@ -267,7 +264,6 @@ public static class PlantSystem
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = 1f;
                 retData.isDarkPlant = true;
-                retData.canReFruit = true;
                 retData.springVitality = .5f;
                 retData.summerVitality = .5f;
                 retData.fallVitality = .75f;
