@@ -292,6 +292,13 @@ public class ArcanaSkilManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return) || (padMgr != null && 
             padMgr.gamepads[0].isActive && padMgr.gPadDown[0].aButton))
         {
+            if (nodes[currentSkillNode].parent > -1 && 
+                !nodes[nodes[currentSkillNode].parent].acquired)
+            {
+                skillInstructions = "Skill '" + nodes[currentSkillNode].name + "'\nis not accessible yet";
+                feedbackTimer = FEEDBACKTIME;
+                return;
+            }
             if (nodes[currentSkillNode].acquired)
             {
                 skillInstructions = "Skill '" + nodes[currentSkillNode].name + "'\nalready acquired";
@@ -347,7 +354,7 @@ public class ArcanaSkilManager : MonoBehaviour
                 currentSkillNode += 5;
             if (currentSkillNode > 15)
                 currentSkillNode = 15;
-            if (move == 3 && nodes[currentSkillNode].acquired)
+            if (move == 3)
                 currentSkillNode += 1;
             return;
         }
@@ -364,7 +371,7 @@ public class ArcanaSkilManager : MonoBehaviour
                 else
                     currentSkillNode -= 2;
             }
-            if (move == 3 && nodes[currentSkillNode].acquired)
+            if (move == 3)
                 currentSkillNode += 2;
             return;
         }
@@ -509,11 +516,22 @@ public class ArcanaSkilManager : MonoBehaviour
                 g.hover.textColor = Color.white;
                 g.active.textColor = Color.white;
             }
-            if (currentSkillNode == i && (confirmPopTimer == 0f && !confirmSlideDown))
+            if (currentSkillNode == i &&
+                (confirmPopTimer == 0f && !confirmSlideDown))
             {
-                g.normal.textColor = Color.yellow;
-                g.hover.textColor = Color.yellow;
-                g.active.textColor = Color.yellow;
+                if (nodes[i].parent == -1 || 
+                    nodes[nodes[i].parent].acquired)
+                {
+                    g.normal.textColor = Color.yellow;
+                    g.hover.textColor = Color.yellow;
+                    g.active.textColor = Color.yellow;
+                }
+                else
+                {
+                    g.normal.textColor = Color.white;
+                    g.hover.textColor = Color.white;
+                    g.active.textColor = Color.white;
+                }
             }
             s = nodes[i].name;
             GUI.Label(r, s, g);
@@ -545,9 +563,19 @@ public class ArcanaSkilManager : MonoBehaviour
         g.alignment = TextAnchor.MiddleCenter;
         g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
         g.fontStyle = FontStyle.Italic;
-        g.normal.textColor = Color.yellow;
-        g.hover.textColor = Color.yellow;
-        g.active.textColor = Color.yellow;
+        if (nodes[currentSkillNode].parent == -1 ||
+                    nodes[nodes[currentSkillNode].parent].acquired)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
+        else
+        {
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.white;
+        }
         s = skillTree.skills[currentSkillNode].description;
         GUI.Label(r, s, g);
 
