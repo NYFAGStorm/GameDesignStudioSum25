@@ -23,8 +23,8 @@ public class InGameAlmanac : MonoBehaviour
     private QuitOnEscape qoe;
     private InGameControls igc;
 
-    private int padButtonSelection = -1;
-    private int padMaxButton = 1;
+    // private int padSelectionButton = -1;
+    // private int padMaxSelection;
 
     private Texture2D[] buttonTex;
 

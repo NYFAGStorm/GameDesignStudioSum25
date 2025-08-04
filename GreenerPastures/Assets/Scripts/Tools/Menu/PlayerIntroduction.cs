@@ -111,7 +111,6 @@ public class PlayerIntroduction : MonoBehaviour
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
-    private int padMaxButton = 6;
 
     private AudioManager sfxAudio;
 
