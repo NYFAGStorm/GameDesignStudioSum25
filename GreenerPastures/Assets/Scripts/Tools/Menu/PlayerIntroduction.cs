@@ -109,6 +109,10 @@ public class PlayerIntroduction : MonoBehaviour
 
     private Texture2D[] buttonTex;
 
+    private MultiGamepad padMgr;
+    private int padButtonSelection = -1;
+    private int padMaxButton = 6;
+
     private AudioManager sfxAudio;
 
     private bool mirrormirror;
@@ -122,6 +126,9 @@ public class PlayerIntroduction : MonoBehaviour
     void Start()
     {
         // validate
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if (padMgr == null)
+            Debug.LogWarning("--- PlayerIntroduction [Start] : no gamepad manager found in scene. will ignore.");
         GameObject sfxObj = GameObject.Find("AudioMgr SFX");
         if (sfxObj != null)
             sfxAudio = sfxObj.GetComponent<AudioManager>();
@@ -891,7 +898,10 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].name = "'Now you try'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
-            "Now you try. You can use your action key 'E' to till and plant this plot.";
+            "Now you try. You can use your action key 'E' to both till and plant this plot.";
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            introBeats[beat].dialogLine =
+                "Now you try. You can use your 'A Button' to both till and plant this plot.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         introBeats[beat].name = "help message action button";
@@ -1038,6 +1048,125 @@ public class PlayerIntroduction : MonoBehaviour
 
     void Update()
     {
+        // handle gamepad controls intro pop
+        if (introPop && padMgr != null && padMgr.gamepads[0].isActive)
+        {
+            int move = -1;
+            if (padMgr.gPadDown[0].YaxisL > 0f)
+                move = 0; // up
+            if (padMgr.gPadDown[0].YaxisL < 0f)
+                move = 1; // down
+            if (padMgr.gPadDown[0].XaxisL < 0f)
+                move = 2; // left
+            if (padMgr.gPadDown[0].XaxisL > 0f)
+                move = 3; // right
+            if (move > -1)
+            {
+                if (padButtonSelection == -1)
+                    padButtonSelection = 0;
+                else if (move == 0 && padButtonSelection > 0)
+                    padButtonSelection--;
+                else if (move == 1 && padButtonSelection < 5)
+                    padButtonSelection++;
+                else if (move == 1 && configValid && padButtonSelection == 5)
+                    padButtonSelection = 6;
+                else if (move == 2)
+                {
+                    if (padButtonSelection == 0)
+                    {
+                        modelSelection--;
+                        if (modelSelection < 0)
+                            modelSelection = characterLines.Length - 1;
+                        configsTouched[0] = true;
+                    }
+                    else if (padButtonSelection == 1)
+                    {
+                        hairSelection--;
+                        if (hairSelection < 0)
+                            hairSelection = characterHairShades.Length - 1;
+                        configsTouched[1] = true;
+                    }
+                    else if (padButtonSelection == 2)
+                    {
+                        skinSelection--;
+                        if (skinSelection < 0)
+                            skinSelection = characterSkinTones.Length - 1;
+                        configsTouched[2] = true;
+                    }
+                    else if (padButtonSelection == 3)
+                    {
+                        fillSelection--;
+                        if (fillSelection < 0)
+                            fillSelection = characterColors.Length - 1;
+                        configsTouched[3] = true;
+                    }
+                    else if (padButtonSelection == 4)
+                    {
+                        secondarySelection--;
+                        if (secondarySelection < 0)
+                            secondarySelection = characterColors.Length - 1;
+                        configsTouched[4] = true;
+                    }
+                    else if (padButtonSelection == 5)
+                    {
+                        accentSelection--;
+                        if (accentSelection < 0)
+                            accentSelection = characterColors.Length - 1;
+                        configsTouched[5] = true;
+                    }
+                }
+                else if (move == 3)
+                {
+                    if (padButtonSelection == 0)
+                    {
+                        modelSelection++;
+                        if (modelSelection > characterLines.Length - 1)
+                            modelSelection = 0;
+                        configsTouched[0] = true;
+                    }
+                    else if (padButtonSelection == 1)
+                    {
+                        hairSelection++;
+                        if (hairSelection > characterHairShades.Length - 1)
+                            hairSelection = 0;
+                        configsTouched[1] = true;
+                    }
+                    else if (padButtonSelection == 2)
+                    {
+                        skinSelection++;
+                        if (skinSelection > characterSkinTones.Length - 1)
+                            skinSelection = 0;
+                        configsTouched[2] = true;
+                    }
+                    else if (padButtonSelection == 3)
+                    {
+                        fillSelection++;
+                        if (fillSelection > characterColors.Length - 1)
+                            fillSelection = 0;
+                        configsTouched[3] = true;
+                    }
+                    else if (padButtonSelection == 4)
+                    {
+                        secondarySelection++;
+                        if (secondarySelection > characterColors.Length - 1)
+                            secondarySelection = 0;
+                        configsTouched[4] = true;
+                    }
+                    else if (padButtonSelection == 5)
+                    {
+                        accentSelection++;
+                        if (accentSelection > characterColors.Length - 1)
+                            accentSelection = 0;
+                        configsTouched[5] = true;
+                    }
+                }
+
+                // consuming input, but why?
+                padMgr.gPadDown[0].YaxisL = 0f;
+                padMgr.gPadDown[0].XaxisL = 0f;
+            }
+        }
+
         // handle intro dialog step
         if (cancelIntro)
         {
@@ -1711,21 +1840,33 @@ public class PlayerIntroduction : MonoBehaviour
             {
                 case IntroHelpMessage.MoveControls:
                     s = "Move your character\nwith W-A-S-D";
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        s = "Move your character\nwith left joystick";
                     break;
                 case IntroHelpMessage.ActionButton:
                     s = "Your action button\nis E";
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        s = "Your action button\nis A button";
                     break;
                 case IntroHelpMessage.InventorySelect:
                     s = "Use [ and ] to select\nitems in your inventory";
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        s = "Use L and R bump to select\nitems in your inventory";
                     break;
                 case IntroHelpMessage.DropButton:
                     s = "Use C to drop your\ncurrently selected item";
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        s = "Use X to drop your\ncurrently selected item";
                     break;
                 case IntroHelpMessage.ControlsDisplay:
                     s = "All player controls are\ndisplayed by holding TAB";
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        s = "All player controls are\ndisplayed by holding LT";
                     break;
                 case IntroHelpMessage.AlmanacDisplay:
                     s = "You may toggle the\nBiomancer's Almanac with \\";
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        s = "You may toggle the\nBiomancer's Almanac with RT";
                     break;
                 default:
                     break;
@@ -1757,7 +1898,10 @@ public class PlayerIntroduction : MonoBehaviour
             r.width = 0.1f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.button);
-            g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                g.fontSize = Mathf.RoundToInt(10f * (w / 1024f));
+            else
+                g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
             g.alignment = TextAnchor.MiddleCenter;
             g.normal.textColor = Color.white;
@@ -1771,10 +1915,17 @@ public class PlayerIntroduction : MonoBehaviour
             }
             GUI.color = Color.white;
             s = "SKIP INTRO";
-            if (GUI.Button(r, s, g))
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                s += "\n[BACK BUTTON]";
+            if (GUI.Button(r, s, g) ||
+                (padMgr != null && padMgr.gamepads[0].isActive && padMgr.gPadDown[0].backButton))
             {
                 cancelIntro = true;
                 canSkipIntro = false;
+
+                // consume input, but why?
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    padMgr.gPadDown[0].backButton = false;
             }
         }
 
@@ -1826,7 +1977,10 @@ public class PlayerIntroduction : MonoBehaviour
             r.width = 0.1f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.button);
-            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+            else
+                g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
             g.fontStyle = FontStyle.Normal;
             g.alignment = TextAnchor.MiddleCenter;
             if (!Application.isEditor)
@@ -1841,8 +1995,11 @@ public class PlayerIntroduction : MonoBehaviour
                 g.active.background = buttonTex[2];
             }
             s = "OK";
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                s += "\n[B BUTTON]";
             GUI.color = Color.white;
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) ||
+                (padMgr != null && padMgr.gamepads[0].isActive && padMgr.gPadDown[0].bButton))
             {
                 // next dialog
                 dialogPop = false;
@@ -1860,6 +2017,9 @@ public class PlayerIntroduction : MonoBehaviour
                     introPop = true;
                     return;
                 }
+                // consume, but why?
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    padMgr.gPadDown[0].bButton = false;
             }
         }
 
@@ -2002,26 +2162,98 @@ public class PlayerIntroduction : MonoBehaviour
         r.width = 0.3f * w;
         g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
         g.fontStyle = FontStyle.Bold;
+        if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 0)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
+        else
+        {
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+        }
         s = "PLAYER MODEL";
         GUI.Label(r, s, g);
         // hair shade label
         r.y += 0.075f * h;
+        if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 1)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
+        else
+        {
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+        }
         s = "HAIR SHADE";
         GUI.Label(r, s, g);
         // skin tone label
         r.y += 0.075f * h;
+        if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 2)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
+        else
+        {
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+        }
         s = "SKIN TONE";
         GUI.Label(r, s, g);
         // main color label
         r.y += 0.075f * h;
+        if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 3)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
+        else
+        {
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+        }
         s = "MAIN COLOR";
         GUI.Label(r, s, g);
         // secondary color label
         r.y += 0.075f * h;
+        if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 4)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
+        else
+        {
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+        }
         s = "SECONDARY COLOR";
         GUI.Label(r, s, g);
         // accent color label
         r.y += 0.075f * h;
+        if (padMgr != null && padMgr.gamepads[0].isActive && padButtonSelection == 5)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
+        else
+        {
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+        }
         s = "ACCENT COLOR";
         GUI.Label(r, s, g);
 
@@ -2178,6 +2410,13 @@ public class PlayerIntroduction : MonoBehaviour
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
+        if (padMgr != null && padMgr.gamepads[0].isActive &&
+            padButtonSelection == 6)
+        {
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+        }
         if (!Application.isEditor)
         {
             g.normal.background = buttonTex[0];
@@ -2186,7 +2425,9 @@ public class PlayerIntroduction : MonoBehaviour
         }
         s = "ACCEPT";
         GUI.enabled = configValid;
-        if (GUI.Button(r,s,g))
+        if (GUI.Button(r,s,g) || 
+            (padMgr != null && padMgr.gamepads[0].isActive && 
+            padButtonSelection == 6 && padMgr.gPadDown[0].aButton))
         {
             // store player options
             configOptions.model = (PlayerModelType)modelSelection + 1;
@@ -2225,6 +2466,10 @@ public class PlayerIntroduction : MonoBehaviour
             canSkipIntro = true;
             // indicaate player reponse has happened
             playerResponse = true;
+
+            // consuming input, but why?
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                padMgr.gPadDown[0].aButton = false;
         }
     }
 }

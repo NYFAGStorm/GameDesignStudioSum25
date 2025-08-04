@@ -75,7 +75,6 @@ public class ChickenRaceManager : MonoBehaviour
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
-    private int padMaxButton = 1;
 
     private QuitOnEscape qoe; // disable to suspend use of start button while in market
 
@@ -221,15 +220,11 @@ public class ChickenRaceManager : MonoBehaviour
         // handle control selection
 
         if (raceState == RaceState.Default || raceState == RaceState.Exiting)
-        {
-            padMaxButton = 0;
             padButtonSelection = -1;
-        }
 
         // Entering,       // instructions and option to exit here only
         if (raceState == RaceState.Entering)
         {
-            padMaxButton = 0;
             if (padMgr.gPadDown[0].YaxisL != 0f)
                 padButtonSelection = 0;
         }
@@ -237,7 +232,6 @@ public class ChickenRaceManager : MonoBehaviour
         // Betting,        // placing bet of gold and selecting chicken
         if (raceState == RaceState.Betting)
         {
-            padMaxButton = 6;
             int move = -1;
             if (padMgr.gPadDown[0].YaxisL > 0f)
                 move = 0; // up

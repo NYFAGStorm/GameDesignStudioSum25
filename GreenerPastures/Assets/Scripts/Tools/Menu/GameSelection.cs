@@ -210,7 +210,7 @@ public class GameSelection : MonoBehaviour
         if (gamePopup)
             padMaxButton = 6;
         else
-            padMaxButton = saveMgr.GetCurrentProfile().gameKeys.Length + 2;
+            padMaxButton = saveMgr.GetCurrentProfile().gameKeys.Length + 4;
 
         // determine ui selection from game pad input
         if (padMgr.gPadDown[0].YaxisL > 0f)
@@ -980,7 +980,7 @@ public class GameSelection : MonoBehaviour
         //
         r.y += 0.1f * h;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == (2 + gamelistNum + 0))
+        if (padButtonSelection == (3 + gamelistNum + 0))
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         s = "Submit A Friend Code (to JOIN a game)";
@@ -988,7 +988,7 @@ public class GameSelection : MonoBehaviour
         if (tinyPopup)
             GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
-            (padButtonSelection == (2 + gamelistNum + 1) && padMgr.gPadDown[0].aButton))
+            (padButtonSelection == (3 + gamelistNum + 1) && padMgr.gPadDown[0].aButton))
         {
             tinyPopup = true; // enter player character name
             saveMgr.StoreHostCode("");
@@ -1264,7 +1264,7 @@ public class GameSelection : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(backButtonFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == gamelistNum + 2)
+        if (padButtonSelection == gamelistNum + 4)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         if (!Application.isEditor)
@@ -1278,7 +1278,7 @@ public class GameSelection : MonoBehaviour
         if (tinyPopup)
             GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
-            padButtonSelection == gamelistNum+2 && padMgr.gPadDown[0].aButton)
+            padButtonSelection == gamelistNum+4 && padMgr.gPadDown[0].aButton)
         {
             SceneManager.LoadScene("Menu");
         }

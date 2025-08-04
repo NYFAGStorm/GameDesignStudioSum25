@@ -54,7 +54,7 @@ Material:
     - _HairFill:
         m_Texture: {fileID: 2800000, guid: 80e72be63fd875c42a9d15b45f884920, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     - _LineArt:
         m_Texture: {fileID: 2800000, guid: 358bc57a146c1ef4ebdb3594fdb50bb4, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -78,7 +78,7 @@ Material:
     - _SkinFill:
         m_Texture: {fileID: 2800000, guid: f56689fa082f9f148925786f5af794f5, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     m_Ints: []
     m_Floats:
     - _BumpScale: 1

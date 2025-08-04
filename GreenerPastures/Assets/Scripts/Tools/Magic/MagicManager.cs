@@ -295,6 +295,11 @@ public class MagicManager : MonoBehaviour
         modeChangeTimer = CASTMODECHANGETIME;
     }
 
+    public bool IsDisplayingMagic()
+    {
+        return (selectionDisplay || castInstructionsDisplay);
+    }
+
     void PlayerControlsAllowed( bool allowed )
     {
         pcm.characterFrozen = !allowed;

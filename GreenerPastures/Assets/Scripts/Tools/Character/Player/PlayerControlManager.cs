@@ -37,6 +37,7 @@ public class PlayerControlManager : MonoBehaviour
         public bool rBumpDown;
         public bool castMagic;
         public bool graftPlant;
+        public bool graftPlantDown;
     }
     // NOTE: not included are the number keys used to quick-select inventory slot
 
@@ -76,6 +77,7 @@ public class PlayerControlManager : MonoBehaviour
     private string letterMessage;
     private float letterPopupTimer;
     private AnimationCurve letterPopupCurve;
+    private bool letterPopOKSelected;
 
     private MultiGamepad padMgr;
 
@@ -247,9 +249,16 @@ public class PlayerControlManager : MonoBehaviour
                     letterPopsDown = false;
                     letterMessage = "";
                     letterPopup = false;
+                    letterPopOKSelected = false;
                 }
             }
         }
+        // letter pop gamepad support
+        if (letterPopup && !letterPopOKSelected &&
+            padMgr != null && padMgr.gamepads[0].isActive &&
+            padMgr.gPadDown[0].YaxisL != 0f)
+            letterPopOKSelected = true;
+
         // run grocery list timer
         if (groceryListTimer > 0f)
         {
@@ -1177,6 +1186,7 @@ public class PlayerControlManager : MonoBehaviour
         // REVIEW: no need for hold control of cast magic
         characterActions.castMagic = Input.GetKeyDown(castKey);
         characterActions.graftPlant = Input.GetKey(graftKey);
+        characterActions.graftPlantDown = Input.GetKeyDown(graftKey);
 
         if (padMgr != null && padMgr.gamepads[0].isActive)
         {
@@ -1193,8 +1203,11 @@ public class PlayerControlManager : MonoBehaviour
             characterActions.lBumpDown = padMgr.gPadDown[0].LBump;
             characterActions.rBump = padMgr.gamepads[0].RBump;
             characterActions.rBumpDown = padMgr.gPadDown[0].RBump;
-            // REVIEW: cast magic control on gamepad is pressing D pad down
+            // REVIEW: cast magic control on gamepad is pressing D pad left
             characterActions.castMagic = padMgr.gPadDown[0].DpadLeft;
+            // REVIEW: grafting control on gamepad is pressing D pad right
+            characterActions.graftPlant = padMgr.gamepads[0].DpadRight;
+            characterActions.graftPlantDown = padMgr.gPadDown[0].DpadRight;
         }
     }
 
@@ -1592,11 +1605,24 @@ public class PlayerControlManager : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.yellow;
             g.active.textColor = Color.white;
+            if (letterPopOKSelected)
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             s = "OK";
-            if (letterPopupTimer == 0f && GUI.Button(r,s,g))
+            if (letterPopupTimer == 0f && 
+                (GUI.Button(r,s,g) || 
+                (padMgr != null && padMgr.gamepads[0].isActive && 
+                letterPopOKSelected && padMgr.gPadDown[0].aButton)))
             {
                 letterPopupTimer = LETTERPOPUPTIME;
                 letterPopsDown = true;
+
+                // consuming input, but why?
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    padMgr.gPadDown[0].aButton = false;
             }
         }
 

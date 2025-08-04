@@ -18,9 +18,13 @@ public class InGameAlmanac : MonoBehaviour
     private int revealedEntryIndex = -1;
 
     private PlayerControlManager pcm;
+    private MagicManager mm;
     private MultiGamepad padMgr;
     private QuitOnEscape qoe;
     private InGameControls igc;
+
+    private int padButtonSelection = -1;
+    private int padMaxButton = 1;
 
     private Texture2D[] buttonTex;
 
@@ -141,13 +145,14 @@ public class InGameAlmanac : MonoBehaviour
             }
         }
 
-        if (igc.controlsDisplay)
+        if (igc.controlsDisplay || mm.IsDisplayingMagic())
         {
             showAlmanac = false;
             return;
         }
 
-        if ( Input.GetKeyDown(KeyCode.Backslash) )
+        if ( Input.GetKeyDown(KeyCode.Backslash) ||
+            (padMgr != null && padMgr.gamepads[0].isActive && padMgr.gPadDown[0].RTrigger > 0f))
         {
             showAlmanac = !showAlmanac;
             // control player hud
@@ -155,8 +160,11 @@ public class InGameAlmanac : MonoBehaviour
                 pcm.hidePlayerHUD = true;
             if (!showAlmanac && pcm.hidePlayerHUD)
                 pcm.hidePlayerHUD = false;
-        }
 
+            // REVIEW: why do I need to consume input on gPadDown?
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                padMgr.gPadDown[0].RTrigger = 0f;
+        }
     }
 
     /// <summary>
@@ -168,6 +176,7 @@ public class InGameAlmanac : MonoBehaviour
         if (pcm != null)
             return;
         pcm = pControlManager;
+        mm = pcm.gameObject.GetComponent<MagicManager>();
         updateAlmanac = true;
     }
 
@@ -230,7 +239,10 @@ public class InGameAlmanac : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.white;
-            s = "BIOMANCER'S\nALMANAC [\\]";
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                s = "BIOMANCER'S\nALMANAC [RT]";
+            else
+                s = "BIOMANCER'S\nALMANAC [\\]";
             GUI.Label(r, s, g);
             return;
         }

@@ -16,6 +16,7 @@ public class InGameControls : MonoBehaviour
     public ControlItem[] controlItems;
 
     private PlayerControlManager pcm;
+    private MagicManager mm;
     private MultiGamepad padMgr;
     private QuitOnEscape qoe;
     private InGameAlmanac iga;
@@ -51,17 +52,20 @@ public class InGameControls : MonoBehaviour
         if (pcm == null)
             return;
 
-        if (iga.showAlmanac)
+        if (iga.showAlmanac || mm.IsDisplayingMagic())
         {
             controlsDisplay = false;
             return;
         }
 
-        controlsDisplay = Input.GetKey(KeyCode.Tab);
+        controlsDisplay = (Input.GetKey(KeyCode.Tab) ||
+            (padMgr != null && padMgr.gamepads[0].isActive && padMgr.gamepads[0].LTrigger > 0f));
 
         // control player hud
         if (controlsDisplay && !pcm.hidePlayerHUD)
             pcm.hidePlayerHUD = true;
+        else if (pcm.hidePlayerHUD && padMgr != null && padMgr.gamepads[0].isActive && padMgr.gamepads[0].LTrigger == 0f)
+            pcm.hidePlayerHUD = false;
         else if (pcm.hidePlayerHUD && Input.GetKeyUp(KeyCode.Tab))
             pcm.hidePlayerHUD = false;
     }
@@ -71,6 +75,7 @@ public class InGameControls : MonoBehaviour
         if (pcm != null)
             return;
         pcm = pControlManager;
+        mm = pcm.gameObject.GetComponent<MagicManager>();
     }
 
     void ConfigureControlItems()
@@ -93,12 +98,12 @@ public class InGameControls : MonoBehaviour
         controlItems[4].controlName = "DIG UP PLANT";
         controlItems[4].keyboardLabel = "V Key";
         controlItems[4].gamepadLabel = "Y Button";
-        controlItems[5].controlName = "GRAFT FRUIT TO STALK";
-        controlItems[5].keyboardLabel = "G Key";
-        controlItems[5].gamepadLabel = "-TBD-";
-        controlItems[6].controlName = "CAST MAGIC SPELL";
-        controlItems[6].keyboardLabel = "Q Key";
-        controlItems[6].gamepadLabel = "D-Pad Press";
+        controlItems[5].controlName = "CAST MAGIC SPELL";
+        controlItems[5].keyboardLabel = "Q Key";
+        controlItems[5].gamepadLabel = "D-Pad Left";
+        controlItems[6].controlName = "GRAFT FRUIT TO STALK";
+        controlItems[6].keyboardLabel = "G Key";
+        controlItems[6].gamepadLabel = "D-Pad Right";
         controlItems[7].controlName = "SELECT NEXT INVENTORY ITEM";
         controlItems[7].keyboardLabel = "[ Key";
         controlItems[7].gamepadLabel = "Left Bump";
@@ -113,7 +118,7 @@ public class InGameControls : MonoBehaviour
         controlItems[10].gamepadLabel = "D-Pad Down";
         controlItems[11].controlName = "BIOMANCER'S ALMANAC";
         controlItems[11].keyboardLabel = "\\ Key";
-        controlItems[11].gamepadLabel = "BACK Button";
+        controlItems[11].gamepadLabel = "Right Trigger";
         controlItems[12].controlName = "QUIT GAME";
         controlItems[12].keyboardLabel = "ESC Key";
         controlItems[12].gamepadLabel = "START Button";
@@ -173,7 +178,10 @@ public class InGameControls : MonoBehaviour
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.white;
-            s = "CONTROLS [TAB]";
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                s = "CONTROLS [LT]";
+            else
+                s = "CONTROLS [TAB]";
             GUI.Label(r, s, g);
             return;
         }
