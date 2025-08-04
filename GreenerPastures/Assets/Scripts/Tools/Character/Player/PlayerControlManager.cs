@@ -960,6 +960,8 @@ public class PlayerControlManager : MonoBehaviour
 
         // pick up loose item, transfer to inventory
         playerInventory = InventorySystem.TakeItem(activeItem.looseItem, out activeItem.looseItem, playerInventory);
+        // auto-select pickup item in inventory
+        //currentInventorySelection = playerInventory.items.Length - 1;
         retBool = true;
 
         return retBool;
@@ -1265,6 +1267,8 @@ public class PlayerControlManager : MonoBehaviour
                 ism.SpawnItem(lid, gameObject.transform.position, pos, false);
             }
             AwardXP(PlayerData.XP_DROPITEM);
+            // auto-select last item in inventory
+            //currentInventorySelection = Mathf.Max(playerInventory.items.Length - 1, 0);
         }
     }
 
@@ -1348,19 +1352,22 @@ public class PlayerControlManager : MonoBehaviour
             {
                 if (playerInventory.items[i].type != ItemType.Default)
                 {
-                    // adjust smaller
-                    r.x += 0.005f * w;
-                    r.y += (0.005f * w);
-                    r.width -= (0.01f * w);
-                    r.height -= (0.01f * w);
-                    // draw inventory item
-                    t = alm.itemImages[alm.GetArtData(playerInventory.items[i].type, playerInventory.items[i].plant).artIndexBase];
-                    GUI.DrawTexture(r, t);
-                    // re-adjust larger again
-                    r.x -= 0.005f * w;
-                    r.y -= (0.005f * w);
-                    r.width += (0.01f * w);
-                    r.height += (0.01f * w);
+                    if (i != currentInventorySelection)
+                    {
+                        // adjust smaller
+                        r.x += 0.005f * w;
+                        r.y += (0.005f * w);
+                        r.width -= (0.01f * w);
+                        r.height -= (0.01f * w);
+                        // draw inventory item
+                        t = alm.itemImages[alm.GetArtData(playerInventory.items[i].type, playerInventory.items[i].plant).artIndexBase];
+                        GUI.DrawTexture(r, t);
+                        // re-adjust larger again
+                        r.x -= 0.005f * w;
+                        r.y -= (0.005f * w);
+                        r.width += (0.01f * w);
+                        r.height += (0.01f * w);
+                    }
                 }
             }
             // draw inventory slot frame
@@ -1371,6 +1378,24 @@ public class PlayerControlManager : MonoBehaviour
             GUI.color = c;
             GUI.DrawTexture(r, t);
             GUI.color = Color.white;
+            if (i == currentInventorySelection && 
+                playerInventory.items != null && playerInventory.items.Length > i &&
+                playerInventory.items[i].type != ItemType.Default)
+            {
+                float pulseSize = (Mathf.Sin(Time.time * 6.18f) * 0.00125f) + 0.00125f;
+                pulseSize = Mathf.RoundToInt(pulseSize * w);
+                r.x -= pulseSize;
+                r.y -= pulseSize;
+                r.width += (pulseSize * 2f);
+                r.height += (pulseSize * 2f);
+                // draw selected inventory larger over slot frame
+                t = alm.itemImages[alm.GetArtData(playerInventory.items[i].type, playerInventory.items[i].plant).artIndexBase];
+                GUI.DrawTexture(r, t);
+                r.x += pulseSize;
+                r.y += pulseSize;
+                r.width -= (pulseSize * 2f);
+                r.height -= (pulseSize * 2f);
+            }
         }
 
         // player stats display
