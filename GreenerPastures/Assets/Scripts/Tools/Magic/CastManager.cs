@@ -424,6 +424,7 @@ public class CastManager : MonoBehaviour
                     // Instantly increase soil quality (+50%)
                     // no plot effect
                     plots[i].data.soil += 0.5f;
+                    plots[i].GiveSoilBuff(0.5f);
                     plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil);
                     break;
                 case SpellType.BlessI:
@@ -472,6 +473,7 @@ public class CastManager : MonoBehaviour
                     break;
                 case SpellType.SoiledItII:
                     // Instantly maximize soil quality (100%)
+                    plots[i].GiveSoilBuff(1f);
                     plots[i].data.soil = 1f;
                     break;
                 case SpellType.EclipseI:
@@ -484,6 +486,7 @@ public class CastManager : MonoBehaviour
                     break;
                 case SpellType.DullEarth:
                     // Decrease soil quality of several plots (-50%)
+                    plots[i].GiveSoilBuff(-.5f);
                     plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil - .5f);
                     break;
                 case SpellType.BlessedSpring:

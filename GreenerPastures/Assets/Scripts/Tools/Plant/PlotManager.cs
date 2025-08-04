@@ -45,6 +45,8 @@ public class PlotManager : MonoBehaviour
     private float actionCompleteTimer;
 
     private float harvestDisplayTimer;
+    private float soilBuffDisplayTimer;
+    private float soilBuffAmount;
     private string plotPlantName;
     private float harvestQualityValue;
 
@@ -80,6 +82,7 @@ public class PlotManager : MonoBehaviour
     // 
     const float ACTIONCOMPLETEDURATION = 0.618f;
     const float HARVESTDISPLAYDURATION = 2f;
+    const float SOILBUFFDISPLAYDURATION = 2f;
     const float UPROOTEDPLOTPAUSE = 1.5f; // disallow dropped items after uprooted
 
     const float MASTERPLANTPROGRESSRATE = 0.000618f;
@@ -403,6 +406,16 @@ public class PlotManager : MonoBehaviour
         pcm.AwardXP(dropAward);
     }
 
+    /// <summary>
+    /// Displays a soil buff percentage above this plot
+    /// </summary>
+    /// <param name="buffAmount">percentage</param>
+    public void GiveSoilBuff( float buffAmount )
+    {
+        soilBuffAmount = buffAmount;
+        soilBuffDisplayTimer = SOILBUFFDISPLAYDURATION;
+    }
+
     void CheckCursor()
     {
         // ignore if not active
@@ -630,7 +643,9 @@ public class PlotManager : MonoBehaviour
                     plotTexture.material.mainTexture = (Texture2D)Resources.Load("Plot_Dirt");
                 data.condition = PlotCondition.Dirt;
                 // soil quality improved
-                data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
+                float rnd = (0.25f * RandomSystem.GaussianRandom01());
+                GiveSoilBuff(rnd);
+                data.soil = Mathf.Clamp01(data.soil + rnd);
                 break;
             case PlotCondition.Dirt:
                 // change ground texture
@@ -640,7 +655,9 @@ public class PlotManager : MonoBehaviour
                     plotTexture.material.mainTexture = (Texture2D)Resources.Load("Plot_Tilled");
                 data.condition = PlotCondition.Tilled;
                 // soil quality improved
-                data.soil = Mathf.Clamp01(data.soil + (0.25f * RandomSystem.GaussianRandom01()));
+                rnd = (0.25f * RandomSystem.GaussianRandom01());
+                GiveSoilBuff(rnd);
+                data.soil = Mathf.Clamp01(data.soil + rnd);
                 break;
             case PlotCondition.Tilled:
                 // skip if no seed
@@ -1142,7 +1159,8 @@ public class PlotManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (!cursorActive && !actionProgressDisplay && harvestDisplayTimer <= 0f)
+        if (!cursorActive && !actionProgressDisplay && 
+            harvestDisplayTimer <= 0f && soilBuffDisplayTimer <= 0f)
             return;
 
         Rect r = new Rect();
@@ -1159,6 +1177,32 @@ public class PlotManager : MonoBehaviour
         // locate display over plot
         Vector3 disp = Camera.main.WorldToViewportPoint(gameObject.transform.position);
         disp.y = (1f - disp.y);
+
+        if (harvestDisplayTimer == 0f && soilBuffDisplayTimer > 0f)
+        {
+            float progress = 1f - (soilBuffDisplayTimer / SOILBUFFDISPLAYDURATION);
+            float fade = Mathf.Clamp01((1f - progress) * 3f);
+
+            r.x = (disp.x - 0.2f) * w;
+            r.y = (disp.y - 0.05f) * h;
+            r.y -= (0.1f + (progress * 0.025f)) * h;
+            r.width = 0.4f * w;
+            r.height = 0.15f * h;
+
+            g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+            s = "Soil Quality\n";
+            if (soilBuffAmount >= 0f)
+                s += "+";
+            else
+                s += "-";
+            s += (soilBuffAmount * 100f).ToString("00.0") + "%";
+            c = Color.yellow;
+            c.a = fade;
+            GUI.color = c;
+            GUI.depth = -3;
+
+            GUI.Label(r, s, g);
+        }
 
         if (harvestDisplayTimer > 0f)
         {
@@ -1185,7 +1229,8 @@ public class PlotManager : MonoBehaviour
         if (currentPlayer == null || (currentPlayer.hidePlayerHUD && !introRunning))
             return;
 
-        if (harvestDisplayTimer == 0f && !actionProgressDisplay)
+        if (harvestDisplayTimer == 0f && soilBuffDisplayTimer == 0f &&
+            !actionProgressDisplay)
         {
             r.x = (disp.x - 0.05f) * w;
             r.y = disp.y * h;

@@ -271,7 +271,9 @@ public class ItemSpawnManager : MonoBehaviour
             if (dist < TARGETDETECTRADIUS && plots[i].data.condition == PlotCondition.Uprooted)
             {
                 // soil quality improved ~.5 (0-1, gaussian random distribution)
-                plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + RandomSystem.GaussianRandom01());
+                float rnd = RandomSystem.GaussianRandom01();
+                plots[i].GiveSoilBuff(rnd);
+                plots[i].data.soil = Mathf.Clamp01(plots[i].data.soil + rnd);
                 retBool = true;
                 if (!drops[index].remoteDrop)
                     plots[i].DropAwardXP(PlayerData.XP_FERTILIZEPLOT);
