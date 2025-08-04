@@ -547,7 +547,7 @@ public static class PlayerSystem
                 retNotifications[3] = "New spell in Grimoire:\nFast Grow II";
                 retNotifications[4] = "New spell in Grimoire:\nMalnutrition I";
                 retNotifications[5] = "New spell in Grimoire:\nProsperous I";
-                retNotifications[6] = "New spell in Grimoire:\nThe Great HArvest";
+                retNotifications[6] = "New spell in Grimoire:\nThe Great Harvest";
                 retNotifications[7] = "New spell in Grimoire:\nSplaturn";
                 break;
             case 4:
