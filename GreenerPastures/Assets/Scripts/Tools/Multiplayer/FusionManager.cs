@@ -12,18 +12,17 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     // Handles all things connected to network management
 
     private NetworkRunner Runner;
+    private FusionServerManager fsm;
     private int playerCount = 0;
     private PlayerRef host;
-    private GameData currentGame;
     private PlayerRef[] players;
     private RemotePlayerManager[] remotePlayers;
-    private SaveLoadManager slm;
-    private int nextFreePlayerSlot = 0;
     private PlayerRef localPlayer;
+
+    public NetworkObject server;
 
     [HideInInspector]
     public bool waitingForHostData = false;
-    public GameObject remotePlayerSpawnable;
 
     private int GetPlayerNumber(PlayerRef player)
     {
@@ -37,47 +36,12 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
         return -1;
     }
 
-    private void UpdateNextPlayerJoinSlot()
-    {
-        for (int plr = 0; plr < 8; plr++)
-        {
-            if (players[plr] == PlayerRef.None)
-            {
-                nextFreePlayerSlot = plr;
-                return;
-            }
-        }
-
-        return;
-    }
-
     private void Start()
     {
         transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
         players = new PlayerRef[8];
         remotePlayers = new RemotePlayerManager[8];
-        slm = FindFirstObjectByType<SaveLoadManager>();
-    }
-    
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, InvokeLocal = true, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendMessage([RpcTarget] PlayerRef targ, string message)
-    {
-        Debug.Log(message);
-    }
-
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, InvokeLocal = true, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_InitializeLocalPlayer([RpcTarget] PlayerRef targ, PlayerRef p)
-    {
-        localPlayer = p;
-        Debug.Log("--- FusionManager [InitializeLocalPlayer] : You have successfully connected as " + p + ".");
-    }
-
-    // Request host's game data as server
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, InvokeLocal = true, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_RequestGameData([RpcTarget] PlayerRef targ)
-    {
-        RPC_TransferGameData(PlayerRef.None, slm.GetCurrentGameData());
     }
 
     //// Request client's profile data as server
@@ -94,33 +58,10 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     //    //playerProfiles[GetPlayerNumber(sender)] = profile;
     //}
 
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SpawnPlayer([RpcTarget] PlayerRef targ, PlayerRef matchingPlayer)
-    {
-        
-    }
-
-    // Transfer game data across network
-    [Rpc(sources: RpcSources.All, targets: RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_TransferGameData([RpcTarget] PlayerRef targ, GameData data)
-    {
-        if (Runner.IsServer)
-        {
-            RPC_SendMessage(host, "--- FusionManager [TransferGameData] : Server has successfully received game data: " + data.gameName);
-            currentGame = data;
-        }
-        else
-        {
-            Debug.Log("--- FusionManager [TransferGameData] : Loading game data: " + data.gameName);
-            slm.SetCurrentGameData(data);
-            waitingForHostData = false;
-        }
-    }
-
     // Use GameMode.Host and GameMode.Client to determine join type
     public async void StartMultiplayerGame(GameMode mode, string code)
     {
-        Debug.Log("--- FusionManager [StartMultiplayerGame] : Starting multiplayer session with code: " + code.ToUpper() + ".");
+        Debug.Log("--- FusionManager [StartMultiplayerGame] : " + (mode == GameMode.Host ? "Hosting" : "Joining") + " session with code: " + code.ToUpper() + ".");
 
         Runner = gameObject.AddComponent<NetworkRunner>();
         Runner.ProvideInput = true;
@@ -147,23 +88,28 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
         if (Runner.IsServer)
         {
             playerCount++;
-            players[nextFreePlayerSlot] = player;
-            UpdateNextPlayerJoinSlot();
-            RPC_InitializeLocalPlayer(player, player);
+
+            if (playerCount == 1)
+            {
+                fsm = Runner.Spawn(server).GetComponent<FusionServerManager>();
+            }
+
+            fsm.RPC_UpdatePlayerCount(playerCount);
+            fsm.RPC_InitializeLocalPlayer(player);
 
             if (playerCount > 1)
             {
-                RPC_SendMessage(player, "--- FusionManager [OnPlayerJoined] : You are a client. Getting save data from server...");
-                RPC_SendMessage(host, "--- FusionManager [OnPlayerJoined] : " + player + " has connected.");
+                fsm.RPC_SendMessage(player, "--- FusionManager [OnPlayerJoined] : You are a client. Getting save data from server...");
+                fsm.RPC_SendMessage(host, "--- FusionManager [OnPlayerJoined] : " + player + " has connected.");
 
-                RPC_TransferGameData(player, currentGame);
+                fsm.RPC_BeginGameDataTransfer(player);
             }
             else
             {
-                RPC_SendMessage(player, "--- FusionManager [OnPlayerJoined] : You are the host. Sending your save data to server...");
+                fsm.RPC_SendMessage(player, "--- FusionManager [OnPlayerJoined] : You are the host. Sending your save data to server...");
                 
                 host = player;
-                RPC_RequestGameData(host);
+                fsm.RPC_RequestGameData(host);
             }
         }
     }
@@ -171,11 +117,9 @@ public class FusionManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (Runner.IsServer)
         {
-            RPC_SendMessage(host, "--- FusionManager [OnPlayerLeft] : " + player + " has left.");
-            
             playerCount--;
-            players[GetPlayerNumber(player)] = PlayerRef.None;
-            UpdateNextPlayerJoinSlot();
+            fsm.RPC_SendMessage(host, "--- FusionManager [OnPlayerLeft] : " + player + " has left.");
+            fsm.RPC_UpdatePlayerCount(playerCount);
         }
     }
 

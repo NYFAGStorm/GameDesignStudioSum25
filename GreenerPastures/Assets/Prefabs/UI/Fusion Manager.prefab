@@ -44,3 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5f336c94641f744aa4a9981c3bd9cde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  server: {fileID: 6235544638963265923, guid: 985cd2146b8cdf84bb58b8c93135c197, type: 3}
+  waitingForHostData: 0
