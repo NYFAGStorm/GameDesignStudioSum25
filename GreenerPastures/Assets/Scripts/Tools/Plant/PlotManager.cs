@@ -281,6 +281,14 @@ public class PlotManager : MonoBehaviour
             }
         }
 
+        // run soil quality buff timer
+        if (soilBuffDisplayTimer > 0f)
+        {
+            soilBuffDisplayTimer -= Time.deltaTime;
+            if (soilBuffDisplayTimer < 0f)
+                soilBuffDisplayTimer = 0f;
+        }
+
         // run harvest display timer
         if (harvestDisplayTimer > 0f)
         {
@@ -1189,13 +1197,13 @@ public class PlotManager : MonoBehaviour
             r.width = 0.4f * w;
             r.height = 0.15f * h;
 
-            g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+            g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
             s = "Soil Quality\n";
             if (soilBuffAmount >= 0f)
                 s += "+";
             else
                 s += "-";
-            s += (soilBuffAmount * 100f).ToString("00.0") + "%";
+            s += (soilBuffAmount * 100f).ToString("0.0") + "%";
             c = Color.yellow;
             c.a = fade;
             GUI.color = c;
