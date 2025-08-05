@@ -10,12 +10,17 @@ public class SalesVisitManager : MonoBehaviour
     public enum ScriptedBeatAction
     {
         Default,
+        NPCSpawn,
         Dialog,
         SalesmanMark,
+        NPCMarkToPlayerFarm,
+        NPCWaitForPlayer,
+        NPCTurnToPlayer,
         TeleportSalesman,
         VFXSpawn,
         ItemSpawn,
         DeleteItem,
+        RemoveNPC,
         EndVisit
     }
 
@@ -62,11 +67,18 @@ public class SalesVisitManager : MonoBehaviour
     private AudioManager sfxAudio;
 
     const float PAUSETIME = 2f;
+    const float PROXIMITY = 1.5f;
 
 
     void Start()
     {
         // validate
+        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        if (pcm == null)
+        {
+            Debug.LogError("--- SalesVisitManager [Start] : no player control manager found in scene. aborting.");
+            enabled = false;
+        }
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
             Debug.LogWarning("--- SalesVisitManager [Start] : no gamepad manager found in scene. will ignore.");
@@ -87,11 +99,6 @@ public class SalesVisitManager : MonoBehaviour
                 buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
             }
         }
-    }
-
-    void ConfigureVisitBeats()
-    {
-
     }
 
     void ValidateVisitBeats()
@@ -134,6 +141,147 @@ public class SalesVisitManager : MonoBehaviour
         if (beatScriptEndIndex == 0)
             Debug.LogWarning("--- SalesVisitManager [ValidatevisitBeats] : no final beat with 'end visit' configured. this will cause errors at runtime.");
 
+    }
+
+    Vector3 FindPlayerIsland()
+    {
+        Vector3 retVector = Vector3.zero;
+
+        IslandManager iMgr = GameObject.FindFirstObjectByType<IslandManager>();
+        if (iMgr == null)
+        {
+            Debug.LogError("--- SalesVisitManager [FindPlayerFarm] : no island manager found in scene. aborting.");
+            return retVector;
+        }
+        retVector = GameSystem.GetVector(iMgr.islands[pcm.playerData.playerIsland].location);
+
+        return retVector;
+    }
+
+    Vector3 FindPlayerFarm()
+    {
+        Vector3 retVector = Vector3.zero;
+
+        for (int i = 0; i < pcm.playerData.farm.plots.Length; i++)
+        {
+            retVector += GameSystem.GetVector(pcm.playerData.farm.plots[i].location);
+        }
+        retVector /= pcm.playerData.farm.plots.Length;
+
+        return retVector;
+    }
+
+    bool IsPlayerClose()
+    {
+        bool retBool = false;
+
+        float dist = Vector3.Distance(pcm.gameObject.transform.position, salesman.transform.position);
+        retBool = (dist <= PROXIMITY);
+
+        return retBool;
+    }
+
+    bool FacingDirectionToPlayer()
+    {
+        bool retBool = false;
+
+        // face left?
+        retBool = (pcm.gameObject.transform.position.x < salesman.transform.position.x);
+
+        return retBool;
+    }
+
+    void ConfigureVisitBeats()
+    {
+        visitBeats = new ScriptedBeat[130];
+        int beat = 0;
+        visitBeats[beat].name = "visit launch - npc spawn";
+        visitBeats[beat].action = ScriptedBeatAction.NPCSpawn;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].beatPosition.x = 20f;
+        visitBeats[beat].beatPosition.y = 0f;
+        visitBeats[beat].beatPosition.z = -20f;
+        visitBeats[beat].duration = 1f;
+        beat++;
+        visitBeats[beat].name = "move salesman out market";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(20f, 0f, -22f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "brief pause";
+        visitBeats[beat].action = ScriptedBeatAction.Default;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].duration = 0.5f;
+        beat++;
+        visitBeats[beat].name = "move salesman from market";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(18f, 0f, -19f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "brief pause";
+        visitBeats[beat].action = ScriptedBeatAction.Default;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].duration = 0.5f;
+        beat++;
+        visitBeats[beat].name = "salesman to teleporter";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(16f, 0f, -16f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "teleporter vfx (a)";
+        visitBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
+        visitBeats[beat].beatPosition.x = 16f;
+        visitBeats[beat].beatPosition.z = -16f;
+        beat++;
+        visitBeats[beat].name = "teleporter vfx (b)";
+        visitBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
+        visitBeats[beat].beatPosition.x = 4f;
+        visitBeats[beat].beatPosition.z = -4f;
+        beat++;
+        visitBeats[beat].name = "salesman teleport";
+        visitBeats[beat].action = ScriptedBeatAction.TeleportSalesman;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].duration = 1f;
+        visitBeats[beat].beatPosition.x = 4f;
+        visitBeats[beat].beatPosition.z = -4f;
+        beat++;
+        visitBeats[beat].name = "salesman off teleporter";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(4.5f, 0f, -3.25f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "salesman to player farm position";
+        visitBeats[beat].action = ScriptedBeatAction.NPCMarkToPlayerFarm;
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "salesman wait for player";
+        visitBeats[beat].action = ScriptedBeatAction.NPCWaitForPlayer;
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "salesman turn to player";
+        visitBeats[beat].action = ScriptedBeatAction.NPCTurnToPlayer;
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "'hey ho, Biomancer friend!'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "Hey ho, Biomancer friend! I've got island upgrades for you!";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+
+        // REVIEW: entire salesman visit script
+        
+        beat++;
+        visitBeats[beat].name = "remove salesman";
+        visitBeats[beat].action = ScriptedBeatAction.RemoveNPC;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].duration = 1f;
+        beat++;
+        visitBeats[beat].name = "end visit";
+        visitBeats[beat].action = ScriptedBeatAction.EndVisit;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].duration = 1f;
     }
 
     void Update()
