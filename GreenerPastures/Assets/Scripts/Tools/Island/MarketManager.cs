@@ -36,14 +36,15 @@ public class MarketManager : MonoBehaviour
     private int topOfMenuList = 0;
     private CustomerMode customerMode;
     private float rejectFlashTimer;
-    private Vector3 purchaseOffset = new Vector3(-1f,0f,0f);
 
     private float discountBuy;
     private int playerItemFinalSellValue; // value determined when selling item, per quality
 
     private int[] maxMenuListPerLevel = new int[11];
     
-    int generalItems = 18; // fertilizer + 15 scrolls + 2 potions
+    int generalItems = 1; // fertilizer (+ unknown seed, all rarities?) (specials?)
+    int magicItems = 13; // 11 scrolls + 2 potions
+
     int plantItemTypes = 3; // seed, fruit, plant
 
     int commonPlants = 10;
@@ -51,6 +52,16 @@ public class MarketManager : MonoBehaviour
     int rarePlants = 10;
     int specialPlants = 10;
     int uniquePlants = 9;
+
+    [System.Serializable]
+    public struct MenuCategory
+    {
+        public string name;
+        public int topOfMenu;
+        public int bottomOfMenu; // REVIEW: num items?
+    }
+    private MenuCategory[] menuCategories;
+    private int currentCatagory;
 
     private ArtLibraryManager alm;
     private QuitOnEscape qoe; // disable to suspend use of start button while in market
@@ -155,47 +166,56 @@ public class MarketManager : MonoBehaviour
             {
                 case 0:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes);
                     break;
                 case 1:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes);
                     break;
                 case 2:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes);
                     break;
                 case 3:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes);
                     break;
                 case 4:
-                    maxMenuListPerLevel[i] = generalItems +
+                    maxMenuListPerLevel[i] = generalItems + 
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes);
                     break;
                 case 5:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes) +
                         (rarePlants * plantItemTypes);
                     break;
                 case 6:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes) +
                         (rarePlants * plantItemTypes);
                     break;
                 case 7:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes) +
                         (rarePlants * plantItemTypes);
                     break;
                 case 8:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes) +
                         (rarePlants * plantItemTypes) +
@@ -203,6 +223,7 @@ public class MarketManager : MonoBehaviour
                     break;
                 case 9:
                     maxMenuListPerLevel[i] = generalItems +
+                        magicItems +
                         (commonPlants * plantItemTypes) + 
                         (uncommonPlants * plantItemTypes) +
                         (rarePlants * plantItemTypes) +
@@ -212,6 +233,7 @@ public class MarketManager : MonoBehaviour
             if (i>9)
             {
                 maxMenuListPerLevel[i] = generalItems +
+                    magicItems +
                 (commonPlants * plantItemTypes) +
                 (uncommonPlants * plantItemTypes) +
                 (rarePlants * plantItemTypes) +
@@ -219,6 +241,36 @@ public class MarketManager : MonoBehaviour
             }
             maxMenuListPerLevel[i]--;
         }
+
+        // TODO: replace max menu list per level with available/not available/specials
+
+        // menu categories
+        int top = 0;
+        menuCategories = new MenuCategory[6];
+        menuCategories[0].name = "General Items";
+        menuCategories[0].topOfMenu = top;
+        menuCategories[0].bottomOfMenu = top + generalItems;
+        top += generalItems;
+        menuCategories[1].name = "Magic Items";
+        menuCategories[0].topOfMenu = top;
+        menuCategories[0].bottomOfMenu = top + magicItems;
+        top += magicItems;
+        menuCategories[2].name = "Common Plants";
+        menuCategories[0].topOfMenu = top;
+        menuCategories[0].bottomOfMenu = top + commonPlants;
+        top += commonPlants;
+        menuCategories[3].name = "Uncommon Plants";
+        menuCategories[0].topOfMenu = top;
+        menuCategories[0].bottomOfMenu = top + uncommonPlants;
+        top += uncommonPlants;
+        menuCategories[4].name = "Rare Plants";
+        menuCategories[0].topOfMenu = top;
+        menuCategories[0].bottomOfMenu = top + rarePlants;
+        top += rarePlants;
+        menuCategories[5].name = "Special Plants";
+        menuCategories[0].topOfMenu = top;
+        menuCategories[0].bottomOfMenu = top + specialPlants;
+        top += specialPlants;
     }
 
     void Update()
@@ -883,30 +935,22 @@ public class MarketManager : MonoBehaviour
 
     void InitializeMenu()
     {
-        menuItems = new MenuItem[generalItems + (plantItemTypes *
-            (commonPlants + uncommonPlants + rarePlants + 
-            specialPlants + uniquePlants + 1))];
+        menuItems = new MenuItem[generalItems + magicItems
+            + (plantItemTypes * (commonPlants + uncommonPlants + 
+            rarePlants + specialPlants + uniquePlants + 1))];
 
         int idx = 0;
 
         // -- GENERAL ITEMS --
 
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 100, 50);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Unknown)");
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 50, 25);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelOneSpellCharge, "\n(Level One)");
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 65, 32);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelTwoSpellCharge, "\n(Level Two)");
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 80, 40);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelThreeSpellCharge, "\n(Level Three)");
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 100, 50);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Four)");
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 120, 60);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Five)");
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 150, 75);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Six)");
-        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 200, 100);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Seven)");
+        menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
+
+        // -- MAGIC ITEMS --
+
+        menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 30, 20);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearOneCooldown, " (Grey)");
+        menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 75, 50);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearAllCooldowns, " (White)");
 
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 60, 35);
         SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollMirrorMirror, "\n(Mirror Mirror)");
@@ -923,12 +967,14 @@ public class MarketManager : MonoBehaviour
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 125, 75);
         SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollFogOfWar, "\n(Fog Of War)");
 
-        menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 30, 20);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearOneCooldown, " (Grey)");
-        menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 75, 50);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearAllCooldowns, " (White)");
-
-        menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 50, 25);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelOneSpellCharge, "\n(Level One)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 65, 32);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelTwoSpellCharge, "\n(Level Two)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 80, 40);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelThreeSpellCharge, "\n(Level Three)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 100, 50);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Unknown)");
 
         // -- COMMON PLANTS --
 
@@ -1364,6 +1410,7 @@ public class MarketManager : MonoBehaviour
         r.height = r.width;
 
         r.x -= (0.05f * w) * ((pInv.maxSlots / 2f) + 0.5f);
+        int selected = currentCustomer.GetPlayerCurrentItemSelectionIndex();
         for (int i = 0; i < 5; i++)
         {
             r.x += 0.05f * w;
@@ -1371,29 +1418,50 @@ public class MarketManager : MonoBehaviour
             {
                 if (pInv.items[i].type != ItemType.Default)
                 {
-                    // adjust smaller
-                    r.x += 0.005f * w;
-                    r.y += (0.005f * w);
-                    r.width -= (0.01f * w);
-                    r.height -= (0.01f * w);
-                    // draw inventory item
-                    t = alm.itemImages[alm.GetArtData(pInv.items[i].type, pInv.items[i].plant).artIndexBase];
-                    GUI.DrawTexture(r, t);
-                    // re-adjust larger again
-                    r.x -= 0.005f * w;
-                    r.y -= (0.005f * w);
-                    r.width += (0.01f * w);
-                    r.height += (0.01f * w);
+                    if (i != selected)
+                    {
+                        // adjust smaller
+                        r.x += 0.005f * w;
+                        r.y += (0.005f * w);
+                        r.width -= (0.01f * w);
+                        r.height -= (0.01f * w);
+                        // draw inventory item
+                        t = alm.itemImages[alm.GetArtData(pInv.items[i].type, pInv.items[i].plant).artIndexBase];
+                        GUI.DrawTexture(r, t);
+                        // re-adjust larger again
+                        r.x -= 0.005f * w;
+                        r.y -= (0.005f * w);
+                        r.width += (0.01f * w);
+                        r.height += (0.01f * w);
+                    }
                 }
             }
             // draw inventory slot frame
             t = (Texture2D)Resources.Load("Plot_Cursor");
             c = Color.white;
-            if (i == currentCustomer.GetPlayerCurrentItemSelectionIndex())
+            if (i == selected)
                 c = Color.yellow;
             GUI.color = c;
             GUI.DrawTexture(r, t);
             GUI.color = Color.white;
+            // pulse larger for selected item
+            if (i == selected && pInv.items != null &&
+                pInv.items.Length > i && pInv.items[i].type != ItemType.Default)
+            {
+                float pulseSize = (Mathf.Sin(Time.time * 6.18f) * 0.00125f) + 0.00125f;
+                pulseSize = Mathf.RoundToInt(pulseSize * w);
+                r.x -= pulseSize;
+                r.y -= pulseSize;
+                r.width += (pulseSize * 2f);
+                r.height += (pulseSize * 2f);
+                // draw selected inventory larger over slot frame
+                t = alm.itemImages[alm.GetArtData(pInv.items[i].type, pInv.items[i].plant).artIndexBase];
+                GUI.DrawTexture(r, t);
+                r.x += pulseSize;
+                r.y += pulseSize;
+                r.width -= (pulseSize * 2f);
+                r.height -= (pulseSize * 2f);
+            }
         }
 
         // selected item label

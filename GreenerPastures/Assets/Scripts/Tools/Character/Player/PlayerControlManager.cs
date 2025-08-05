@@ -1399,6 +1399,7 @@ public class PlayerControlManager : MonoBehaviour
             GUI.color = c;
             GUI.DrawTexture(r, t);
             GUI.color = Color.white;
+            // pulse larger for selected item
             if (i == currentInventorySelection && 
                 playerInventory.items != null && playerInventory.items.Length > i &&
                 playerInventory.items[i].type != ItemType.Default)
