@@ -654,10 +654,15 @@ public class MagicManager : MonoBehaviour
                 }
                 GUI.color = c;
 
+                g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+
                 s = "[" + pcm.playerData.magic.library.spellBook[i].chargesAvailable + "] " + pcm.playerData.magic.library.spellBook[i].name;
 
                 if (pcm.playerData.magic.library.spellBook[i].cooldown > 0f)
-                    s += " (COOLDOWN "+DisplayCooldownTime(pcm.playerData.magic.library.spellBook[i].cooldown) +"min)";
+                {
+                    s += "\n(COOLDOWN " + DisplayCooldownTime(pcm.playerData.magic.library.spellBook[i].cooldown) + "min)";
+                    g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+                }
 
                 GUI.Label(r, s, g);
                 r.y += 0.05f * h;
