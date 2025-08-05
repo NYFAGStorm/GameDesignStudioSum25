@@ -244,7 +244,6 @@ public static class PlantSystem
             case PlantType.Chrystalia:
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = .8f;
-                retData.canReFruit = true;
                 retData.springVitality = .8f;
                 retData.summerVitality = .5f;
                 retData.winterVitality = .8f;
@@ -254,6 +253,7 @@ public static class PlantSystem
                 retData.rarity = PlantRarity.Uncommon;
                 retData.growthRate = .75f;
                 retData.isDarkPlant = true;
+                retData.canReFruit = true;
                 retData.springVitality = .75f;
                 retData.summerVitality = .75f;
                 retData.fallVitality = 1f;
