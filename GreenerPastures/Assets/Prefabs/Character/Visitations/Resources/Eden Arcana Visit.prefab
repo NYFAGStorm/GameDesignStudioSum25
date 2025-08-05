@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &247884724891534219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6640856767766312879}
+  - component: {fileID: 2327785688193568985}
+  m_Layer: 0
+  m_Name: Eden Arcana Visit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6640856767766312879
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247884724891534219}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2327785688193568985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247884724891534219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7740e535e5ec543adf74ef532aef28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eden: {fileID: 0}
+  visitBeats: []
+  currentBeat:
+    name: 
+    action: 0
+    actionDone: 0
+    dialogLine: 
+    npcMark: {x: 0, y: 0, z: 0}
+    transition: 0
+    transitionDone: 0
+    duration: 0
+    beatPosition:
+      w: 0
+      x: 0
+      y: 0
+      z: 0
+  visitRunning: 0
+  dialogTimer: 0
+  dialogPop: 0
+  beatTimeUp: 0
+  npcCallback: 0
+  playerResponse: 0
