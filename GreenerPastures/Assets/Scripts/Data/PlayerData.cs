@@ -165,24 +165,24 @@ public class PlayerData
 
     // XP AWARD VALUES
     public const int XP_USETELEPORTER = 0; // abuse potential too high
-    public const int XP_PICKUPITEM = 1;
-    public const int XP_DROPITEM = 1;
-    public const int XP_WORKTHEPLOT = 2;
-    public const int XP_PLANTASEED = 5;
-    public const int XP_COMPLETETUTORIAL = 15;
-    public const int XP_HARVESTPLANT = 10;
+    public const int XP_PICKUPITEM = 0;
+    public const int XP_DROPITEM = 0;
+    public const int XP_WORKTHEPLOT = 3;
+    public const int XP_PLANTASEED = 7;
+    public const int XP_COMPLETETUTORIAL = 20;
+    public const int XP_HARVESTPLANT = 12;
     public const int XP_SELLTOSHOP = 5;
-    public const int XP_BUYFROMSHOP = 4;
-    public const int XP_WATERTHEPLOT = 3;
-    public const int XP_DIGAHOLE = 4;
-    public const int XP_FERTILIZEPLOT = 3;
+    public const int XP_BUYFROMSHOP = 2;
+    public const int XP_WATERTHEPLOT = 1;
+    public const int XP_DIGAHOLE = 3;
+    public const int XP_FERTILIZEPLOT = 4;
     public const int XP_PAYRENT = 50; // not implemented
-    public const int XP_CRAFTMAGIC = 15;
-    public const int XP_CASTMAGIC = 10;
-    public const int XP_GRAFTPLANT = 9;
-    public const int XP_BROADCASTPLANT = 6;
-    public const int XP_TRANSPLANT = 7;
-    public const int XP_FINDCLICKABLE = 3;
-    public const int XP_CATCHFIREFLY = 3; // not implemented
+    public const int XP_CRAFTMAGIC = 25;
+    public const int XP_CASTMAGIC = 15;
+    public const int XP_GRAFTPLANT = 15;
+    public const int XP_BROADCASTPLANT = 8;
+    public const int XP_TRANSPLANT = 9;
+    public const int XP_FINDCLICKABLE = 10;
+    public const int XP_CATCHFIREFLY = 10; // not implemented
     public const int XP_HOLIDAYBONUS = 100; // not implemented
 }
