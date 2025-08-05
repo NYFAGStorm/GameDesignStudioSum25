@@ -1210,6 +1210,9 @@ public class PlotManager : MonoBehaviour
             GUI.depth = -3;
 
             GUI.Label(r, s, g);
+
+            // restore action label
+            s = actionLabel;
         }
 
         if (harvestDisplayTimer > 0f)

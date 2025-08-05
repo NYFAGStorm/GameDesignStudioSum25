@@ -182,6 +182,8 @@ public class PlayerData
     public const int XP_GRAFTPLANT = 15;
     public const int XP_BROADCASTPLANT = 8;
     public const int XP_TRANSPLANT = 9;
+    public const int XP_BETCHICKENRACE = 2;
+    public const int XP_WINCHICKENRACE = 6;
     public const int XP_FINDCLICKABLE = 10;
     public const int XP_CATCHFIREFLY = 10; // not implemented
     public const int XP_HOLIDAYBONUS = 100; // not implemented

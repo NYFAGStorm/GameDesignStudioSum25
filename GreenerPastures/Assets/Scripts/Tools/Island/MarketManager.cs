@@ -475,7 +475,7 @@ public class MarketManager : MonoBehaviour
         {
             customerMode = CustomerMode.Buy;
             currentCustomer.characterFrozen = true;
-            menuItemSelection = 0;
+            //menuItemSelection = 0;
             marketInstructions = "- BUY MODE -\nE=BUY V=EXIT";
             if (padMgr != null && padMgr.gamepads[0].isActive)
                 marketInstructions = "- BUY MODE -\nA=BUY Y=EXIT";

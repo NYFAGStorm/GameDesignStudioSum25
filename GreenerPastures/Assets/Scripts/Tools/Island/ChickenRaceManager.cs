@@ -580,6 +580,8 @@ public class ChickenRaceManager : MonoBehaviour
                         break;
                     case RaceState.Rewarding:
                         rewardTimer = 2f;
+                        if (chickenPick == chickenWinner)
+                            currentGuest.AwardXP(PlayerData.XP_WINCHICKENRACE);
                         break;
                     case RaceState.Exiting:
                         guestStateTimer = (GUESTSTATETIMERMAX / 2f); // exit faster
@@ -1440,6 +1442,7 @@ public class ChickenRaceManager : MonoBehaviour
                 raceState = RaceState.PreRace;
                 raceStateTimer = 0.618f; //RACESTATETIMERMAX;
                 padButtonSelection = -1;
+                currentGuest.AwardXP(PlayerData.XP_BETCHICKENRACE);
             }
             GUI.enabled = true;
             // cancel button
