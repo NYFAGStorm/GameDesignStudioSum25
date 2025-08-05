@@ -59,6 +59,9 @@ public class SalesVisitManager : MonoBehaviour
     public bool playerResponse;
     private int beatScriptEndIndex;
 
+    private bool waitingForPlayer;
+    private bool facingPlayer;
+
     private Texture2D[] buttonTex;
 
     private MultiGamepad padMgr;
@@ -269,8 +272,14 @@ public class SalesVisitManager : MonoBehaviour
             "Hey ho, Biomancer friend! I've got island upgrades for you!";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
 
+
+
+        visitBeats[beat].name = "salesman turn to player";
+        visitBeats[beat].action = ScriptedBeatAction.NPCTurnToPlayer;
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
         // REVIEW: entire salesman visit script
-        
+
         beat++;
         visitBeats[beat].name = "remove salesman";
         visitBeats[beat].action = ScriptedBeatAction.RemoveNPC;
@@ -285,6 +294,15 @@ public class SalesVisitManager : MonoBehaviour
 
     void Update()
     {
+        // waiting for player
+        if (waitingForPlayer)
+        {
+            if (IsPlayerClose())
+                waitingForPlayer = false;
+            else
+                return;
+        }
+
         // run dialog timer
         if (dialogTimer > 0f)
         {
@@ -297,6 +315,30 @@ public class SalesVisitManager : MonoBehaviour
 
         if (!visitRunning)
             return;
+
+        // turn to face player
+        if (facingPlayer)
+        {
+            bool facingLeft = (salesman.GetComponentInChildren<CharacterAnimManager>().GetImageFlipped());
+            Vector3 newMove = salesman.moveTarget;
+            // should face left?
+            if (FacingDirectionToPlayer())
+            {
+                if (!facingLeft)
+                {
+                    newMove += Vector3.left * 0.1f;
+                    salesman.moveTarget = newMove;
+                }
+            }
+            else 
+            {
+                if (facingLeft)
+                {
+                    newMove += Vector3.right * 0.1f;
+                    salesman.moveTarget = newMove;
+                }
+            }
+        }
 
         // run beat timer
         if (beatTimer > 0f)
@@ -356,6 +398,13 @@ public class SalesVisitManager : MonoBehaviour
                 case ScriptedBeatAction.Default:
                     // do nothing (pause)
                     break;
+                case ScriptedBeatAction.NPCSpawn:
+                    // salesman arrives
+                    salesman = SpawnSalesman(currentBeat.npcMark);
+                    salesman.moveTarget = currentBeat.npcMark;
+                    salesman.ghostMode = true;
+                    salesman.mode = NPCController.NPCMode.Scripted;
+                    break;
                 case ScriptedBeatAction.Dialog:
                     dialogTimer = PAUSETIME;
                     playerResponse = false;
@@ -363,6 +412,16 @@ public class SalesVisitManager : MonoBehaviour
                 case ScriptedBeatAction.SalesmanMark:
                     salesman.moveTarget = currentBeat.npcMark;
                     salesman.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.NPCMarkToPlayerFarm:
+                    salesman.moveTarget = FindPlayerFarm();
+                    salesman.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.NPCWaitForPlayer:
+                    waitingForPlayer = true;
+                    break;
+                case ScriptedBeatAction.NPCTurnToPlayer:
+                    facingPlayer = !facingPlayer;
                     break;
                 case ScriptedBeatAction.TeleportSalesman:
                     Vector3 pos = salesman.gameObject.transform.position;
@@ -408,6 +467,9 @@ public class SalesVisitManager : MonoBehaviour
                     else
                         Destroy(vfx, 6.18f);
                     break;
+                case ScriptedBeatAction.RemoveNPC:
+                    RemoveSalesman();
+                    break;
                 case ScriptedBeatAction.EndVisit:
                     visitRunning = false;
                     break;
@@ -418,7 +480,8 @@ public class SalesVisitManager : MonoBehaviour
         if (currentBeatIndex >= visitBeats.Length)
         {
             visitRunning = false;
-            Destroy(salesman.gameObject, 10f);
+            if (salesman != null)
+                Destroy(salesman.gameObject, 10f);
             return;
         }
 
@@ -452,18 +515,19 @@ public class SalesVisitManager : MonoBehaviour
             //Debug.Log(s);
         }
     }
-    void LaunchVisit()
+
+    public void LaunchVisit()
     {
         visitRunning = true;
         currentBeatIndex = 0;
         currentBeat = visitBeats[currentBeatIndex];
         beatTimer = currentBeat.duration;
+    }
 
-        // eden arrives
-        salesman = SpawnSalesman(currentBeat.npcMark);
-        salesman.moveTarget = currentBeat.npcMark;
-        salesman.ghostMode = true;
-        salesman.mode = NPCController.NPCMode.Scripted;
+    void RemoveSalesman()
+    {
+        if (salesman != null)
+            Destroy(salesman.gameObject);
     }
 
     NPCController SpawnSalesman(Vector3 pos)

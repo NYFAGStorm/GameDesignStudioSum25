@@ -59,6 +59,9 @@ public class EdenVisitManager : MonoBehaviour
     public bool playerResponse;
     private int beatScriptEndIndex;
 
+    private bool waitingForPlayer;
+    private bool facingPlayer;
+
     private Texture2D[] buttonTex;
 
     private MultiGamepad padMgr;
@@ -192,7 +195,7 @@ public class EdenVisitManager : MonoBehaviour
 
     void ConfigureVisitBeats()
     {
-        visitBeats = new ScriptedBeat[33];
+        visitBeats = new ScriptedBeat[34];
         int beat = 0;
         visitBeats[beat].name = "visit launch - npc spawn";
         visitBeats[beat].action = ScriptedBeatAction.NPCSpawn;
@@ -308,6 +311,10 @@ public class EdenVisitManager : MonoBehaviour
         visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         visitBeats[beat].duration = 0.5f;
         beat++;
+        visitBeats[beat].name = "eden turn to player";
+        visitBeats[beat].action = ScriptedBeatAction.NPCTurnToPlayer;
+        visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
         visitBeats[beat].name = "eden to teleporter";
         visitBeats[beat].action = ScriptedBeatAction.EdenMark;
         visitBeats[beat].npcMark = new Vector3(4f, 0f, -4f);
@@ -375,6 +382,15 @@ public class EdenVisitManager : MonoBehaviour
 
     void Update()
     {
+        // waiting for player
+        if (waitingForPlayer)
+        {
+            if (IsPlayerClose())
+                waitingForPlayer = false;
+            else
+                return;
+        }
+
         // run dialog timer
         if (dialogTimer > 0f)
         {
@@ -387,6 +403,30 @@ public class EdenVisitManager : MonoBehaviour
 
         if (!visitRunning)
             return;
+
+        // turn to face player
+        if (facingPlayer)
+        {
+            bool facingLeft = (eden.GetComponentInChildren<CharacterAnimManager>().GetImageFlipped());
+            Vector3 newMove = eden.moveTarget;
+            // should face left?
+            if (FacingDirectionToPlayer())
+            {
+                if (!facingLeft)
+                {
+                    newMove += Vector3.left * 0.1f;
+                    eden.moveTarget = newMove;
+                }
+            }
+            else
+            {
+                if (facingLeft)
+                {
+                    newMove += Vector3.right * 0.1f;
+                    eden.moveTarget = newMove;
+                }
+            }
+        }
 
         // run beat timer
         if (beatTimer > 0f)
@@ -446,6 +486,13 @@ public class EdenVisitManager : MonoBehaviour
                 case ScriptedBeatAction.Default:
                     // do nothing (pause)
                     break;
+                case ScriptedBeatAction.NPCSpawn:
+                    // eden arrives
+                    eden = SpawnEden(currentBeat.npcMark);
+                    eden.moveTarget = currentBeat.npcMark;
+                    eden.ghostMode = true;
+                    eden.mode = NPCController.NPCMode.Scripted;
+                    break;
                 case ScriptedBeatAction.Dialog:
                     dialogTimer = PAUSETIME;
                     playerResponse = false;
@@ -453,6 +500,16 @@ public class EdenVisitManager : MonoBehaviour
                 case ScriptedBeatAction.EdenMark:
                     eden.moveTarget = currentBeat.npcMark;
                     eden.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.NPCMarkToPlayerFarm:
+                    eden.moveTarget = FindPlayerFarm();
+                    eden.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.NPCWaitForPlayer:
+                    waitingForPlayer = true;
+                    break;
+                case ScriptedBeatAction.NPCTurnToPlayer:
+                    facingPlayer = !facingPlayer;
                     break;
                 case ScriptedBeatAction.TeleportEden:
                     Vector3 pos = eden.gameObject.transform.position;
@@ -498,6 +555,9 @@ public class EdenVisitManager : MonoBehaviour
                     else
                         Destroy(vfx, 6.18f);
                     break;
+                case ScriptedBeatAction.RemoveNPC:
+                    RemoveEden();
+                    break;
                 case ScriptedBeatAction.EndVisit:
                     visitRunning = false;
                     break;
@@ -508,7 +568,8 @@ public class EdenVisitManager : MonoBehaviour
         if (currentBeatIndex >= visitBeats.Length)
         {
             visitRunning = false;
-            Destroy(eden.gameObject, 10f);
+            if (eden != null)
+                Destroy(eden.gameObject, 10f);
             return;
         }
 
@@ -539,23 +600,24 @@ public class EdenVisitManager : MonoBehaviour
                 npcCallback = false;
                 s += " npc mark x:" + currentBeat.npcMark.x + " , z:" + currentBeat.npcMark.z;
             }
-            //Debug.Log(s);
+            Debug.Log(s);
         }
     }
 
-    void LaunchVisit()
+    public void LaunchVisit()
     {
         visitRunning = true;
         currentBeatIndex = 0;
         currentBeat = visitBeats[currentBeatIndex];
         beatTimer = currentBeat.duration;
-
-        // eden arrives
-        eden = SpawnEden(currentBeat.npcMark);
-        eden.moveTarget = currentBeat.npcMark;
-        eden.ghostMode = true;
-        eden.mode = NPCController.NPCMode.Scripted;
     }
+
+    void RemoveEden()
+    {
+        if (eden != null)
+            Destroy(eden.gameObject);
+    }
+
     NPCController SpawnEden(Vector3 pos)
     {
         GameObject eNPC = GameObject.Instantiate((GameObject)Resources.Load("NPC Eden"));
