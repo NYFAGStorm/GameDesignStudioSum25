@@ -3,7 +3,7 @@ using UnityEngine;
 public class NPCController : MonoBehaviour
 {
     // Author: Glenn Storm
-    // This handles NPC character movements either alone or via scripted action from another script
+    // This handles NPC character movements via scripted action from another script
 
     public enum NPCMode
     {
@@ -39,15 +39,7 @@ public class NPCController : MonoBehaviour
         // initialize
         if (enabled)
         {
-            // configure Eden appearance
-            PlayerOptions eden = new PlayerOptions();
-            eden.model = PlayerModelType.Female;
-            eden.hairColor = PlayerHairColor.ShadeG;
-            eden.skinColor = PlayerSkinColor.ToneG;
-            eden.accentColor = PlayerColor.ColorN;
-            eden.secondaryColor = PlayerColor.ColorF;
-            eden.mainColor = PlayerColor.ColorA;
-            pam.ConfigureAppearance(eden);
+
         }
     }
 

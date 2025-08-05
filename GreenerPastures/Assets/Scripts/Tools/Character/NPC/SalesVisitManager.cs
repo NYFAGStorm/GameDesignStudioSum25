@@ -18,8 +18,6 @@ public class SalesVisitManager : MonoBehaviour
         NPCTurnToPlayer,
         TeleportSalesman,
         VFXSpawn,
-        ItemSpawn,
-        DeleteItem,
         RemoveNPC,
         EndVisit
     }
@@ -51,6 +49,7 @@ public class SalesVisitManager : MonoBehaviour
     private PlayerControlManager pcm;
 
     public bool visitRunning;
+    public float dialogTimer;
     public bool dialogPop;
 
     private int currentBeatIndex;
@@ -286,6 +285,292 @@ public class SalesVisitManager : MonoBehaviour
 
     void Update()
     {
-        
+        // run dialog timer
+        if (dialogTimer > 0f)
+        {
+            if (dialogTimer > 0f)
+            {
+                dialogTimer = 0f;
+                dialogPop = true;
+            }
+        }
+
+        if (!visitRunning)
+            return;
+
+        // run beat timer
+        if (beatTimer > 0f)
+        {
+            beatTimer -= Time.deltaTime;
+            if (beatTimer < 0f)
+            {
+                beatTimer = 0f;
+                beatTimeUp = true;
+            }
+        }
+
+        // detect npc destination reached ('callback')
+        npcCallback = salesman.destinationReached;
+
+        // handle beat script transition
+        switch (currentBeat.transition)
+        {
+            case ScriptedBeatTransition.Default:
+                currentBeatIndex++; // immediate transition
+                currentBeat.transitionDone = true;
+                break;
+            case ScriptedBeatTransition.TimedDuration:
+                if (beatTimeUp)
+                {
+                    currentBeatIndex++;
+                    beatTimeUp = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
+            case ScriptedBeatTransition.PlayerResponse:
+                if (playerResponse)
+                {
+                    currentBeatIndex++;
+                    playerResponse = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
+            case ScriptedBeatTransition.SalesmanCallback:
+                if (npcCallback)
+                {
+                    currentBeatIndex++;
+                    npcCallback = false;
+                    salesman.destinationReached = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
+            default:
+                break;
+        }
+
+        if (!currentBeat.actionDone)
+        {
+            // handle beat script action
+            switch (currentBeat.action)
+            {
+                case ScriptedBeatAction.Default:
+                    // do nothing (pause)
+                    break;
+                case ScriptedBeatAction.Dialog:
+                    dialogTimer = PAUSETIME;
+                    playerResponse = false;
+                    break;
+                case ScriptedBeatAction.SalesmanMark:
+                    salesman.moveTarget = currentBeat.npcMark;
+                    salesman.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.TeleportSalesman:
+                    Vector3 pos = salesman.gameObject.transform.position;
+                    pos.x = currentBeat.beatPosition.x;
+                    pos.z = currentBeat.beatPosition.z;
+                    salesman.gameObject.transform.position = pos;
+                    salesman.moveTarget = pos;
+                    salesman.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.VFXSpawn:
+                    Vector3 vfxPos = Vector3.zero;
+                    // either teleport or magic
+                    GameObject vfx = null;
+                    if (currentBeat.beatPosition.w >= 0f)
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+                    else if (currentBeat.beatPosition.w < 0f &&
+                        currentBeat.beatPosition.w >= -1f)
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Cast Magic"));
+                    else
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("Big Hint"));
+                    vfxPos.x = currentBeat.beatPosition.x;
+                    vfxPos.z = currentBeat.beatPosition.z;
+                    vfx.transform.position = vfxPos;
+                    if (vfx.GetComponentInChildren<SpriteRenderer>() != null)
+                        vfx.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
+                    GameObject sfxTemp = new GameObject();
+                    sfxTemp.name = "Teleport SFX Obj";
+                    sfxTemp.transform.position = vfxPos;
+                    if (currentBeat.beatPosition.w >= 0f)
+                    {
+                        // teleporter
+                        sfxAudio.StartSound("Teleport", sfxTemp, 0f, 6.18f);
+                        Destroy(sfxTemp, 2.2f);
+                        Destroy(vfx, 1f);
+                    }
+                    else if (currentBeat.beatPosition.w < 0f &&
+                            currentBeat.beatPosition.w >= -1f)
+                    {
+                        // magic
+                        sfxAudio.StartSound("Magic Cast 2", vfx, 0f, 6.18f);
+                        Destroy(vfx, 3.81f);
+                    }
+                    else
+                        Destroy(vfx, 6.18f);
+                    break;
+                case ScriptedBeatAction.EndVisit:
+                    visitRunning = false;
+                    break;
+            }
+        }
+
+        // end on no more beats
+        if (currentBeatIndex >= visitBeats.Length)
+        {
+            visitRunning = false;
+            Destroy(salesman.gameObject, 10f);
+            return;
+        }
+
+        // end of beat
+        if (visitBeats[currentBeatIndex].name != currentBeat.name)
+        {
+            // reset transition flags
+            beatTimeUp = false;
+            playerResponse = false;
+            npcCallback = false;
+            // set current beat (transition incremented index value)
+            currentBeat = visitBeats[currentBeatIndex];
+            // display new beat name
+            string s = "beat '" + visitBeats[currentBeatIndex].name + "'";
+            if (currentBeat.transition == ScriptedBeatTransition.TimedDuration)
+            {
+                // if timed duration transition, set timer
+                beatTimer = currentBeat.duration;
+                beatTimeUp = false;
+            }
+            else if (currentBeat.transition == ScriptedBeatTransition.SalesmanCallback)
+            {
+                // if npc callback transition, set mark
+                if (salesman.destinationReached && salesman.gameObject.transform.position == currentBeat.npcMark)
+                    s += " > DESTINATION ALREADY REACHED <";
+                salesman.moveTarget = currentBeat.npcMark;
+                salesman.destinationReached = false;
+                npcCallback = false;
+                s += " npc mark x:" + currentBeat.npcMark.x + " , z:" + currentBeat.npcMark.z;
+            }
+            //Debug.Log(s);
+        }
+    }
+    void LaunchVisit()
+    {
+        visitRunning = true;
+        currentBeatIndex = 0;
+        currentBeat = visitBeats[currentBeatIndex];
+        beatTimer = currentBeat.duration;
+
+        // eden arrives
+        salesman = SpawnSalesman(currentBeat.npcMark);
+        salesman.moveTarget = currentBeat.npcMark;
+        salesman.ghostMode = true;
+        salesman.mode = NPCController.NPCMode.Scripted;
+    }
+
+    NPCController SpawnSalesman(Vector3 pos)
+    {
+        GameObject sNPC = GameObject.Instantiate((GameObject)Resources.Load("NPC Salesman"));
+        sNPC.transform.position = pos;
+        return sNPC.GetComponent<NPCController>();
+    }
+
+    void OnGUI()
+    {
+        if (!visitRunning || !dialogPop)
+            return;
+
+        Rect r = new Rect();
+        float w = Screen.width;
+        float h = Screen.height;
+        GUIStyle g = new GUIStyle(GUI.skin.box);
+        Texture2D t = Texture2D.whiteTexture;
+        Color c = Color.white;
+        string s = "";
+
+        if (dialogPop)
+        {
+            // box
+            r.x = 0.675f * w;
+            r.y = 0.125f * h;
+            r.width = 0.3f * w;
+            r.height = 0.25f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.padding = new RectOffset(0, 0, 20, 0);
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            t = Texture2D.whiteTexture;
+            c.r = 0.85f;
+            c.g = 0.8f;
+            c.b = 0.618f;
+            c.a = 1f;
+            g.normal.background = t;
+            g.hover.background = t;
+            g.active.background = t;
+            GUI.color = c;
+            s = "SALESMAN";
+            GUI.Box(r, s, g);
+
+            // dialog label
+            r.x = 0.6875f * w;
+            r.y = 0.14f * h;
+            r.width = 0.2625f * w;
+            r.height = 0.225f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.BoldAndItalic;
+            g.alignment = TextAnchor.MiddleLeft;
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            g.wordWrap = true;
+            s = currentBeat.dialogLine;
+            GUI.color = Color.white;
+            GUI.Label(r, s, g);
+            // ok button
+            r.x = 0.86f * w;
+            r.y = 0.3125f * h;
+            r.width = 0.1f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.button);
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+            else
+                g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.fontStyle = FontStyle.Normal;
+            g.alignment = TextAnchor.MiddleCenter;
+            if (!Application.isEditor)
+                c *= 0.618f;
+            g.normal.textColor = c;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.yellow;
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
+            s = "OK";
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                s += "\n[B BUTTON]";
+            GUI.color = Color.white;
+            if (GUI.Button(r, s, g) ||
+                (padMgr != null && padMgr.gamepads[0].isActive && padMgr.gPadDown[0].bButton))
+            {
+                // next dialog
+                dialogPop = false;
+                //introScriptStep++;
+                playerResponse = true;
+                if (currentBeatIndex >= visitBeats.Length)
+                {
+                    visitRunning = false;
+                    return;
+                }
+                // consume, but why?
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                    padMgr.gPadDown[0].bButton = false;
+            }
+        }
     }
 }
