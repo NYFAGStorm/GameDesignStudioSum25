@@ -61,7 +61,9 @@ public class MarketManager : MonoBehaviour
         public int bottomOfMenu; // REVIEW: num items?
     }
     private MenuCategory[] menuCategories;
-    private int currentCatagory;
+    private int currentCategory;
+    private string prevCategoryLabel;
+    private string nextCategoryLabel;
 
     private ArtLibraryManager alm;
     private QuitOnEscape qoe; // disable to suspend use of start button while in market
@@ -252,25 +254,32 @@ public class MarketManager : MonoBehaviour
         menuCategories[0].bottomOfMenu = top + generalItems;
         top += generalItems;
         menuCategories[1].name = "Magic Items";
-        menuCategories[0].topOfMenu = top;
-        menuCategories[0].bottomOfMenu = top + magicItems;
+        menuCategories[1].topOfMenu = top;
+        menuCategories[1].bottomOfMenu = top + magicItems;
         top += magicItems;
         menuCategories[2].name = "Common Plants";
-        menuCategories[0].topOfMenu = top;
-        menuCategories[0].bottomOfMenu = top + commonPlants;
-        top += commonPlants;
+        menuCategories[2].topOfMenu = top;
+        menuCategories[2].bottomOfMenu = top + (commonPlants * plantItemTypes);
+        top += (commonPlants * plantItemTypes);
         menuCategories[3].name = "Uncommon Plants";
-        menuCategories[0].topOfMenu = top;
-        menuCategories[0].bottomOfMenu = top + uncommonPlants;
-        top += uncommonPlants;
+        menuCategories[3].topOfMenu = top;
+        menuCategories[3].bottomOfMenu = top + (uncommonPlants * plantItemTypes);
+        top += (uncommonPlants * plantItemTypes);
         menuCategories[4].name = "Rare Plants";
-        menuCategories[0].topOfMenu = top;
-        menuCategories[0].bottomOfMenu = top + rarePlants;
-        top += rarePlants;
+        menuCategories[4].topOfMenu = top;
+        menuCategories[4].bottomOfMenu = top + (rarePlants * plantItemTypes);
+        top += (rarePlants * plantItemTypes);
         menuCategories[5].name = "Special Plants";
-        menuCategories[0].topOfMenu = top;
-        menuCategories[0].bottomOfMenu = top + specialPlants;
-        top += specialPlants;
+        menuCategories[5].topOfMenu = top;
+        menuCategories[5].bottomOfMenu = top + (specialPlants * plantItemTypes);
+        //top += (specialPlants * plantItemTypes);
+        //menuCategories[6].name = "Unique Plants";
+        //menuCategories[6].topOfMenu = top;
+        //menuCategories[6].bottomOfMenu = top + (uniquePlants * plantItemTypes);
+
+        // category labels
+        prevCategoryLabel = "Special Plants";
+        nextCategoryLabel = "Magic Items";
     }
 
     void Update()
@@ -521,13 +530,88 @@ public class MarketManager : MonoBehaviour
         }
     }
 
+    void SetTopOfMenuList( bool setToTop )
+    {
+        int maxMenuList = menuItems.Length - 1;
+        maxMenuList = maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level, 0, 9)];
+
+        if (topOfMenuList > menuItems.Length - MENUITEMSINLIST)
+            topOfMenuList = menuItems.Length - MENUITEMSINLIST;
+
+        if (topOfMenuList > maxMenuList - MENUITEMSINLIST)
+            topOfMenuList = maxMenuList - MENUITEMSINLIST;
+
+        //
+        if (setToTop)
+        {
+            //
+            if (topOfMenuList < menuCategories[currentCategory].topOfMenu)
+                topOfMenuList = menuCategories[currentCategory].topOfMenu;
+            if (topOfMenuList > menuCategories[currentCategory].bottomOfMenu - MENUITEMSINLIST - 1)
+                topOfMenuList = menuCategories[currentCategory].bottomOfMenu - MENUITEMSINLIST - 1;
+
+            menuItemSelection = menuCategories[currentCategory].topOfMenu;
+            topOfMenuList = menuCategories[currentCategory].topOfMenu;
+        }
+
+        //
+        topOfMenuList = menuItemSelection - MENUITEMSINLIST;
+        topOfMenuList = Mathf.Clamp(topOfMenuList,
+                menuCategories[currentCategory].topOfMenu, menuCategories[currentCategory].bottomOfMenu - 1);
+    }
+
+    int GetItemCategory( ItemData item )
+    {
+        if (item == null)
+            return currentCategory;
+
+        int retInt = 0;
+
+        int itemIndex = 0;
+        for (int i = 0; i < menuItems.Length; i++)
+        {
+            if (menuItems[i].itemType == item.type &&
+                menuItems[i].plantType == item.plant)
+            {
+                itemIndex = i;
+                break;
+            }
+        }
+
+        if (itemIndex >= generalItems)
+            retInt++;
+        if (itemIndex >= generalItems + magicItems)
+            retInt++;
+        if (itemIndex >= generalItems + magicItems +
+            (plantItemTypes * commonPlants))
+            retInt++;
+        if (itemIndex >= generalItems + magicItems +
+            (plantItemTypes * commonPlants) +
+            (plantItemTypes * uncommonPlants))
+            retInt++;
+        if (itemIndex >= generalItems + magicItems +
+            (plantItemTypes * commonPlants) +
+            (plantItemTypes * uncommonPlants) +
+            (plantItemTypes * rarePlants))
+            retInt++;
+        if (itemIndex >= generalItems + magicItems +
+            (plantItemTypes * commonPlants) +
+            (plantItemTypes * uncommonPlants) +
+            (plantItemTypes * rarePlants) +
+            (plantItemTypes * specialPlants))
+            retInt++;
+
+        return retInt;
+    }
+
     void CheckBuyMode( PlayerControlManager.PlayerActions pa )
     {
         if (customerMode == CustomerMode.Default && pa.actionADown)
         {
             customerMode = CustomerMode.Buy;
             currentCustomer.characterFrozen = true;
-            //menuItemSelection = 0;
+            menuItemSelection = menuCategories[currentCategory].topOfMenu;
+            topOfMenuList = menuCategories[currentCategory].topOfMenu;
             marketInstructions = "- BUY MODE -\nE=BUY V=EXIT";
             if (padMgr != null && padMgr.gamepads[0].isActive)
                 marketInstructions = "- BUY MODE -\nA=BUY Y=EXIT";
@@ -553,11 +637,10 @@ public class MarketManager : MonoBehaviour
             int maxMenuList = menuItems.Length - 1;
             maxMenuList = maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level,0,9)];
             menuItemSelection = Mathf.Clamp(menuItemSelection, 0, maxMenuList);
+            menuItemSelection = Mathf.Clamp(menuItemSelection, 
+                menuCategories[currentCategory].topOfMenu, menuCategories[currentCategory].bottomOfMenu-1);
             // set top of menu list
-            if (menuItemSelection < topOfMenuList)
-                topOfMenuList = menuItemSelection;
-            if (menuItemSelection > topOfMenuList + MENUITEMSINLIST)
-                topOfMenuList = menuItemSelection - MENUITEMSINLIST;
+            SetTopOfMenuList(false);
             // detect player coupon is selected in inventory
             ItemData coupon = currentCustomer.GetPlayerCurrentItemSelection();
             discountBuy = 1f; // 100% purchase price (no discount by default)
@@ -684,6 +767,9 @@ public class MarketManager : MonoBehaviour
         {
             // find item on menu matching player selection and display sell value
             ItemData iData = currentCustomer.GetPlayerCurrentItemSelection();
+            // go to category of item
+            if (iData != null)
+                currentCategory = GetItemCategory(iData);
             bool found = false;
             int value = 0;
             topOfMenuList = 0;
@@ -707,11 +793,7 @@ public class MarketManager : MonoBehaviour
                             found = true;
                             menuItemSelection = i;
                             topOfMenuList = i;
-                            if (topOfMenuList > menuItems.Length - MENUITEMSINLIST)
-                                topOfMenuList = menuItems.Length - MENUITEMSINLIST;
-                            
-                            if (topOfMenuList > maxMenuList - MENUITEMSINLIST)
-                                topOfMenuList = maxMenuList - MENUITEMSINLIST;
+                            SetTopOfMenuList(false);
                             break;
                         }
                     }
@@ -1317,6 +1399,10 @@ public class MarketManager : MonoBehaviour
 
         for (int i = 0; i < menuItems.Length; i++)
         {
+            if (i < menuCategories[currentCategory].topOfMenu ||
+                i >= menuCategories[currentCategory].bottomOfMenu)
+                continue;
+
             r.x = 0.1f * w;
             r.width = 0.305f * w;
             g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
@@ -1517,6 +1603,94 @@ public class MarketManager : MonoBehaviour
         GUI.Label(r, s, g);
         GUI.color = Color.white;
 
+        // current category label
+        // bg box
+        r.x = 0.15325f * w;
+        r.y = 0.2125f * h;
+        r.width = 0.2f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.box);
+        GUI.color = new Color(0.381f, 0.381f, 0.381f, 0.618f);
+        s = "";
+        GUI.Box(r, s, g);
+        GUI.color = Color.white;
+        // label
+        g = new GUIStyle(GUI.skin.label);
+        g.alignment = TextAnchor.MiddleCenter;
+        g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+        g.fontStyle = FontStyle.Bold;
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.white;
+        s = menuCategories[currentCategory].name;
+        r.x += 0.0006f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.0012f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.white;
+        GUI.Label(r, s, g);
+
+        // category arrow labels + buttons
+        r.x = 0.0125f * w;
+        r.y = 0.08325f * h;
+        g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+        g.padding = new RectOffset(0, 30, 0, 0);
+        s = prevCategoryLabel;
+        r.x += 0.0005f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.001f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        // TODO: gamepad support
+        if (GUI.Button(r,s,g))
+        {
+            currentCategory--;
+            if (currentCategory < 0)
+                currentCategory = menuCategories.Length - 1;
+            if (currentCategory > 0)
+                prevCategoryLabel = menuCategories[currentCategory - 1].name;
+            else
+                prevCategoryLabel = menuCategories[menuCategories.Length - 1].name;
+            if (currentCategory < menuCategories.Length - 1)
+                nextCategoryLabel = menuCategories[currentCategory + 1].name;
+            else
+                nextCategoryLabel = menuCategories[0].name;
+
+            SetTopOfMenuList(true);
+        }
+        r.x = 0.7875f * w;
+        g.padding = new RectOffset(30, 0, 0, 0);
+        s = nextCategoryLabel;
+        r.x += 0.0005f * w;
+        r.y += 0.001f * h;
+        GUI.color = Color.black;
+        GUI.Label(r, s, g);
+        r.x -= 0.001f * w;
+        r.y -= 0.002f * h;
+        GUI.color = Color.yellow;
+        GUI.Label(r, s, g);
+        // TODO: gamepad support
+        if (GUI.Button(r, s, g))
+        {
+            currentCategory++;
+            if (currentCategory > menuCategories.Length - 1)
+                currentCategory = 0;
+            if (currentCategory > 0)
+                prevCategoryLabel = menuCategories[currentCategory - 1].name;
+            else
+                prevCategoryLabel = menuCategories[menuCategories.Length - 1].name;
+            if (currentCategory < menuCategories.Length - 1)
+                nextCategoryLabel = menuCategories[currentCategory + 1].name;
+            else
+                nextCategoryLabel = menuCategories[0].name;
+
+            SetTopOfMenuList(true);
+        }
 
         // exit market button
         r.x = 0.4f * w;
