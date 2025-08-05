@@ -903,6 +903,14 @@ public class PlayerIntroduction : MonoBehaviour
                 "Now you try. You can use your 'A Button' to both till and plant this plot.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
+        introBeats[beat].name = "big hint work eden plot";
+        introBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        introBeats[beat].duration = .618f;
+        introBeats[beat].islandPos.x = 2f;
+        introBeats[beat].islandPos.z = -2f;
+        introBeats[beat].islandPos.w = -2f;
+        beat++;
         introBeats[beat].name = "help message action button";
         introBeats[beat].action = ScriptedBeatAction.HelpMessage;
         introBeats[beat].transition = ScriptedBeatTransition.Default;
@@ -1415,12 +1423,15 @@ public class PlayerIntroduction : MonoBehaviour
                     GameObject vfx = null;
                     if (currentBeat.islandPos.w >= 0f)
                         vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
-                    else
+                    else if (currentBeat.islandPos.w < 0f &&
+                        currentBeat.islandPos.w >= -1f)
                         vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Cast Magic"));
+                    else
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("Big Hint"));
                     vfxPos.x = currentBeat.islandPos.x;
                     vfxPos.z = currentBeat.islandPos.z;
                     vfx.transform.position = vfxPos;
-                    if (vfx.GetComponentInChildren<SpriteRenderer>()!= null)
+                    if (vfx.GetComponentInChildren<SpriteRenderer>() != null)
                         vfx.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
                     GameObject sfxTemp = new GameObject();
                     sfxTemp.name = "Teleport SFX Obj";
@@ -1432,12 +1443,15 @@ public class PlayerIntroduction : MonoBehaviour
                         Destroy(sfxTemp, 2.2f);
                         Destroy(vfx, 1f);
                     }
-                    else
+                    else if (currentBeat.islandPos.w < 0f &&
+                            currentBeat.islandPos.w >= -1f)
                     {
                         // magic
                         sfxAudio.StartSound("Magic Cast 2", vfx, 0f, 6.18f);
                         Destroy(vfx, 3.81f);
                     }
+                    else
+                        Destroy(vfx, 6.18f);
                     break;
                 case ScriptedBeatAction.ItemSpawn:
                     // item type
