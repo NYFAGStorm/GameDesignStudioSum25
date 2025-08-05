@@ -997,9 +997,49 @@ public class MarketManager : MonoBehaviour
 
     void SetLimitedItemAvailability()
     {
-        // popcorn seed and plant
+        // seed and plant of plants with grafting requirement cannot be bought
+        // popcorn
         SetMenuItemAvailable(ItemType.Seed, PlantType.Popcorn, false);
         SetMenuItemAvailable(ItemType.Plant, PlantType.Popcorn, false);
+        // eclipse flower
+        SetMenuItemAvailable(ItemType.Seed, PlantType.EclipseFlower, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.EclipseFlower, false);
+        // golden apple
+        SetMenuItemAvailable(ItemType.Seed, PlantType.GoldenApple, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.GoldenApple, false);
+        // hollowbloom
+        SetMenuItemAvailable(ItemType.Seed, PlantType.Hollowbloom, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.Hollowbloom, false);
+        // frost lily
+        SetMenuItemAvailable(ItemType.Seed, PlantType.FrostLily, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.FrostLily, false);
+        // mysteria
+        SetMenuItemAvailable(ItemType.Seed, PlantType.Mysteria, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.Mysteria, false);
+        // crystal rose
+        SetMenuItemAvailable(ItemType.Seed, PlantType.CrystalRose, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.CrystalRose, false);
+        // dragonroot
+        SetMenuItemAvailable(ItemType.Seed, PlantType.Dragonroot, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.Dragonroot, false);
+        // winter rose
+        SetMenuItemAvailable(ItemType.Seed, PlantType.WinterRose, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.WinterRose, false);
+        // tropicus
+        SetMenuItemAvailable(ItemType.Seed, PlantType.Tropicus, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.Tropicus, false);
+        // mourning nyx
+        SetMenuItemAvailable(ItemType.Seed, PlantType.MourningNyx, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.MourningNyx, false);
+        // blast apple
+        SetMenuItemAvailable(ItemType.Seed, PlantType.BlastApple, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.BlastApple, false);
+        // druid's lotus
+        SetMenuItemAvailable(ItemType.Seed, PlantType.DruidsLotus, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.DruidsLotus, false);
+        // splat berry
+        SetMenuItemAvailable(ItemType.Seed, PlantType.SplatBerry, false);
+        SetMenuItemAvailable(ItemType.Plant, PlantType.SplatBerry, false);
     }
 
     void SetMenuItemEffect( MenuItem mItem, ItemEffect iEffect, string itemNameSuffix )
