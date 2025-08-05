@@ -5,15 +5,6 @@ public class MarketManager : MonoBehaviour
     // Author: Glenn Storm
     // This handles the market transactions with players
 
-    // REVIEW: we have the ability to set individual items 'available to buy' or not
-    // we should consider _not_ offering everything to buy, so rare items are rare
-    // For Example:
-    // all special plant, fruit and seed not available to buy
-    // all rare plant and seed not available to buy
-    // all uncommon plant not available to buy
-    // while we would need to have another way for players to get these (like grafting)
-    // the point would be, the market isn't the 'all too easy' way to get very rare items
-
     public enum CustomerMode
     {
         Default,
@@ -52,7 +43,7 @@ public class MarketManager : MonoBehaviour
 
     private int[] maxMenuListPerLevel = new int[11];
     
-    int generalItems = 11; // fertilizer + 8 scrolls + 2 potions
+    int generalItems = 18; // fertilizer + 15 scrolls + 2 potions
     int plantItemTypes = 3; // seed, fruit, plant
 
     int commonPlants = 10;
@@ -557,7 +548,8 @@ public class MarketManager : MonoBehaviour
                         {
                             iData.plant = menuItems[menuItemSelection].plantType;
                             if (menuItems[menuItemSelection].itemType == ItemType.Seed ||
-                                menuItems[menuItemSelection].itemType == ItemType.Fruit)
+                                menuItems[menuItemSelection].itemType == ItemType.Fruit ||
+                                menuItems[menuItemSelection].itemType == ItemType.Plant)
                             {
                                 PlantType p = iData.plant;
                                 iData.name += " (" + p.ToString() + ")";
@@ -566,7 +558,7 @@ public class MarketManager : MonoBehaviour
                                 menuItems[menuItemSelection].itemType == ItemType.Potion)
                             {
                                 // magic item config
-                                iData.name = menuItems[menuItemSelection].itemName;
+                                iData.name = menuItems[menuItemSelection].itemName.Replace("\n", " ");
                                 iData.effects = new ItemEffect[1];
                                 iData.effects[0] = menuItems[menuItemSelection].effect;
                             }
@@ -900,21 +892,36 @@ public class MarketManager : MonoBehaviour
         // -- GENERAL ITEMS --
 
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 100, 50);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Unknown)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Unknown)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 50, 25);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelOneSpellCharge, " (Level One)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelOneSpellCharge, "\n(Level One)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 65, 32);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelTwoSpellCharge, " (Level Two)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelTwoSpellCharge, "\n(Level Two)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 80, 40);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelThreeSpellCharge, " (Level Three)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollLevelThreeSpellCharge, "\n(Level Three)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 100, 50);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Four)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Four)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 120, 60);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Five)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Five)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 150, 75);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Six)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Six)");
         menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 200, 100);
-        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, " (Level Seven)");
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollRandomSpellCharge, "\n(Level Seven)");
+
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 60, 35);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollMirrorMirror, "\n(Mirror Mirror)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 75, 42);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollColorTrailI, "\n(Color Trail I)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 75, 42);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollColorTrailII, "\n(Color Trail II)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 75, 42);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollColorTrailIII, "\n(Color Trail III)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 90, 50);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollSplaturn, "\n(Splaturn)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 110, 60);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollStarbloomBurst, "\n(Starbloom Burst)");
+        menuItems[idx] = SetMenuItems(ItemType.Scroll, PlantType.Default, 125, 75);
+        SetMenuItemEffect(menuItems[idx++], ItemEffect.ScrollFogOfWar, "\n(Fog Of War)");
 
         menuItems[idx] = SetMenuItems(ItemType.Potion, PlantType.Default, 30, 20);
         SetMenuItemEffect(menuItems[idx++], ItemEffect.PotionClearOneCooldown, " (Grey)");

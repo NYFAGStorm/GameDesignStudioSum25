@@ -857,6 +857,27 @@ public class PlayerControlManager : MonoBehaviour
                         scrollCharge = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 2) - 1;
                         scrollAddsCharge = (SpellType)(scrollCharge + 33); // level five spells start at 33
                         break;
+                    case ItemEffect.ScrollMirrorMirror:
+                        scrollAddsCharge = SpellType.MirrorMirror;
+                        break;
+                    case ItemEffect.ScrollColorTrailI:
+                        scrollAddsCharge = SpellType.ColorTrailI;
+                        break;
+                    case ItemEffect.ScrollColorTrailII:
+                        scrollAddsCharge = SpellType.ColorTrailII;
+                        break;
+                    case ItemEffect.ScrollColorTrailIII:
+                        scrollAddsCharge = SpellType.ColorTrailIII;
+                        break;
+                    case ItemEffect.ScrollSplaturn:
+                        scrollAddsCharge = SpellType.Splaturn;
+                        break;
+                    case ItemEffect.ScrollStarbloomBurst:
+                        scrollAddsCharge = SpellType.StarbloomBurst;
+                        break;
+                    case ItemEffect.ScrollFogOfWar:
+                        scrollAddsCharge = SpellType.FogOfWar;
+                        break;
                 }
                 // apply effect
                 playerData.magic.library = MagicSystem.AddChargeToSpellBook(scrollAddsCharge, playerData.magic.library);
