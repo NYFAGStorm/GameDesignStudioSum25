@@ -1635,9 +1635,14 @@ public class MarketManager : MonoBehaviour
         // category arrow labels + buttons
         r.x = 0.0125f * w;
         r.y = 0.08325f * h;
-        g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+        else
+            g.fontSize = Mathf.RoundToInt(14f * (w / 1024f));
         g.padding = new RectOffset(0, 30, 0, 0);
         s = prevCategoryLabel;
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            s += "\n[Left Trigger]";
         r.x += 0.0005f * w;
         r.y += 0.001f * h;
         GUI.color = Color.black;
@@ -1647,7 +1652,9 @@ public class MarketManager : MonoBehaviour
         GUI.color = Color.yellow;
         GUI.Label(r, s, g);
         // TODO: gamepad support
-        if (GUI.Button(r,s,g))
+        if (GUI.Button(r,s,g) ||
+            (padMgr != null && padMgr.gamepads[0].isActive &&
+            padMgr.gPadDown[0].LTrigger > 0f))
         {
             currentCategory--;
             if (currentCategory < 0)
@@ -1662,10 +1669,16 @@ public class MarketManager : MonoBehaviour
                 nextCategoryLabel = menuCategories[0].name;
 
             SetTopOfMenuList(true);
+
+            // consuming input, but why?
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                padMgr.gPadDown[0].LTrigger = 0f;
         }
         r.x = 0.7875f * w;
         g.padding = new RectOffset(30, 0, 0, 0);
         s = nextCategoryLabel;
+        if (padMgr != null && padMgr.gamepads[0].isActive)
+            s += "\n[Right Trigger]";
         r.x += 0.0005f * w;
         r.y += 0.001f * h;
         GUI.color = Color.black;
@@ -1675,7 +1688,9 @@ public class MarketManager : MonoBehaviour
         GUI.color = Color.yellow;
         GUI.Label(r, s, g);
         // TODO: gamepad support
-        if (GUI.Button(r, s, g))
+        if (GUI.Button(r, s, g) ||
+            (padMgr != null && padMgr.gamepads[0].isActive &&
+            padMgr.gPadDown[0].RTrigger > 0f))
         {
             currentCategory++;
             if (currentCategory > menuCategories.Length - 1)
@@ -1690,6 +1705,10 @@ public class MarketManager : MonoBehaviour
                 nextCategoryLabel = menuCategories[0].name;
 
             SetTopOfMenuList(true);
+
+            // consuming input, but why?
+            if (padMgr != null && padMgr.gamepads[0].isActive)
+                padMgr.gPadDown[0].RTrigger = 0f;
         }
 
         // exit market button
