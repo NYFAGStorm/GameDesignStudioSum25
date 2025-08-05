@@ -435,66 +435,76 @@ public static class PlayerSystem
                 retData.magic = MagicSystem.IntializeMagic();
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowI, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterI, retData.magic.library);
+                break;
+            case 2:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SoiledItI, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.MirrorMirror, retData.magic.library);
                 break;
-            case 2:
+            case 3:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.BlessI, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.DaylightI, retData.magic.library);
+                break;
+            case 4:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.GildedWordsI, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SeedingEcho, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ColorTrailI, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ColorTrailII, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ColorTrailIII, retData.magic.library);
                 break;
-            case 3:
+            case 5:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ColorTrailI, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FastGrowII, retData.magic.library);
+                break;
+            case 6:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ColorTrailII, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.MalnutritionI, retData.magic.library);
+                break;
+            case 7:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ColorTrailIII, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ProsperousI, retData.magic.library);
+                break;
+            case 8:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.TheGreatHarvest, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.Splaturn, retData.magic.library);
                 break;
-            case 4:
+            case 9:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SummonWaterII, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.LesionI, retData.magic.library);
+                break;
+            case 10:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.TheReaper, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.Swiftness, retData.magic.library);
+                break;
+            case 11:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.LightWork, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.StarbloomBurst, retData.magic.library);
                 break;
-            case 5:
+            case 12:
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.SoiledItII, retData.magic.library);
                 retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.GildedWordsII, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.EclipseI, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.GoldenThumbI, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.DullEarth, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FogOfWar, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.BlessedSpring, retData.magic.library);
-                break;
-            case 6:
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.MalnutritionII, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.BlessII, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ProsperousII, retData.magic.library);
-                break;
-            case 7:
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.DaylightII, retData.magic.library);
-                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.RabbitHole, retData.magic.library);
-                break;
-            case 8:
-                break;
-            case 9:
-                break;
-            case 10:
-                break;
-            case 11:
-                break;
-            case 12:
                 break;
             case 13:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.EclipseI, retData.magic.library);
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.GoldenThumbI, retData.magic.library);
                 break;
             case 14:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.DullEarth, retData.magic.library);
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.FogOfWar, retData.magic.library);
                 break;
             case 15:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.BlessedSpring, retData.magic.library);
+                break;
+            case 16:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.MalnutritionII, retData.magic.library);
+                break;
+            case 17:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.BlessII, retData.magic.library);
+                break;
+            case 18:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.ProsperousII, retData.magic.library);
+                break;
+            case 19:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.DaylightII, retData.magic.library);
+                break;
+            case 20:
+                retData.magic.library = MagicSystem.AddSpellToGrimoire(SpellType.RabbitHole, retData.magic.library);
                 break;
         }
 
@@ -517,121 +527,146 @@ public static class PlayerSystem
                 // welcome to the game
                 break;
             case 1:
-                retNotifications = new string[7];
+                retNotifications = new string[5];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 1";
                 retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "Magic Crafting\nUNLOCKED";
                 retNotifications[3] = "New spell in Grimoire:\nFast Grow I";
                 retNotifications[4] = "New spell in Grimoire:\nSummon Water I";
-                retNotifications[5] = "New spell in Grimoire:\nSoiled It I";
-                retNotifications[6] = "New spell in Grimoire:\nMirror Mirror";
                 break;
             case 2:
-                retNotifications = new string[11];
+                retNotifications = new string[6];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 2";
                 retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "Plant Grafting\nUNLOCKED";
                 retNotifications[3] = "UNCOMMON plants at market\nAVAILABLE";
-                retNotifications[4] = "New spell in Grimoire:\nBless I";
-                retNotifications[5] = "New spell in Grimoire:\nDaylight I";
-                retNotifications[6] = "New spell in Grimoire:\nGilded Words I";
-                retNotifications[7] = "New spell in Grimoire:\nSeeding Echo";
-                retNotifications[8] = "New spell in Grimoire:\nColor Trail I";
-                retNotifications[9] = "New spell in Grimoire:\nColor Trail II";
-                retNotifications[10] = "New spell in Grimoire:\nColor Trail III";
+                retNotifications[4] = "New spell in Grimoire:\nSoiled It I";
+                retNotifications[5] = "New spell in Grimoire:\nMirror Mirror";
                 break;
             case 3:
-                retNotifications = new string[8];
+                retNotifications = new string[5];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 3";
                 retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "Magic Crafting Cauldron\nUPGRADED";
-                retNotifications[3] = "New spell in Grimoire:\nFast Grow II";
-                retNotifications[4] = "New spell in Grimoire:\nMalnutrition I";
-                retNotifications[5] = "New spell in Grimoire:\nProsperous I";
-                retNotifications[6] = "New spell in Grimoire:\nThe Great Harvest";
-                retNotifications[7] = "New spell in Grimoire:\nSplaturn";
+                retNotifications[3] = "New spell in Grimoire:\nBless I";
+                retNotifications[4] = "New spell in Grimoire:\nDaylight I";
                 break;
             case 4:
-                retNotifications = new string[8];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 4";
                 retNotifications[1] = "You recieve\none ARCANA";
-                retNotifications[2] = "New spell in Grimoire:\nSummon Water II";
-                retNotifications[3] = "New spell in Grimoire:\nLesion I";
-                retNotifications[4] = "New spell in Grimoire:\nThe Reaper";
-                retNotifications[5] = "New spell in Grimoire:\nSwiftness";
-                retNotifications[6] = "New spell in Grimoire:\nLight Work";
-                retNotifications[7] = "New spell in Grimoire:\nStarbloom Burst";
+                retNotifications[2] = "New spell in Grimoire:\nGilded Words I";
+                retNotifications[3] = "New spell in Grimoire:\nSeeding Echo";
                 break;
             case 5:
-                retNotifications = new string[11];
+                retNotifications = new string[6];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 5";
                 retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "RARE plants at market\nAVAILABLE";
                 retNotifications[3] = "Magic Crafting Cauldron\nUPGRADED";
-                retNotifications[4] = "New spell in Grimoire:\nSoiled IT II";
-                retNotifications[5] = "New spell in Grimoire:\nGilded Words II";
-                retNotifications[6] = "New spell in Grimoire:\nEclipse I";
-                retNotifications[7] = "New spell in Grimoire:\nGolden Thumb I";
-                retNotifications[8] = "New spell in Grimoire:\nDull Earth";
-                retNotifications[9] = "New spell in Grimoire:\nFog Of War";
-                retNotifications[10] = "New spell in Grimoire:\nBlessed Spring";
+                retNotifications[4] = "New spell in Grimoire:\nColor Trail I";
+                retNotifications[5] = "New spell in Grimoire:\nFast Grow II";
                 break;
             case 6:
-                retNotifications = new string[5];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 6";
                 retNotifications[1] = "You recieve\none ARCANA";
-                retNotifications[2] = "New spell in Grimoire:\nMalnutrition II";
-                retNotifications[3] = "New spell in Grimoire:\nBless II";
-                retNotifications[4] = "New spell in Grimoire:\nProsperous II";
+                retNotifications[2] = "New spell in Grimoire:\nColor Trail II";
+                retNotifications[3] = "New spell in Grimoire:\nMalnutrition I";
                 break;
             case 7:
                 retNotifications = new string[5];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 7";
                 retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "Magic Crafting Cauldron\nUPGRADED";
-                retNotifications[3] = "New spell in Grimoire:\nDaylight II";
-                retNotifications[4] = "New spell in Grimoire:\nRabbit Hole I";
+                retNotifications[3] = "New spell in Grimoire:\nColor Trail III";
+                retNotifications[4] = "New spell in Grimoire:\nProsperous I";
                 break;
             case 8:
-                retNotifications = new string[3];
+                retNotifications = new string[5];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 8";
                 retNotifications[1] = "You recieve\none ARCANA";
                 retNotifications[2] = "SPECIAL plants at market\nAVAILABLE";
+                retNotifications[3] = "New spell in Grimoire:\nThe Great Harvest";
+                retNotifications[4] = "New spell in Grimoire:\nSplaturn";
                 break;
             case 9:
-                retNotifications = new string[2];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 9";
                 retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nSummon Water II";
+                retNotifications[3] = "New spell in Grimoire:\nLesion I";
                 break;
             case 10:
-                retNotifications = new string[2];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 10";
                 retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nThe Reaper";
+                retNotifications[3] = "New spell in Grimoire:\nSwiftness";
                 break;
             case 11:
-                retNotifications = new string[2];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 11";
                 retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nLight Work";
+                retNotifications[3] = "New spell in Grimoire:\nStarbloom Burst";
                 break;
             case 12:
-                retNotifications = new string[2];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 12";
                 retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nSoiled IT II";
+                retNotifications[3] = "New spell in Grimoire:\nGilded Words II";
                 break;
             case 13:
-                retNotifications = new string[2];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 13";
                 retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nEclipse I";
+                retNotifications[3] = "New spell in Grimoire:\nGolden Thumb I";
                 break;
             case 14:
-                retNotifications = new string[2];
+                retNotifications = new string[4];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 14";
                 retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nDull Earth";
+                retNotifications[3] = "New spell in Grimoire:\nFog Of War";
                 break;
             case 15:
-                retNotifications = new string[2];
+                retNotifications = new string[3];
                 retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 15";
                 retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nBlessed Spring";
+                break;
+            case 16:
+                retNotifications = new string[3];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 16";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nMalnutrition II";
+                break;
+            case 17:
+                retNotifications = new string[3];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 17";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nBless II";
+                break;
+            case 18:
+                retNotifications = new string[3];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 18";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nProsperous II";
+                break;
+            case 19:
+                retNotifications = new string[3];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 19";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nDaylight II";
+                break;
+            case 20:
+                retNotifications = new string[3];
+                retNotifications[0] = "You Leveled Up!\nYou reached LEVEL 20";
+                retNotifications[1] = "You recieve\none ARCANA";
+                retNotifications[2] = "New spell in Grimoire:\nRabbit Hole I";
                 break;
         }
 
