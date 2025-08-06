@@ -60,6 +60,7 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 0
+  countdownToVisit: 3
   visitRunning: 0
   dialogTimer: 0
   dialogPop: 0

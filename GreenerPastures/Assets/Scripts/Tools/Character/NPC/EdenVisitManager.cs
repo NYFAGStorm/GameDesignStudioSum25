@@ -48,6 +48,8 @@ public class EdenVisitManager : MonoBehaviour
 
     private PlayerControlManager pcm;
 
+    public float countdownToVisit = 3f;
+
     public bool visitRunning;
     public float dialogTimer;
     public bool dialogPop;
@@ -75,7 +77,7 @@ public class EdenVisitManager : MonoBehaviour
     void Start()
     {
         // validate
-        PlayerControlManager pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
+        pcm = GameObject.FindFirstObjectByType<PlayerControlManager>();
         if (pcm == null)
         {
             Debug.LogError("--- EdenVisitManager [Start] : no player control manager found in scene. aborting.");
@@ -164,6 +166,9 @@ public class EdenVisitManager : MonoBehaviour
     {
         Vector3 retVector = Vector3.zero;
 
+        if (pcm == null)
+            Debug.LogWarning("--- EdenVisitManager [FindPlayerFarm] : no pcm. will ignore.");
+
         for (int i = 0; i < pcm.playerData.farm.plots.Length; i++)
         {
             retVector += GameSystem.GetVector(pcm.playerData.farm.plots[i].location);
@@ -177,6 +182,9 @@ public class EdenVisitManager : MonoBehaviour
     {
         bool retBool = false;
 
+        if (pcm == null)
+            Debug.LogWarning("--- EdenVisitManager [IsPlayerClose] : no pcm. will ignore.");
+
         float dist = Vector3.Distance(pcm.gameObject.transform.position, eden.transform.position);
         retBool = (dist <= PROXIMITY);
 
@@ -187,6 +195,9 @@ public class EdenVisitManager : MonoBehaviour
     {
         bool retBool = false;
 
+        if (pcm == null)
+            Debug.LogWarning("--- EdenVisitManager [FacingDirectionToPlayer] : no pcm. will ignore.");
+
         // face left?
         retBool = (pcm.gameObject.transform.position.x < eden.transform.position.x);
 
@@ -195,14 +206,12 @@ public class EdenVisitManager : MonoBehaviour
 
     void ConfigureVisitBeats()
     {
-        visitBeats = new ScriptedBeat[34];
+        visitBeats = new ScriptedBeat[33];
         int beat = 0;
-        visitBeats[beat].name = "visit launch - npc spawn";
-        visitBeats[beat].action = ScriptedBeatAction.NPCSpawn;
+        visitBeats[beat].name = "visit launch";
+        visitBeats[beat].action = ScriptedBeatAction.Default;
+        visitBeats[beat].npcMark = new Vector3(20f,0f,-20f);
         visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].beatPosition.x = 20f;
-        visitBeats[beat].beatPosition.y = 0f;
-        visitBeats[beat].beatPosition.z = -20f;
         visitBeats[beat].duration = 1f;
         beat++;
         visitBeats[beat].name = "move eden out market";
@@ -217,7 +226,7 @@ public class EdenVisitManager : MonoBehaviour
         beat++;
         visitBeats[beat].name = "move eden from market";
         visitBeats[beat].action = ScriptedBeatAction.EdenMark;
-        visitBeats[beat].npcMark = new Vector3(18f, 0f, -19f);
+        visitBeats[beat].npcMark = new Vector3(18f, 0f, -21f);
         visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         visitBeats[beat].name = "brief pause";
@@ -254,17 +263,22 @@ public class EdenVisitManager : MonoBehaviour
         visitBeats[beat].npcMark = new Vector3(4.5f, 0f, -3.25f);
         visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
+        visitBeats[beat].name = "eden toward farm";
+        visitBeats[beat].action = ScriptedBeatAction.EdenMark;
+        visitBeats[beat].npcMark = new Vector3(3f, 0f, -1f);
+        visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
         visitBeats[beat].name = "eden to player farm position";
         visitBeats[beat].action = ScriptedBeatAction.NPCMarkToPlayerFarm;
         visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         visitBeats[beat].name = "eden wait for player";
         visitBeats[beat].action = ScriptedBeatAction.NPCWaitForPlayer;
-        visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
         beat++;
         visitBeats[beat].name = "eden turn to player";
         visitBeats[beat].action = ScriptedBeatAction.NPCTurnToPlayer;
-        visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
         beat++;
         visitBeats[beat].name = "'you've been busy!'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
@@ -275,7 +289,7 @@ public class EdenVisitManager : MonoBehaviour
         visitBeats[beat].name = "'have you seen?'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
         visitBeats[beat].dialogLine =
-            "Have you seen the Arcana shrine is in the market?";
+            "Have you seen the Arcana shrine in the market?";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         visitBeats[beat].name = "'the genesis tree grants'";
@@ -284,36 +298,27 @@ public class EdenVisitManager : MonoBehaviour
             "The Genesis Tree grants special abilities to advanced Biomancers.";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
-        visitBeats[beat].name = "brief pause";
-        visitBeats[beat].action = ScriptedBeatAction.Default;
-        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 0.5f;
-        beat++;
         visitBeats[beat].name = "'visit the shrine'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
         visitBeats[beat].dialogLine =
             "Visit the shrine and use your Arcana to receive the Genesis Tree blessings.";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
-        visitBeats[beat].name = "brief pause";
-        visitBeats[beat].action = ScriptedBeatAction.Default;
-        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 0.5f;
-        beat++;
         visitBeats[beat].name = "'we're all so glad'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
         visitBeats[beat].dialogLine =
-            "We're all so glad you're a part of our community! Be well and take care.";
+            "We're all so glad you're a part of our community!";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
-        visitBeats[beat].name = "brief pause";
-        visitBeats[beat].action = ScriptedBeatAction.Default;
-        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 0.5f;
+        visitBeats[beat].name = "'be well'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "Be well and take care.";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         visitBeats[beat].name = "eden turn to player";
         visitBeats[beat].action = ScriptedBeatAction.NPCTurnToPlayer;
-        visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
         beat++;
         visitBeats[beat].name = "eden to teleporter";
         visitBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -351,7 +356,7 @@ public class EdenVisitManager : MonoBehaviour
         beat++;
         visitBeats[beat].name = "move eden towards market";
         visitBeats[beat].action = ScriptedBeatAction.EdenMark;
-        visitBeats[beat].npcMark = new Vector3(18f, 0f, -19f);
+        visitBeats[beat].npcMark = new Vector3(18f, 0f, -21f);
         visitBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         visitBeats[beat].name = "brief pause";
@@ -382,6 +387,19 @@ public class EdenVisitManager : MonoBehaviour
 
     void Update()
     {
+        // countdown to visit
+        if (countdownToVisit > 0f)
+        {
+            countdownToVisit -= Time.deltaTime;
+            if (countdownToVisit < 0f)
+            {
+                countdownToVisit = 0f;
+                BeginVisit();
+            }
+            else
+                return;
+        }
+
         // waiting for player
         if (waitingForPlayer)
         {
@@ -394,7 +412,8 @@ public class EdenVisitManager : MonoBehaviour
         // run dialog timer
         if (dialogTimer > 0f)
         {
-            if (dialogTimer > 0f)
+            dialogTimer -= Time.deltaTime;
+            if (dialogTimer < 0f)
             {
                 dialogTimer = 0f;
                 dialogPop = true;
@@ -405,7 +424,7 @@ public class EdenVisitManager : MonoBehaviour
             return;
 
         // turn to face player
-        if (facingPlayer)
+        if (eden != null && facingPlayer)
         {
             bool facingLeft = (eden.GetComponentInChildren<CharacterAnimManager>().GetImageFlipped());
             Vector3 newMove = eden.moveTarget;
@@ -440,7 +459,8 @@ public class EdenVisitManager : MonoBehaviour
         }
 
         // detect npc destination reached ('callback')
-        npcCallback = eden.destinationReached;
+        if (eden != null)
+            npcCallback = eden.destinationReached;
 
         // handle beat script transition
         switch (currentBeat.transition)
@@ -488,8 +508,8 @@ public class EdenVisitManager : MonoBehaviour
                     break;
                 case ScriptedBeatAction.NPCSpawn:
                     // eden arrives
-                    eden = SpawnEden(currentBeat.npcMark);
-                    eden.moveTarget = currentBeat.npcMark;
+                    eden = SpawnEden(GameSystem.GetVector(currentBeat.beatPosition));
+                    eden.moveTarget = GameSystem.GetVector(currentBeat.beatPosition);
                     eden.ghostMode = true;
                     eden.mode = NPCController.NPCMode.Scripted;
                     break;
@@ -562,6 +582,7 @@ public class EdenVisitManager : MonoBehaviour
                     visitRunning = false;
                     break;
             }
+            currentBeat.actionDone = true;
         }
 
         // end on no more beats
@@ -606,10 +627,21 @@ public class EdenVisitManager : MonoBehaviour
 
     public void LaunchVisit()
     {
+        countdownToVisit = 1f;
+    }
+
+    void BeginVisit()
+    {
         visitRunning = true;
         currentBeatIndex = 0;
         currentBeat = visitBeats[currentBeatIndex];
         beatTimer = currentBeat.duration;
+
+        // eden arrives
+        eden = SpawnEden(currentBeat.npcMark);
+        eden.moveTarget = currentBeat.npcMark;
+        eden.ghostMode = true;
+        eden.mode = NPCController.NPCMode.Scripted;
     }
 
     void RemoveEden()
@@ -624,6 +656,7 @@ public class EdenVisitManager : MonoBehaviour
         eNPC.transform.position = pos;
         return eNPC.GetComponent<NPCController>();
     }
+
     void OnGUI()
     {
         if (!visitRunning || !dialogPop)
@@ -711,7 +744,6 @@ public class EdenVisitManager : MonoBehaviour
             {
                 // next dialog
                 dialogPop = false;
-                //introScriptStep++;
                 playerResponse = true;
                 if (currentBeatIndex >= visitBeats.Length)
                 {
