@@ -88,6 +88,9 @@ public class GameSelection : MonoBehaviour
 
     private string deleteGameKey;
 
+    private int maxNumberToDisplay = 4;
+    private int topOfGameDisplayList = 0;
+
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
     private int padMaxButton = 0;
@@ -950,7 +953,8 @@ public class GameSelection : MonoBehaviour
             r.y = 0.425f * h;
             r.width = 0.45f * w;
             r.height = 0.07f * h;
-            for (int i = 0; i < gamelistNum; i++)
+            int clampList = Mathf.Clamp(topOfGameDisplayList + maxNumberToDisplay, 1, gamelistNum);
+            for (int i = topOfGameDisplayList; i < clampList; i++)
             {
                 g = new GUIStyle(GUI.skin.button);
                 g.font = buttonFont;
@@ -1015,6 +1019,50 @@ public class GameSelection : MonoBehaviour
                 GUI.enabled = true;
                 r.y += 0.075f * h;
             }
+            
+            // long list navigation buttons
+            if (gamelistNum > maxNumberToDisplay)
+            {
+                r.x = 0.05f * w;
+                r.y = 0.8f * h;
+                r.width = 0.1f * w;
+                r.height = 0.05f * h;
+
+                g = new GUIStyle(GUI.skin.button);
+                g.font = buttonFont;
+                g.fontStyle = FontStyle.Normal;
+                g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f)); // smaller
+                g.alignment = TextAnchor.MiddleCenter;
+                g.normal.textColor = buttonFontColor;
+                // TODO: gamepad support
+                //if (padButtonSelection == (2 + i))
+                //    g.normal.textColor = Color.white;
+                g.active.textColor = buttonFontColor;
+                if (!Application.isEditor)
+                {
+                    g.normal.background = buttonTex[0];
+                    g.hover.background = buttonTex[1];
+                    g.active.background = buttonTex[2];
+                }
+                s = "Up";
+                GUI.enabled = (topOfGameDisplayList > 0);
+                if (GUI.Button(r,s,g))
+                {
+                    topOfGameDisplayList--;
+                    if (topOfGameDisplayList < 0)
+                        topOfGameDisplayList = 0;
+                }
+                r.x += 0.125f * w;
+                s = "Down";
+                GUI.enabled = (topOfGameDisplayList + maxNumberToDisplay < gamelistNum);
+                if (GUI.Button(r,s,g))
+                {
+                    topOfGameDisplayList++;
+                    if (topOfGameDisplayList > gamelistNum - maxNumberToDisplay)
+                        topOfGameDisplayList = gamelistNum - maxNumberToDisplay;
+                }
+            }
+            GUI.enabled = true;
         }
 
         // multiplayer support
