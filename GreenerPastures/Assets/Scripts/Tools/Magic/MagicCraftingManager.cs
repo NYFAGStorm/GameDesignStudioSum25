@@ -38,7 +38,8 @@ public class MagicCraftingManager : MonoBehaviour
     public LibraryState libraryState;
     public CraftState craftState;
 
-    public Texture2D grimoireBackground;
+    public Texture2D grimoireBackgroundDark;
+    public Texture2D grimoireBackgroundLight;
     public Texture2D cauldronBackgroundDark;
     public Texture2D cauldronBackgroundLight;
 
@@ -334,10 +335,18 @@ public class MagicCraftingManager : MonoBehaviour
                     case CraftState.Grimoire:
                         if (!fadingFromBlack)
                         {
-                            if (currentBackground == null && grimoireBackground != null)
-                                currentBackground = grimoireBackground;
-                            if (currentBackground == null || 
-                                currentBackground == cauldronBackgroundDark || currentBackground == cauldronBackgroundLight)
+                            if (grimoireBackgroundDark != null)
+                                currentBackground = grimoireBackgroundDark;
+                            TimeManager tm = GameObject.FindFirstObjectByType<TimeManager>();
+                            if (tm != null)
+                            {
+                                if (tm.dayProgress > 0.25f && tm.dayProgress < 0.75f)
+                                {
+                                    if (grimoireBackgroundLight != null)
+                                        currentBackground = grimoireBackgroundLight;
+                                }
+                            }
+                            if (currentBackground != grimoireBackgroundDark && currentBackground != grimoireBackgroundLight)
                                 currentBackground = Texture2D.whiteTexture;
                         }
                         break;
@@ -969,10 +978,10 @@ public class MagicCraftingManager : MonoBehaviour
         if (craftState == CraftState.Grimoire)
         {
             // grimoire box overlay
-            r.x = 0.1f * w;
+            r.x = 0.35f * w;
             r.y = 0.05f * h;
-            r.width = 0.8f * w;
-            r.height = 0.8f * h;
+            r.width = 0.3f * w;
+            r.height = 0.08f * h;
             /*
             r.x = 0.375f * w;
             r.y = 0.025f * h;
@@ -982,7 +991,7 @@ public class MagicCraftingManager : MonoBehaviour
             g = new GUIStyle(GUI.skin.box);
             g.fontSize = Mathf.RoundToInt(24 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
-            g.padding = new RectOffset(0, 0, 30, 0);
+            g.padding = new RectOffset(0, 0, 20, 0);
             s = "THE GRIMOIRE";
             c = Color.white;
             GUI.color = c;
@@ -991,7 +1000,7 @@ public class MagicCraftingManager : MonoBehaviour
 
             // grimoire spell listing
             r.x = 0.15f * w;
-            r.y = 0.1f * h;
+            r.y = 0.15f * h;
             r.width = 0.7f * w;
             r.height = 0.7f * h;
             g = new GUIStyle(GUI.skin.label);
@@ -1009,9 +1018,9 @@ public class MagicCraftingManager : MonoBehaviour
             }
             else
             {
-                r.x = 0.15f * w;
-                r.y = 0.15f * h;
-                r.width = 0.7f * w;
+                r.x = 0.175f * w;
+                r.y = 0.225f * h;
+                r.width = 0.625f * w;
                 r.height = 0.065f * h;
                 g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
                 for ( int i = 0; i < pcm.playerData.magic.library.grimoire.Length; i++ )
@@ -1045,7 +1054,7 @@ public class MagicCraftingManager : MonoBehaviour
                     s = grim.description;
                     GUI.Label(r, s, g);
                     // spell ingredients
-                    r.y += 0.05f * h;
+                    r.y += 0.025f * h;
                     g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
                     g.alignment = TextAnchor.MiddleRight;
                     s = "";
@@ -1059,7 +1068,7 @@ public class MagicCraftingManager : MonoBehaviour
                     r.y += 0.05f * h;
                 }
 
-                r.y = 0.775f * h;
+                r.y = 0.94f * h;
                 GUI.color = Color.black;
                 g.alignment = TextAnchor.MiddleCenter;
                 s = "Spell Recipe " + (currentGrimoireEntry+1) + " of " + pcm.playerData.magic.library.grimoire.Length;

@@ -46,7 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   libraryState: 0
   craftState: 0
-  grimoireBackground: {fileID: 0}
+  grimoireBackgroundDark: {fileID: 2800000, guid: 619ee5a8faa18e44791a08a54748c42e, type: 3}
+  grimoireBackgroundLight: {fileID: 2800000, guid: 26f84ebbbb779384b8bbe339788e31a3, type: 3}
   cauldronBackgroundDark: {fileID: 2800000, guid: 948a9d9c852534d42aefbac3f7a42f1a, type: 3}
   cauldronBackgroundLight: {fileID: 2800000, guid: ccd6488cb6e986941b82f2273c64d701, type: 3}
   cauldronBubbles:
