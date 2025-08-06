@@ -219,6 +219,8 @@ public class GameSelection : MonoBehaviour
             padMaxButton = Mathf.Min(saveMgr.GetCurrentProfile().gameKeys.Length, maxNumberToDisplay) + 4;
         if (saveMgr.GetCurrentProfile().gameKeys.Length > maxNumberToDisplay)
             padMaxButton += 2;
+        if (confirmDelete)
+            padMaxButton = 1;
 
         // determine ui selection from game pad input
         if (padMgr.gPadDown[0].YaxisL > 0f)
@@ -760,7 +762,6 @@ public class GameSelection : MonoBehaviour
                 padMgr.gamepads[0].isActive &&
                 ((gamePopup && padButtonSelection == 6) && padMgr.gPadDown[0].aButton)))
             {
-                padMaxButton = 2;
                 padButtonSelection = -1;
                 deleteGameKey = saveMgr.GetCurrentGameData().gameKey;
                 confirmDelete = true;
