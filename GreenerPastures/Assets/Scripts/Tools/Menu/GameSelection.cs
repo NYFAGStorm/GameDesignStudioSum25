@@ -216,7 +216,9 @@ public class GameSelection : MonoBehaviour
         if (gamePopup)
             padMaxButton = 7;
         else
-            padMaxButton = saveMgr.GetCurrentProfile().gameKeys.Length + 4;
+            padMaxButton = Mathf.Min(saveMgr.GetCurrentProfile().gameKeys.Length, maxNumberToDisplay) + 4;
+        if (saveMgr.GetCurrentProfile().gameKeys.Length > maxNumberToDisplay)
+            padMaxButton += 2;
 
         // determine ui selection from game pad input
         if (padMgr.gPadDown[0].YaxisL > 0f)
@@ -346,6 +348,10 @@ public class GameSelection : MonoBehaviour
             r.height = 0.075f * h;
             g = new GUIStyle(GUI.skin.button);
             g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            g.normal.textColor = labelFontColor;
+            if (padMgr != null && padMgr.gamepads[0].isActive &&
+                padButtonSelection == 0)
+                g.normal.textColor = Color.white;
             if (!Application.isEditor)
             {
                 g.normal.background = buttonTex[0];
@@ -353,7 +359,9 @@ public class GameSelection : MonoBehaviour
                 g.active.background = buttonTex[2];
             }
             s = "Accept";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null && 
+                padMgr.gamepads[0].isActive &&
+                padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
             {
                 // un-load and delete current save game, remove key from profile
                 saveMgr.RemoveSaveGame(saveMgr.GetCurrentProfile(), deleteGameKey);
@@ -366,18 +374,31 @@ public class GameSelection : MonoBehaviour
                 popupTimer = POPUPTIME;
                 if (padMgr != null && padMgr.gamepads[0].isActive)
                 {
+                    padMgr.gPadDown[0].aButton = false;
                     padButtonSelection = -1;
-                    padMaxButton = 1;
+                    padMaxButton = 7;
                 }
                 return;
             }
 
             r.x = 0.525f * w;
+            g.normal.textColor = labelFontColor;
+            if (padMgr != null && padMgr.gamepads[0].isActive &&
+                padButtonSelection == 1)
+                g.normal.textColor = Color.white;
             s = "Cancel";
-            if (GUI.Button(r, s, g))
+            if (GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive &&
+                padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
             {
                 confirmDelete = false;
                 popupTimer = POPUPTIME;
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                {
+                    padMgr.gPadDown[0].aButton = false;
+                    padButtonSelection = -1;
+                    padMaxButton = 7;
+                }
                 return;
             }
 
@@ -496,7 +517,7 @@ public class GameSelection : MonoBehaviour
             g.fontStyle = buttonFontStyle;
             g.normal.textColor = buttonFontColor;
             g.active.textColor = buttonFontColor;
-            if (padButtonSelection == 0)
+            if (padButtonSelection == 0 && !confirmDelete)
                 g.normal.textColor = Color.white;
             if (!Application.isEditor)
             {
@@ -518,7 +539,7 @@ public class GameSelection : MonoBehaviour
             }
             r.x += 0.075f * w;
             g.normal.textColor = buttonFontColor;
-            if (padButtonSelection == 1)
+            if (padButtonSelection == 1 && !confirmDelete)
                 g.normal.textColor = Color.white;
             s = "+";
             // alow more max players if new game or owner of game and less than 8
@@ -739,9 +760,10 @@ public class GameSelection : MonoBehaviour
                 padMgr.gamepads[0].isActive &&
                 ((gamePopup && padButtonSelection == 6) && padMgr.gPadDown[0].aButton)))
             {
+                padMaxButton = 2;
+                padButtonSelection = -1;
                 deleteGameKey = saveMgr.GetCurrentGameData().gameKey;
                 confirmDelete = true;
-                print("pressed delete");
             }
             GUI.enabled = true;
             if (confirmDelete)
@@ -962,7 +984,7 @@ public class GameSelection : MonoBehaviour
                 g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f)); // smaller
                 g.alignment = TextAnchor.MiddleCenter;
                 g.normal.textColor = buttonFontColor;
-                if (padButtonSelection == (2 + i))
+                if (padButtonSelection == (2 + (i-topOfGameDisplayList)))
                     g.normal.textColor = Color.white;
                 g.active.textColor = buttonFontColor;
                 if (!Application.isEditor)
@@ -981,7 +1003,9 @@ public class GameSelection : MonoBehaviour
                 if (tinyPopup)
                         GUI.enabled = false;
 
-                if (GUI.Button(r, s, g) || (padButtonSelection == (2+i) && padMgr.gPadDown[0].aButton))
+                if (GUI.Button(r, s, g) || 
+                    (padButtonSelection == (2 + (i - topOfGameDisplayList)) && 
+                    padMgr.gPadDown[0].aButton))
                 {
                     // REVIEW: if saved game is selected, net game selection is abandoned
                     currentNet = new MultiplayerHostPing(); // empty
@@ -1034,9 +1058,9 @@ public class GameSelection : MonoBehaviour
                 g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f)); // smaller
                 g.alignment = TextAnchor.MiddleCenter;
                 g.normal.textColor = buttonFontColor;
-                // TODO: gamepad support
-                //if (padButtonSelection == (2 + i))
-                //    g.normal.textColor = Color.white;
+                // gamepad support
+                if (padButtonSelection == (2 + Mathf.Min(gamelistNum, maxNumberToDisplay)))
+                    g.normal.textColor = Color.white;
                 g.active.textColor = buttonFontColor;
                 if (!Application.isEditor)
                 {
@@ -1046,24 +1070,43 @@ public class GameSelection : MonoBehaviour
                 }
                 s = "Up";
                 GUI.enabled = (topOfGameDisplayList > 0);
-                if (GUI.Button(r,s,g))
+                if (GUI.Button(r,s,g) || 
+                    (padButtonSelection == (2 + Mathf.Min(gamelistNum, maxNumberToDisplay))
+                    && padMgr.gPadDown[0].aButton))
                 {
                     topOfGameDisplayList--;
                     if (topOfGameDisplayList < 0)
                         topOfGameDisplayList = 0;
+
+                    // consuming input, but why?
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        padMgr.gPadDown[0].aButton = false;
                 }
                 r.x += 0.125f * w;
+                g.normal.textColor = buttonFontColor;
+                if (padButtonSelection == (3 + Mathf.Min(gamelistNum, maxNumberToDisplay)))
+                    g.normal.textColor = Color.white;
                 s = "Down";
                 GUI.enabled = (topOfGameDisplayList + maxNumberToDisplay < gamelistNum);
-                if (GUI.Button(r,s,g))
+                if (GUI.Button(r,s,g) || 
+                    (padButtonSelection == (3 + Mathf.Min(gamelistNum, maxNumberToDisplay))
+                    && padMgr.gPadDown[0].aButton))
                 {
                     topOfGameDisplayList++;
                     if (topOfGameDisplayList > gamelistNum - maxNumberToDisplay)
                         topOfGameDisplayList = gamelistNum - maxNumberToDisplay;
+
+                    // consuming input, but why?
+                    if (padMgr != null && padMgr.gamepads[0].isActive)
+                        padMgr.gPadDown[0].aButton = false;
                 }
             }
             GUI.enabled = true;
         }
+
+        int nextButton = (2 + Mathf.Min(gamelistNum, maxNumberToDisplay));
+        if (gamelistNum > maxNumberToDisplay)
+            nextButton += 2;
 
         // multiplayer support
         // show text field
@@ -1097,7 +1140,7 @@ public class GameSelection : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == (2 + gamelistNum + 0))
+        if (padButtonSelection == nextButton)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         hostsCode = GUI.TextField(r, hostsCode, g);
@@ -1111,7 +1154,7 @@ public class GameSelection : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(labelFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == (2 + gamelistNum + 0))
+        if (padButtonSelection == nextButton)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         if (!Application.isEditor)
@@ -1125,7 +1168,7 @@ public class GameSelection : MonoBehaviour
         if (tinyPopup)
             GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
-            (padButtonSelection == (2 + gamelistNum + 0) && padMgr.gPadDown[0].aButton))
+            (padButtonSelection == nextButton && padMgr.gPadDown[0].aButton))
         {
             GenerateHostCode();
             saveMgr.StoreHostCode(hostsCode);
@@ -1136,9 +1179,11 @@ public class GameSelection : MonoBehaviour
         }
         GUI.enabled = true;
         //
+        nextButton++;
+        //
         r.y += 0.1f * h;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == (3 + gamelistNum + 0))
+        if (padButtonSelection == nextButton)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         s = "Submit A Friend Code (to JOIN a game)";
@@ -1146,7 +1191,7 @@ public class GameSelection : MonoBehaviour
         if (tinyPopup)
             GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
-            (padButtonSelection == (3 + gamelistNum + 1) && padMgr.gPadDown[0].aButton))
+            (padButtonSelection == nextButton && padMgr.gPadDown[0].aButton))
         {
             tinyPopup = true; // enter player character name
             saveMgr.StoreHostCode("");
@@ -1410,6 +1455,7 @@ public class GameSelection : MonoBehaviour
             }
         }
 
+        nextButton++;
         // back button
         r = backButton;
         r.x *= w;
@@ -1422,7 +1468,7 @@ public class GameSelection : MonoBehaviour
         g.fontSize = Mathf.RoundToInt(backButtonFontSizeAt1024 * (w / 1024f));
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = buttonFontColor;
-        if (padButtonSelection == gamelistNum + 4)
+        if (padButtonSelection == nextButton)
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         if (!Application.isEditor)
@@ -1436,7 +1482,7 @@ public class GameSelection : MonoBehaviour
         if (tinyPopup)
             GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
-            padButtonSelection == gamelistNum+4 && padMgr.gPadDown[0].aButton)
+            padButtonSelection == nextButton && padMgr.gPadDown[0].aButton)
         {
             SceneManager.LoadScene("Menu");
         }
