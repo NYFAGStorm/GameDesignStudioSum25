@@ -555,7 +555,10 @@ public class MarketManager : MonoBehaviour
         }
 
         //
-        topOfMenuList = menuItemSelection - MENUITEMSINLIST;
+        if (menuItemSelection < topOfMenuList)
+            topOfMenuList = menuItemSelection;
+        if (menuItemSelection > topOfMenuList + MENUITEMSINLIST)
+            topOfMenuList = menuItemSelection - MENUITEMSINLIST;
         topOfMenuList = Mathf.Clamp(topOfMenuList,
                 menuCategories[currentCategory].topOfMenu, menuCategories[currentCategory].bottomOfMenu - 1);
     }
