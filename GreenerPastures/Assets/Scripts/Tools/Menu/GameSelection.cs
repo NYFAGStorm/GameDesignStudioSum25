@@ -75,6 +75,7 @@ public class GameSelection : MonoBehaviour
     private float pingPollTimer; // interval when collection of hostPings takes place
     private MultiplayerHostPing[] hostPings; // host pings heard within interval
     private bool tinyPopup; // ask new player name, offer "join" and "cancel"
+    private bool confirmDelete; // confirm deletion of selected save game
     private MultiplayerHostPing currentNet; // the host ping selected to join
 
     private string popGameName;
@@ -84,6 +85,8 @@ public class GameSelection : MonoBehaviour
     private bool popAllowHazards;
     private bool popAllowCurses;
     private bool gameOptionsChanged;
+
+    private string deleteGameKey;
 
     private MultiGamepad padMgr;
     private int padButtonSelection = -1;
@@ -208,7 +211,7 @@ public class GameSelection : MonoBehaviour
         }
 
         if (gamePopup)
-            padMaxButton = 6;
+            padMaxButton = 7;
         else
             padMaxButton = saveMgr.GetCurrentProfile().gameKeys.Length + 4;
 
@@ -312,9 +315,78 @@ public class GameSelection : MonoBehaviour
 
         GUI.Label(r, s, g);
 
+        // tiny confirm popup for game deletion
+        if (confirmDelete)
+        {
+            GUI.enabled = true;
+            GUI.depth = -9;
+
+            r.x = 0.3f * w;
+            r.y = 0.35f * h;
+            r.width = 0.4f * w;
+            r.height = 0.3f * h;
+            g = new GUIStyle(GUI.skin.box);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.normal.textColor = labelFontColor;
+            g.hover.textColor = labelFontColor;
+            g.active.textColor = labelFontColor;
+            g.padding = new RectOffset(0, 0, 20, 0);
+            s = "Are you sure you want\nto delete this game?";
+            GUI.Box(r, s, g);
+            GUI.Box(r, s, g);
+            GUI.Box(r, s, g);
+
+            r.x = 0.325f * w;
+            r.y = 0.55f * h;
+            r.width = 0.15f * w;
+            r.height = 0.075f * h;
+            g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
+            if (!Application.isEditor)
+            {
+                g.normal.background = buttonTex[0];
+                g.hover.background = buttonTex[1];
+                g.active.background = buttonTex[2];
+            }
+            s = "Accept";
+            if (GUI.Button(r, s, g))
+            {
+                // un-load and delete current save game, remove key from profile
+                saveMgr.RemoveSaveGame(saveMgr.GetCurrentProfile(), deleteGameKey);
+                saveMgr.ClearCurrentGameData();
+                ConfigureCurrentGameEnabled();
+                selectionFeedback = "game deleted";
+                feedbackTimer = FEEDBACKTIME;
+                deleteGameKey = "";
+                confirmDelete = false;
+                popupTimer = POPUPTIME;
+                if (padMgr != null && padMgr.gamepads[0].isActive)
+                {
+                    padButtonSelection = -1;
+                    padMaxButton = 1;
+                }
+                return;
+            }
+
+            r.x = 0.525f * w;
+            s = "Cancel";
+            if (GUI.Button(r, s, g))
+            {
+                confirmDelete = false;
+                popupTimer = POPUPTIME;
+                return;
+            }
+
+            GUI.enabled = false;
+        }
+
         // NEW GAME / GAME OPTIONS
         if (gamePopup)
         {
+            if (confirmDelete)
+                GUI.enabled = false;
+
             r = new Rect();
             r.x = 0.2f * w;
             r.y = (0.2f * h) + (popupProgress * 0.85f * h);
@@ -412,6 +484,7 @@ public class GameSelection : MonoBehaviour
             // . toggle curses
             // . (textfield) joining player name
             // . Create new game ('Unload' if not new, 'Accept' if editing)
+            // . Delete game (if not new)
             // . Cancel
             r.x += 0.025f * w;
             r.y += 0.075f * h;
@@ -432,6 +505,8 @@ public class GameSelection : MonoBehaviour
             s = "-";
             // allow less max players if new game or owner of game max is more than player length
             GUI.enabled = popMaxPlayers > 1 && (newGame || (!saveMgr.IsRemoteClient() && gameLoaded && saveMgr.GetCurrentGameData().players.Length < popMaxPlayers));
+            if (confirmDelete)
+                GUI.enabled = false;
             if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
                 padButtonSelection == 0 && padMgr.gPadDown[0].aButton))
             {
@@ -445,6 +520,8 @@ public class GameSelection : MonoBehaviour
             s = "+";
             // alow more max players if new game or owner of game and less than 8
             GUI.enabled = popMaxPlayers < 8 && (newGame || !saveMgr.IsRemoteClient());
+            if (confirmDelete)
+                GUI.enabled = false;
             if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
                 padButtonSelection == 1 && padMgr.gPadDown[0].aButton))
             {
@@ -461,6 +538,8 @@ public class GameSelection : MonoBehaviour
             if (!popAllowCheats)
                 s = "OFF";
             GUI.enabled = (!saveMgr.IsRemoteClient()); // only owner of data can change options
+            if (confirmDelete)
+                GUI.enabled = false;
             if (GUI.Button(r, s, g) || (padMgr != null && padMgr.gamepads[0].isActive &&
                 padButtonSelection == 2 && padMgr.gPadDown[0].aButton))
             {
@@ -500,6 +579,8 @@ public class GameSelection : MonoBehaviour
                 g.hover.textColor = labelFontColor;
                 g.active.textColor = labelFontColor;
                 GUI.enabled = true;
+                if (confirmDelete)
+                    GUI.enabled = false;
                 popPlayerName = GUI.TextField(r, popPlayerName, g);
             }
             else
@@ -514,12 +595,16 @@ public class GameSelection : MonoBehaviour
                 g.hover.textColor = labelFontColor;
                 g.active.textColor = labelFontColor;
                 GUI.enabled = true;
+                if (confirmDelete)
+                    GUI.enabled = false;
                 s = "Playing as '" + gamePlayerName + "' in this game";
                 if (saveMgr.IsRemoteClient())
                     s = "Playing as '" + popPlayerName + "' in this game";
                 GUI.Label(r, s, g);
             }
             GUI.enabled = true;
+            if (confirmDelete)
+                GUI.enabled = false;
 
             gameOptionsChanged = (currentGameOptions != null &&
                 (currentGameOptions.maxPlayers != popMaxPlayers ||
@@ -530,7 +615,7 @@ public class GameSelection : MonoBehaviour
             // popup buttons
             r.x = 0.25f * w;
             r.y += 0.1f * h;
-            r.width = 0.2f * w;
+            r.width = 0.15f * w;
             r.height = 0.1f * h;
             g = new GUIStyle(GUI.skin.button);
             g.normal.textColor = buttonFontColor;
@@ -555,6 +640,8 @@ public class GameSelection : MonoBehaviour
             // validate new game info (game name and player name)
             if (newGame)
                 GUI.enabled = (popGameName != "" && popPlayerName != "");
+            if (confirmDelete)
+                GUI.enabled = false;
             if (GUI.Button(r, s, g) || (padMgr != null &&
                 padMgr.gamepads[0].isActive &&
                 ((gamePopup && padButtonSelection == 5) || (!gamePopup && padButtonSelection == 0)) &&
@@ -633,16 +720,39 @@ public class GameSelection : MonoBehaviour
                 }
             }
             GUI.enabled = true;
-            // cancel
-            r.x += 0.3f * w;
+            if (confirmDelete)
+                GUI.enabled = false;
+            // delete
+            r.x += 0.175f * w;
             g.normal.textColor = buttonFontColor;
             if (padButtonSelection == 6)
+                g.normal.textColor = Color.white;
+            g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
+            s = "DELETE";
+            GUI.enabled = !newGame;
+            if (confirmDelete)
+                GUI.enabled = false;
+            if (gamePopup && GUI.Button(r, s, g) || (padMgr != null &&
+                padMgr.gamepads[0].isActive &&
+                ((gamePopup && padButtonSelection == 6) && padMgr.gPadDown[0].aButton)))
+            {
+                deleteGameKey = saveMgr.GetCurrentGameData().gameKey;
+                confirmDelete = true;
+                print("pressed delete");
+            }
+            GUI.enabled = true;
+            if (confirmDelete)
+                GUI.enabled = false;
+            // cancel
+            r.x += 0.175f * w;
+            g.normal.textColor = buttonFontColor;
+            if (padButtonSelection == 7)
                 g.normal.textColor = Color.white;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "CANCEL";
             if (GUI.Button(r, s, g) || (padMgr != null &&
                 padMgr.gamepads[0].isActive && 
-                ((gamePopup && padButtonSelection == 6) || (!gamePopup && padButtonSelection == 1)) &&
+                ((gamePopup && padButtonSelection == 7) || (!gamePopup && padButtonSelection == 1)) &&
                 padMgr.gPadDown[0].aButton))
             {
                 popupTimer = POPUPTIME;

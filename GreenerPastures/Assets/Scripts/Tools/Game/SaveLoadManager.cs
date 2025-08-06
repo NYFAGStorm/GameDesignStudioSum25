@@ -497,4 +497,18 @@ public class SaveLoadManager : MonoBehaviour
 
         game = gData;
     }
+
+    public void RemoveSaveGame( ProfileData profile, string gameKey )
+    {
+        string p = GetGameDataPath() + GetGameFileName(gameKey);
+        if (File.Exists(p))
+        {
+            File.Delete(p);
+            for (int i = 0; i < roster.profiles.Length; i++)
+            {
+                if (roster.profiles[i] == profile)
+                    roster.profiles[i] = ProfileSystem.RemoveGameKey(profile, gameKey);
+            }
+        }
+    }
 }
