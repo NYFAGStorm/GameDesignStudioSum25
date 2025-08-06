@@ -1635,11 +1635,11 @@ public class PlayerControlManager : MonoBehaviour
             // letter text
             r.x += 0.0725f * w;
             r.y += 0.15f * h;
-            r.width = 0.325f * w;
+            r.width = 0.32f * w;
             r.height -= 0.2f * h;
             g = new GUIStyle(GUI.skin.label);
             g.font = (Font)Resources.Load("ChewedPenBB"); // "BRUSHSCI");
-            g.fontSize = Mathf.RoundToInt(28f * (w / 1024f));
+            g.fontSize = Mathf.RoundToInt(26f * (w / 1024f));
             g.alignment = TextAnchor.UpperLeft;
             g.wordWrap = true;
             g.normal.textColor = Color.black;

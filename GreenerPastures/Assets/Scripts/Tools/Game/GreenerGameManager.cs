@@ -395,6 +395,15 @@ public class GreenerGameManager : MonoBehaviour
                 }
             }
         }
+
+        // tell market about midnight (update menu item specials)
+        //PositionData season = new PositionData();
+        //season.x = tim.GetAmountOfSeason(WorldSeason.Spring);
+        //season.y = tim.GetAmountOfSeason(WorldSeason.Summer);
+        //season.z = tim.GetAmountOfSeason(WorldSeason.Fall);
+        //season.w = tim.GetAmountOfSeason(WorldSeason.Winter);
+        //GameObject.FindFirstObjectByType<MarketManager>().UpdateSeasonalValues(season);
+        GameObject.FindFirstObjectByType<MarketManager>().ReviseDailySpecials();
     }
 
     /// <summary>

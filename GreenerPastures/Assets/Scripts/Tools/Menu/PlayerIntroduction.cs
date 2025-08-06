@@ -129,7 +129,7 @@ public class PlayerIntroduction : MonoBehaviour
     {
         // in case user quit very early in the customization process
         // prevent 'blank white square appearance' of player character
-        if (!configValid)
+        if (introRunning && !configValid)
         {
             PlayerOptions options = new PlayerOptions();
             options.model = PlayerModelType.Male;

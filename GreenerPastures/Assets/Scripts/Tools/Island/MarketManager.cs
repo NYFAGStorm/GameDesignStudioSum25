@@ -21,6 +21,7 @@ public class MarketManager : MonoBehaviour
         public PlantType plantType;
         public ItemEffect effect; // scrolls and potions defined by item effect
         public bool availableToBuy;
+        public bool saleItem; // 25% off menu item 'specials'
         public int buyItemValue;
         public int sellItemValue;
     }
@@ -42,7 +43,7 @@ public class MarketManager : MonoBehaviour
 
     private int[] maxMenuListPerLevel = new int[11];
     
-    int generalItems = 1; // fertilizer (+ unknown seed, all rarities?) (specials?)
+    int generalItems = 4; // fertilizer (+ unknown seed, all rarities?) (3 specials?)
     int magicItems = 13; // 11 scrolls + 2 potions
 
     int plantItemTypes = 3; // seed, fruit, plant
@@ -64,6 +65,8 @@ public class MarketManager : MonoBehaviour
     private int currentCategory;
     private string prevCategoryLabel;
     private string nextCategoryLabel;
+
+    private PositionData seasonValues; // for seasonal specials idea
 
     private ArtLibraryManager alm;
     private QuitOnEscape qoe; // disable to suspend use of start button while in market
@@ -143,6 +146,7 @@ public class MarketManager : MonoBehaviour
         {
             InitializeMenu();
             InitializeMaxMenuList();
+            ReviseDailySpecials();
             playerCheckTimer = PLAYERCHECKTIME;
             marketInstructions = "Welcome, Biomancer!\nE=BUY F=SELL";
             if (padMgr != null && padMgr.gamepads[0].isActive)
@@ -157,6 +161,77 @@ public class MarketManager : MonoBehaviour
                 buttonTex[1] = (Texture2D)Resources.Load("Button_Hover");
                 buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
             }
+        }
+    }
+
+    public void ReviseDailySpecials()
+    {
+        // clear previous sales items
+        for (int i = 0; i < menuItems.Length; i++)
+        {
+            menuItems[i].saleItem = false;
+        }
+
+        // pick three different items off menu for daily specials
+        int safety = 100;
+        int[] rnds = new int[3];
+        for (int i = 0; i < 3; i++)
+        {
+            safety = 100;
+            bool found = true;
+            while (safety > 0 && found)
+            {
+                safety--;
+                found = false;
+                int rnd = GameSystem.RoundedResult(RandomSystem.WeightedRandom01(),menuItems.Length);
+                for (int n = 0; n < rnds.Length; n++)
+                {
+                    // daily specials cannot be daily specials (or fertilizer)
+                    // daily specials cannot be unavialable
+                    // daily specials cannot be duplicates
+                    if (rnd < 4 || rnds[n] == rnd ||
+                        !menuItems[rnd].availableToBuy)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                    rnds[i] = rnd;
+            }
+        }
+
+        // sort order
+        int[] sorted = new int[3];
+        for (int i = 0; i < 3; i++)
+        {
+            sorted[i] = rnds[i];
+        }
+        safety = 100;
+        bool notSorted = true;
+        while (safety > 0 && notSorted)
+        {
+            notSorted = false;
+            for (int i = 0; i < 2; i++)
+            {
+                if (sorted[i] > sorted[i + 1])
+                {
+                    int tmp = sorted[i + 1];
+                    sorted[i + 1] = sorted[i];
+                    sorted[i] = tmp;
+                    notSorted = true;
+                }
+            }
+        }
+        rnds = sorted;
+
+        // set daily special items (duplicates of those in menu)
+        for (int i = 0; i < 3; i++)
+        {
+            menuItems[rnds[i]].saleItem = true;
+            // specials are items 1-3
+            menuItems[i + 1] = menuItems[rnds[i]];
+            //
         }
     }
 
@@ -672,6 +747,8 @@ public class MarketManager : MonoBehaviour
                         if (coupon != null && coupon.type == ItemType.Coupon)
                             currentCustomer.playerData.inventory = InventorySystem.RemoveItemFromInventory(currentCustomer.playerData.inventory, currentCustomer.GetPlayerCurrentItemSelection() );
                     }
+                    else if (menuItems[menuItemSelection].saleItem)
+                        currentCustomer.playerData.gold -= Mathf.RoundToInt(menuItems[menuItemSelection].buyItemValue * .75f);
                     else
                         currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;
                     currentCustomer.AwardXP(PlayerData.XP_BUYFROMSHOP);
@@ -941,6 +1018,9 @@ public class MarketManager : MonoBehaviour
         // quality factor
         int qualityDing = Mathf.RoundToInt(baseValue * qualityReduction);
         retInt -= qualityDing;
+        // if a sale item, 50% less value
+        int saleDing = Mathf.RoundToInt(baseValue * .5f);
+        retInt -= saleDing;
         // REVIEW: other factors
 
         return retInt;
@@ -1068,6 +1148,10 @@ public class MarketManager : MonoBehaviour
 
         // -- GENERAL ITEMS --
 
+        menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
+        // 3 daily specials (to be reset in UpdateDailySpecials)
+        menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
+        menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
         menuItems[idx++] = SetMenuItems(ItemType.Fertilizer, PlantType.Default, 1, 0);
 
         // -- MAGIC ITEMS --
@@ -1473,7 +1557,9 @@ public class MarketManager : MonoBehaviour
             s = menuItems[i].itemName;
             if (customerMode == CustomerMode.Sell && menuItemSelection == i &&
                 currentCustomer.GetPlayerCurrentItemSelection() != null)
-                s = menuItems[i].itemName + "\nQuality "+(Mathf.RoundToInt(currentCustomer.GetPlayerCurrentItemSelection().quality * 1000f)/10f)+"%";
+                s = menuItems[i].itemName + "\nQuality " + (Mathf.RoundToInt(currentCustomer.GetPlayerCurrentItemSelection().quality * 1000f) / 10f) + "%";
+            else if (menuItems[i].saleItem && discountBuy == 1f)
+                s += "\nON SALE!";
             g.alignment = TextAnchor.MiddleLeft;
             g.wordWrap = true;
             if (menuItems[i].availableToBuy)
@@ -1499,6 +1585,8 @@ public class MarketManager : MonoBehaviour
                 // buy value
                 if (discountBuy < 1f)
                     s = Mathf.RoundToInt(menuItems[i].buyItemValue * discountBuy ).ToString();
+                else if (menuItems[i].saleItem)
+                    s = Mathf.RoundToInt(menuItems[i].buyItemValue * .75f).ToString();
                 else
                     s = menuItems[i].buyItemValue.ToString();
             }
