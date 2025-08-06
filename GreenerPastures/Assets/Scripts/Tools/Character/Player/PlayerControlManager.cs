@@ -1621,11 +1621,11 @@ public class PlayerControlManager : MonoBehaviour
                 progress = 1f - progress;
 
             // centered and square, based on height
-            r.x = (0.5f * w) - ((0.9f * h) / 2f);
-            r.y = 0.1f * h;
+            r.x = (0.5f * w) - ((1f * h) / 2f);
+            r.y = 0.025f * h;
             r.y += (0.9f * progress) * h;
-            r.width = 0.9f * h; // square
-            r.height = 0.9f * h;
+            r.width = 1f * h; // square
+            r.height = 1f * h;
 
             // letter image
             t = (Texture2D)Resources.Load("Popup_Open Letter");
@@ -1633,13 +1633,13 @@ public class PlayerControlManager : MonoBehaviour
             GUI.DrawTexture(r, t);
 
             // letter text
-            r.x += 0.0575f * w;
-            r.y += 0.13f * h;
-            r.width = 0.29f * w;
+            r.x += 0.0725f * w;
+            r.y += 0.15f * h;
+            r.width = 0.325f * w;
             r.height -= 0.2f * h;
             g = new GUIStyle(GUI.skin.label);
-            g.font = (Font)Resources.Load("BRUSHSCI");
-            g.fontSize = Mathf.RoundToInt(24f * (w / 1024f));
+            g.font = (Font)Resources.Load("ChewedPenBB"); // "BRUSHSCI");
+            g.fontSize = Mathf.RoundToInt(28f * (w / 1024f));
             g.alignment = TextAnchor.UpperLeft;
             g.wordWrap = true;
             g.normal.textColor = Color.black;
