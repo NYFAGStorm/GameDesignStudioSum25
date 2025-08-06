@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class SalesVisitManager : MonoBehaviour
+public class SalesmanIntroduction : MonoBehaviour
 {
     // Author: Glenn Storm
-    // This handles the traveling salesman visit routine
+    // This handles the cameo of the traveling salesman in introduction
 
     public NPCController salesman;
 
@@ -19,7 +19,8 @@ public class SalesVisitManager : MonoBehaviour
         TeleportSalesman,
         VFXSpawn,
         RemoveNPC,
-        EndVisit
+        EndVisit,
+        NudgeEden
     }
 
     public enum ScriptedBeatTransition
@@ -27,7 +28,8 @@ public class SalesVisitManager : MonoBehaviour
         Default,
         TimedDuration,
         PlayerResponse,
-        SalesmanCallback
+        SalesmanCallback,
+        ExternalEvent
     }
 
     [System.Serializable]
@@ -59,6 +61,7 @@ public class SalesVisitManager : MonoBehaviour
     public bool beatTimeUp;
     public bool npcCallback;
     public bool playerResponse;
+    public bool nudgeEvent;
     private int beatScriptEndIndex;
 
     private bool waitingForPlayer;
@@ -197,76 +200,42 @@ public class SalesVisitManager : MonoBehaviour
 
     void ConfigureVisitBeats()
     {
-        visitBeats = new ScriptedBeat[130];
+        visitBeats = new ScriptedBeat[22];
         int beat = 0;
         visitBeats[beat].name = "visit launch";
         visitBeats[beat].action = ScriptedBeatAction.Default;
-        visitBeats[beat].npcMark = new Vector3(20f, 0f, -20f);
+        visitBeats[beat].npcMark = new Vector3(20f, 0f, -20.25f);
         visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         visitBeats[beat].duration = 1f;
         beat++;
         visitBeats[beat].name = "move salesman out market";
         visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(20f, 0f, -22f);
+        visitBeats[beat].npcMark = new Vector3(20.25f, 0f, -21f);
         visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
         visitBeats[beat].name = "brief pause";
         visitBeats[beat].action = ScriptedBeatAction.Default;
         visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 0.5f;
+        visitBeats[beat].duration = 3.5f;
         beat++;
         visitBeats[beat].name = "move salesman from market";
         visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(18f, 0f, -19f);
+        visitBeats[beat].npcMark = new Vector3(17f, 0f, -22f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "wait to be nudged";
+        visitBeats[beat].action = ScriptedBeatAction.Default;
+        visitBeats[beat].transition = ScriptedBeatTransition.ExternalEvent;
+        beat++;
+        visitBeats[beat].name = "move salesman back to market";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(19f, 0f, -23f);
         visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
         visitBeats[beat].name = "brief pause";
         visitBeats[beat].action = ScriptedBeatAction.Default;
         visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         visitBeats[beat].duration = 0.5f;
-        beat++;
-        visitBeats[beat].name = "salesman to teleporter";
-        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(16f, 0f, -16f);
-        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
-        beat++;
-        visitBeats[beat].name = "teleporter vfx (a)";
-        visitBeats[beat].action = ScriptedBeatAction.VFXSpawn;
-        visitBeats[beat].transition = ScriptedBeatTransition.Default;
-        visitBeats[beat].beatPosition.x = 16f;
-        visitBeats[beat].beatPosition.z = -16f;
-        beat++;
-        visitBeats[beat].name = "teleporter vfx (b)";
-        visitBeats[beat].action = ScriptedBeatAction.VFXSpawn;
-        visitBeats[beat].transition = ScriptedBeatTransition.Default;
-        visitBeats[beat].beatPosition.x = 4f;
-        visitBeats[beat].beatPosition.z = -4f;
-        beat++;
-        visitBeats[beat].name = "salesman teleport";
-        visitBeats[beat].action = ScriptedBeatAction.TeleportSalesman;
-        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 1f;
-        visitBeats[beat].beatPosition.x = 4f;
-        visitBeats[beat].beatPosition.z = -4f;
-        beat++;
-        visitBeats[beat].name = "salesman off teleporter";
-        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(4.5f, 0f, -3.25f);
-        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
-        beat++;
-        visitBeats[beat].name = "salesman off teleporter";
-        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(4.5f, 0f, -3.25f);
-        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
-        beat++;
-        visitBeats[beat].name = "salesman toward farm";
-        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(3f, 0f, -1f);
-        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
-        beat++;
-        visitBeats[beat].name = "salesman to player farm position";
-        visitBeats[beat].action = ScriptedBeatAction.NPCMarkToPlayerFarm;
-        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
         visitBeats[beat].name = "salesman wait for player";
         visitBeats[beat].action = ScriptedBeatAction.NPCWaitForPlayer;
@@ -279,21 +248,59 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].name = "'hey ho, Biomancer friend!'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
         visitBeats[beat].dialogLine =
-            "Hey ho, Biomancer friend! I've got island upgrades for you!";
+            "Hey ho, Biomancer friend! I am a traveling salesman.";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
-        
-        
+        beat++;
+        visitBeats[beat].name = "'I travel far and wide'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "I travel far and wide to bring back goodies for you to buy.";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        visitBeats[beat].name = "'I was just leaving now'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "I was just leaving now, but I will be back every month for a visit.";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        visitBeats[beat].name = "'Take care friend'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "Take care friend, and save your gold for when I return next month.";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         visitBeats[beat].name = "salesman turn to player";
         visitBeats[beat].action = ScriptedBeatAction.NPCTurnToPlayer;
         visitBeats[beat].transition = ScriptedBeatTransition.Default;
-        // REVIEW: entire salesman visit script
-
+        beat++;
+        visitBeats[beat].name = "brief pause";
+        visitBeats[beat].action = ScriptedBeatAction.Default;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].duration = 1f;
+        beat++;
+        visitBeats[beat].name = "salesman nudges eden";
+        visitBeats[beat].action = ScriptedBeatAction.NudgeEden;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
+        beat++;
+        visitBeats[beat].name = "move salesman away from market";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(22f, 0f, -26f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "brief pause";
+        visitBeats[beat].action = ScriptedBeatAction.Default;
+        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
+        visitBeats[beat].duration = 1f;
+        beat++;
+        visitBeats[beat].name = "teleporter vfx";
+        visitBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
+        visitBeats[beat].beatPosition.x = 22f;
+        visitBeats[beat].beatPosition.z = -26f;
         beat++;
         visitBeats[beat].name = "remove salesman";
         visitBeats[beat].action = ScriptedBeatAction.RemoveNPC;
-        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 1f;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
         beat++;
         visitBeats[beat].name = "end visit";
         visitBeats[beat].action = ScriptedBeatAction.EndVisit;
@@ -410,6 +417,14 @@ public class SalesVisitManager : MonoBehaviour
                     currentBeat.transitionDone = true;
                 }
                 break;
+            case ScriptedBeatTransition.ExternalEvent:
+                if (nudgeEvent)
+                {
+                    currentBeatIndex++;
+                    nudgeEvent = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
             default:
                 break;
         }
@@ -497,6 +512,11 @@ public class SalesVisitManager : MonoBehaviour
                 case ScriptedBeatAction.EndVisit:
                     visitRunning = false;
                     break;
+                case ScriptedBeatAction.NudgeEden:
+                    PlayerIntroduction introSeq = GameObject.FindFirstObjectByType<PlayerIntroduction>();
+                    if (introSeq != null)
+                        introSeq.NudgeEden();
+                    break;
             }
             currentBeat.actionDone = true;
         }
@@ -558,6 +578,11 @@ public class SalesVisitManager : MonoBehaviour
         salesman.moveTarget = currentBeat.npcMark;
         salesman.ghostMode = true;
         salesman.mode = NPCController.NPCMode.Scripted;
+    }
+
+    public void SalesmanNudgeEvent()
+    {
+        nudgeEvent = true;
     }
 
     void RemoveSalesman()

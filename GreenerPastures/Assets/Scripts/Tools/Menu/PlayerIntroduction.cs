@@ -21,7 +21,8 @@ public class PlayerIntroduction : MonoBehaviour
         ItemSpawn,
         PlotChange,
         DeleteItem,
-        EndIntro
+        EndIntro,
+        NudgeSalesman
     }
 
     public enum ScriptedBeatTransition
@@ -29,7 +30,8 @@ public class PlayerIntroduction : MonoBehaviour
         Default,
         TimedDuration,
         PlayerResponse,
-        EdenCallback
+        EdenCallback,
+        ExternalEvent
     }
 
     [System.Serializable]
@@ -105,6 +107,7 @@ public class PlayerIntroduction : MonoBehaviour
     public bool beatTimeUp;
     public bool npcCallback;
     public bool playerResponse;
+    public bool nudgeEvent;
     private int beatScriptEndIndex;
 
     private Texture2D[] buttonTex;
@@ -337,7 +340,7 @@ public class PlayerIntroduction : MonoBehaviour
     //
     void ConfigureIntroBeats()
     {
-        introBeats = new ScriptedBeat[130]; // we use ~124 beats, currently
+        introBeats = new ScriptedBeat[137]; // we use ~124 beats, currently
         int beat = 0;
         introBeats[beat].name = "intro launch - world view";
         introBeats[beat].action = ScriptedBeatAction.Default;
@@ -347,7 +350,7 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "intro zoom in - eden move";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(20f, 0f, -26f);
+        introBeats[beat].npcMark = new Vector3(20.25f, 0f, -26f);
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
         introBeats[beat].duration = 2f;
         beat++;
@@ -440,10 +443,18 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].npcMark = new Vector3(20f, 0f, -20f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
+        introBeats[beat].name = "nudge salesman";
+        introBeats[beat].action = ScriptedBeatAction.NudgeSalesman;
+        introBeats[beat].transition = ScriptedBeatTransition.Default;
+        beat++;
+        introBeats[beat].name = "wait to be nudged by salesman";
+        introBeats[beat].action = ScriptedBeatAction.Default;
+        introBeats[beat].transition = ScriptedBeatTransition.ExternalEvent;
+        beat++;
         introBeats[beat].name = "pause for purchase";
         introBeats[beat].action = ScriptedBeatAction.Default;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        introBeats[beat].duration = 2f;
+        introBeats[beat].duration = 3f;
         beat++;
         introBeats[beat].name = "eden exit market";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
@@ -709,7 +720,7 @@ public class PlayerIntroduction : MonoBehaviour
         introBeats[beat].name = "cheat grow 2";
         introBeats[beat].action = ScriptedBeatAction.PlotChange;
         introBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        introBeats[beat].duration = 3f;
+        introBeats[beat].duration = 2f;
         introBeats[beat].islandPos.w = 4f; // <4 magic grow
         beat++;
         introBeats[beat].name = "'with our plant all grown'";
@@ -1000,6 +1011,16 @@ public class PlayerIntroduction : MonoBehaviour
             "Great! You're a natural. May the grace of the Genesis Tree be with you.";
         introBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
+        introBeats[beat].name = "step forward";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].npcMark = new Vector3(2.25f, 0f, -2.75f);
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "move near teleporter";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].npcMark = new Vector3(2.75f, 0f, -3.25f);
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
         introBeats[beat].name = "'Again, welcome'";
         introBeats[beat].action = ScriptedBeatAction.Dialog;
         introBeats[beat].dialogLine =
@@ -1047,7 +1068,12 @@ public class PlayerIntroduction : MonoBehaviour
         beat++;
         introBeats[beat].name = "eden walks to market";
         introBeats[beat].action = ScriptedBeatAction.EdenMark;
-        introBeats[beat].npcMark = new Vector3(18f, 0f, -19f);
+        introBeats[beat].npcMark = new Vector3(19f, 0f, -21f);
+        introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
+        beat++;
+        introBeats[beat].name = "eden walks to doorway market";
+        introBeats[beat].action = ScriptedBeatAction.EdenMark;
+        introBeats[beat].npcMark = new Vector3(20f, 0f, -21f);
         introBeats[beat].transition = ScriptedBeatTransition.EdenCallback;
         beat++;
         introBeats[beat].name = "eden walks into market";
@@ -1314,6 +1340,14 @@ public class PlayerIntroduction : MonoBehaviour
                     currentBeatIndex++;
                     npcCallback = false;
                     eden.destinationReached = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
+            case ScriptedBeatTransition.ExternalEvent:
+                if (nudgeEvent)
+                {
+                    currentBeatIndex++;
+                    nudgeEvent = false;
                     currentBeat.transitionDone = true;
                 }
                 break;
@@ -1695,6 +1729,11 @@ public class PlayerIntroduction : MonoBehaviour
                     Destroy(eden.gameObject, 10f);
                     pcm.AwardXP(PlayerData.XP_COMPLETETUTORIAL);
                     break;
+                case ScriptedBeatAction.NudgeSalesman:
+                    SalesmanIntroduction sales = GameObject.FindFirstObjectByType<SalesmanIntroduction>();
+                    if (sales != null)
+                        sales.SalesmanNudgeEvent();
+                    break;
             }
             currentBeat.actionDone = true;
         }
@@ -1820,6 +1859,11 @@ public class PlayerIntroduction : MonoBehaviour
         GameObject eNPC = GameObject.Instantiate((GameObject)Resources.Load("NPC Eden"));
         eNPC.transform.position = pos;
         return eNPC.GetComponent<NPCController>();
+    }
+
+    public void NudgeEden()
+    {
+        nudgeEvent = true;
     }
 
     void TryConfigPlayerInScene( PlayerOptions options )
@@ -2491,6 +2535,10 @@ public class PlayerIntroduction : MonoBehaviour
             canSkipIntro = true;
             // indicaate player reponse has happened
             playerResponse = true;
+
+            // launch traveling salesman intro
+            GameObject salesIntro = new GameObject();
+            salesIntro.AddComponent<SalesmanIntroduction>();
 
             // consuming input, but why?
             if (padMgr != null && padMgr.gamepads[0].isActive)
