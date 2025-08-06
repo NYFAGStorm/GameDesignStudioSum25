@@ -122,6 +122,18 @@ public class PlayerIntroduction : MonoBehaviour
     const float HELPMESSAGETIME = 7f;
 
 
+    void OnDisable()
+    {
+        // in case user quit very early in the customization process
+        // prevent 'blank white square appearance' of player character
+        if (!configValid)
+        {
+            PlayerOptions options = new PlayerOptions();
+            options.model = PlayerModelType.Male;
+            TryConfigPlayerInScene(options);
+        }
+    }
+
     void Start()
     {
         // validate

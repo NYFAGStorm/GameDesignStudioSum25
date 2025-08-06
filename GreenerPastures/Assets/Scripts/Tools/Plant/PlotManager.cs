@@ -1201,8 +1201,6 @@ public class PlotManager : MonoBehaviour
             s = "Soil Quality\n";
             if (soilBuffAmount >= 0f)
                 s += "+";
-            else
-                s += "-";
             s += (soilBuffAmount * 100f).ToString("0.0") + "%";
             c = Color.yellow;
             c.a = fade;
