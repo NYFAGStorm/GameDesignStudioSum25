@@ -470,11 +470,8 @@ public class GreenerGameManager : MonoBehaviour
             {
                 if (tim.dayOfMonth == 1)
                 {
-                    // trigger traveling salesman visit
-                    GameObject salesVisit = GameObject.Instantiate((GameObject)Resources.Load("Salesman Monthly Visit"));
-                    SalesVisitManager salesMgr = salesVisit.GetComponent<SalesVisitManager>();
-                    if (salesMgr != null)
-                        salesMgr.LaunchVisit();
+                    // spawn traveling salesman visit manager (it will remove itself when done)
+                    GameObject.Instantiate((GameObject)Resources.Load("Salesman Monthly Visit"));
                 }
             }
         }

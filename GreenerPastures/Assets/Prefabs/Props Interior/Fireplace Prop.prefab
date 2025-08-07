@@ -16425,7 +16425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db4b58b160975047ab7d466c3b01f08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minIntensity: 2.5
+  minIntensity: 2.25
   maxIntensity: 3.81
   noiseSpeed: 0.618
 --- !u!1 &8779047001015976860

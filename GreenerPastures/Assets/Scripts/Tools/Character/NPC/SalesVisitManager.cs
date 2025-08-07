@@ -19,7 +19,8 @@ public class SalesVisitManager : MonoBehaviour
         TeleportSalesman,
         VFXSpawn,
         RemoveNPC,
-        EndVisit
+        EndVisit,
+        IslandMenu
     }
 
     public enum ScriptedBeatTransition
@@ -27,7 +28,8 @@ public class SalesVisitManager : MonoBehaviour
         Default,
         TimedDuration,
         PlayerResponse,
-        SalesmanCallback
+        SalesmanCallback,
+        MenuClose
     }
 
     [System.Serializable]
@@ -59,6 +61,7 @@ public class SalesVisitManager : MonoBehaviour
     public bool beatTimeUp;
     public bool npcCallback;
     public bool playerResponse;
+    public bool menuClose;
     private int beatScriptEndIndex;
 
     private bool waitingForPlayer;
@@ -197,7 +200,7 @@ public class SalesVisitManager : MonoBehaviour
 
     void ConfigureVisitBeats()
     {
-        visitBeats = new ScriptedBeat[130];
+        visitBeats = new ScriptedBeat[30];
         int beat = 0;
         visitBeats[beat].name = "visit launch";
         visitBeats[beat].action = ScriptedBeatAction.Default;
@@ -254,18 +257,9 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].npcMark = new Vector3(4.5f, 0f, -3.25f);
         visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
-        visitBeats[beat].name = "salesman off teleporter";
-        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(4.5f, 0f, -3.25f);
-        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
-        beat++;
         visitBeats[beat].name = "salesman toward farm";
         visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(3f, 0f, -1f);
-        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
-        beat++;
-        visitBeats[beat].name = "salesman to player farm position";
-        visitBeats[beat].action = ScriptedBeatAction.NPCMarkToPlayerFarm;
+        visitBeats[beat].npcMark = new Vector3(2.5f, 0f, -2.75f);
         visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
         visitBeats[beat].name = "salesman wait for player";
@@ -281,24 +275,70 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].dialogLine =
             "Hey ho, Biomancer friend! I've got island upgrades for you!";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
-        
-        
+        beat++;
+        visitBeats[beat].name = "'Let's do business'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "Let's do business! I can purchase from you, move things for you...";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        visitBeats[beat].name = "'and of course sell'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "... and of course, I can sell you the finest island upgrades!";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        visitBeats[beat].name = "'take a look!'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "Just take a look at what I can do for you!";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        // island upgrades menu
+        beat++;
+        visitBeats[beat].name = "island upgrade menu";
+        visitBeats[beat].action = ScriptedBeatAction.IslandMenu;
+        visitBeats[beat].transition = ScriptedBeatTransition.MenuClose;
+        beat++;
+        visitBeats[beat].name = "'I think your island looks great'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "I think your island looks great! I do enjoy our visits each month.";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
+        beat++;
+        visitBeats[beat].name = "'I must be off now'";
+        visitBeats[beat].action = ScriptedBeatAction.Dialog;
+        visitBeats[beat].dialogLine =
+            "I must be off now! Many places to go. Fare well, Biomancer friend!";
+        visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         visitBeats[beat].name = "salesman turn to player";
         visitBeats[beat].action = ScriptedBeatAction.NPCTurnToPlayer;
         visitBeats[beat].transition = ScriptedBeatTransition.Default;
-        // REVIEW: entire salesman visit script
-
+        beat++;
+        visitBeats[beat].name = "salesman toward teleporter";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(3.5f, 0f, -3f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "salesman onto teleporter";
+        visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
+        visitBeats[beat].npcMark = new Vector3(4f, 0f, -4f);
+        visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
+        beat++;
+        visitBeats[beat].name = "teleporter vfx (b)";
+        visitBeats[beat].action = ScriptedBeatAction.VFXSpawn;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
+        visitBeats[beat].beatPosition.x = 4f;
+        visitBeats[beat].beatPosition.z = -4f;
         beat++;
         visitBeats[beat].name = "remove salesman";
         visitBeats[beat].action = ScriptedBeatAction.RemoveNPC;
-        visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 1f;
+        visitBeats[beat].transition = ScriptedBeatTransition.Default;
         beat++;
         visitBeats[beat].name = "end visit";
         visitBeats[beat].action = ScriptedBeatAction.EndVisit;
         visitBeats[beat].transition = ScriptedBeatTransition.TimedDuration;
-        visitBeats[beat].duration = 1f;
+        visitBeats[beat].duration = 2f;
     }
 
     void Update()
@@ -410,6 +450,14 @@ public class SalesVisitManager : MonoBehaviour
                     currentBeat.transitionDone = true;
                 }
                 break;
+            case ScriptedBeatTransition.MenuClose:
+                if (menuClose)
+                {
+                    currentBeatIndex++;
+                    menuClose = false;
+                    currentBeat.transitionDone = true;
+                }
+                break;
             default:
                 break;
         }
@@ -495,7 +543,18 @@ public class SalesVisitManager : MonoBehaviour
                     RemoveSalesman();
                     break;
                 case ScriptedBeatAction.EndVisit:
+                    Destroy(gameObject, 3f);
                     visitRunning = false;
+                    break;
+                case ScriptedBeatAction.IslandMenu:
+                    menuClose = false;
+                    // ISLAND MENU OPEN
+                    GameObject islandMenu = GameObject.Instantiate((GameObject)Resources.Load("Island Upgrade Menu"));
+                    IslandUpgradeMenu im = islandMenu.GetComponent<IslandUpgradeMenu>();
+                    if (im != null)
+                        im.ConfigSalesVisit(this);
+                    else
+                        Debug.LogWarning("--- SalesVisitManager [Update] : unable to access island upgrade manager script for config. will ignore.");
                     break;
             }
             currentBeat.actionDone = true;
@@ -541,9 +600,9 @@ public class SalesVisitManager : MonoBehaviour
         }
     }
 
-    public void LaunchVisit()
+    public void IslandMenuClosed()
     {
-        countdownToVisit = 1f;
+        menuClose = true;
     }
 
     void BeginVisit()
