@@ -457,6 +457,30 @@ public class GreenerGameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// This tick represents mid-day (high noon)
+    /// </summary>
+    public void NoonTick()
+    {
+        // determine if it is the 1st of the month (and intro not running)
+        PlayerIntroduction playerIntro = GameObject.FindFirstObjectByType<PlayerIntroduction>();
+        if (playerIntro != null && !playerIntro.introRunning)
+        {
+            TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
+            if (tim != null)
+            {
+                if (tim.dayOfMonth == 1)
+                {
+                    // trigger traveling salesman visit
+                    GameObject salesVisit = GameObject.Instantiate((GameObject)Resources.Load("Salesman Monthly Visit"));
+                    SalesVisitManager salesMgr = salesVisit.GetComponent<SalesVisitManager>();
+                    if (salesMgr != null)
+                        salesMgr.LaunchVisit();
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// This tick represents a end of day (dusk)
     /// </summary>
     public void EveningTick()

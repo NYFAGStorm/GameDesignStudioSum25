@@ -54,7 +54,7 @@ public class TimeManager : MonoBehaviour
     private float cheatTimeScale = 1f; // adjusts time rate from world time multiplier
 
     private int previousDayOfMonth; // check for midnight tick
-    private float previousDayProgress; // check for morning, evening tick
+    private float previousDayProgress; // check for morning, noon, evening tick
 
     const float ABSOLUTEMINIMUMFLOAT = -999999999999999f; // used for timestamp difference
 
@@ -228,6 +228,12 @@ public class TimeManager : MonoBehaviour
             GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
             if (ggm != null)
                 ggm.MorningTick();
+        }
+        if (dayProgress >= 0.5f && previousDayOfMonth < 0.5f)
+        {
+            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+            if (ggm != null)
+                ggm.NoonTick();
         }
         if (dayProgress >= 0.75f && previousDayProgress < .75f) 
         {
