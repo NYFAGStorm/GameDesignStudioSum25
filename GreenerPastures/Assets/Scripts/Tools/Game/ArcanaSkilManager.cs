@@ -44,6 +44,8 @@ public class ArcanaSkilManager : MonoBehaviour
 
     private Texture2D[] buttonTex;
 
+    private AudioManager sfxAudio;
+
     const float PLAYERCHECKTIME = 1f;
     const float PLAYERPROXIMITY = 1f;
     const string DEFAULTINSTRUCTIONS = "WASD to explore skills\nPress ENTER to purchase";
@@ -59,6 +61,9 @@ public class ArcanaSkilManager : MonoBehaviour
         padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
         if (padMgr == null)
             Debug.LogWarning("--- ArcanaSkillManager [Start] : no multi gamepad found. will ignore.");
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -689,6 +694,9 @@ public class ArcanaSkilManager : MonoBehaviour
                 PurchaseSkill(currentSkillNode);
                 confirmPopTimer = CONFIRMPOPTIME;
                 popSelectionButton = -1;
+                // sfx
+                if (sfxAudio != null)
+                    sfxAudio.StartSound("Player Arcana Skill");
             }
             // cancel button
             r.x = 0.55f * w;

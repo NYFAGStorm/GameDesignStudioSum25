@@ -799,10 +799,9 @@ public class PlayerControlManager : MonoBehaviour
                 {
                     // with so many gold coins, just collect gold directly
                     playerData.gold += activeItem.looseItem.inv.items.Length - 1;
-                    // REVIEW : sfx collect gold (not gold drop sfx)
-                    GameObject sfxGoldObj = GameObject.Find("AudioMgr ChickRace SFX");
-                    if (sfxGoldObj != null)
-                        sfxGoldObj.GetComponent<AudioManager>().StartSound("Coin Drop 4");
+                    // sfx collect gold
+                    if (sfxAudio != null)
+                        sfxAudio.StartSound("Player Pickup GoldSack");
                 }
                 else
                     unpackLooseItem = true;
