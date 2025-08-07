@@ -44,3 +44,97 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d2e20c2511455b429418186f412aadf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  items:
+  - name: Teleporter
+    type: 0
+    description: Everyone needs a teleport node ... literally a must have.
+    price: 0
+    icon: {fileID: 2800000, guid: 31b437882ddb2214c98a96c600eab51a, type: 3}
+    prefab: {fileID: 7935676510358305019, guid: 05732be752a652d439e8f7677717b70c, type: 3}
+    itemPadding: 0.5
+  - name: Mail Box
+    type: 1
+    description: Everyone needs a mailbox ... literally a must have.
+    price: 0
+    icon: {fileID: 2800000, guid: 57ef7264804a25c488f0facbbe662fcd, type: 3}
+    prefab: {fileID: 7890912895949274550, guid: 0aa0bba8e004a544f97d3eab15fdfc28, type: 3}
+    itemPadding: 0.5
+  - name: Compost Bin
+    type: 2
+    description: A convenience for every farm
+    price: 1
+    icon: {fileID: 2800000, guid: 867eb09d09d44444dbd25228f250fcd8, type: 3}
+    prefab: {fileID: 3070835500137206287, guid: 0a1f4554c7f511e4c9e85cd3ab5dd0e0, type: 3}
+    itemPadding: 1
+  - name: Bush (Style A)
+    type: 3
+    description: Bushy!
+    price: 200
+    icon: {fileID: 2800000, guid: fa6d2cd3fd4629843ac32fd25f4d7426, type: 3}
+    prefab: {fileID: 6346147611437419249, guid: 70f19f9164ea6ed4f81f509b9cccb1a5, type: 3}
+    itemPadding: 0.5
+  - name: Bush (Style B)
+    type: 4
+    description: An alternate bush.
+    price: 200
+    icon: {fileID: 2800000, guid: d9dc34b87eb35e4469521ba6b9f6a422, type: 3}
+    prefab: {fileID: 7690793300073019133, guid: 3f4aaccf0203c584ab614db11e2da0a2, type: 3}
+    itemPadding: 0.5
+  - name: Bush (Style C)
+    type: 5
+    description: A different kind of bush.
+    price: 200
+    icon: {fileID: 2800000, guid: 0103877a508cd3848b372b59a54e7eab, type: 3}
+    prefab: {fileID: 8062035689148026909, guid: d1ce943cb4f85ab4293fc0f0873e7a73, type: 3}
+    itemPadding: 0.5
+  - name: Rock (Style A)
+    type: 6
+    description: Rock of Ages
+    price: 500
+    icon: {fileID: 2800000, guid: 66ccc1c6f07d3404093149d35cf0ff1a, type: 3}
+    prefab: {fileID: 7327149901317404351, guid: 857986cbc01960f4daaefafbea95d10f, type: 3}
+    itemPadding: 0.5
+  - name: Rock (Style B)
+    type: 7
+    description: Rock on!
+    price: 500
+    icon: {fileID: 2800000, guid: 840eb275e62bef941ad9e707a995ce3d, type: 3}
+    prefab: {fileID: 6372381594341545684, guid: dde89a35a78512849b5cd0f61591636e, type: 3}
+    itemPadding: 0.5
+  - name: Rock (Style C)
+    type: 8
+    description: A rock without the roll.
+    price: 500
+    icon: {fileID: 2800000, guid: e254018f85f7018488dc47afc749d427, type: 3}
+    prefab: {fileID: 6720054733243077431, guid: a58af9040ee70a844afaae6410fe9b2c, type: 3}
+    itemPadding: 0.5
+  - name: Lamp Post (Style A)
+    type: 9
+    description: A fancy lamp post, for the discerning Biomancer who fancies themselves
+      cultured and modern.
+    price: 2500
+    icon: {fileID: 2800000, guid: f5d00b422532ac94d9c9e2547d6e06e9, type: 3}
+    prefab: {fileID: 6292877075674068963, guid: 369d18384c997174b92928a42aa888f5, type: 3}
+    itemPadding: 0.5
+  - name: Lamp Post (Style B)
+    type: 10
+    description: A modest lamp post with purpose. A lamp post that says, 'I can be
+      a light for all and not be fancy. Watch me.'
+    price: 2500
+    icon: {fileID: 2800000, guid: d2cc466746d1f404a890f5391858d1f5, type: 3}
+    prefab: {fileID: 875824388285108143, guid: 04814dc991d541146afae59e1586d464, type: 3}
+    itemPadding: 0.5
+  - name: Banner (Style A)
+    type: 11
+    description: Banner a
+    price: 5000
+    icon: {fileID: 2800000, guid: db37e83af4203954bbfc90717be7a545, type: 3}
+    prefab: {fileID: 5365601680046490509, guid: d680ed7e1735ed74aa627b959f401bf7, type: 3}
+    itemPadding: 1
+  - name: Banner (Style B)
+    type: 12
+    description: Banner b
+    price: 5000
+    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    itemPadding: 1
