@@ -1725,12 +1725,12 @@ public class PlayerControlManager : MonoBehaviour
             g.fontStyle = FontStyle.Italic;
             g.wordWrap = true;
             s = groceryList;
-            r.x += 0.0005f * w;
-            r.y += 0.0008f * w;
+            r.x += 0.0004f * w;
+            r.y += 0.0005f * w;
             GUI.color = Color.black;
             GUI.Label(r, s, g);
-            r.x -= 0.001f * w;
-            r.y -= 0.0016f * w;
+            r.x -= 0.0008f * w;
+            r.y -= 0.001f * w;
             GUI.color = Color.white;
             GUI.Label(r, s, g);
         }

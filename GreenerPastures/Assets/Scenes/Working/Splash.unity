@@ -1548,7 +1548,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
+    pitchVariance: 0.01
     volume: 0
     volumeVariance: 0
   - name: Magic Cast 1
@@ -1558,7 +1558,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 1
-    pitchVariance: 0.1
+    pitchVariance: 0.05
     volume: 0.381
     volumeVariance: 0
   - name: Magic Cast 2
@@ -1568,7 +1568,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 1
-    pitchVariance: 0.1
+    pitchVariance: 0.05
     volume: 0.618
     volumeVariance: 0
   - name: Magic Cauldron Bubble Loop
@@ -1588,7 +1588,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.1
+    pitchVariance: 0.05
     volume: 0
     volumeVariance: 0
   - name: Magic Cauldron Drop 2
@@ -1598,7 +1598,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.1
+    pitchVariance: 0.05
     volume: 0
     volumeVariance: 0
   - name: Magic Cauldron Drop 3
@@ -1608,7 +1608,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.1
+    pitchVariance: 0.05
     volume: 0
     volumeVariance: 0
   - name: Magic Cauldron Charge Crafted
@@ -1618,7 +1618,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.1
+    pitchVariance: 0.05
     volume: 0
     volumeVariance: 0
   - name: Plant Seedling Appear
@@ -1728,7 +1728,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.1
+    pitchVariance: 0.05
     volume: 1
     volumeVariance: 0
   musicCrossFadeTime: 3.81
