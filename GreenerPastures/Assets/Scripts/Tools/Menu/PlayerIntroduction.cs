@@ -280,6 +280,8 @@ public class PlayerIntroduction : MonoBehaviour
         pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterFive);
         pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterSix);
         pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenLetterSeven);
+        // ensure eden arcana visit
+        pcm.playerData = PlayerSystem.AddPlayerEffect(pcm.playerData, PlayerEffect.EdenArcanaVisit);
     }
 
     void FindManagedPlot()

@@ -132,6 +132,7 @@ public enum PlayerEffect
     SkillCoolCat,
     SkillMysticForager,
     SkillArchmage,
+    EdenArcanaVisit,
     EffectA,
     EffectB,
     EffectC,

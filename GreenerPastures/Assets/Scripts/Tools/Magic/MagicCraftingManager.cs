@@ -1042,22 +1042,26 @@ public class MagicCraftingManager : MonoBehaviour
                     {
                         // recipe selected, may toggle un-select with a button press
                         c = Color.white;
-                        c.r = 0.381f;
-                        c.g = 0.381f;
+                        c.r = 0.2f;
+                        c.g = 0.2f;
+                        c.b = 0.8f;
                     }
                     GUI.color = c;
                     GrimoireData grim = pcm.playerData.magic.library.grimoire[i];
                     // spell name
                     g.alignment = TextAnchor.MiddleLeft;
+                    g.fontStyle = FontStyle.Italic;
+                    if (i == currentGrimoireEntry && currentEntryValid)
+                        g.fontStyle = FontStyle.BoldAndItalic;
                     s = grim.name;
                     GUI.Label(r, s, g);
                     // spell description
-                    r.y += 0.05f * h;
+                    r.y += 0.04f * h;
                     g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
                     s = grim.description;
                     GUI.Label(r, s, g);
                     // spell ingredients
-                    r.y += 0.025f * h;
+                    r.y += 0.04f * h;
                     g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
                     g.alignment = TextAnchor.MiddleRight;
                     s = "";

@@ -718,9 +718,10 @@ public class PlayerControlManager : MonoBehaviour
             return retBool;
 
         retBool = PlayerSystem.WillPlayerLevelUp(playerData, xpAmount);
-        // trigger eden arcana visit if player just reached level 1
-        if (playerData.level == 0 && retBool)
+        // trigger eden arcana visit if player has not yet been visited
+        if (retBool && PlayerSystem.PlayerHasEffect(playerData,PlayerEffect.EdenArcanaVisit))
         {
+            // eden visit will clear this effect once visit is complete
             GameObject edenVisitMgr = GameObject.Instantiate((GameObject)Resources.Load("Eden Arcana Visit"));
             edenVisitMgr.GetComponent<EdenVisitManager>().LaunchVisit();
         }

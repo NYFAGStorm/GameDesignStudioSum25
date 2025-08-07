@@ -579,6 +579,8 @@ public class EdenVisitManager : MonoBehaviour
                     RemoveEden();
                     break;
                 case ScriptedBeatAction.EndVisit:
+                    // remove eden visit effect from this player
+                    pcm.playerData = PlayerSystem.RemovePlayerEffect(pcm.playerData, PlayerEffect.EdenArcanaVisit);
                     visitRunning = false;
                     break;
             }
