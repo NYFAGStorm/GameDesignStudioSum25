@@ -1032,15 +1032,18 @@ public class MagicCraftingManager : MonoBehaviour
                     c = Color.green;
                     c *= 0.381f;
                     if (i == currentGrimoireEntry)
-                        c = Color.white;
+                    {
+                        c = Color.black;
+                        c.b = 0.381f;
+                    }
                     if (i == currentGrimoireEntry && !currentEntryValid)
                         c = Color.black; // invalid due to lack of ingredients in inventory
                     if (i == selectedGrimoireRecipe)
                     {
                         // recipe selected, may toggle un-select with a button press
-                        c = Color.blue;
-                        c.r = 0.2f;
-                        c.g = 0.2f;
+                        c = Color.white;
+                        c.r = 0.381f;
+                        c.g = 0.381f;
                     }
                     GUI.color = c;
                     GrimoireData grim = pcm.playerData.magic.library.grimoire[i];
