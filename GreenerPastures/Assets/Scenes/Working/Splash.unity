@@ -1628,7 +1628,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0
+    pitchVariance: 0.075
     volume: 0
     volumeVariance: 0
   - name: Player Dig Hole
@@ -1638,7 +1638,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.05
+    pitchVariance: 0.075
     volume: 0
     volumeVariance: 0
   - name: Player Harvest
@@ -1648,7 +1648,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.05
+    pitchVariance: 0.075
     volume: 0
     volumeVariance: 0
   - name: Player Uproot
@@ -1658,7 +1658,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.05
+    pitchVariance: 0.075
     volume: 0
     volumeVariance: 0
   - name: Player Watering
@@ -1668,7 +1668,7 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.05
+    pitchVariance: 0.075
     volume: 0
     volumeVariance: 0
   - name: Player Level Up

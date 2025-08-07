@@ -768,6 +768,8 @@ public class MarketManager : MonoBehaviour
                             {
                                 PlantType p = iData.plant;
                                 iData.name += " (" + p.ToString() + ")";
+                                if (menuItems[menuItemSelection].itemType == ItemType.Plant)
+                                    iData.size = 0.95f;
                             }
                             else if (menuItems[menuItemSelection].itemType == ItemType.Scroll ||
                                 menuItems[menuItemSelection].itemType == ItemType.Potion)
@@ -796,6 +798,8 @@ public class MarketManager : MonoBehaviour
                         {
                             // plant config
                             PlantData pData = PlantSystem.InitializePlant(menuItems[menuItemSelection].plantType);
+                            if (menuItems[menuItemSelection].itemType == ItemType.Plant)
+                                tmp[packingItems.Length].size = 0.95f;
                             tmp[packingItems.Length] = InventorySystem.SetItemAsPlant(tmp[packingItems.Length], pData);
                         }
                         if (menuItems[menuItemSelection].itemType == ItemType.Scroll ||
@@ -1062,6 +1066,7 @@ public class MarketManager : MonoBehaviour
                 if (pData.canReFruit)
                     menuItems[i].buyItemValue *= 2;
                 menuItems[i].sellItemValue = menuItems[i].buyItemValue + seedBuy;
+                //
             }
         }
     }
