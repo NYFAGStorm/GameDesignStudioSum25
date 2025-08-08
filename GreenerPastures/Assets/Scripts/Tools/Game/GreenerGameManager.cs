@@ -403,7 +403,9 @@ public class GreenerGameManager : MonoBehaviour
         //season.z = tim.GetAmountOfSeason(WorldSeason.Fall);
         //season.w = tim.GetAmountOfSeason(WorldSeason.Winter);
         //GameObject.FindFirstObjectByType<MarketManager>().UpdateSeasonalValues(season);
-        GameObject.FindFirstObjectByType<MarketManager>().ReviseDailySpecials();
+        MarketManager mm = GameObject.FindFirstObjectByType<MarketManager>();
+        if (mm != null)
+            mm.ReviseDailySpecials();
     }
 
     /// <summary>

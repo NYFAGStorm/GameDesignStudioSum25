@@ -46,128 +46,128 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   items:
   - name: Medium Island
-    category: 1
-    type: 12
+    category: 0
+    type: 0
     description: 16 m diameter
     price: 5000
     icon: {fileID: 2800000, guid: 4238329dc61a1e54e9443662c3063156, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
     itemPadding: 1
   - name: Large Island
-    category: 1
-    type: 12
+    category: 0
+    type: 1
     description: 18 m diameter
     price: 5000
     icon: {fileID: 2800000, guid: 4238329dc61a1e54e9443662c3063156, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
     itemPadding: 1
   - name: Very Large Island
-    category: 1
-    type: 12
+    category: 0
+    type: 2
     description: 20 m diameter
     price: 5000
     icon: {fileID: 2800000, guid: 4238329dc61a1e54e9443662c3063156, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
     itemPadding: 1
   - name: Modest Farm
-    category: 2
-    type: 12
+    category: 1
+    type: 3
     description: 4x4 16 plots
     price: 5000
     icon: {fileID: 2800000, guid: b44d8606fdc4dd94399f3cbb8a75d80b, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Sizable Farm
-    category: 4
-    type: 12
+    category: 1
+    type: 4
     description: 5x5 25 plots
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Huge Farm
-    category: 4
-    type: 12
+    category: 1
+    type: 5
     description: 6x6 36 plots
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Vast Farm
-    category: 2
-    type: 12
+    category: 1
+    type: 6
     description: 7x7 49 plots
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Wizard Tower
-    category: 3
-    type: 12
+    category: 2
+    type: 7
     description: Impressive tower
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 6947510240047528838, guid: d06852ee56888d34d88232ca4d026d50, type: 3}
     itemPadding: 1
   - name: Sorcerer Tower
-    category: 3
-    type: 12
+    category: 2
+    type: 8
     description: Grand scale
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
-    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    prefab: {fileID: 1012485463665324318, guid: 6b9ecde0752711745bf389957fea3910, type: 3}
     itemPadding: 1
   - name: Bush (Style A)
-    category: 4
-    type: 3
+    category: 3
+    type: 12
     description: Bushy!
     price: 200
     icon: {fileID: 2800000, guid: fa6d2cd3fd4629843ac32fd25f4d7426, type: 3}
     prefab: {fileID: 6346147611437419249, guid: 70f19f9164ea6ed4f81f509b9cccb1a5, type: 3}
     itemPadding: 0.5
   - name: Bush (Style B)
-    category: 4
-    type: 4
+    category: 3
+    type: 13
     description: An alternate bush.
     price: 200
     icon: {fileID: 2800000, guid: d9dc34b87eb35e4469521ba6b9f6a422, type: 3}
     prefab: {fileID: 7690793300073019133, guid: 3f4aaccf0203c584ab614db11e2da0a2, type: 3}
     itemPadding: 0.5
   - name: Bush (Style C)
-    category: 4
-    type: 5
+    category: 3
+    type: 14
     description: A different kind of bush.
     price: 200
     icon: {fileID: 2800000, guid: 0103877a508cd3848b372b59a54e7eab, type: 3}
     prefab: {fileID: 8062035689148026909, guid: d1ce943cb4f85ab4293fc0f0873e7a73, type: 3}
     itemPadding: 0.5
   - name: Rock (Style A)
-    category: 4
-    type: 6
+    category: 3
+    type: 15
     description: Rock of Ages
     price: 500
     icon: {fileID: 2800000, guid: 66ccc1c6f07d3404093149d35cf0ff1a, type: 3}
     prefab: {fileID: 7327149901317404351, guid: 857986cbc01960f4daaefafbea95d10f, type: 3}
     itemPadding: 0.5
   - name: Rock (Style B)
-    category: 4
-    type: 7
+    category: 3
+    type: 16
     description: Rock on!
     price: 500
     icon: {fileID: 2800000, guid: 840eb275e62bef941ad9e707a995ce3d, type: 3}
     prefab: {fileID: 6372381594341545684, guid: dde89a35a78512849b5cd0f61591636e, type: 3}
     itemPadding: 0.5
   - name: Rock (Style C)
-    category: 4
-    type: 8
+    category: 3
+    type: 17
     description: A rock without the roll.
     price: 500
     icon: {fileID: 2800000, guid: e254018f85f7018488dc47afc749d427, type: 3}
     prefab: {fileID: 6720054733243077431, guid: a58af9040ee70a844afaae6410fe9b2c, type: 3}
     itemPadding: 0.5
   - name: Lamp Post (Style A)
-    category: 4
-    type: 9
+    category: 3
+    type: 18
     description: A fancy lamp post, for the discerning Biomancer who fancies themselves
       cultured and modern.
     price: 2500
@@ -175,8 +175,8 @@ MonoBehaviour:
     prefab: {fileID: 6292877075674068963, guid: 369d18384c997174b92928a42aa888f5, type: 3}
     itemPadding: 0.5
   - name: Lamp Post (Style B)
-    category: 4
-    type: 10
+    category: 3
+    type: 19
     description: A modest lamp post with purpose. A lamp post that says, 'I can be
       a light for all and not be fancy. Watch me.'
     price: 2500
@@ -184,48 +184,56 @@ MonoBehaviour:
     prefab: {fileID: 875824388285108143, guid: 04814dc991d541146afae59e1586d464, type: 3}
     itemPadding: 0.5
   - name: Banner (Style A)
-    category: 4
-    type: 11
+    category: 3
+    type: 20
     description: Banner a
     price: 5000
     icon: {fileID: 2800000, guid: db37e83af4203954bbfc90717be7a545, type: 3}
     prefab: {fileID: 5365601680046490509, guid: d680ed7e1735ed74aa627b959f401bf7, type: 3}
     itemPadding: 1
   - name: Banner (Style B)
-    category: 4
-    type: 12
+    category: 3
+    type: 21
     description: Banner b
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
-  - name: Candle Stick
-    category: 5
-    type: 12
+  - name: Candle Stick (Style A)
+    category: 4
+    type: 22
     description: Everyone needs some light
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
+  - name: Candle Stick (Style B)
+    category: 4
+    type: 23
+    description: Everyone could use more light
+    price: 5000
+    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
+    itemPadding: 1
   - name: Fireplace
-    category: 5
-    type: 12
+    category: 4
+    type: 24
     description: A warm hearth for cold nights
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Bookshelf
-    category: 5
-    type: 12
+    category: 4
+    type: 25
     description: A must for every well-read biomancer
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Writing Desk
-    category: 5
-    type: 12
+    category: 4
+    type: 26
     description: Compose letters or write that great novel
     price: 5000
     icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}

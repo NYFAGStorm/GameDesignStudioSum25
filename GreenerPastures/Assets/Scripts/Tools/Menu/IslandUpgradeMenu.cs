@@ -16,6 +16,15 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     public enum  UpgradeType
     {
+        IslandMedium,
+        IslandLarge,
+        IslandVeryLarge,
+        FarmModest,
+        FarmSizable,
+        FarmHuge,
+        FarmVast,
+        WizardTower,
+        SorcererTower,
         TeleportNode,
         Mailbox,
         CompostBin,
@@ -29,7 +38,8 @@ public class IslandUpgradeMenu : MonoBehaviour
         LampPostB,
         BannerA,
         BannerB,
-        IntCandleStick,
+        IntCandleStickA,
+        IntCandleStickB,
         IntFireplace,
         IntBookshelf,
         IntWritingDesk,
