@@ -46,6 +46,8 @@ public class IslandUpgradeMenu : MonoBehaviour
     }
     public MenuItem[] items;
 
+    public bool test;
+
     private PlayerControlManager pcm;
     private GreenerGameManager ggm;
     private IslandManager im;
@@ -173,9 +175,6 @@ public class IslandUpgradeMenu : MonoBehaviour
                 Debug.LogWarning("--- IslandUpgradeMenu [ConfigureMenuItemDescriptions] : item #" + i + " is missing an icon. will ignore.");
             if (items[i].prefab == null)
                 Debug.LogWarning("--- IslandUpgradeMenu [ConfigureMenuItemDescriptions] : item #" + i + " is missing a prefab. will ignore.");
-
-            // temp
-            items[i].category = UpgradeCategory.OutdoorProps;
 
             switch (items[i].type)
             {
@@ -469,7 +468,8 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (currentConfigObject != null)
                 currentConfigObject.transform.position = cursor.transform.position;
         }
-        else if (cursor.GetComponent<Renderer>().enabled)
+        else if (cursor != null &&
+            cursor.GetComponent<Renderer>().enabled)
             SetCursorVisible(false);
 
         // gamepad control
@@ -625,6 +625,12 @@ public class IslandUpgradeMenu : MonoBehaviour
     {
         if (!menuOpen)
             return;
+
+        if (test)
+        {
+            test = false;
+            salesVisit.MenuDialogBeat("We are defintely UP selling!");
+        }
 
         Rect r = new Rect();
         float w = Screen.width;

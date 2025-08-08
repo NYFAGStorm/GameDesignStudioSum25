@@ -73,7 +73,7 @@ public class SalesVisitManager : MonoBehaviour
 
     private AudioManager sfxAudio;
 
-    const float PAUSETIME = 2f;
+    const float PAUSETIME = 1.5f;
     const float PROXIMITY = 1.5f;
 
 
@@ -298,6 +298,7 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].name = "island upgrade menu";
         visitBeats[beat].action = ScriptedBeatAction.IslandMenu;
         visitBeats[beat].transition = ScriptedBeatTransition.MenuClose;
+        // back from menu
         beat++;
         visitBeats[beat].name = "'I think your island looks great'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
@@ -598,6 +599,17 @@ public class SalesVisitManager : MonoBehaviour
             }
             //Debug.Log(s);
         }
+    }
+
+    public void MenuDialogBeat(string dialog)
+    {
+        // FIXME: this needs fixing
+        currentBeat.actionDone = false;
+        currentBeat.action = ScriptedBeatAction.Dialog;
+        currentBeat.transition = ScriptedBeatTransition.PlayerResponse;
+        currentBeat.dialogLine = dialog;
+        dialogTimer = 0.1f;
+        playerResponse = false;
     }
 
     public void IslandMenuClosed()
