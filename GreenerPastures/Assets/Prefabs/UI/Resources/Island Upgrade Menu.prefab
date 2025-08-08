@@ -50,7 +50,7 @@ MonoBehaviour:
     type: 0
     description: 16 m diameter
     price: 5000
-    icon: {fileID: 2800000, guid: 4238329dc61a1e54e9443662c3063156, type: 3}
+    icon: {fileID: 2800000, guid: 11bb9aaf34e0cb840b4965328158992b, type: 3}
     prefab: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
     itemPadding: 1
   - name: Large Island
@@ -58,7 +58,7 @@ MonoBehaviour:
     type: 1
     description: 18 m diameter
     price: 5000
-    icon: {fileID: 2800000, guid: 4238329dc61a1e54e9443662c3063156, type: 3}
+    icon: {fileID: 2800000, guid: 11bb9aaf34e0cb840b4965328158992b, type: 3}
     prefab: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
     itemPadding: 1
   - name: Very Large Island
@@ -66,7 +66,7 @@ MonoBehaviour:
     type: 2
     description: 20 m diameter
     price: 5000
-    icon: {fileID: 2800000, guid: 4238329dc61a1e54e9443662c3063156, type: 3}
+    icon: {fileID: 2800000, guid: 11bb9aaf34e0cb840b4965328158992b, type: 3}
     prefab: {fileID: 8012958570283673001, guid: 02b7de4b0db598746bafbd1ec1516d8e, type: 3}
     itemPadding: 1
   - name: Modest Farm
@@ -74,7 +74,7 @@ MonoBehaviour:
     type: 3
     description: 4x4 16 plots
     price: 5000
-    icon: {fileID: 2800000, guid: b44d8606fdc4dd94399f3cbb8a75d80b, type: 3}
+    icon: {fileID: 2800000, guid: 9751071d4c786244eab32d81c21aff11, type: 3}
     prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Sizable Farm
@@ -82,7 +82,7 @@ MonoBehaviour:
     type: 4
     description: 5x5 25 plots
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 9751071d4c786244eab32d81c21aff11, type: 3}
     prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Huge Farm
@@ -90,7 +90,7 @@ MonoBehaviour:
     type: 5
     description: 6x6 36 plots
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 9751071d4c786244eab32d81c21aff11, type: 3}
     prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Vast Farm
@@ -98,7 +98,7 @@ MonoBehaviour:
     type: 6
     description: 7x7 49 plots
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 9751071d4c786244eab32d81c21aff11, type: 3}
     prefab: {fileID: 5606789961741191233, guid: 1fbb451aa960449458741614c45879e8, type: 3}
     itemPadding: 1
   - name: Wizard Tower
@@ -106,7 +106,7 @@ MonoBehaviour:
     type: 7
     description: Impressive tower
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 91b1d69c881dfc242b7f2e7ba528e0f0, type: 3}
     prefab: {fileID: 6947510240047528838, guid: d06852ee56888d34d88232ca4d026d50, type: 3}
     itemPadding: 1
   - name: Sorcerer Tower
@@ -114,7 +114,7 @@ MonoBehaviour:
     type: 8
     description: Grand scale
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: b75ca8d7854f3b74fbf16e61092c2a64, type: 3}
     prefab: {fileID: 1012485463665324318, guid: 6b9ecde0752711745bf389957fea3910, type: 3}
     itemPadding: 1
   - name: Bush (Style A)
@@ -188,7 +188,7 @@ MonoBehaviour:
     type: 20
     description: Banner a
     price: 5000
-    icon: {fileID: 2800000, guid: db37e83af4203954bbfc90717be7a545, type: 3}
+    icon: {fileID: 2800000, guid: b6b975061ec991b408f8a44ad0e04943, type: 3}
     prefab: {fileID: 5365601680046490509, guid: d680ed7e1735ed74aa627b959f401bf7, type: 3}
     itemPadding: 1
   - name: Banner (Style B)
@@ -196,7 +196,7 @@ MonoBehaviour:
     type: 21
     description: Banner b
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: eba80f1a31e9f80498732bb43b2ffa16, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Candle Stick (Style A)
@@ -204,7 +204,7 @@ MonoBehaviour:
     type: 22
     description: Everyone needs some light
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: ee9906fa919df1e4d8aec07f170f79f6, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Candle Stick (Style B)
@@ -212,7 +212,7 @@ MonoBehaviour:
     type: 23
     description: Everyone could use more light
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: ee9906fa919df1e4d8aec07f170f79f6, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Fireplace
@@ -220,7 +220,7 @@ MonoBehaviour:
     type: 24
     description: A warm hearth for cold nights
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 2a19baf6e102d564dbe25ac9e0003a84, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Bookshelf
@@ -228,7 +228,7 @@ MonoBehaviour:
     type: 25
     description: A must for every well-read biomancer
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 8ddd83931ad52524f942b462e13a5375, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Writing Desk
@@ -236,7 +236,7 @@ MonoBehaviour:
     type: 26
     description: Compose letters or write that great novel
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 982981e0c8e129f429f2f58554bfb46a, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Tapestry (Style A)
@@ -244,7 +244,7 @@ MonoBehaviour:
     type: 12
     description: Colorful banner in your style
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: 74099cc70ac9bbd46bb40a5588663ed1, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Tapestry (Style B)
@@ -252,7 +252,7 @@ MonoBehaviour:
     type: 12
     description: Automagically configures to your personal colors
     price: 5000
-    icon: {fileID: 2800000, guid: 86dc8d4485952934f9ea64a7c5dbffc0, type: 3}
+    icon: {fileID: 2800000, guid: f656c02045b64624789479bb7fdf78aa, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   test: 0
