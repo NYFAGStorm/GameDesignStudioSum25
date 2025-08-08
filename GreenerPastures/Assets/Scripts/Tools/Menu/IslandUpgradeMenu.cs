@@ -66,6 +66,10 @@ public class IslandUpgradeMenu : MonoBehaviour
     private int padClickButton = -1;
     private int padMove = -1;
 
+    private int menuItemSelection = -1;
+    private int topOfMenuList = 0;
+    private int maxDisplayItems = 5;
+
     private AudioManager sfxAudio;
 
     private SalesVisitManager salesVisit;
@@ -112,6 +116,11 @@ public class IslandUpgradeMenu : MonoBehaviour
         GameObject sfxObj = GameObject.Find("AudioMgr SFX");
         if (sfxObj != null)
             sfxAudio = sfxObj.GetComponent<AudioManager>();
+        if (items == null || items.Length == 0)
+        {
+            Debug.LogError("--- IslandUpgradeMenu [Start] : no items configured on this tool (need icons and prefabs). aborting.");
+            enabled = false;
+        }
         // initialize
         if (enabled)
         {
@@ -121,6 +130,11 @@ public class IslandUpgradeMenu : MonoBehaviour
             validConfig = true; // begin with valid island configuration
 
             ConfigureMenuItems();
+
+            // lock down player
+            pcm.characterFrozen = true;
+            pcm.freezeCharacterActions = true;
+            //
         }
         else if (salesVisit != null)
             salesVisit.IslandMenuClosed(); // abort menu operation, free the salesman
@@ -136,19 +150,24 @@ public class IslandUpgradeMenu : MonoBehaviour
 
         for (int i =0; i < items.Length; i++)
         {
+            if (items[i].icon == null)
+                Debug.LogWarning("--- IslandUpgradeMenu [ConfigureMenuItemDescriptions] : item #" + i + " is missing an icon. will ignore.");
+            if (items[i].prefab == null)
+                Debug.LogWarning("--- IslandUpgradeMenu [ConfigureMenuItemDescriptions] : item #" + i + " is missing a prefab. will ignore.");
+
             switch (items[i].type)
             {
                 case UpgradeType.TeleportNode:
                     items[i].name = "Teleporter";
                     items[i].description = "Everyone needs a teleport node ... literally a must have.";
                     items[i].price = 0;
-                    items[i].itemPadding = 0.5f;
+                    items[i].itemPadding = 1f;
                     break;
                 case UpgradeType.Mailbox:
                     items[i].name = "Mail Box";
                     items[i].description = "Everyone needs a mailbox ... literally a must have.";
                     items[i].price = 0;
-                    items[i].itemPadding = 0.5f;
+                    items[i].itemPadding = 1f;
                     break;
                 case UpgradeType.CompostBin:
                     items[i].name = "Compost Bin";
@@ -228,6 +247,10 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     void SignalMenuClose()
     {
+        // release player
+        pcm.characterFrozen = false;
+        pcm.freezeCharacterActions = false;
+        //
         menuOpen = false;
         salesVisit.IslandMenuClosed();
         Destroy(gameObject, 1f);
@@ -260,6 +283,15 @@ public class IslandUpgradeMenu : MonoBehaviour
                 ((dist + currentObjectPadding) - islandRange);
             cursor.transform.position = pos;
         }
+    }
+
+    bool CheckValidCursorLocation()
+    {
+        bool retBool = true;
+
+        // check if overlapping critical elements (structures or other props)
+
+        return retBool;
     }
 
     void ConfigFeedback( string feedbackString )
@@ -427,7 +459,7 @@ public class IslandUpgradeMenu : MonoBehaviour
 
         // keyboard controls
         int keyMove = -1;
-        if (gridLockCursor)
+        if (gridLockCursor || !cursorMode)
         {
             if (Input.GetKeyDown(pcm.upKey))
                 keyMove = 0; // up
@@ -461,6 +493,23 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (keyMove == 3)
                 cursorMove.x = 1f;
         }
+        else
+        {
+            if (keyMove == 0)
+                menuItemSelection--;
+            if (keyMove == 1)
+                menuItemSelection++;
+            if (menuItemSelection < 0)
+                menuItemSelection = 0;
+            if (menuItemSelection > items.Length-1)
+                menuItemSelection = items.Length-1;
+        }
+
+        // configure top of menu
+        if (menuItemSelection > topOfMenuList + maxDisplayItems - 1)
+            topOfMenuList = menuItemSelection - maxDisplayItems + 1;
+        if (menuItemSelection < topOfMenuList)
+            topOfMenuList = menuItemSelection;
     }
 
     void OnGUI()
@@ -494,9 +543,118 @@ public class IslandUpgradeMenu : MonoBehaviour
         s = "ISLAND UPGRADES";
         GUI.Box(r, s, g);
 
+        // category label
+        r.x = 0.4f * w;
+        r.y = 0.175f * h;
+        r.width = 0.2f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.label);
+        g.alignment = TextAnchor.MiddleCenter;
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        g.fontStyle = FontStyle.BoldAndItalic;
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.white;
+        s = "PROPS";
+        GUI.Label(r, s, g);
+
         GUI.enabled = !confirmPopup;
 
-        //
+        // menu item list
+        r.y = 0.25f * h;
+        for (int i = topOfMenuList; i < Mathf.Min((topOfMenuList+maxDisplayItems),items.Length); i++)
+        {
+            // icon
+            r.x = 0.1f * w;
+            r.width = 0.05f * w;
+            r.height = r.width; // square
+            t = items[i].icon;
+            c = Color.white;
+            GUI.color = c;
+            GUI.DrawTexture(r, t);
+            // name
+            r.x = 0.175f * w;
+            r.width = 0.2f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleLeft;
+            g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
+            g.fontStyle = FontStyle.Bold;
+            s = items[i].name;
+            r.x += 0.0008f * w;
+            r.y += 0.001f * w;
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            GUI.Label(r, s, g);
+            r.x -= 0.0016f * w;
+            r.y -= 0.002f * w;
+            g.normal.textColor = Color.white;
+            if (menuItemSelection == (i + 0) || 
+                (usingPad && padButtonSelection == (i + 0)))
+                g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.white;
+            GUI.Label(r, s, g);
+            r.x += 0.0008f * w;
+            r.y += 0.001f * w;
+            // price
+            r.x = 0.7f * w;
+            r.width = 0.1f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleRight;
+            g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            s = items[i].price.ToString();
+            r.x += 0.0008f * w;
+            r.y += 0.001f * w;
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            GUI.Label(r, s, g);
+            r.x -= 0.0016f * w;
+            r.y -= 0.002f * w;
+            g.normal.textColor = Color.white;
+            if (menuItemSelection == (i + 0) ||
+                (usingPad && padButtonSelection == (i + 0)))
+                g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.white;
+            GUI.Label(r, s, g);
+            r.x += 0.0008f * w;
+            r.y += 0.001f * w;
+            // description
+            r.x = 0.2f * w;
+            r.y += 0.025f * h;
+            r.width = 0.6f * w;
+            r.height = 0.1f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.alignment = TextAnchor.MiddleLeft;
+            g.wordWrap = true;
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+            g.fontStyle = FontStyle.Italic;
+            if (menuItemSelection == (i + 0) ||
+                (usingPad && padButtonSelection == (i + 0)))
+                g.fontStyle = FontStyle.BoldAndItalic;
+            s = items[i].description;
+            r.x += 0.0008f * w;
+            r.y += 0.001f * w;
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            GUI.Label(r, s, g);
+            r.x -= 0.0016f * w;
+            r.y -= 0.002f * w;
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.white;
+            GUI.Label(r, s, g);
+            r.x += 0.0008f * w;
+            r.y += 0.001f * w;
+
+            r.y += 0.1f * h;
+        }
 
         GUI.enabled = true;
         // confirm popup
