@@ -7,7 +7,6 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     public enum UpgradeCategory
     {
-        Services,
         Islands,
         Farms,
         Towers,
@@ -29,7 +28,13 @@ public class IslandUpgradeMenu : MonoBehaviour
         LampPostA,
         LampPostB,
         BannerA,
-        BannerB
+        BannerB,
+        IntCandleStick,
+        IntFireplace,
+        IntBookshelf,
+        IntWritingDesk,
+        IntTapestryA,
+        IntTapestryB
     }
 
     [System.Serializable]
@@ -598,9 +603,6 @@ public class IslandUpgradeMenu : MonoBehaviour
 
         switch (category)
         {
-            case UpgradeCategory.Services:
-                retString = "Services";
-                break;
             case UpgradeCategory.Islands:
                 retString = "Islands";
                 break;
@@ -691,7 +693,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             (usingPad && padMgr.gPadDown[0].LBump))
         {
             currentCategory--;
-            if (currentCategory < UpgradeCategory.Services)
+            if (currentCategory < UpgradeCategory.Islands)
                 currentCategory = UpgradeCategory.IndoorProps;
             displayItems = GetDisplayItems(currentCategory);
 
@@ -708,7 +710,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         {
             currentCategory++;
             if (currentCategory > UpgradeCategory.IndoorProps)
-                currentCategory = UpgradeCategory.Services;
+                currentCategory = UpgradeCategory.Islands;
             displayItems = GetDisplayItems(currentCategory);
 
             // consuming input, but why?

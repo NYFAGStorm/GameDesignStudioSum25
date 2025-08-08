@@ -14,7 +14,9 @@ public struct TPortNodeConfig
 public enum StructureType
 {
     Default,
+    HermitTower,
     WizardTower,
+    SorcererTower,
     WizardInterior,
     MarketShop,
     MarketShopInterior
@@ -67,7 +69,14 @@ public enum PropType
     LampPostA,
     LampPostB,
     BannerA,
-    BannerB
+    BannerB,
+    IntCandleA,
+    IntCandleB,
+    IntFireplace,
+    IntBookshelf,
+    IntWritingDesk,
+    IntTapestryA,
+    IntTapestryB
 }
 
 public enum PropEffect
@@ -84,7 +93,7 @@ public class PropData
 {
     public string name;
     public PropType type;
-    public PositionData location; // local space to island parent
+    public PositionData location; // local space to island parent for outdoor props
     public PropEffect[] effects;
 }
 

@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 9195921219474899980}
   - component: {fileID: 4046057402855058573}
   m_Layer: 0
-  m_Name: Tower Stand-In
+  m_Name: Hermit Tower
   m_TagString: CamClip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

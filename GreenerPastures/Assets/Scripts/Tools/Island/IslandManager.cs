@@ -137,6 +137,7 @@ public class IslandManager : MonoBehaviour
     public void InvokeSplaturnSpell( int islandIndex, int structureIndex )
     {
         // TODO:
+        // can look for all Util_White and replace with player color based on effect
     }
 
     /// <summary>
@@ -266,8 +267,14 @@ public class IslandManager : MonoBehaviour
                 case StructureType.Default:
                     // we should never be here
                     break;
+                case StructureType.HermitTower:
+                    prefabName = "Hermit Tower";
+                    break;
                 case StructureType.WizardTower:
-                    prefabName = "Tower Stand-In";
+                    prefabName = "Wizard Tower";
+                    break;
+                case StructureType.SorcererTower:
+                    prefabName = "Sorcerer Tower";
                     break;
                 case StructureType.WizardInterior:
                     prefabName = "Test Tower Interior";
@@ -311,82 +318,148 @@ public class IslandManager : MonoBehaviour
 
         for (int i = 0; i < island.props.Length; i++)
         {
+            // outdoor props load prefab
             PropData pData = island.props[i];
-            // prop type determines resources load name
-            string prefabName = "";
-            switch (pData.type)
+            if (pData.type < PropType.IntCandleA)
             {
-                case PropType.Default:
-                    // we should never be here
-                    break;
-                case PropType.RockA:
-                    prefabName = "Rock A";
-                    break;
-                case PropType.RockB:
-                    prefabName = "Rock B";
-                    break;
-                case PropType.RockC:
-                    prefabName = "Rock C";
-                    break;
-                case PropType.BushA:
-                    prefabName = "Bush A";
-                    break;
-                case PropType.BushB:
-                    prefabName = "Bush B";
-                    break;
-                case PropType.BushC:
-                    prefabName = "Bush C";
-                    break;
-                case PropType.CompostBin:
-                    prefabName = "Compost Bin";
-                    break;
-                case PropType.Mailbox:
-                    prefabName = "Mail Box";
-                    break;
-                case PropType.LampPostA:
-                    prefabName = "Lamp Post A";
-                    break;
-                case PropType.LampPostB:
-                    prefabName = "Lamp Post B";
-                    break;
-                case PropType.BannerA:
-                    prefabName = "Banner A";
-                    break;
-                case PropType.BannerB:
-                    prefabName = "Banner B";
-                    break;
-                default:
-                    break;
-            }            
-            // invalid prefab type
-            if (prefabName == "")
-                return retBool;
-            // load prop prefab
-            GameObject prop = GameObject.Instantiate((GameObject)Resources.Load(prefabName));
-            prop.name = "Prop " + pData.name;
-            // position prop
-            Vector3 pos = Vector3.zero;
-            pos.x = pData.location.x;
-            pos.y = pData.location.y;
-            pos.z = pData.location.z;
-            pos += islandObj.transform.position;
-            prop.transform.position = pos;
-            // parent to island
-            prop.transform.parent = islandObj.transform;
-            // store prop reneders for color adjustment
-            Renderer[] rends = prop.GetComponentsInChildren<Renderer>();
-            if (rends != null  && rends.Length > 0)
+                // prop type determines resources load name
+                string prefabName = "";
+                switch (pData.type)
+                {
+                    case PropType.Default:
+                        // we should never be here
+                        break;
+                    case PropType.RockA:
+                        prefabName = "Rock A";
+                        break;
+                    case PropType.RockB:
+                        prefabName = "Rock B";
+                        break;
+                    case PropType.RockC:
+                        prefabName = "Rock C";
+                        break;
+                    case PropType.BushA:
+                        prefabName = "Bush A";
+                        break;
+                    case PropType.BushB:
+                        prefabName = "Bush B";
+                        break;
+                    case PropType.BushC:
+                        prefabName = "Bush C";
+                        break;
+                    case PropType.CompostBin:
+                        prefabName = "Compost Bin";
+                        break;
+                    case PropType.Mailbox:
+                        prefabName = "Mail Box";
+                        break;
+                    case PropType.LampPostA:
+                        prefabName = "Lamp Post A";
+                        break;
+                    case PropType.LampPostB:
+                        prefabName = "Lamp Post B";
+                        break;
+                    case PropType.BannerA:
+                        prefabName = "Banner A";
+                        break;
+                    case PropType.BannerB:
+                        prefabName = "Banner B";
+                        break;
+                    default:
+                        break;
+                }
+                // invalid prefab type
+                if (prefabName == "")
+                    return retBool;
+                // load prop prefab
+                GameObject prop = GameObject.Instantiate((GameObject)Resources.Load(prefabName));
+                prop.name = "Prop " + pData.name;
+                // position prop
+                Vector3 pos = Vector3.zero;
+                pos.x = pData.location.x;
+                pos.y = pData.location.y;
+                pos.z = pData.location.z;
+                pos += islandObj.transform.position;
+                prop.transform.position = pos;
+                // parent to island
+                prop.transform.parent = islandObj.transform;
+                // store prop reneders for color adjustment
+                Renderer[] rends = prop.GetComponentsInChildren<Renderer>();
+                if (rends != null && rends.Length > 0)
+                {
+                    Renderer[] tmp = new Renderer[propRenderers.Length + rends.Length];
+                    for (int n = 0; n < propRenderers.Length; n++)
+                    {
+                        tmp[n] = propRenderers[n];
+                    }
+                    for (int n = 0; n < rends.Length; n++)
+                    {
+                        tmp[propRenderers.Length + n] = rends[n];
+                    }
+                    propRenderers = tmp;
+                }
+            }
+            else
             {
-                Renderer[] tmp = new Renderer[propRenderers.Length + rends.Length];
-                for (int n = 0; n < propRenderers.Length; n++)
+                // indoor props 
+                GameObject interiorTower = GameObject.Find("Structure tower interior");
+                GameObject decoObj = null;
+                if (interiorTower == null)
                 {
-                    tmp[n] = propRenderers[n];
+                    Debug.LogError("--- IslandManager [ConfigureProps] : interior prop config failed. cannot find tower interior. aborting.");
+                    return retBool;
                 }
-                for (int n = 0; n < rends.Length; n++)
+                decoObj = interiorTower.transform.Find("Deco").gameObject;
+                GameObject tapestryObj = null;
+                switch (pData.type)
                 {
-                    tmp[propRenderers.Length + n] = rends[n];
+                    case PropType.Default:
+                        // we should never be here
+                        break;
+                    case PropType.IntCandleA:
+                        decoObj.transform.Find("Candle Prop A").gameObject.SetActive(true);
+                        break;
+                    case PropType.IntCandleB:
+                        decoObj.transform.Find("Candle Prop B").gameObject.SetActive(true);
+                        break;
+                    case PropType.IntFireplace:
+                        decoObj.transform.Find("Fireplace Prop").gameObject.SetActive(true);
+                        break;
+                    case PropType.IntBookshelf:
+                        decoObj.transform.Find("Bookshelf").gameObject.SetActive(true);
+                        break;
+                    case PropType.IntWritingDesk:
+                        decoObj.transform.Find("Writing Desk").gameObject.SetActive(true);
+                        break;
+                    case PropType.IntTapestryA:
+                        decoObj.transform.Find("Tapestry A").gameObject.SetActive(true);
+                        tapestryObj = decoObj.transform.Find("Tapestry A").gameObject;
+                        break;
+                    case PropType.IntTapestryB:
+                        decoObj.transform.Find("Tapestry B").gameObject.SetActive(true);
+                        tapestryObj = decoObj.transform.Find("Tapestry B").gameObject;
+                        break;
+                    default:
+                        break;
                 }
-                propRenderers = tmp;
+                // store prop reneders for color adjustment
+                if (tapestryObj != null)
+                {
+                    Renderer[] rends = tapestryObj.GetComponentsInChildren<Renderer>();
+                    if (rends != null && rends.Length > 0)
+                    {
+                        Renderer[] tmp = new Renderer[propRenderers.Length + rends.Length];
+                        for (int n = 0; n < propRenderers.Length; n++)
+                        {
+                            tmp[n] = propRenderers[n];
+                        }
+                        for (int n = 0; n < rends.Length; n++)
+                        {
+                            tmp[propRenderers.Length + n] = rends[n];
+                        }
+                        propRenderers = tmp;
+                    }
+                }
             }
         }
         retBool = true;

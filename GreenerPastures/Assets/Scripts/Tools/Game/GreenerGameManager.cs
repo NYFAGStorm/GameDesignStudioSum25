@@ -1098,7 +1098,7 @@ public class GreenerGameManager : MonoBehaviour
         pos.y = 1f;
         pos.z = 2f;
         pos.w = 0f;
-        game.islands[0].structures[0] = IslandSystem.InitializeStructure("wiz tower", StructureType.WizardTower, pos);
+        game.islands[0].structures[0] = IslandSystem.InitializeStructure("wiz tower", StructureType.HermitTower, pos);
         pos.x = 0f;
         pos.y = -2f;
         pos.z = 0f;
