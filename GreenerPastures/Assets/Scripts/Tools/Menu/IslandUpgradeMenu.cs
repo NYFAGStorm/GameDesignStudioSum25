@@ -5,6 +5,16 @@ public class IslandUpgradeMenu : MonoBehaviour
     // Author: Glenn Storm
     // This handles the island upgrade menu
 
+    public enum UpgradeCategory
+    {
+        Services,
+        Islands,
+        Farms,
+        Towers,
+        OutdoorProps,
+        IndoorProps
+    }
+
     public enum  UpgradeType
     {
         TeleportNode,
@@ -26,6 +36,7 @@ public class IslandUpgradeMenu : MonoBehaviour
     public struct MenuItem
     {
         public string name;
+        public UpgradeCategory category;
         public UpgradeType type;
         public string description;
         public int price;
@@ -38,6 +49,8 @@ public class IslandUpgradeMenu : MonoBehaviour
     private PlayerControlManager pcm;
     private GreenerGameManager ggm;
     private IslandManager im;
+
+    private bool hasSalesmanDiscount;
 
     private bool cursorMode;
     private GameObject cursor;
@@ -66,6 +79,8 @@ public class IslandUpgradeMenu : MonoBehaviour
     private int padClickButton = -1;
     private int padMove = -1;
 
+    private UpgradeCategory currentCategory;
+    private MenuItem[] displayItems;
     private int menuItemSelection = -1;
     private int topOfMenuList = 0;
     private int maxDisplayItems = 5;
@@ -124,8 +139,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         // initialize
         if (enabled)
         {
-            cursor = GameObject.Instantiate((GameObject)Resources.Load("Cast Cursor"));
-            SetCursorVisible(false);
+            CreateCursor();
 
             validConfig = true; // begin with valid island configuration
 
@@ -134,7 +148,12 @@ public class IslandUpgradeMenu : MonoBehaviour
             // lock down player
             pcm.characterFrozen = true;
             pcm.freezeCharacterActions = true;
-            //
+            // detect salesman discount
+            hasSalesmanDiscount = PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillFriendsSalesman);
+
+            // temp
+            currentCategory = UpgradeCategory.OutdoorProps;
+            displayItems = GetDisplayItems(currentCategory);
         }
         else if (salesVisit != null)
             salesVisit.IslandMenuClosed(); // abort menu operation, free the salesman
@@ -154,6 +173,9 @@ public class IslandUpgradeMenu : MonoBehaviour
                 Debug.LogWarning("--- IslandUpgradeMenu [ConfigureMenuItemDescriptions] : item #" + i + " is missing an icon. will ignore.");
             if (items[i].prefab == null)
                 Debug.LogWarning("--- IslandUpgradeMenu [ConfigureMenuItemDescriptions] : item #" + i + " is missing a prefab. will ignore.");
+
+            // temp
+            items[i].category = UpgradeCategory.OutdoorProps;
 
             switch (items[i].type)
             {
@@ -201,7 +223,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                     break;
                 case UpgradeType.RockB:
                     items[i].name = "Rock (Style B)";
-                    items[i].description = "Rocks come and go, but this one is here to stay. Owning this rock is owning a piece of history; literally age old!";
+                    items[i].description = "Rocks come and go, but this one is here to stay. Owning this rock is owning a piece of history; literally very old!";
                     items[i].price = 200;
                     items[i].itemPadding = 0.5f;
                     break;
@@ -239,6 +261,32 @@ public class IslandUpgradeMenu : MonoBehaviour
         }
     }
 
+    MenuItem[] GetDisplayItems( UpgradeCategory category )
+    {
+        // find number of items
+        int num = 0;
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (items[i].category == category)
+                num++;
+        }
+        MenuItem[] retItems = new MenuItem[num];
+
+        int count = 0;
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (items[i].category == category)
+            {
+                retItems[count] = items[i];
+                count++;
+            }
+        }
+
+        topOfMenuList = 0;
+
+        return retItems;
+    }
+
     public void ConfigSalesVisit( SalesVisitManager sales )
     {
         salesVisit = sales;
@@ -247,19 +295,29 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     void SignalMenuClose()
     {
+        // remove cursor
+        Destroy(cursor);
         // release player
         pcm.characterFrozen = false;
         pcm.freezeCharacterActions = false;
-        //
+        // close menu
         menuOpen = false;
         salesVisit.IslandMenuClosed();
+        // remove this tool
         Destroy(gameObject, 1f);
+    }
+
+    void CreateCursor()
+    {
+        cursor = GameObject.Instantiate((GameObject)Resources.Load("Cast Cursor"));
+        cursor.name = "Island Upgrade Cursor";
+        SetCursorVisible(false);
     }
 
     void SetCursorVisible( bool visible )
     {
         cursor.GetComponent<Renderer>().enabled = visible;
-        cursor.GetComponentInChildren<Renderer>().enabled = visible;
+        cursor.transform.GetChild(0).GetComponent<Renderer>().enabled = visible;
     }
 
     void MoveCursor()
@@ -501,8 +559,8 @@ public class IslandUpgradeMenu : MonoBehaviour
                 menuItemSelection++;
             if (menuItemSelection < 0)
                 menuItemSelection = 0;
-            if (menuItemSelection > items.Length-1)
-                menuItemSelection = items.Length-1;
+            if (menuItemSelection > displayItems.Length-1)
+                menuItemSelection = displayItems.Length-1;
         }
 
         // configure top of menu
@@ -510,6 +568,57 @@ public class IslandUpgradeMenu : MonoBehaviour
             topOfMenuList = menuItemSelection - maxDisplayItems + 1;
         if (menuItemSelection < topOfMenuList)
             topOfMenuList = menuItemSelection;
+    }
+
+
+
+    bool CanPurchase( MenuItem item )
+    {
+        bool retBool = false;
+
+        int thisPrice = item.price;
+        if (hasSalesmanDiscount)
+            thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
+        retBool = (pcm.playerData.gold >= thisPrice);
+
+        return retBool;
+    }
+
+    void MakePurchase( MenuItem item )
+    {
+        int thisPrice = item.price;
+        if (hasSalesmanDiscount)
+            thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
+        pcm.playerData.gold -= thisPrice;
+    }
+
+    string FormCategoryLabel( UpgradeCategory category )
+    {
+        string retString = "";
+
+        switch (category)
+        {
+            case UpgradeCategory.Services:
+                retString = "Services";
+                break;
+            case UpgradeCategory.Islands:
+                retString = "Islands";
+                break;
+            case UpgradeCategory.Farms:
+                retString = "Farms";
+                break;
+            case UpgradeCategory.Towers:
+                retString = "Towers";
+                break;
+            case UpgradeCategory.OutdoorProps:
+                retString = "Outdoor Props";
+                break;
+            case UpgradeCategory.IndoorProps:
+                retString = "Indoor Props";
+                break;
+        }
+
+        return retString;
     }
 
     void OnGUI()
@@ -555,20 +664,67 @@ public class IslandUpgradeMenu : MonoBehaviour
         g.normal.textColor = Color.white;
         g.hover.textColor = Color.white;
         g.active.textColor = Color.white;
-        s = "PROPS";
+        s = FormCategoryLabel(currentCategory);
         GUI.Label(r, s, g);
+        // category nav buttons
+        r.x = 0.2f * w;
+        r.y = 0.175f * h;
+        r.width = 0.1f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.button);
+        if (usingPad)
+            g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        g.normal.textColor = Color.white;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.yellow;
+        s = "<<";
+        if (usingPad)
+            s += "\nL Bump";
+        if (GUI.Button(r,s,g) || 
+            (usingPad && padMgr.gPadDown[0].LBump))
+        {
+            currentCategory--;
+            if (currentCategory < UpgradeCategory.Services)
+                currentCategory = UpgradeCategory.IndoorProps;
+            displayItems = GetDisplayItems(currentCategory);
+
+            // consuming input, but why?
+            if (usingPad)
+                padMgr.gPadDown[0].LBump = false;
+        }
+        r.x = 0.7f * w;
+        s = ">>";
+        if (usingPad)
+            s += "\nR Bump";
+        if (GUI.Button(r, s, g) ||
+            (usingPad && padMgr.gPadDown[0].RBump))
+        {
+            currentCategory++;
+            if (currentCategory > UpgradeCategory.IndoorProps)
+                currentCategory = UpgradeCategory.Services;
+            displayItems = GetDisplayItems(currentCategory);
+
+            // consuming input, but why?
+            if (usingPad)
+                padMgr.gPadDown[0].RBump = false;
+        }
 
         GUI.enabled = !confirmPopup;
 
         // menu item list
         r.y = 0.25f * h;
-        for (int i = topOfMenuList; i < Mathf.Min((topOfMenuList+maxDisplayItems),items.Length); i++)
+        for (int i = topOfMenuList; i < Mathf.Min((topOfMenuList+maxDisplayItems),displayItems.Length); i++)
         {
+            if (displayItems == null || displayItems.Length == 0 ||
+                i < 0 || i > displayItems.Length)
+                continue;
+
             // icon
             r.x = 0.1f * w;
             r.width = 0.05f * w;
             r.height = r.width; // square
-            t = items[i].icon;
+            t = displayItems[i].icon;
             c = Color.white;
             GUI.color = c;
             GUI.DrawTexture(r, t);
@@ -580,7 +736,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             g.alignment = TextAnchor.MiddleLeft;
             g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
             g.fontStyle = FontStyle.Bold;
-            s = items[i].name;
+            s = displayItems[i].name;
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
             g.normal.textColor = Color.black;
@@ -606,7 +762,10 @@ public class IslandUpgradeMenu : MonoBehaviour
             g.alignment = TextAnchor.MiddleRight;
             g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
-            s = items[i].price.ToString();
+            int thisPrice = displayItems[i].price;
+            if (hasSalesmanDiscount)
+                thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
+            s = thisPrice.ToString();
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
             g.normal.textColor = Color.black;
@@ -637,7 +796,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (menuItemSelection == (i + 0) ||
                 (usingPad && padButtonSelection == (i + 0)))
                 g.fontStyle = FontStyle.BoldAndItalic;
-            s = items[i].description;
+            s = displayItems[i].description;
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
             g.normal.textColor = Color.black;

@@ -285,7 +285,7 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].name = "'and of course sell'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
         visitBeats[beat].dialogLine =
-            "... and of course, I can sell you the finest island upgrades!";
+            "... and of course, I can sell you the finest in island upgrades!";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         visitBeats[beat].name = "'take a look!'";
