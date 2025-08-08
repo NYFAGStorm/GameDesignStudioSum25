@@ -193,82 +193,165 @@ public class IslandUpgradeMenu : MonoBehaviour
 
             switch (items[i].type)
             {
-                case UpgradeType.TeleportNode:
-                    items[i].name = "Teleporter";
-                    items[i].description = "Everyone needs a teleport node ... literally a must have.";
-                    items[i].price = 0;
+                // islands
+                case UpgradeType.IslandMedium:
+                    items[i].name = "Medium Island";
+                    items[i].description = "If you like a little more room, this 16 meter diameter island is priced to fit your budget. Make the move to this great island.";
+                    items[i].price = 10000;
                     items[i].itemPadding = 1f;
                     break;
-                case UpgradeType.Mailbox:
-                    items[i].name = "Mail Box";
-                    items[i].description = "Everyone needs a mailbox ... literally a must have.";
-                    items[i].price = 0;
+                case UpgradeType.IslandLarge:
+                    items[i].name = "Large Island";
+                    items[i].description = "This island boasts a 18 meter diameter scale and can accomodate most of our larger upgrades. Keep this at the top of your wish list.";
+                    items[i].price = 15000;
                     items[i].itemPadding = 1f;
                     break;
-                case UpgradeType.CompostBin:
-                    items[i].name = "Compost Bin";
-                    items[i].description = "A convenience for every farm. Simple, elegant. So useful! A compost bin is the best friend a Biomancer has on the farm.";
-                    items[i].price = 1;
+                case UpgradeType.IslandVeryLarge:
+                    items[i].name = "Very Large Island";
+                    items[i].description = "Our largest island available is 20 meters in diameter and demands a fair amount of accessories to fill it. A very impressive island.";
+                    items[i].price = 20000;
                     items[i].itemPadding = 1f;
                     break;
+                // farms
+                case UpgradeType.FarmModest:
+                    items[i].name = "Modest Farm";
+                    items[i].description = "When you're ready to handle more crops and more harvests, this upgrade is for you. A 4x4 farm with 16 plots in total.";
+                    items[i].price = 2000;
+                    items[i].itemPadding = 1f;
+                    break;
+                case UpgradeType.FarmSizable:
+                    items[i].name = "Sizable Farm";
+                    items[i].description = "A 5x5 farm with 25 plots, brings in a large harvest while maintainable for the casual Biomancer. A good mid-sized farm.";
+                    items[i].price = 3000;
+                    items[i].itemPadding = 1f;
+                    break;
+                case UpgradeType.FarmHuge:
+                    items[i].name = "Huge Farm";
+                    items[i].description = "To impress your guests and the market at the same time, look no further than this glorioud 6x6 farm with a total of 36 plots!";
+                    items[i].price = 4000;
+                    items[i].itemPadding = 1f;
+                    break;
+                case UpgradeType.FarmVast:
+                    items[i].name = "Vast Farm";
+                    items[i].description = "Only for the advanced Biomancer, we offer this incredible 7x7 farm with an amazing 49 plots! Only for the larger islands.";
+                    items[i].price = 5000;
+                    items[i].itemPadding = 1f;
+                    break;
+                // towers
+                case UpgradeType.WizardTower:
+                    items[i].name = "Wizard Tower";
+                    items[i].description = "Impressive tower and a marvelous upgrade. The classic roofline and taller stature appears as sturdy as it is welcoming to guests.";
+                    items[i].price = 10000;
+                    items[i].itemPadding = 1f;
+                    break;
+                case UpgradeType.SorcererTower:
+                    items[i].name = "Sorcerer Tower";
+                    items[i].description = "There is no finer residence for Biomancers. The sorcerer tower is on a grand scale; standing proud and tall to be seen from afar.";
+                    items[i].price = 20000;
+                    items[i].itemPadding = 1f;
+                    break;
+                // outdoor props
                 case UpgradeType.BushA:
                     items[i].name = "Bush (Style A)";
                     items[i].description = "Bushy! When you need a bush on your farm, look no further! It has everything you want in a bush, and it is maintenance free!";
-                    items[i].price = 100;
+                    items[i].price = 50;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.BushB:
                     items[i].name = "Bush (Style B)";
                     items[i].description = "An alternate bush. Sometimes the standard bush just isn't right. That's when you turn to this; a standout bush.";
-                    items[i].price = 100;
+                    items[i].price = 50;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.BushC:
                     items[i].name = "Bush (Style C)";
                     items[i].description = "A different kind of bush. This bush sets itself apart from all others. It definitely is distinctive in it's own way.";
-                    items[i].price = 100;
+                    items[i].price = 50;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.RockA:
                     items[i].name = "Rock (Style A)";
                     items[i].description = "Rock of Ages; truly a classic rock. Very solid. Guaranteed to hold up under any weather. This rock will never let you down.";
-                    items[i].price = 200;
+                    items[i].price = 100;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.RockB:
                     items[i].name = "Rock (Style B)";
                     items[i].description = "Rocks come and go, but this one is here to stay. Owning this rock is owning a piece of history; literally very old!";
-                    items[i].price = 200;
+                    items[i].price = 100;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.RockC:
                     items[i].name = "Rock (Style C)";
                     items[i].description = "A rock without the roll. A no-nonsense rock when you just need a rock you can count on to be there - every time.";
-                    items[i].price = 200;
+                    items[i].price = 100;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.LampPostA:
                     items[i].name = "Lamp Post (Style A)";
                     items[i].description = "A fancy lamp post, for the discerning Biomancer who fancies themselves cultured and modern.";
-                    items[i].price = 1000;
+                    items[i].price = 500;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.LampPostB:
                     items[i].name = "Lamp Post (Style B)";
                     items[i].description = "A modest lamp post with purpose. A lamp post that says, 'I can be a light for all and not be fancy. Watch me.'";
-                    items[i].price = 1000;
+                    items[i].price = 500;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.BannerA:
                     items[i].name = "Banner (Style A)";
                     items[i].description = "Declare your island clearly and proudly with this broad banner. It automagically conforms to your personal colors!";
-                    items[i].price = 2500;
+                    items[i].price = 1250;
                     items[i].itemPadding = 0.5f;
                     break;
                 case UpgradeType.BannerB:
                     items[i].name = "Banner (Style B)";
                     items[i].description = "A sturdy banner that displays your personal colors automagically! Tell all who see this banner whose farm this is.";
+                    items[i].price = 1250;
+                    items[i].itemPadding = 0.5f;
+                    break;
+                // indoor props
+                case UpgradeType.IntCandleStickA:
+                    items[i].name = "Candle Stick (Style A)";
+                    items[i].description = "Everyone needs some light. These candle sticks stand tall on study wooden posts to cast the warm light across your interior.";
+                    items[i].price = 750;
+                    items[i].itemPadding = 0.5f;
+                    break;
+                case UpgradeType.IntCandleStickB:
+                    items[i].name = "Candle Stick (Style B)";
+                    items[i].description = "Everyone could use more light. This one stands closer to the doorway to help guests remove shoes and coats. Always lit!";
+                    items[i].price = 750;
+                    items[i].itemPadding = 0.5f;
+                    break;
+                case UpgradeType.IntFireplace:
+                    items[i].name = "Fireplace";
+                    items[i].description = "A warm hearth for cold nights. This is a center piece to any tower interior, and the warm glow and crackling fire is a treat!";
                     items[i].price = 2500;
+                    items[i].itemPadding = 0.5f;
+                    break;
+                case UpgradeType.IntBookshelf:
+                    items[i].name = "Bookshelf";
+                    items[i].description = "A bookshelf tells your guests you value knowledge. A must for every well-read Biomancer. Comes with assorted books!";
+                    items[i].price = 1750;
+                    items[i].itemPadding = 0.5f;
+                    break;
+                case UpgradeType.IntWritingDesk:
+                    items[i].name = "Writing Desk";
+                    items[i].description = "This valuable addition to your tower interior is as useful as it is stylish. Compose letters or write that great novel!";
+                    items[i].price = 1500;
+                    items[i].itemPadding = 0.5f;
+                    break;
+                case UpgradeType.IntTapestryA:
+                    items[i].name = "Tapestry (Style A)";
+                    items[i].description = "Colorful banner in your style. Hangs on most any wall. Always a fine decor choice for the Biomancer with taste.";
+                    items[i].price = 1000;
+                    items[i].itemPadding = 0.5f;
+                    break;
+                case UpgradeType.IntTapestryB:
+                    items[i].name = "Tapestry (Style B)";
+                    items[i].description = "Truly a magnificent tapestry, made from the finest material. Automagically configures to your personal colors.";
+                    items[i].price = 1000;
                     items[i].itemPadding = 0.5f;
                     break;
             }
@@ -706,6 +789,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (currentCategory < UpgradeCategory.Islands)
                 currentCategory = UpgradeCategory.IndoorProps;
             displayItems = GetDisplayItems(currentCategory);
+            topOfMenuList = 0;
 
             // consuming input, but why?
             if (usingPad)
@@ -722,6 +806,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (currentCategory > UpgradeCategory.IndoorProps)
                 currentCategory = UpgradeCategory.Islands;
             displayItems = GetDisplayItems(currentCategory);
+            topOfMenuList = 0;
 
             // consuming input, but why?
             if (usingPad)

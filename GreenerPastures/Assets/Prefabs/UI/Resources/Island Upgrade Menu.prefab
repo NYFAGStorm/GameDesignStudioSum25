@@ -202,7 +202,7 @@ MonoBehaviour:
   - name: Candle Stick (Style A)
     category: 4
     type: 22
-    description: Everyone needs some light
+    description: Everyone needs some light.
     price: 5000
     icon: {fileID: 2800000, guid: ee9906fa919df1e4d8aec07f170f79f6, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
@@ -210,7 +210,7 @@ MonoBehaviour:
   - name: Candle Stick (Style B)
     category: 4
     type: 23
-    description: Everyone could use more light
+    description: Everyone could use more light.
     price: 5000
     icon: {fileID: 2800000, guid: ee9906fa919df1e4d8aec07f170f79f6, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
@@ -218,7 +218,7 @@ MonoBehaviour:
   - name: Fireplace
     category: 4
     type: 24
-    description: A warm hearth for cold nights
+    description: A warm hearth for cold nights.
     price: 5000
     icon: {fileID: 2800000, guid: 2a19baf6e102d564dbe25ac9e0003a84, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
@@ -226,7 +226,7 @@ MonoBehaviour:
   - name: Bookshelf
     category: 4
     type: 25
-    description: A must for every well-read biomancer
+    description: A must for every well-read biomancer.
     price: 5000
     icon: {fileID: 2800000, guid: 8ddd83931ad52524f942b462e13a5375, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
@@ -234,23 +234,23 @@ MonoBehaviour:
   - name: Writing Desk
     category: 4
     type: 26
-    description: Compose letters or write that great novel
+    description: Compose letters or write that great novel.
     price: 5000
     icon: {fileID: 2800000, guid: 982981e0c8e129f429f2f58554bfb46a, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Tapestry (Style A)
-    category: 5
-    type: 12
-    description: Colorful banner in your style
+    category: 4
+    type: 27
+    description: Colorful banner in your style.
     price: 5000
     icon: {fileID: 2800000, guid: 74099cc70ac9bbd46bb40a5588663ed1, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
     itemPadding: 1
   - name: Tapestry (Style B)
-    category: 5
-    type: 12
-    description: Automagically configures to your personal colors
+    category: 4
+    type: 28
+    description: Automagically configures to your personal colors.
     price: 5000
     icon: {fileID: 2800000, guid: f656c02045b64624789479bb7fdf78aa, type: 3}
     prefab: {fileID: 8701352133713150911, guid: f464c80ecd4a99a44a07a5d83ce308de, type: 3}
