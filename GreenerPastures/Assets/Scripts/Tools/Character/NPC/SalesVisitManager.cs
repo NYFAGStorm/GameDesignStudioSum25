@@ -21,7 +21,9 @@ public class SalesVisitManager : MonoBehaviour
         RemoveNPC,
         EndVisit,
         IslandMenu,
-        MenuDialog
+        MenuDialog,
+        MenuMark,
+        MenuVFX
     }
 
     public enum ScriptedBeatTransition
@@ -67,6 +69,12 @@ public class SalesVisitManager : MonoBehaviour
 
     private bool waitingForPlayer;
     private bool facingPlayer;
+
+    public bool menuBeatTimeUp;
+    public bool menuNpcCallback;
+    public bool menuPlayerResponse;
+
+    private bool salesmanColorPlatform; // tether player to npc and display salesman color trail vfx
 
     private Texture2D[] buttonTex;
 
@@ -352,6 +360,45 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].duration = 2f;
     }
 
+    public void ToggleSalesmanPlatform()
+    {
+        salesmanColorPlatform = !salesmanColorPlatform;
+        pcm.characterFrozen = !salesmanColorPlatform;
+    }
+
+    void TetherPlayerToSalesman()
+    {
+        pcm.playerData.island.x = salesman.gameObject.transform.position.x;
+        pcm.playerData.island.z = salesman.gameObject.transform.position.z;
+        pcm.playerData.island.w = 0.618f;
+    }
+
+    void DisplaySalesmanPlatformVFX()
+    {
+        if (RandomSystem.FlatRandom01() >= .381f)
+            return;
+
+        GameObject lightingFolderObject = GameObject.Find("Lighting");
+        Color c = Color.white;
+        c.r = 0.9f * RandomSystem.GaussianRandom01();
+        c.g = 0.8f * RandomSystem.GaussianRandom01();
+        c.b = 0.618f * RandomSystem.GaussianRandom01();
+        GameObject vfx = GameObject.Instantiate((GameObject)Resources.Load("Spells/VFX Spell Color Trail"));
+        vfx.transform.position = salesman.transform.position;
+        Vector3 offset = Vector3.zero;
+        offset.x = RandomSystem.GaussianRandom01() - 0.5f;
+        offset.z = RandomSystem.GaussianRandom01() - 0.5f;
+        offset *= 0.618f;
+        vfx.transform.position += offset;
+        Vector3 scl = Vector3.one;
+        scl *= RandomSystem.GaussianRandom01() * 2f;
+        vfx.transform.localScale = scl;
+        vfx.name = "VFX Salesman Platform";
+        vfx.transform.parent = lightingFolderObject.transform;
+        vfx.GetComponent<Renderer>().material.color = c;
+        Destroy(vfx, 3.81f);
+    }
+
     void Update()
     {
         // countdown to visit
@@ -390,6 +437,13 @@ public class SalesVisitManager : MonoBehaviour
         if (!visitRunning)
             return;
 
+        // salesman platform
+        if (salesmanColorPlatform)
+        {
+            DisplaySalesmanPlatformVFX();
+            TetherPlayerToSalesman();
+        }
+
         // turn to face player
         if (salesman != null && facingPlayer)
         {
@@ -415,15 +469,34 @@ public class SalesVisitManager : MonoBehaviour
         switch (currentBeat.transition)
         {
             case ScriptedBeatTransition.Default:
-                currentBeatIndex++; // immediate transition
-                currentBeat.transitionDone = true;
+                if (currentBeat.action == ScriptedBeatAction.MenuVFX)
+                {
+                    currentBeat.beatPosition.w = 0f;
+                    currentBeat.transition = ScriptedBeatTransition.MenuClose;
+                }
+                else
+                {
+                    currentBeatIndex++; // immediate transition
+                    currentBeat.transitionDone = true;
+                }
                 break;
             case ScriptedBeatTransition.TimedDuration:
                 if (beatTimeUp)
                 {
-                    currentBeatIndex++;
-                    beatTimeUp = false;
-                    currentBeat.transitionDone = true;
+                    if (currentBeat.action == ScriptedBeatAction.MenuVFX)
+                    {
+                        currentBeat.beatPosition.w = 0f;
+                        currentBeat.duration = 0f;
+                        currentBeat.transition = ScriptedBeatTransition.MenuClose;
+                        beatTimeUp = false;
+                        menuBeatTimeUp = true;
+                    }
+                    else
+                    {
+                        currentBeatIndex++;
+                        beatTimeUp = false;
+                        currentBeat.transitionDone = true;
+                    }
                 }
                 break;
             case ScriptedBeatTransition.PlayerResponse:
@@ -434,6 +507,7 @@ public class SalesVisitManager : MonoBehaviour
                         currentBeat.dialogLine = "";
                         currentBeat.transition = ScriptedBeatTransition.MenuClose;
                         playerResponse = false;
+                        menuPlayerResponse = true;
                     }
                     else
                     {
@@ -446,10 +520,20 @@ public class SalesVisitManager : MonoBehaviour
             case ScriptedBeatTransition.SalesmanCallback:
                 if (npcCallback)
                 {
-                    currentBeatIndex++;
-                    npcCallback = false;
-                    salesman.destinationReached = false;
-                    currentBeat.transitionDone = true;
+                    if (currentBeat.action == ScriptedBeatAction.MenuMark)
+                    {
+                        npcCallback = false;
+                        currentBeat.transition = ScriptedBeatTransition.MenuClose;
+                        salesman.destinationReached = false;
+                        menuNpcCallback = true;
+                    }
+                    else
+                    {
+                        currentBeatIndex++;
+                        npcCallback = false;
+                        salesman.destinationReached = false;
+                        currentBeat.transitionDone = true;
+                    }
                 }
                 break;
             case ScriptedBeatTransition.MenuClose:
@@ -509,7 +593,8 @@ public class SalesVisitManager : MonoBehaviour
                     Vector3 vfxPos = Vector3.zero;
                     // either teleport or magic
                     GameObject vfx = null;
-                    if (currentBeat.beatPosition.w >= 0f)
+                    if (currentBeat.beatPosition.w >= 0f &&
+                        currentBeat.beatPosition.w < 1f)
                         vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
                     else if (currentBeat.beatPosition.w < 0f &&
                         currentBeat.beatPosition.w >= -1f)
@@ -561,6 +646,47 @@ public class SalesVisitManager : MonoBehaviour
                 case ScriptedBeatAction.MenuDialog:
                     dialogTimer = PAUSETIME;
                     playerResponse = false;
+                    break;
+                case ScriptedBeatAction.MenuMark:
+                    salesman.moveTarget = currentBeat.npcMark;
+                    salesman.destinationReached = false;
+                    break;
+                case ScriptedBeatAction.MenuVFX:
+                    vfxPos = Vector3.zero;
+                    // either teleport or magic
+                    vfx = null;
+                    if (currentBeat.beatPosition.w >= 0f &&
+                        currentBeat.beatPosition.w < 1f)
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Tport Flash"));
+                    else if (currentBeat.beatPosition.w < 0f &&
+                        currentBeat.beatPosition.w >= -1f)
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("VFX Cast Magic"));
+                    else
+                        vfx = GameObject.Instantiate((GameObject)Resources.Load("Big Hint"));
+                    vfxPos.x = currentBeat.beatPosition.x;
+                    vfxPos.z = currentBeat.beatPosition.z;
+                    vfx.transform.position = vfxPos;
+                    if (vfx.GetComponentInChildren<SpriteRenderer>() != null)
+                        vfx.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
+                    sfxTemp = new GameObject();
+                    sfxTemp.name = "Teleport SFX Obj";
+                    sfxTemp.transform.position = vfxPos;
+                    if (currentBeat.beatPosition.w >= 0f)
+                    {
+                        // teleporter
+                        sfxAudio.StartSound("Teleport", sfxTemp, 0f, 6.18f);
+                        Destroy(sfxTemp, 2.2f);
+                        Destroy(vfx, 1f);
+                    }
+                    else if (currentBeat.beatPosition.w < 0f &&
+                            currentBeat.beatPosition.w >= -1f)
+                    {
+                        // magic
+                        sfxAudio.StartSound("Magic Cast 2", vfx, 0f, 6.18f);
+                        Destroy(vfx, 3.81f);
+                    }
+                    else
+                        Destroy(vfx, 6.18f);
                     break;
             }
             currentBeat.actionDone = true;
@@ -614,8 +740,32 @@ public class SalesVisitManager : MonoBehaviour
         currentBeat.dialogLine = dialog;
     }
 
+    public void MenuMarkBeat( Vector3 npcTarget )
+    {
+        currentBeat.actionDone = false;
+        currentBeat.action = ScriptedBeatAction.MenuMark;
+        currentBeat.transition = ScriptedBeatTransition.SalesmanCallback;
+        currentBeat.npcMark = npcTarget;
+    }
+
+    public void MenuVFXBeat( float vfx, float time )
+    {
+        currentBeat.actionDone = false;
+        currentBeat.action = ScriptedBeatAction.MenuVFX;
+        currentBeat.transition = ScriptedBeatTransition.Default;
+        currentBeat.beatPosition.x = salesman.gameObject.transform.position.x;
+        currentBeat.beatPosition.z = salesman.gameObject.transform.position.z;
+        if (time > 0f)
+        {
+            currentBeat.transition = ScriptedBeatTransition.TimedDuration;
+            currentBeat.duration = time;
+        }
+        currentBeat.beatPosition.w = vfx;
+    }
+
     public void IslandMenuClosed()
     {
+        currentBeat.transition = ScriptedBeatTransition.MenuClose;
         menuClose = true;
     }
 
