@@ -280,7 +280,7 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].name = "'Let's do business'";
         visitBeats[beat].action = ScriptedBeatAction.Dialog;
         visitBeats[beat].dialogLine =
-            "Let's do business! I can purchase from you, move things for you...";
+            "Let's do business! I can review your current island, move things you buy...";
         visitBeats[beat].transition = ScriptedBeatTransition.PlayerResponse;
         beat++;
         visitBeats[beat].name = "'and of course sell'";
@@ -670,6 +670,8 @@ public class SalesVisitManager : MonoBehaviour
 
         if (dialogPop)
         {
+            GUI.depth = -99;
+
             // box
             r.x = 0.675f * w;
             r.y = 0.125f * h;

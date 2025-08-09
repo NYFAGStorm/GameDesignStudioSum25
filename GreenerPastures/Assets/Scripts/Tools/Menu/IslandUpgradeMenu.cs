@@ -1059,10 +1059,13 @@ public class IslandUpgradeMenu : MonoBehaviour
         {
             if (CanPurchase(displayItems[menuItemSelection]))
             {
-                ConfirmPopup("Are you sure you want to buy\n"
-                    + displayItems[menuItemSelection].name + "\nfor " +
-                    GetPurchasePrice(displayItems[menuItemSelection]) + " gold?",
-                    ConfirmType.Purchase);
+                string confirmString = "Are you sure you want to buy\n"
+                    + displayItems[menuItemSelection].name;
+                MenuItem tradeIn = GetTradeInItemForUpgrade(menuItemSelection);
+                if (tradeIn != null)
+                    confirmString += "\nand trade in " + tradeIn.name;
+                confirmString += "\nfor " + GetPurchasePrice(displayItems[menuItemSelection]) + " gold?";
+                ConfirmPopup(confirmString, ConfirmType.Purchase);
                 currentPurchaseItem = displayItems[menuItemSelection];
                 currentPurchsePrice = GetPurchasePrice(displayItems[menuItemSelection]);
             }
@@ -1080,6 +1083,26 @@ public class IslandUpgradeMenu : MonoBehaviour
                 invalidPulseTimer = INVALIDPULSETIME;
             }
         }
+    }
+
+    MenuItem GetTradeInItemForUpgrade( int displayIndex )
+    {
+        // return existing item being replaced with this upgrade purchase (or null)
+        MenuItem retItem = null;
+
+        if (displayItems[displayIndex].category >= UpgradeCategory.OutdoorProps)
+            return retItem; // only islands, farms and towers
+
+        for (int i = displayIndex-1; i >= 0; i--)
+        {
+            if (displayItems[i].playerNowHas)
+            {
+                retItem = displayItems[i]; // trade-in item
+                break;
+            }
+        }
+
+        return retItem;
     }
 
     int GetPurchasePrice( MenuItem item )
@@ -1243,7 +1266,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
         g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
         g.normal.textColor = Color.white;
-        g.hover.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
         g.active.textColor = Color.yellow;
         s = "<<";
         if (usingPad)
@@ -1256,6 +1279,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                 currentCategory = UpgradeCategory.IndoorProps;
             displayItems = GetDisplayItems(currentCategory);
             topOfMenuList = 0;
+            menuItemSelection = 0;
 
             // consuming input, but why?
             if (usingPad)
@@ -1273,6 +1297,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                 currentCategory = UpgradeCategory.Islands;
             displayItems = GetDisplayItems(currentCategory);
             topOfMenuList = 0;
+            menuItemSelection = 0;
 
             // consuming input, but why?
             if (usingPad)
@@ -1302,13 +1327,15 @@ public class IslandUpgradeMenu : MonoBehaviour
             GUI.DrawTexture(r, t);
             // name
             r.x = 0.175f * w;
-            r.width = 0.2f * w;
+            r.width = 0.5f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);
             g.alignment = TextAnchor.MiddleLeft;
             g.fontSize = Mathf.RoundToInt(18 * (w/1024f));
             g.fontStyle = FontStyle.Bold;
             s = displayItems[i].name;
+            if (displayItems[i].playerNowHas)
+                s += " (Currently Owned or Upgraded)";
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
             g.normal.textColor = Color.black;
@@ -1318,11 +1345,15 @@ public class IslandUpgradeMenu : MonoBehaviour
             r.x -= 0.0016f * w;
             r.y -= 0.002f * w;
             g.normal.textColor = Color.white;
-            if (menuItemSelection == (i + 0) || 
-                (usingPad && padButtonSelection == (i + 0)))
-                g.normal.textColor = Color.yellow;
             g.hover.textColor = Color.white;
             g.active.textColor = Color.white;
+            if (menuItemSelection == (i + 0) ||
+                (usingPad && padButtonSelection == (i + 0)))
+            {
+                g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.yellow;
+                g.active.textColor = Color.yellow;
+            }
             GUI.Label(r, s, g);
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
@@ -1391,29 +1422,6 @@ public class IslandUpgradeMenu : MonoBehaviour
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
 
-            if (displayItems[i].playerNowHas)
-            {
-                GUI.enabled = true;
-                // already owned banner
-                r.x = 0.2f * w;
-                r.y -= 0.025f * h;
-                r.width = 0.6f * w;
-                r.height = 0.1f * h;
-                g = new GUIStyle(GUI.skin.label);
-                g.alignment = TextAnchor.MiddleCenter;
-                g.fontSize = Mathf.RoundToInt(32 * (w / 1024f));
-                g.fontStyle = FontStyle.Italic;
-                g.normal.textColor = Color.white;
-                if (menuItemSelection == (i + 0) ||
-                    (usingPad && padButtonSelection == (i + 0)))
-                    g.normal.textColor = Color.yellow;
-                g.hover.textColor = Color.white;
-                g.active.textColor = Color.white;
-                s = "Already Owned";
-                GUI.Label(r, s, g);
-                r.y += 0.025f * h;
-            }
-
             r.y += 0.1f * h;
         }
 
@@ -1437,7 +1445,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             GUI.Box(r, s, g);
             // accept button
             r.x = 0.35f * w;
-            r.y = 0.5f * h;
+            r.y = 0.55f * h;
             r.width = 0.1f * w;
             r.height = 0.1f * h;
             g = new GUIStyle(GUI.skin.box);
@@ -1447,7 +1455,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             g.normal.textColor = Color.white;
             if (usingPad && padClickButton == 0)
                 g.normal.textColor = Color.yellow;
-            g.hover.textColor = Color.white;
+            g.hover.textColor = Color.yellow;
             g.active.textColor = Color.white;
             s = "ACCEPT";
             if (GUI.Button(r,s,g) ||
@@ -1480,7 +1488,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             g.normal.textColor = Color.white;
             if (usingPad && padClickButton == 1)
                 g.normal.textColor = Color.yellow;
-            g.hover.textColor = Color.white;
+            g.hover.textColor = Color.yellow;
             g.active.textColor = Color.white;
             s = "CANCEL";
             if (GUI.Button(r, s, g) ||
@@ -1527,7 +1535,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         g.normal.textColor = Color.white;
         if (usingPad && padButtonSelection == padMaxButton)
             g.normal.textColor = Color.yellow;
-        g.hover.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         s = "Compose Puchases";
         if (purchaseItemsHeld.Length > 0 && (GUI.Button(r, s, g) ||
@@ -1567,7 +1575,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         g.normal.textColor = Color.white;
         if (usingPad && padButtonSelection == padMaxButton)
             g.normal.textColor = Color.yellow;
-        g.hover.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         s = "Clear All Purchases";
         if (purchaseItemsHeld.Length > 0 && (GUI.Button(r, s, g) ||
@@ -1589,7 +1597,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         g.normal.textColor = Color.white;
         if (usingPad && padButtonSelection == padMaxButton - 1)
             g.normal.textColor = Color.yellow;
-        g.hover.textColor = Color.white;
+        g.hover.textColor = Color.yellow;
         g.active.textColor = Color.white;
         s = "End Island Upgrades";
         if (validConfig && (GUI.Button(r, s, g) || 
