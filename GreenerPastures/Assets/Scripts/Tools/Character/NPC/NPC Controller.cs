@@ -39,7 +39,8 @@ public class NPCController : MonoBehaviour
         // initialize
         if (enabled)
         {
-
+            if (pam.singleLayerCharacter)
+                pam.ConfigureAppearance(new PlayerOptions());
         }
     }
 
@@ -98,6 +99,11 @@ public class NPCController : MonoBehaviour
         // non-ghost mode movement would stop at collision detection
 
         return true;
+    }
+
+    public void SetCharacterAnimMoveVector( Vector3 animMoveVector )
+    {
+        pam.characterMoveVector = animMoveVector;
     }
 
     void HandleCharacterAnimation()

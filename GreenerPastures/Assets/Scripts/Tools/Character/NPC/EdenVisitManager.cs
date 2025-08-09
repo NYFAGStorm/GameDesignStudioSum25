@@ -191,17 +191,23 @@ public class EdenVisitManager : MonoBehaviour
         return retBool;
     }
 
-    bool FacingDirectionToPlayer()
+    Vector3 FacingDirectionToPlayer()
     {
-        bool retBool = false;
+        Vector3 retVector = Vector3.zero;
 
         if (pcm == null)
             Debug.LogWarning("--- EdenVisitManager [FacingDirectionToPlayer] : no pcm. will ignore.");
 
-        // face left?
-        retBool = (pcm.gameObject.transform.position.x < eden.transform.position.x);
+        retVector = (pcm.gameObject.transform.position - eden.transform.position);
+        retVector.Normalize();
 
-        return retBool;
+        bool facingLeft = (eden.GetComponentInChildren<CharacterAnimManager>().GetImageFlipped());
+        if (facingLeft && pcm.gameObject.transform.position.x > eden.transform.position.x)
+            retVector += Vector3.right * 0.381f;
+        else if (!facingLeft && pcm.gameObject.transform.position.x < eden.transform.position.x)
+            retVector += Vector3.left * 0.381f;
+
+        return retVector;
     }
 
     void ConfigureVisitBeats()
@@ -426,25 +432,7 @@ public class EdenVisitManager : MonoBehaviour
         // turn to face player
         if (eden != null && facingPlayer)
         {
-            bool facingLeft = (eden.GetComponentInChildren<CharacterAnimManager>().GetImageFlipped());
-            Vector3 newMove = eden.moveTarget;
-            // should face left?
-            if (FacingDirectionToPlayer())
-            {
-                if (!facingLeft)
-                {
-                    newMove += Vector3.left * 0.1f;
-                    eden.moveTarget = newMove;
-                }
-            }
-            else
-            {
-                if (facingLeft)
-                {
-                    newMove += Vector3.right * 0.1f;
-                    eden.moveTarget = newMove;
-                }
-            }
+            eden.SetCharacterAnimMoveVector(FacingDirectionToPlayer());
         }
 
         // run beat timer
