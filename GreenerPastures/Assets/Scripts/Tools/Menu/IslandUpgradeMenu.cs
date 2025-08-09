@@ -91,6 +91,8 @@ public class IslandUpgradeMenu : MonoBehaviour
     private Vector3 cursorMove;
     private bool gridLockCursor;
 
+    private GameObject islandObj;
+    private Vector3 islandSavedPosition;
     private Vector3 islandCenter;
     private float islandRange = 7f;
 
@@ -138,10 +140,16 @@ public class IslandUpgradeMenu : MonoBehaviour
     private float popupTimer;
     private bool popUpMoveDown;
 
+    private AnimationCurve greenerAnimCurve;
+    private float greenerPasturesTimer;
+    private bool greenerMoveUp;
+
     const float FEEDBACKTIME = 3f;
     const float PULSETIME = 2f;
     const float INVALIDPULSETIME = 1f;
     const float POPTIME = 1f;
+    const float GREENERPASTURESTIME = 4f;
+    const float GREENERDEPTH = 40f;
 
 
     void Start()
@@ -198,6 +206,9 @@ public class IslandUpgradeMenu : MonoBehaviour
 
             // set stage to purchasing
             stage = StageOfTransaction.Purchases;
+
+            // greenerAnimCurve for 'greener pastures' moment
+            greenerAnimCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         }
         else if (salesVisit != null)
             salesVisit.IslandMenuClosed(); // abort menu operation, free the salesman
@@ -568,6 +579,30 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (invalidPulseTimer < 0f)
                 invalidPulseTimer = 0f;
         }
+        if (greenerPasturesTimer > 0f)
+        {
+            greenerPasturesTimer -= Time.deltaTime;
+            if (greenerPasturesTimer < 0f)
+            {
+                greenerPasturesTimer = 0f;
+                if (!greenerMoveUp)
+                {
+                    // TODO: perform replacement swaps (new island, new tower, repositioned mailbox and tporter)
+                    greenerMoveUp = true;
+                    greenerPasturesTimer = GREENERPASTURESTIME;
+                }
+            }
+            // island move progress
+            float progress = greenerAnimCurve.Evaluate(greenerPasturesTimer / GREENERPASTURESTIME);
+            if (!greenerMoveUp)
+                progress = 1f - progress;
+            if (islandObj != null)
+            {
+                Vector3 pos = islandSavedPosition;
+                pos.y -= progress * GREENERDEPTH;
+                islandObj.transform.position = pos;
+            }
+        }
 
         // run config pulse
         if (configPulse)
@@ -768,6 +803,45 @@ public class IslandUpgradeMenu : MonoBehaviour
         }
         tmp[purchaseItemsHeld.Length] = item;
         purchaseItemsHeld = tmp;
+    }
+
+    void PrepareForGreenerPastures()
+    {
+        // if we are swapping islands, perform the lowering of island, rising of new island
+
+    }
+
+    void LaunchGreenerPastures()
+    {
+        // TODO: get current island, prepare to revise
+        // prepare to swap tower
+        // prepare to swap farm
+        // prepare to move mail box and teleporter
+        greenerMoveUp = false;
+        greenerPasturesTimer = GREENERPASTURESTIME;
+    }
+
+    void PerformReplacementSwaps()
+    {
+        // all purchase items held that represent replacement upgrades, swap them
+        for (int i = 0; i < purchaseItemsHeld.Length; i++)
+        {
+            if (purchaseItemsHeld[i].type == UpgradeType.IslandMedium ||
+                purchaseItemsHeld[i].type == UpgradeType.IslandLarge ||
+                purchaseItemsHeld[i].type == UpgradeType.IslandVeryLarge )
+            {
+                // REVIEW: we would like to do the 'greener pastures' move here
+                // step off the current island (float on color trail spots?)
+                // watch old island sink, watch new island rise
+                // step back on island?
+                
+                // REVIEW: should towers be set already?
+                // REVIEW: should farm be set already?
+                // REVIEW: should outdoor props be set as they were before to start?
+
+
+            }
+        }
     }
 
     string FormCategoryLabel( UpgradeCategory category )
@@ -1048,6 +1122,12 @@ public class IslandUpgradeMenu : MonoBehaviour
                     purchaseItemsHeld = new MenuItem[0];
                     purchaseGoldHeld = 0;
                 }
+                if (confirmType == ConfirmType.ComposeIsland)
+                {
+                    // REVIEW: at this moment, we should have the salesman review all replacement items?
+                    // TODO: step off island, etc. etc. etc.
+                    //stage = StageOfTransaction.Composition;
+                }
                 confirmType = ConfirmType.None;
                 popupTimer = POPTIME;
             }
@@ -1076,10 +1156,10 @@ public class IslandUpgradeMenu : MonoBehaviour
 
         GUI.enabled = true;
         // total purchases cost display
-        r.x = 0.1f * w;
-        r.y = 0.9f * h;
-        r.width = 0.275f * w;
-        r.height = 0.05f * h;
+        r.x = 0.075f * w;
+        r.y = 0.85f * h;
+        r.width = 0.2f * w;
+        r.height = 0.1f * h;
         g = new GUIStyle(GUI.skin.label);
         g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
         g.fontStyle = FontStyle.Bold;
@@ -1087,9 +1167,30 @@ public class IslandUpgradeMenu : MonoBehaviour
         g.normal.textColor = Color.yellow;
         g.hover.textColor = Color.yellow;
         g.active.textColor = Color.yellow;
-        s = "TOTAL GOLD TO COMPLETE\nOUR BUSINESS: " + purchaseGoldHeld;
+        s = "TOTAL GOLD TO COMPLETE OUR BUSINESS: " + purchaseGoldHeld;
         if (purchaseItemsHeld.Length > 0)
             GUI.Label(r, s, g);
+
+        // purchases complete button
+        r.x = 0.225f * w;
+        r.y = 0.9f * h;
+        r.width = 0.15f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        //g.fontStyle = FontStyle.Bold;
+        g.alignment = TextAnchor.MiddleCenter;
+        g.normal.textColor = Color.white;
+        if (usingPad && padButtonSelection == padMaxButton)
+            g.normal.textColor = Color.yellow;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.white;
+        s = "Compose Puchases";
+        if (purchaseItemsHeld.Length > 0 && (GUI.Button(r, s, g) ||
+            (usingPad && padClickButton == padMaxButton)))
+        {
+            ConfirmPopup("Are you sure you're done purchasing\neverything you want today?", ConfirmType.ComposeIsland);
+        }
 
         // config feedback label
         if (feedbackTimer > 0f)
@@ -1111,9 +1212,9 @@ public class IslandUpgradeMenu : MonoBehaviour
         }
 
         // clear purchase items button
-        r.x = 0.7f * w;
+        r.x = 0.775f * w;
         r.y = 0.9f * h;
-        r.width = 0.2f * w;
+        r.width = 0.15f * w;
         r.height = 0.05f * h;
         g = new GUIStyle(GUI.skin.button);
         g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
@@ -1125,7 +1226,6 @@ public class IslandUpgradeMenu : MonoBehaviour
         g.hover.textColor = Color.white;
         g.active.textColor = Color.white;
         s = "Clear All Purchases";
-        GUI.enabled = (purchaseItemsHeld.Length > 0f);
         if (purchaseItemsHeld.Length > 0 && (GUI.Button(r, s, g) ||
             (usingPad && padClickButton == padMaxButton)))
         {
