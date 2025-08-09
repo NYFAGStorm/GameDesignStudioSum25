@@ -24,13 +24,16 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     public enum  UpgradeType
     {
+        IslandSmall,
         IslandMedium,
         IslandLarge,
         IslandVeryLarge,
+        FarmTiny,
         FarmModest,
         FarmSizable,
         FarmHuge,
         FarmVast,
+        HermitTower,
         WizardTower,
         SorcererTower,
         TeleportNode,
@@ -76,6 +79,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         public Texture2D icon;
         public GameObject prefab;
         public float itemPadding;
+        public bool playerNowHas;
     }
     public MenuItem[] items;
 
@@ -191,8 +195,13 @@ public class IslandUpgradeMenu : MonoBehaviour
         if (enabled)
         {
             validConfig = true; // begin with valid island configuration
-            ConfigureMenuItems();
             CreateCursor();
+
+            // set up menu
+            ConfigureMenuItems();
+
+            // scan player's current configuration (matched to menu items)
+            ScanPlayerIslandConfig();
 
             // lock down player
             pcm.characterFrozen = true;
@@ -232,61 +241,79 @@ public class IslandUpgradeMenu : MonoBehaviour
             switch (items[i].type)
             {
                 // islands
+                case UpgradeType.IslandSmall:
+                    items[i].name = "Small Island";
+                    items[i].description = "Our smallest island measuring 14 meters in diameter. It comes with a flat grassy surface and enough fertile ground to grow upon.";
+                    items[i].price = 7500;
+                    items[i].itemPadding = 7f;
+                    break;
                 case UpgradeType.IslandMedium:
                     items[i].name = "Medium Island";
                     items[i].description = "If you like a little more room, this 16 meter diameter island is priced to fit your budget. Make the move to this great island.";
                     items[i].price = 10000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 8f;
                     break;
                 case UpgradeType.IslandLarge:
                     items[i].name = "Large Island";
                     items[i].description = "This island boasts a 18 meter diameter scale and can accomodate most of our larger upgrades. Keep this at the top of your wish list.";
                     items[i].price = 15000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 9f;
                     break;
                 case UpgradeType.IslandVeryLarge:
                     items[i].name = "Very Large Island";
                     items[i].description = "Our largest island available is 20 meters in diameter and demands a fair amount of accessories to fill it. A very impressive island.";
                     items[i].price = 20000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 10f;
                     break;
                 // farms
+                case UpgradeType.FarmTiny:
+                    items[i].name = "Tiny Farm";
+                    items[i].description = "10 plots of land make up the smallest of farms. Manageable for any Biomancer. They say a garden is all we really need to grow.";
+                    items[i].price = 1000;
+                    items[i].itemPadding = 2f;
+                    break;
                 case UpgradeType.FarmModest:
                     items[i].name = "Modest Farm";
                     items[i].description = "When you're ready to handle more crops and more harvests, this upgrade is for you. A 4x4 farm with 16 plots in total.";
                     items[i].price = 2000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 2.5f;
                     break;
                 case UpgradeType.FarmSizable:
                     items[i].name = "Sizable Farm";
                     items[i].description = "A 5x5 farm with 25 plots, brings in a large harvest while maintainable for the casual Biomancer. A good mid-sized farm.";
                     items[i].price = 3000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 3f;
                     break;
                 case UpgradeType.FarmHuge:
                     items[i].name = "Huge Farm";
                     items[i].description = "To impress your guests and the market at the same time, look no further than this glorioud 6x6 farm with a total of 36 plots!";
                     items[i].price = 4000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 3.5f;
                     break;
                 case UpgradeType.FarmVast:
                     items[i].name = "Vast Farm";
                     items[i].description = "Only for the advanced Biomancer, we offer this incredible 7x7 farm with an amazing 49 plots! Only for the larger islands.";
                     items[i].price = 5000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 4f;
                     break;
                 // towers
+                case UpgradeType.HermitTower:
+                    items[i].name = "Hermit Tower";
+                    items[i].description = "A humble tower for a humble Biomancer. This tower need only be an indoor space to craft magic or retreat from dramatic weather.";
+                    items[i].price = 10000;
+                    items[i].itemPadding = 2f;
+                    break;
                 case UpgradeType.WizardTower:
                     items[i].name = "Wizard Tower";
                     items[i].description = "Impressive tower and a marvelous upgrade. The classic roofline and taller stature appears as sturdy as it is welcoming to guests.";
                     items[i].price = 10000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 2.5f;
                     break;
                 case UpgradeType.SorcererTower:
                     items[i].name = "Sorcerer Tower";
                     items[i].description = "There is no finer residence for Biomancers. The sorcerer tower is on a grand scale; standing proud and tall to be seen from afar.";
                     items[i].price = 20000;
-                    items[i].itemPadding = 1f;
+                    items[i].itemPadding = 3f;
                     break;
                 // outdoor props
                 case UpgradeType.BushA:
@@ -394,6 +421,24 @@ public class IslandUpgradeMenu : MonoBehaviour
                     break;
             }
         }
+    }
+
+    void ScanPlayerIslandConfig()
+    {
+        // island
+        // 7m radius = smallest, 10m radius = largest
+        //if (pcm.playerData.island.w == 7)
+        // farm
+        // # of plots
+        // 10 = smallest, 49 = largest
+        // tower
+        // tower structure type
+
+        // outdoor props
+        // island props
+        // im.islands[pcm.playerData.playerIsland]
+        // indoor props
+        // island props (int)
     }
 
     MenuItem[] GetDisplayItems( UpgradeCategory category )
