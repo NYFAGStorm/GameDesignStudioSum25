@@ -5,6 +5,14 @@ public class IslandUpgradeMenu : MonoBehaviour
     // Author: Glenn Storm
     // This handles the island upgrade menu
 
+    public enum StageOfTransaction
+    {
+        None,
+        Purchases,
+        Composition,
+        Completion
+    }
+
     public enum UpgradeCategory
     {
         Islands,
@@ -104,6 +112,8 @@ public class IslandUpgradeMenu : MonoBehaviour
     private int padClickButton = -1;
     private int padMove = -1;
 
+    private StageOfTransaction stage;
+
     private UpgradeCategory currentCategory;
     private MenuItem[] displayItems;
     private int menuItemSelection = -1;
@@ -185,6 +195,9 @@ public class IslandUpgradeMenu : MonoBehaviour
             // start menu on islands
             currentCategory = UpgradeCategory.Islands;
             displayItems = GetDisplayItems(currentCategory);
+
+            // set stage to purchasing
+            stage = StageOfTransaction.Purchases;
         }
         else if (salesVisit != null)
             salesVisit.IslandMenuClosed(); // abort menu operation, free the salesman
@@ -688,23 +701,31 @@ public class IslandUpgradeMenu : MonoBehaviour
             topOfMenuList = menuItemSelection;
 
         // purchase selection
-        if (Input.GetKeyDown(pcm.actionAKey) || usingPad && padMgr.gPadDown[0].aButton)
+        if (stage == StageOfTransaction.Purchases && 
+            (Input.GetKeyDown(pcm.actionAKey) || usingPad && padMgr.gPadDown[0].aButton))
         {
             if (CanPurchase(displayItems[menuItemSelection]))
             {
                 ConfirmPopup("Are you sure you want to buy\n"
-                    + displayItems[menuItemSelection].name + " for " + 
-                    GetPurchasePrice(displayItems[menuItemSelection]) + " gold?", 
+                    + displayItems[menuItemSelection].name + "\nfor " +
+                    GetPurchasePrice(displayItems[menuItemSelection]) + " gold?",
                     ConfirmType.Purchase);
                 currentPurchaseItem = displayItems[menuItemSelection];
                 currentPurchsePrice = GetPurchasePrice(displayItems[menuItemSelection]);
             }
             else
+            {
+                float rnd = RandomSystem.FlatRandom01();
+                if (rnd < .25f)
+                    salesVisit.MenuDialogBeat("It looks like that is a little more than you have, friend.");
+                else if (rnd >= .25f && rnd < .5f)
+                    salesVisit.MenuDialogBeat("Some things are worth waiting for. Just save up your gold.");
+                else if (rnd >= .5f && rnd < .75f)
+                    salesVisit.MenuDialogBeat("You've got good taste, friend. That item will have to wait.");
+                else
+                    salesVisit.MenuDialogBeat("It seems you're a little short on gold to buy that item.");
                 invalidPulseTimer = INVALIDPULSETIME;
-
-            // FIXME: menu dialog beat broken
-            //else
-            //    salesVisit.MenuDialogBeat("It looks like that is out of your price range, friend.");
+            }
         }
     }
 

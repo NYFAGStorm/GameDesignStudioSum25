@@ -20,7 +20,8 @@ public class SalesVisitManager : MonoBehaviour
         VFXSpawn,
         RemoveNPC,
         EndVisit,
-        IslandMenu
+        IslandMenu,
+        MenuDialog
     }
 
     public enum ScriptedBeatTransition
@@ -220,7 +221,7 @@ public class SalesVisitManager : MonoBehaviour
         beat++;
         visitBeats[beat].name = "move salesman from market";
         visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(18f, 0f, -19f);
+        visitBeats[beat].npcMark = new Vector3(17f, 0f, -19.5f);
         visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
         visitBeats[beat].name = "brief pause";
@@ -437,9 +438,18 @@ public class SalesVisitManager : MonoBehaviour
             case ScriptedBeatTransition.PlayerResponse:
                 if (playerResponse)
                 {
-                    currentBeatIndex++;
-                    playerResponse = false;
-                    currentBeat.transitionDone = true;
+                    if (currentBeat.action == ScriptedBeatAction.MenuDialog)
+                    {
+                        currentBeat.dialogLine = "";
+                        currentBeat.transition = ScriptedBeatTransition.MenuClose;
+                        playerResponse = false;
+                    }
+                    else
+                    {
+                        currentBeatIndex++;
+                        playerResponse = false;
+                        currentBeat.transitionDone = true;
+                    }
                 }
                 break;
             case ScriptedBeatTransition.SalesmanCallback:
@@ -557,6 +567,10 @@ public class SalesVisitManager : MonoBehaviour
                     else
                         Debug.LogWarning("--- SalesVisitManager [Update] : unable to access island upgrade manager script for config. will ignore.");
                     break;
+                case ScriptedBeatAction.MenuDialog:
+                    dialogTimer = PAUSETIME;
+                    playerResponse = false;
+                    break;
             }
             currentBeat.actionDone = true;
         }
@@ -603,13 +617,10 @@ public class SalesVisitManager : MonoBehaviour
 
     public void MenuDialogBeat(string dialog)
     {
-        // FIXME: this needs fixing
         currentBeat.actionDone = false;
-        currentBeat.action = ScriptedBeatAction.Dialog;
+        currentBeat.action = ScriptedBeatAction.MenuDialog;
         currentBeat.transition = ScriptedBeatTransition.PlayerResponse;
         currentBeat.dialogLine = dialog;
-        dialogTimer = 0.1f;
-        playerResponse = false;
     }
 
     public void IslandMenuClosed()
