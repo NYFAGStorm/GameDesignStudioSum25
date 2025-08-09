@@ -300,7 +300,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                 case UpgradeType.HermitTower:
                     items[i].name = "Hermit Tower";
                     items[i].description = "A humble tower for a humble Biomancer. This tower need only be an indoor space to craft magic or retreat from dramatic weather.";
-                    items[i].price = 10000;
+                    items[i].price = 5000;
                     items[i].itemPadding = 2f;
                     break;
                 case UpgradeType.WizardTower:
@@ -419,26 +419,299 @@ public class IslandUpgradeMenu : MonoBehaviour
                     items[i].price = 1000;
                     items[i].itemPadding = 0.5f;
                     break;
+                default:
+                    break;
             }
         }
     }
 
     void ScanPlayerIslandConfig()
     {
-        // island
-        // 7m radius = smallest, 10m radius = largest
-        //if (pcm.playerData.island.w == 7)
-        // farm
-        // # of plots
-        // 10 = smallest, 49 = largest
-        // tower
-        // tower structure type
+        PlayerData pData = pcm.playerData;
+        IslandData iData = im.islands[pData.playerIsland];
 
-        // outdoor props
-        // island props
-        // im.islands[pcm.playerData.playerIsland]
-        // indoor props
-        // island props (int)
+        // for any menu item, determine if player has it now (or lesser variant)
+        for (int i = 0; i < items.Length; i++)
+        {
+            // island
+            // 7m radius = smallest, 10m radius = largest
+
+            // farm
+            // # of plots
+            // 10 = smallest, 49 = largest
+
+            // tower
+            // tower structure type
+
+            // outdoor props
+            // island props
+
+            // indoor props
+            // island props (int)
+
+            bool found = false;
+
+            switch (items[i].type)
+            {
+                // islands
+                case UpgradeType.IslandSmall:
+                    items[i].playerNowHas = (pData.island.w >= 7f);
+                    break;
+                case UpgradeType.IslandMedium:
+                    items[i].playerNowHas = (pData.island.w >= 8f);
+                    break;
+                case UpgradeType.IslandLarge:
+                    items[i].playerNowHas = (pData.island.w >= 9f);
+                    break;
+                case UpgradeType.IslandVeryLarge:
+                    items[i].playerNowHas = (pData.island.w >= 10f);
+                    break;
+                // farms
+                case UpgradeType.FarmTiny:
+                    items[i].playerNowHas = (pData.farm.plots.Length >= 10);
+                    break;
+                case UpgradeType.FarmModest:
+                    items[i].playerNowHas = (pData.farm.plots.Length >= 16);
+                    break;
+                case UpgradeType.FarmSizable:
+                    items[i].playerNowHas = (pData.farm.plots.Length >= 25);
+                    break;
+                case UpgradeType.FarmHuge:
+                    items[i].playerNowHas = (pData.farm.plots.Length >= 36);
+                    break;
+                case UpgradeType.FarmVast:
+                    items[i].playerNowHas = (pData.farm.plots.Length >= 49);
+                    break;
+                // towers
+                case UpgradeType.HermitTower:
+                    for (int n = 0; n < iData.structures.Length; n++)
+                    {
+                        if (iData.structures[n].type == StructureType.HermitTower ||
+                            iData.structures[n].type == StructureType.WizardTower ||
+                            iData.structures[n].type == StructureType.SorcererTower)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.WizardTower:
+                    for (int n = 0; n < iData.structures.Length; n++)
+                    {
+                        if (iData.structures[n].type == StructureType.WizardTower ||
+                            iData.structures[n].type == StructureType.SorcererTower)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.SorcererTower:
+                    for (int n = 0; n < iData.structures.Length; n++)
+                    {
+                        if (iData.structures[n].type == StructureType.SorcererTower)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                // outdoor props
+                case UpgradeType.BushA:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.BushA)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.BushB:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.BushB)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.BushC:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.BushC)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.RockA:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.RockA)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.RockB:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.RockB)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.RockC:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.RockC)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.LampPostA:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.LampPostA)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.LampPostB:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.LampPostB)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.BannerA:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.BannerA)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.BannerB:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.BannerB)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                // indoor props
+                case UpgradeType.IntCandleStickA:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.IntCandleA)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.IntCandleStickB:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.IntCandleB)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.IntFireplace:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.IntFireplace)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.IntBookshelf:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.IntBookshelf)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.IntWritingDesk:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.IntWritingDesk)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.IntTapestryA:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.IntTapestryA)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                case UpgradeType.IntTapestryB:
+                    for (int n = 0; n < iData.props.Length; n++)
+                    {
+                        if (iData.props[n].type == PropType.IntTapestryB)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    items[i].playerNowHas = found;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     MenuItem[] GetDisplayItems( UpgradeCategory category )
@@ -1016,6 +1289,9 @@ public class IslandUpgradeMenu : MonoBehaviour
                 i < 0 || i > displayItems.Length)
                 continue;
 
+            // if already owned, gray out display and place 'already owned' banner above
+            GUI.enabled = (!displayItems[i].playerNowHas);
+
             // icon
             r.x = 0.1f * w;
             r.width = 0.05f * w;
@@ -1114,6 +1390,29 @@ public class IslandUpgradeMenu : MonoBehaviour
             GUI.Label(r, s, g);
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
+
+            if (displayItems[i].playerNowHas)
+            {
+                GUI.enabled = true;
+                // already owned banner
+                r.x = 0.2f * w;
+                r.y -= 0.025f * h;
+                r.width = 0.6f * w;
+                r.height = 0.1f * h;
+                g = new GUIStyle(GUI.skin.label);
+                g.alignment = TextAnchor.MiddleCenter;
+                g.fontSize = Mathf.RoundToInt(32 * (w / 1024f));
+                g.fontStyle = FontStyle.Italic;
+                g.normal.textColor = Color.white;
+                if (menuItemSelection == (i + 0) ||
+                    (usingPad && padButtonSelection == (i + 0)))
+                    g.normal.textColor = Color.yellow;
+                g.hover.textColor = Color.white;
+                g.active.textColor = Color.white;
+                s = "Already Owned";
+                GUI.Label(r, s, g);
+                r.y += 0.025f * h;
+            }
 
             r.y += 0.1f * h;
         }

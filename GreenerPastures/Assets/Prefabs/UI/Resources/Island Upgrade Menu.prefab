@@ -265,7 +265,7 @@ MonoBehaviour:
     playerNowHas: 0
   - name: Fireplace
     category: 4
-    type: 24
+    type: 27
     description: A warm hearth for cold nights.
     price: 5000
     icon: {fileID: 2800000, guid: 2a19baf6e102d564dbe25ac9e0003a84, type: 3}
@@ -274,7 +274,7 @@ MonoBehaviour:
     playerNowHas: 0
   - name: Bookshelf
     category: 4
-    type: 25
+    type: 28
     description: A must for every well-read biomancer.
     price: 5000
     icon: {fileID: 2800000, guid: 8ddd83931ad52524f942b462e13a5375, type: 3}
@@ -283,7 +283,7 @@ MonoBehaviour:
     playerNowHas: 0
   - name: Writing Desk
     category: 4
-    type: 26
+    type: 29
     description: Compose letters or write that great novel.
     price: 5000
     icon: {fileID: 2800000, guid: 982981e0c8e129f429f2f58554bfb46a, type: 3}
@@ -292,7 +292,7 @@ MonoBehaviour:
     playerNowHas: 0
   - name: Tapestry (Style A)
     category: 4
-    type: 27
+    type: 30
     description: Colorful banner in your style.
     price: 5000
     icon: {fileID: 2800000, guid: 74099cc70ac9bbd46bb40a5588663ed1, type: 3}
@@ -301,7 +301,7 @@ MonoBehaviour:
     playerNowHas: 0
   - name: Tapestry (Style B)
     category: 4
-    type: 28
+    type: 31
     description: Automagically configures to your personal colors.
     price: 5000
     icon: {fileID: 2800000, guid: f656c02045b64624789479bb7fdf78aa, type: 3}
