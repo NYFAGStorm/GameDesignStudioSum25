@@ -107,7 +107,7 @@ Shader "Unlit/Moon Composite"
                 fixed4 fullShadow = tex2D(_Shadow, i.uv);
                 fullShadow = fullShadow * moon;
 
-                fixed4 clearColor = (0,1,0,0);
+                fixed4 clearColor = fixed4(0,1,0,0);
 
                 // TODO: cleanup
                 fixed4 leftShadow = tex2D(_Shadow, i.uv);

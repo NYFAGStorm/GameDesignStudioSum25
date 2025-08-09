@@ -1007,7 +1007,7 @@ public class MagicCraftingManager : MonoBehaviour
             g.alignment = TextAnchor.MiddleCenter;
             g.fontSize = Mathf.RoundToInt(20 * (w / 1024f));
             s = "No spell recipes have been acquired.\nLevel up to gain new recipes.";
-            c = Color.white;
+            c = Color.black;
             GUI.color = c;
             // default empty grimoire display
             if ( pcm.playerData.magic.library.grimoire == null ||
