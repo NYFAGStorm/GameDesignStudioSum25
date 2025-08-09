@@ -47,8 +47,18 @@ public class IslandUpgradeMenu : MonoBehaviour
         IntTapestryB
     }
 
+    public enum ConfirmType
+    {
+        None,
+        ReplaceExisting,
+        Purchase,
+        ClearPurchases,
+        ComposeIsland,
+        CompleteIsland
+    }
+
     [System.Serializable]
-    public struct MenuItem
+    public class MenuItem
     {
         public string name;
         public UpgradeCategory category;
@@ -60,8 +70,6 @@ public class IslandUpgradeMenu : MonoBehaviour
         public float itemPadding;
     }
     public MenuItem[] items;
-
-    public bool test;
 
     private PlayerControlManager pcm;
     private GreenerGameManager ggm;
@@ -102,19 +110,27 @@ public class IslandUpgradeMenu : MonoBehaviour
     private int topOfMenuList = 0;
     private int maxDisplayItems = 5;
 
+    private MenuItem currentPurchaseItem;
+    private int currentPurchsePrice;
+    private MenuItem[] purchaseItemsHeld = new MenuItem[0];
+    private int purchaseGoldHeld;
+
+    private float invalidPulseTimer;
+
     private AudioManager sfxAudio;
 
     private SalesVisitManager salesVisit;
     private bool menuOpen;
 
-    private bool confirmAccepted; // TODO: do something with this
     private bool confirmPopup;
+    private ConfirmType confirmType;
     private string popupMessage;
     private float popupTimer;
     private bool popUpMoveDown;
 
     const float FEEDBACKTIME = 3f;
     const float PULSETIME = 2f;
+    const float INVALIDPULSETIME = 1f;
     const float POPTIME = 1f;
 
 
@@ -156,20 +172,18 @@ public class IslandUpgradeMenu : MonoBehaviour
         // initialize
         if (enabled)
         {
-            CreateCursor();
-
             validConfig = true; // begin with valid island configuration
-
             ConfigureMenuItems();
+            CreateCursor();
 
             // lock down player
             pcm.characterFrozen = true;
             pcm.freezeCharacterActions = true;
             // detect salesman discount
             hasSalesmanDiscount = PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillFriendsSalesman);
-
-            // temp
-            currentCategory = UpgradeCategory.OutdoorProps;
+            
+            // start menu on islands
+            currentCategory = UpgradeCategory.Islands;
             displayItems = GetDisplayItems(currentCategory);
         }
         else if (salesVisit != null)
@@ -455,9 +469,9 @@ public class IslandUpgradeMenu : MonoBehaviour
         feedbackTimer = FEEDBACKTIME;
     }
 
-    void ConfirmPopup( string message )
+    void ConfirmPopup( string message, ConfirmType type )
     {
-        confirmAccepted = false;
+        confirmType = type;
         popupMessage = message;
         popUpMoveDown = false;
         popupTimer = POPTIME;
@@ -534,6 +548,12 @@ public class IslandUpgradeMenu : MonoBehaviour
                 else
                     confirmPopup = false;
             }
+        }
+        if (invalidPulseTimer > 0f)
+        {
+            invalidPulseTimer -= Time.deltaTime;
+            if (invalidPulseTimer < 0f)
+                invalidPulseTimer = 0f;
         }
 
         // run config pulse
@@ -666,9 +686,37 @@ public class IslandUpgradeMenu : MonoBehaviour
             topOfMenuList = menuItemSelection - maxDisplayItems + 1;
         if (menuItemSelection < topOfMenuList)
             topOfMenuList = menuItemSelection;
+
+        // purchase selection
+        if (Input.GetKeyDown(pcm.actionAKey) || usingPad && padMgr.gPadDown[0].aButton)
+        {
+            if (CanPurchase(displayItems[menuItemSelection]))
+            {
+                ConfirmPopup("Are you sure you want to buy\n"
+                    + displayItems[menuItemSelection].name + " for " + 
+                    GetPurchasePrice(displayItems[menuItemSelection]) + " gold?", 
+                    ConfirmType.Purchase);
+                currentPurchaseItem = displayItems[menuItemSelection];
+                currentPurchsePrice = GetPurchasePrice(displayItems[menuItemSelection]);
+            }
+            else
+                invalidPulseTimer = INVALIDPULSETIME;
+
+            // FIXME: menu dialog beat broken
+            //else
+            //    salesVisit.MenuDialogBeat("It looks like that is out of your price range, friend.");
+        }
     }
 
+    int GetPurchasePrice( MenuItem item )
+    {
+        int thisPrice = item.price;
+        
+        if (hasSalesmanDiscount)
+            thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
 
+        return thisPrice;
+    }
 
     bool CanPurchase( MenuItem item )
     {
@@ -677,7 +725,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         int thisPrice = item.price;
         if (hasSalesmanDiscount)
             thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
-        retBool = (pcm.playerData.gold >= thisPrice);
+        retBool = ((pcm.playerData.gold - purchaseGoldHeld) >= thisPrice);
 
         return retBool;
     }
@@ -688,6 +736,17 @@ public class IslandUpgradeMenu : MonoBehaviour
         if (hasSalesmanDiscount)
             thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
         pcm.playerData.gold -= thisPrice;
+    }
+
+    void AddToPurchaseItemsHeld( MenuItem item )
+    {
+        MenuItem[] tmp = new MenuItem[purchaseItemsHeld.Length + 1];
+        for (int i = 0; i < purchaseItemsHeld.Length; i++)
+        {
+            tmp[i] = purchaseItemsHeld[i];
+        }
+        tmp[purchaseItemsHeld.Length] = item;
+        purchaseItemsHeld = tmp;
     }
 
     string FormCategoryLabel( UpgradeCategory category )
@@ -720,12 +779,6 @@ public class IslandUpgradeMenu : MonoBehaviour
     {
         if (!menuOpen)
             return;
-
-        if (test)
-        {
-            test = false;
-            salesVisit.MenuDialogBeat("We are defintely UP selling!");
-        }
 
         Rect r = new Rect();
         float w = Screen.width;
@@ -858,10 +911,11 @@ public class IslandUpgradeMenu : MonoBehaviour
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
             // price
-            r.x = 0.7f * w;
+            r.x = 0.8f * w;
             r.width = 0.1f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.label);
+            g.padding = new RectOffset(0, 20, 0, 0);
             g.alignment = TextAnchor.MiddleRight;
             g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
@@ -877,12 +931,18 @@ public class IslandUpgradeMenu : MonoBehaviour
             GUI.Label(r, s, g);
             r.x -= 0.0016f * w;
             r.y -= 0.002f * w;
-            g.normal.textColor = Color.white;
+            c = Color.white;
             if (menuItemSelection == (i + 0) ||
                 (usingPad && padButtonSelection == (i + 0)))
-                g.normal.textColor = Color.yellow;
-            g.hover.textColor = Color.white;
-            g.active.textColor = Color.white;
+                c = Color.yellow;
+            if (invalidPulseTimer > 0f && menuItemSelection == (i + 0))
+            {
+                c = Color.red;
+                c *= (invalidPulseTimer * 5f) % 1f;
+            }
+            g.normal.textColor = c;
+            g.hover.textColor = c;
+            g.active.textColor = c;
             GUI.Label(r, s, g);
             r.x += 0.0008f * w;
             r.y += 0.001f * w;
@@ -938,9 +998,9 @@ public class IslandUpgradeMenu : MonoBehaviour
             GUI.Box(r, s, g);
             // accept button
             r.x = 0.35f * w;
-            r.y = 0.35f * h;
+            r.y = 0.5f * h;
             r.width = 0.1f * w;
-            r.height = 0.3f * h;
+            r.height = 0.1f * h;
             g = new GUIStyle(GUI.skin.box);
             g.padding = new RectOffset(0, 0, 30, 0);
             g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
@@ -954,7 +1014,20 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (GUI.Button(r,s,g) ||
                 (usingPad && padClickButton == 0))
             {
-                confirmAccepted = true;
+                if (confirmType == ConfirmType.Purchase)
+                {
+                    if (currentPurchaseItem != null)
+                    {
+                        AddToPurchaseItemsHeld(currentPurchaseItem);
+                        purchaseGoldHeld += currentPurchsePrice;
+                    }
+                }
+                if (confirmType == ConfirmType.ClearPurchases)
+                {
+                    purchaseItemsHeld = new MenuItem[0];
+                    purchaseGoldHeld = 0;
+                }
+                confirmType = ConfirmType.None;
                 popupTimer = POPTIME;
             }
             // cancel button
@@ -968,11 +1041,35 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (GUI.Button(r, s, g) ||
                 (usingPad && padClickButton == 1))
             {
+
+                if (confirmType == ConfirmType.Purchase)
+                {                
+                    // clear current purchase item consideration
+                    currentPurchaseItem = null;
+                    currentPurchsePrice = 0;
+                }
+                confirmType = ConfirmType.None;
                 popupTimer = POPTIME;
             }
         }
 
         GUI.enabled = true;
+        // total purchases cost display
+        r.x = 0.1f * w;
+        r.y = 0.9f * h;
+        r.width = 0.275f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.label);
+        g.fontSize = Mathf.RoundToInt(14 * (w / 1024f));
+        g.fontStyle = FontStyle.Bold;
+        g.alignment = TextAnchor.MiddleLeft;
+        g.normal.textColor = Color.yellow;
+        g.hover.textColor = Color.yellow;
+        g.active.textColor = Color.yellow;
+        s = "TOTAL GOLD TO COMPLETE\nOUR BUSINESS: " + purchaseGoldHeld;
+        if (purchaseItemsHeld.Length > 0)
+            GUI.Label(r, s, g);
+
         // config feedback label
         if (feedbackTimer > 0f)
         {
@@ -989,6 +1086,29 @@ public class IslandUpgradeMenu : MonoBehaviour
             g.hover.textColor = Color.white;
             g.active.textColor = Color.white;
             s = configFeedback;
+            GUI.Label(r, s, g);
+        }
+
+        // clear purchase items button
+        r.x = 0.7f * w;
+        r.y = 0.9f * h;
+        r.width = 0.2f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        //g.fontStyle = FontStyle.Bold;
+        g.alignment = TextAnchor.MiddleCenter;
+        g.normal.textColor = Color.white;
+        if (usingPad && padButtonSelection == padMaxButton)
+            g.normal.textColor = Color.yellow;
+        g.hover.textColor = Color.white;
+        g.active.textColor = Color.white;
+        s = "Clear All Purchases";
+        GUI.enabled = (purchaseItemsHeld.Length > 0f);
+        if (purchaseItemsHeld.Length > 0 && (GUI.Button(r, s, g) ||
+            (usingPad && padClickButton == padMaxButton)))
+        {
+            ConfirmPopup("Are you sure you want to clear\nall purchases you've considered so far?", ConfirmType.ClearPurchases);
         }
 
         GUI.enabled = !confirmPopup;
@@ -1002,13 +1122,13 @@ public class IslandUpgradeMenu : MonoBehaviour
         //g.fontStyle = FontStyle.Bold;
         g.alignment = TextAnchor.MiddleCenter;
         g.normal.textColor = Color.white;
-        if (usingPad && padButtonSelection == padMaxButton)
+        if (usingPad && padButtonSelection == padMaxButton - 1)
             g.normal.textColor = Color.yellow;
         g.hover.textColor = Color.white;
         g.active.textColor = Color.white;
         s = "End Island Upgrades";
         if (validConfig && (GUI.Button(r, s, g) || 
-            (usingPad && padClickButton == padMaxButton)))
+            (usingPad && padClickButton == padMaxButton - 1)))
         {
             SignalMenuClose();
         }
