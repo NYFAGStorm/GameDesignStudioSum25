@@ -319,6 +319,16 @@ public class IslandManager : MonoBehaviour
         return retBool;
     }
 
+    /// <summary>
+    /// Force island manager to re-acquire props in island data, and re-form prop renderers (periodic checks)
+    /// </summary>
+    /// <param name="isl">island data</param>
+    /// <param name="iObj">island object</param>
+    public void ForceReconfigureProps(IslandData isl, GameObject iObj)
+    {
+        ConfigureProps(isl, iObj);
+    }
+
     bool ConfigureProps(IslandData island, GameObject islandObj)
     {
         bool retBool = false;

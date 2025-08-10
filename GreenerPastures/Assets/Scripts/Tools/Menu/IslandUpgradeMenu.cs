@@ -157,6 +157,8 @@ public class IslandUpgradeMenu : MonoBehaviour
     private int compositionBeat;
     private float compositionTimer;
 
+    private GameObject[] compositionObjects = new GameObject[0];
+
     const float FEEDBACKTIME = 3f;
     const float PULSETIME = 2f;
     const float INVALIDPULSETIME = 1f;
@@ -1275,6 +1277,23 @@ public class IslandUpgradeMenu : MonoBehaviour
         greenerPasturesTimer = GREENERPASTURESTIME;
     }
 
+    void AddToCompositionObjects( GameObject obj )
+    {
+        if (obj == null)
+        {
+            Debug.LogWarning("--- IslandUpgradeMenu [AddToCompositionObject] : object not found. will ignore.");
+            return;
+        }
+
+        GameObject[] tmp = new GameObject[compositionObjects.Length + 1];
+        for (int i = 0; i < compositionObjects.Length; i++)
+        {
+            tmp[i] = compositionObjects[i];
+        }
+        tmp[compositionObjects.Length] = obj;
+        compositionObjects = tmp;
+    }
+
     void PerformReplacementSwaps()
     {
         // set island object to whole number y position
@@ -1573,16 +1592,97 @@ public class IslandUpgradeMenu : MonoBehaviour
                 Vector3 cPropPos = childProp.transform.localPosition;
                 cPropPos += (pPos - islandCenter).normalized * radiusDelta;
                 childProp.transform.localPosition = cPropPos;
+                //if (im.islands[pcm.playerData.playerIsland].props[n].type != PropType.Mailbox)
+                if (childProp != null)
+                    AddToCompositionObjects(childProp);
             }
         }
+
+        // REVIEW: and center of farm movable?
 
         // outdoor prop spawn
         for (int i = 0; i < purchaseItemsHeld.Length; i++)
         {
             if (purchaseItemsHeld[i].category == UpgradeCategory.OutdoorProps)
             {
-                // TODO:
+                string pName = "";
+                PropType pType = PropType.Default;
+                Vector3 pPos = Vector3.zero;
+                string prefabName = "";
+                switch (purchaseItemsHeld[i].type)
+                {
+                    case UpgradeType.BushA:
+                        pName = "bush A";
+                        pType = PropType.BushA;
+                        prefabName = "Bush A";
+                        break;
+                    case UpgradeType.BushB:
+                        pName = "bush B";
+                        pType = PropType.BushB;
+                        prefabName = "Bush B";
+                        break;
+                    case UpgradeType.BushC:
+                        pName = "bush C";
+                        pType = PropType.BushC;
+                        prefabName = "Bush C";
+                        break;
+                    case UpgradeType.RockA:
+                        pName = "rock A";
+                        pType = PropType.RockA;
+                        prefabName = "Rock A";
+                        break;
+                    case UpgradeType.RockB:
+                        pName = "rock B";
+                        pType = PropType.RockB;
+                        prefabName = "Rock B";
+                        break;
+                    case UpgradeType.RockC:
+                        pName = "rock C";
+                        pType = PropType.RockC;
+                        prefabName = "Rock C";
+                        break;
+                    case UpgradeType.LampPostA:
+                        pName = "lamp post A";
+                        pType = PropType.LampPostA;
+                        prefabName = "Lamp Post A";
+                        break;
+                    case UpgradeType.LampPostB:
+                        pName = "lamp post B";
+                        pType = PropType.LampPostB;
+                        prefabName = "Lamp Post B";
+                        break;
+                    case UpgradeType.BannerA:
+                        pName = "banner A";
+                        pType = PropType.BannerA;
+                        prefabName = "Banner A";
+                        break;
+                    case UpgradeType.BannerB:
+                        pName = "banner B";
+                        pType = PropType.BannerB;
+                        prefabName = "Banner B";
+                        break;
+                }
+                // spawn prop
+                GameObject newProp = GameObject.Instantiate((GameObject)Resources.Load(prefabName));
+                newProp.name = pName;
+                // rando position
+                pPos.x = RandomSystem.GaussianRandom01();
+                pPos.z = RandomSystem.GaussianRandom01();
+                newProp.transform.position = islandObj.transform.position + pPos;
+                newProp.transform.parent = islandObj.transform;
+                // store outdoor props as composition objects
+                AddToCompositionObjects(newProp);
                 // add island data for exterior prop
+                PropData[] tmp = new PropData[im.islands[pcm.playerData.playerIsland].props.Length + 1];
+                for (int n = 0; n < im.islands[pcm.playerData.playerIsland].props.Length; n++)
+                {
+                    tmp[n] = im.islands[pcm.playerData.playerIsland].props[n];
+                }
+                tmp[im.islands[pcm.playerData.playerIsland].props.Length] = new PropData();
+                tmp[im.islands[pcm.playerData.playerIsland].props.Length].name = pName;
+                tmp[im.islands[pcm.playerData.playerIsland].props.Length].type = pType;
+                tmp[im.islands[pcm.playerData.playerIsland].props.Length].location = GameSystem.GetPositionData(pPos);
+                im.islands[pcm.playerData.playerIsland].props = tmp;
             }
         }
 
@@ -1664,6 +1764,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         islandObj.transform.parent = islandFolderObj.transform;
 
         // get island manger to re-acquire props for period check
+        im.ForceReconfigureProps(im.islands[pcm.playerData.playerIsland], islandObj);
         im.SetCheckProps(true);
 
         greenerMoveUp = true;
