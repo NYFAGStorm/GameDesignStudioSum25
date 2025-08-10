@@ -158,6 +158,7 @@ public class IslandUpgradeMenu : MonoBehaviour
     private float compositionTimer;
 
     private GameObject[] compositionObjects = new GameObject[0];
+    private int currentCompositionObject;
 
     const float FEEDBACKTIME = 3f;
     const float PULSETIME = 2f;
@@ -783,6 +784,11 @@ public class IslandUpgradeMenu : MonoBehaviour
         cursor.transform.GetChild(0).GetComponent<Renderer>().enabled = visible;
     }
 
+    void SetCursorToObject( GameObject obj )
+    {
+        cursor.transform.position = obj.transform.position;
+    }
+
     void MoveCursor()
     {
         Vector3 pos = cursor.transform.position;
@@ -971,7 +977,7 @@ public class IslandUpgradeMenu : MonoBehaviour
 
         // handle composition beats
         if (stage == StageOfTransaction.Composition)
-            HandleCompositoinBeats();
+            HandleCompositionBeats();
 
         // cursor move
         if (cursorMode)
@@ -1277,11 +1283,12 @@ public class IslandUpgradeMenu : MonoBehaviour
         greenerPasturesTimer = GREENERPASTURESTIME;
     }
 
+    // REVIEW: no
     void AddToCompositionObjects( GameObject obj )
     {
         if (obj == null)
         {
-            Debug.LogWarning("--- IslandUpgradeMenu [AddToCompositionObject] : object not found. will ignore.");
+            Debug.LogWarning("--- IslandUpgradeMenu [AddToCompositionObject] : object transform not found. will ignore.");
             return;
         }
 
@@ -1591,6 +1598,10 @@ public class IslandUpgradeMenu : MonoBehaviour
                 im.islands[pcm.playerData.playerIsland].props[n].location = GameSystem.GetPositionData(pPos);
                 Vector3 cPropPos = childProp.transform.localPosition;
                 cPropPos += (pPos - islandCenter).normalized * radiusDelta;
+                // set to whole number (grid lock)
+                cPropPos.x = Mathf.RoundToInt(cPropPos.x);
+                cPropPos.y = Mathf.RoundToInt(cPropPos.y);
+                cPropPos.z = Mathf.RoundToInt(cPropPos.z);
                 childProp.transform.localPosition = cPropPos;
                 //if (im.islands[pcm.playerData.playerIsland].props[n].type != PropType.Mailbox)
                 if (childProp != null)
@@ -1601,6 +1612,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         // REVIEW: and center of farm movable?
 
         // outdoor prop spawn
+        int propMove = 0;
         for (int i = 0; i < purchaseItemsHeld.Length; i++)
         {
             if (purchaseItemsHeld[i].category == UpgradeCategory.OutdoorProps)
@@ -1664,10 +1676,9 @@ public class IslandUpgradeMenu : MonoBehaviour
                 }
                 // spawn prop
                 GameObject newProp = GameObject.Instantiate((GameObject)Resources.Load(prefabName));
-                newProp.name = pName;
+                newProp.name = "Prop " + pName;
                 // rando position
-                pPos.x = RandomSystem.GaussianRandom01();
-                pPos.z = RandomSystem.GaussianRandom01();
+                pPos.x = propMove++;
                 newProp.transform.position = islandObj.transform.position + pPos;
                 newProp.transform.parent = islandObj.transform;
                 // store outdoor props as composition objects
@@ -1764,7 +1775,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         islandObj.transform.parent = islandFolderObj.transform;
 
         // get island manger to re-acquire props for period check
-        im.ForceReconfigureProps(im.islands[pcm.playerData.playerIsland], islandObj);
+        im.ForceReConfigurePropRenderers(im.islands[pcm.playerData.playerIsland], islandObj);
         im.SetCheckProps(true);
 
         greenerMoveUp = true;
@@ -1791,7 +1802,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         compositionTimer = COMPOSITIONPAUSETIME;
     }
 
-    void HandleCompositoinBeats()
+    void HandleCompositionBeats()
     {
         if (compositionTimer > 0f)
             return;
@@ -1892,8 +1903,30 @@ public class IslandUpgradeMenu : MonoBehaviour
                     pcm.hidePlayerNameTag = false;
                     pcm.playerData.island = im.islands[pcm.playerData.playerIsland].location;
                     pcm.playerData.island.w = islandRange;
-                    compositionTimer = 0.5f;
-
+                    compositionTimer = 4f;
+                }
+                break;
+            case 13:
+                if (salesVisit.menuBeatTimeUp)
+                {
+                    // TODO: fast-forward if no outdoor props to move
+                    salesVisit.menuBeatTimeUp = false;
+                    salesVisit.MenuDialogBeat("Let me help you move items around.");
+                    compositionTimer = 1f;
+                }
+                break;
+            case 14:
+                if (salesVisit.menuPlayerResponse)
+                {
+                    SetCursorVisible(true);
+                    SetCursorToObject(compositionObjects[0]);
+                    SetCurrentConfigObject(true, compositionObjects[0], 1f);
+                    compositionTimer = 1f;
+                }
+                break;
+            case 15:
+                if (salesVisit.menuPlayerResponse)
+                {
                     stage = StageOfTransaction.Completion; // temp
                     validConfig = true; // temp;
                 }

@@ -322,11 +322,74 @@ public class IslandManager : MonoBehaviour
     /// <summary>
     /// Force island manager to re-acquire props in island data, and re-form prop renderers (periodic checks)
     /// </summary>
-    /// <param name="isl">island data</param>
-    /// <param name="iObj">island object</param>
-    public void ForceReconfigureProps(IslandData isl, GameObject iObj)
+    /// <param name="iData">island data</param>
+    /// <param name="iObject">island object</param>
+    public void ForceReConfigurePropRenderers( IslandData iData, GameObject iObject )
     {
-        ConfigureProps(isl, iObj);
+        GameObject interiorObj = iObject.transform.Find("Structure tower interior").gameObject;
+        for ( int i = 0; i < iData.props.Length; i++ )
+        {
+            // outdoor prop renderers
+            if (iData.props[i].type < PropType.IntCandleA)
+            {
+                GameObject prop = null;
+                if (iObject.transform.Find("Prop "+iData.props[i].name) != null)
+                    prop = iObject.transform.Find("Prop " + iData.props[i].name).gameObject;
+                else
+                {
+                    Debug.LogWarning("--- IslandManger [ForceReConfigurePropRenderers] : no object found of name 'Prop " + iData.props[i].name + "'. will ignore.");
+                    continue;
+                }
+                // store prop reneders for color adjustment
+                Renderer[] rends = prop.GetComponentsInChildren<Renderer>();
+                if (rends != null && rends.Length > 0)
+                {
+                    Renderer[] tmp = new Renderer[propRenderers.Length + rends.Length];
+                    for (int n = 0; n < propRenderers.Length; n++)
+                    {
+                        tmp[n] = propRenderers[n];
+                    }
+                    for (int n = 0; n < rends.Length; n++)
+                    {
+                        tmp[propRenderers.Length + n] = rends[n];
+                    }
+                    propRenderers = tmp;
+                }
+            }
+            else
+            {
+                // indoor prop renderers
+                GameObject tapestryObj = null;
+                GameObject decoObj = null;
+                if (iData.props[i].type == PropType.IntTapestryA || iData.props[i].type == PropType.IntTapestryB)
+                    decoObj = interiorObj.transform.Find("Deco").gameObject;
+                if (decoObj != null)
+                {
+                    if (iData.props[i].type == PropType.IntTapestryA)
+                        tapestryObj = decoObj.transform.Find("Tapestry A").gameObject;
+                    if (iData.props[i].type == PropType.IntTapestryB)
+                        tapestryObj = decoObj.transform.Find("Tapestry B").gameObject;
+                }
+                // store prop reneders for color adjustment
+                if (tapestryObj != null)
+                {
+                    Renderer[] rends = tapestryObj.GetComponentsInChildren<Renderer>();
+                    if (rends != null && rends.Length > 0)
+                    {
+                        Renderer[] tmp = new Renderer[propRenderers.Length + rends.Length];
+                        for (int n = 0; n < propRenderers.Length; n++)
+                        {
+                            tmp[n] = propRenderers[n];
+                        }
+                        for (int n = 0; n < rends.Length; n++)
+                        {
+                            tmp[propRenderers.Length + n] = rends[n];
+                        }
+                        propRenderers = tmp;
+                    }
+                }
+            }
+        }
     }
 
     bool ConfigureProps(IslandData island, GameObject islandObj)
