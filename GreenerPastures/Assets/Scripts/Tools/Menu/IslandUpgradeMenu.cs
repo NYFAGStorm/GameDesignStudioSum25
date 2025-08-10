@@ -1468,6 +1468,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                 newTowerObject = GameObject.Instantiate((GameObject)Resources.Load("Sorcerer Tower"));
             }
         }
+        GameObject towerInterior = null;
         if (newTowerObject != null)
         {
             // find old tower
@@ -1490,7 +1491,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             // delete old tower
             Destroy(oldTowerObject);
             // move tower interior same offset
-            GameObject towerInterior = islandObj.transform.Find("Structure tower interior").gameObject;
+            towerInterior = islandObj.transform.Find("Structure tower interior").gameObject;
             Vector3 iTPos = towerInterior.transform.position;
             iTPos.z += towerOffset.z - 2f; // TODO: cannot use +, need solid numbers
             towerInterior.transform.position = iTPos;
@@ -1576,8 +1577,87 @@ public class IslandUpgradeMenu : MonoBehaviour
         }
 
         // outdoor prop spawn
+        for (int i = 0; i < purchaseItemsHeld.Length; i++)
+        {
+            if (purchaseItemsHeld[i].category == UpgradeCategory.OutdoorProps)
+            {
+                // TODO:
+                // add island data for exterior prop
+            }
+        }
 
         // indoor prop activation
+        for (int i =0; i < purchaseItemsHeld.Length; i++)
+        {
+            if (purchaseItemsHeld[i].category == UpgradeCategory.IndoorProps)
+            {
+                if (towerInterior == null)
+                {
+                    towerInterior = islandObj.transform.Find("Structure tower interior").gameObject;
+                    if (towerInterior == null)
+                    {
+                        Debug.LogWarning("--- IslandUpgradeMenu [swap] : indoor prop held but no tower interior available. will ignore.");
+                        continue;
+                    }
+                }
+                GameObject decoObj = towerInterior.transform.Find("Deco").gameObject;
+                if (decoObj == null)
+                {
+                    Debug.LogWarning("--- IslandUpgradeMenu [swap] : indoor prop held but no tower interior deco object found. will ignore.");
+                    continue;
+                }
+                string pName = "";
+                PropType pType = PropType.Default;
+                switch (purchaseItemsHeld[i].type)
+                {
+                    case UpgradeType.IntCandleStickA:
+                        decoObj.transform.Find("Candle Prop A").gameObject.SetActive(true);
+                        pName = "int candle stick A";
+                        pType = PropType.IntCandleA;
+                        break;
+                    case UpgradeType.IntCandleStickB:
+                        decoObj.transform.Find("Candle Prop B").gameObject.SetActive(true);
+                        pName = "int candle stick B";
+                        pType = PropType.IntCandleB;
+                        break;
+                    case UpgradeType.IntFireplace:
+                        decoObj.transform.Find("Fireplace Prop").gameObject.SetActive(true);
+                        pName = "int fireplace";
+                        pType = PropType.IntFireplace;
+                        break;
+                    case UpgradeType.IntBookshelf:
+                        decoObj.transform.Find("Bookshelf").gameObject.SetActive(true);
+                        pName = "int bookshelf";
+                        pType = PropType.IntBookshelf;
+                        break;
+                    case UpgradeType.IntWritingDesk:
+                        decoObj.transform.Find("Writing Desk").gameObject.SetActive(true);
+                        pName = "int writing desk";
+                        pType = PropType.IntWritingDesk;
+                        break;
+                    case UpgradeType.IntTapestryA:
+                        decoObj.transform.Find("Tapestry A").gameObject.SetActive(true);
+                        pName = "int tapestry A";
+                        pType = PropType.IntTapestryA;
+                        break;
+                    case UpgradeType.IntTapestryB:
+                        decoObj.transform.Find("Tapestry B").gameObject.SetActive(true);
+                        pName = "int tapestry B";
+                        pType = PropType.IntTapestryB;
+                        break;
+                }
+                // add island data for interior prop
+                PropData[] tmp = new PropData[im.islands[pcm.playerData.playerIsland].props.Length + 1];
+                for (int n = 0; n < im.islands[pcm.playerData.playerIsland].props.Length; n++)
+                {
+                    tmp[n] = im.islands[pcm.playerData.playerIsland].props[n];
+                }
+                tmp[im.islands[pcm.playerData.playerIsland].props.Length] = new PropData();
+                tmp[im.islands[pcm.playerData.playerIsland].props.Length].name = pName;
+                tmp[im.islands[pcm.playerData.playerIsland].props.Length].type = pType;
+                im.islands[pcm.playerData.playerIsland].props = tmp;
+            }
+        }
 
         // re-parent new island to islands folder
         GameObject islandFolderObj = GameObject.Find("Islands");
