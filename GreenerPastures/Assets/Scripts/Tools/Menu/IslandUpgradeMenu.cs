@@ -819,6 +819,41 @@ public class IslandUpgradeMenu : MonoBehaviour
         bool retBool = true;
 
         // check if overlapping critical elements (structures or other props)
+        bool found = false;
+        for (int i = 0; i < im.islands[pcm.playerData.playerIsland].props.Length; i++)
+        {
+            if (compositionPropDataIndex == i)
+                continue; // ignore prop being moved
+
+            float dist = Vector3.Distance(cursor.transform.position, GameSystem.GetVector(im.islands[pcm.playerData.playerIsland].props[i].location));
+            float minDist = 1f;
+            if (dist < minDist)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            retBool = false;
+        found = false;
+        for (int i = 0; i < im.islands[pcm.playerData.playerIsland].structures.Length; i++)
+        {
+            float dist = Vector3.Distance(cursor.transform.position, GameSystem.GetVector(im.islands[pcm.playerData.playerIsland].structures[i].location));
+            float minDist = 1f;
+            if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.HermitTower)
+                minDist = 1f;
+            if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.WizardTower)
+                minDist = 1.5f;
+            if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.SorcererTower)
+                minDist = 2f;
+            if (dist < minDist)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            retBool = false;
 
         return retBool;
     }
@@ -991,6 +1026,8 @@ public class IslandUpgradeMenu : MonoBehaviour
                 {
                     Color c = Color.white;
                     c *= configObjectPulse;
+                    if (!CheckValidCursorLocation())
+                        c.r = 1f;
                     r.material.color = c;
                 }
             }
@@ -1105,47 +1142,50 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (keyMove == 3)
                 cursorMove.x = 1f;
 
-            if (Input.GetKeyDown(pcm.actionAKey) || usingPad && padMgr.gPadDown[0].aButton)
+            if (CheckValidCursorLocation())
             {
-                // next composition object
-                ReleaseCurrentConfigObject();
-                currentCompositionObject++;
-                if (currentCompositionObject > compositionObjects.Length - 1)
+                if (Input.GetKeyDown(pcm.actionAKey) || usingPad && padMgr.gPadDown[0].aButton)
+                {
+                    // next composition object
+                    ReleaseCurrentConfigObject();
+                    currentCompositionObject++;
+                    if (currentCompositionObject > compositionObjects.Length - 1)
+                        currentCompositionObject = 0;
+                    SetCursorToObject(compositionObjects[currentCompositionObject]);
+                    SetCurrentConfigObject(true, compositionObjects[currentCompositionObject], 1f);
+                    CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+                    if (cm != null)
+                        cm.ConfigurePlayerObject(compositionObjects[currentCompositionObject]);
+                }
+                if (Input.GetKeyDown(pcm.actionBKey) || usingPad && padMgr.gPadDown[0].bButton)
+                {
+                    // previous composition object
+                    ReleaseCurrentConfigObject();
+                    currentCompositionObject--;
+                    if (currentCompositionObject < 0)
+                        currentCompositionObject = compositionObjects.Length - 1;
+                    SetCursorToObject(compositionObjects[currentCompositionObject]);
+                    SetCurrentConfigObject(true, compositionObjects[currentCompositionObject], 1f);
+                    CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+                    if (cm != null)
+                        cm.ConfigurePlayerObject(compositionObjects[currentCompositionObject]);
+                }
+                if (Input.GetKeyDown(pcm.actionDKey) || usingPad && padMgr.gPadDown[0].yButton)
+                {
+                    // step out of composition mode
+                    ReleaseCurrentConfigObject();
                     currentCompositionObject = 0;
-                SetCursorToObject(compositionObjects[currentCompositionObject]);
-                SetCurrentConfigObject(true, compositionObjects[currentCompositionObject], 1f);
-                CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
-                if (cm != null)
-                    cm.ConfigurePlayerObject(compositionObjects[currentCompositionObject]);
-            }
-            if (Input.GetKeyDown(pcm.actionBKey) || usingPad && padMgr.gPadDown[0].bButton)
-            {
-                // previous composition object
-                ReleaseCurrentConfigObject();
-                currentCompositionObject--;
-                if (currentCompositionObject < 0)
-                    currentCompositionObject = compositionObjects.Length - 1;
-                SetCursorToObject(compositionObjects[currentCompositionObject]);
-                SetCurrentConfigObject(true, compositionObjects[currentCompositionObject], 1f);
-                CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
-                if (cm != null)
-                    cm.ConfigurePlayerObject(compositionObjects[currentCompositionObject]);
-            }
-            if (Input.GetKeyDown(pcm.actionDKey) || usingPad && padMgr.gPadDown[0].yButton)
-            {
-                // step out of composition mode
-                ReleaseCurrentConfigObject();
-                currentCompositionObject = 0;
-                cursorMode = false;
-                CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
-                if (cm != null)
-                    cm.ConfigurePlayerObject(pcm.gameObject);
-                pcm.characterFrozen = false;
-                pcm.freezeCharacterActions = false;
-                pcm.hidePlayerHUD = false;
-                pcm.hidePlayerNameTag = false;
-                stage = StageOfTransaction.Completion;
-                validConfig = true;
+                    cursorMode = false;
+                    CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+                    if (cm != null)
+                        cm.ConfigurePlayerObject(pcm.gameObject);
+                    pcm.characterFrozen = false;
+                    pcm.freezeCharacterActions = false;
+                    pcm.hidePlayerHUD = false;
+                    pcm.hidePlayerNameTag = false;
+                    stage = StageOfTransaction.Completion;
+                    validConfig = true;
+                }
             }
         }
         else
