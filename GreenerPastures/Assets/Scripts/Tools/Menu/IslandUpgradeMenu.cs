@@ -161,7 +161,7 @@ public class IslandUpgradeMenu : MonoBehaviour
     private int currentCompositionObject;
     private int compositionPropDataIndex;
 
-    const float FEEDBACKTIME = 60f;
+    const float FEEDBACKTIME = 120f;
     const float PULSETIME = 2f;
     const float INVALIDPULSETIME = 1f;
     const float POPTIME = 2f;
@@ -1183,6 +1183,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                     pcm.freezeCharacterActions = false;
                     pcm.hidePlayerHUD = false;
                     pcm.hidePlayerNameTag = false;
+                    feedbackTimer = 0f;
                     stage = StageOfTransaction.Completion;
                     validConfig = true;
                 }
@@ -1226,15 +1227,6 @@ public class IslandUpgradeMenu : MonoBehaviour
             }
             else
             {
-                float rnd = RandomSystem.FlatRandom01();
-                if (rnd < .25f)
-                    salesVisit.MenuDialogBeat("It looks like that is a little more than you have, friend.");
-                else if (rnd >= .25f && rnd < .5f)
-                    salesVisit.MenuDialogBeat("Some things are worth waiting for. Just save up your gold.");
-                else if (rnd >= .5f && rnd < .75f)
-                    salesVisit.MenuDialogBeat("You've got good taste, friend. That item will have to wait.");
-                else
-                    salesVisit.MenuDialogBeat("It seems you're a little short on gold to buy that item.");
                 invalidPulseTimer = INVALIDPULSETIME;
             }
         }
@@ -1294,10 +1286,116 @@ public class IslandUpgradeMenu : MonoBehaviour
     {
         bool retBool = false;
 
+        bool notEnoughGold = false;
+        bool alreadyHeld = false;
+        bool alreadyHave = false;
+        bool sameCategory = false;
+        bool upgradedHeld = false;
+        bool upgradedHave = false;
+
+        // answer is yes if have gold
         int thisPrice = item.price;
         if (hasSalesmanDiscount)
             thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
         retBool = ((pcm.playerData.gold - purchaseGoldHeld) >= thisPrice);
+        if (!retBool)
+            notEnoughGold = true;
+        // answer is no if you already have this purchase held
+        bool found = false;
+        for (int i = 0; i < purchaseItemsHeld.Length; i++)
+        {
+            if (purchaseItemsHeld[i].type == item.type)
+            {
+                found = true;
+                alreadyHeld = true;
+                break;
+            }
+        }
+        if (found)
+            retBool = false;
+        // answer is no if you already have this item
+        if (item.playerNowHas)
+        {
+            retBool = false;
+            alreadyHave = true;
+        }
+        // answer is no if you have or are holding any other item in category
+        if (item.category == UpgradeCategory.Islands || item.category == UpgradeCategory.Farms ||
+            item.category == UpgradeCategory.Towers)
+        {
+            for (int i = 0; i < purchaseItemsHeld.Length; i++)
+            {
+                if (purchaseItemsHeld[i].category == item.category)
+                {
+                    if (purchaseItemsHeld[i].type > item.type)
+                    {
+                        upgradedHeld = true;
+                        break;
+                    }
+                    else
+                        sameCategory = true;
+                }
+            }
+            if (upgradedHeld || sameCategory)
+                retBool = false;
+            // find item in menu item list, walk up to end of category to see if player already has better item
+            int thisItemIndex = -1;
+            UpgradeCategory itemCategory = item.category;
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i].type == item.type)
+                {
+                    thisItemIndex = i;
+                    itemCategory = item.category;
+                }
+                if (thisItemIndex == -1)
+                    continue;
+                else if (itemCategory == items[i].category)
+                {
+                    if (items[i].playerNowHas)
+                        upgradedHave = true;
+                }
+                if (upgradedHave)
+                {
+                    retBool = false;
+                    break;
+                }
+            }
+        }
+        
+        // salesman response
+        if (notEnoughGold)
+        {
+            float rnd = RandomSystem.FlatRandom01();
+            if (rnd < .25f)
+                salesVisit.MenuDialogBeat("It looks like that is a little more than you have, friend.");
+            else if (rnd >= .25f && rnd < .5f)
+                salesVisit.MenuDialogBeat("Some things are worth waiting for. Just save up your gold.");
+            else if (rnd >= .5f && rnd < .75f)
+                salesVisit.MenuDialogBeat("You've got good taste, friend. That item will have to wait.");
+            else
+                salesVisit.MenuDialogBeat("It seems you're a little short on gold to buy that item.");
+        }
+        else if (alreadyHeld)
+        {
+            salesVisit.MenuDialogBeat("You've already selected this item for purchase, my friend.");
+        }
+        else if (alreadyHave)
+        {
+            salesVisit.MenuDialogBeat("This is an island upgrade you already have, Biomancer friend. Enjoy!");
+        }
+        else if (upgradedHeld)
+        {
+            salesVisit.MenuDialogBeat("The item you've already selected for purchase is better. 'Changed your mind?");
+        }
+        else if (sameCategory)
+        {
+            salesVisit.MenuDialogBeat("You have an item held in this category already, but you may clear your selections.");
+        }
+        else if (upgradedHave)
+        {
+            salesVisit.MenuDialogBeat("Well, you already have a higher grade of item on your island. That's great!");
+        }
 
         return retBool;
     }
@@ -2055,6 +2153,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             case 15:
                 if (salesVisit.menuBeatTimeUp)
                 {
+                    // NOTE: currently not used
                     salesVisit.menuBeatTimeUp = false;
                     salesVisit.MenuDialogBeat("Go ahead an move this around your island.");
                     compositionTimer = 1f;
