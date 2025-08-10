@@ -10,6 +10,8 @@ public class IslandManager : MonoBehaviour
     private float propTimer;
     private Renderer[] propRenderers = new Renderer[0];
 
+    private bool suspendCheckProps; // during greener pastures routine
+
     const float PROPCHECKTIME = 5f;
 
 
@@ -37,8 +39,16 @@ public class IslandManager : MonoBehaviour
         }
     }
 
+    public void SetCheckProps( bool check )
+    {
+        suspendCheckProps = !check;
+    }
+
     void CheckProps()
     {
+        if (suspendCheckProps)
+            return;
+
         // use ambient intensity to adjust color of props
         float aIntensity = RenderSettings.ambientIntensity;
         Color c = Color.white;

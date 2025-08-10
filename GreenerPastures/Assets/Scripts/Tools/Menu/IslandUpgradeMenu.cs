@@ -157,7 +157,7 @@ public class IslandUpgradeMenu : MonoBehaviour
     const float PULSETIME = 2f;
     const float INVALIDPULSETIME = 1f;
     const float POPTIME = 1f;
-    const float GREENERPASTURESTIME = 4f;
+    const float GREENERPASTURESTIME = 8f;
     const float GREENERDEPTH = 55f;
     const float COMPOSITIONPAUSETIME = 1f;
 
@@ -212,6 +212,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             // lock down player
             pcm.characterFrozen = true;
             pcm.freezeCharacterActions = true;
+            pcm.hidePlayerNameTag = true;
             // detect salesman discount
             hasSalesmanDiscount = PlayerSystem.PlayerHasEffect(pcm.playerData, PlayerEffect.SkillFriendsSalesman);
             
@@ -742,6 +743,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         // release player
         pcm.characterFrozen = false;
         pcm.freezeCharacterActions = false;
+        pcm.hidePlayerNameTag = false;
         // close menu
         menuOpen = false;
         salesVisit.IslandMenuClosed();
@@ -802,6 +804,9 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     void ConfirmPopup( string message, ConfirmType type )
     {
+        if (confirmPopup)
+            return;
+
         confirmType = type;
         popupMessage = message;
         popUpMoveDown = false;
@@ -893,11 +898,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             {
                 greenerPasturesTimer = 0f;
                 if (!greenerMoveUp)
-                {
-                    // TODO: perform replacement swaps (new island, new tower, repositioned mailbox and tporter)
-                    greenerMoveUp = true;
-                    greenerPasturesTimer = GREENERPASTURESTIME;
-                }
+                    PerformReplacementSwaps();
             }
             // island move progress
             float progress = greenerAnimCurve.Evaluate(greenerPasturesTimer / GREENERPASTURESTIME);
@@ -1119,6 +1120,8 @@ public class IslandUpgradeMenu : MonoBehaviour
         return thisPrice;
     }
 
+    // TODO: do not allow purchases in the same category (island, farm, tower), exchange instead
+
     bool CanPurchase( MenuItem item )
     {
         bool retBool = false;
@@ -1167,44 +1170,371 @@ public class IslandUpgradeMenu : MonoBehaviour
         tradeInItems = new MenuItem[0];
     }
 
+    void GetIslandObject()
+    {
+        PositionData islandPos = im.islands[pcm.playerData.playerIsland].location;
+        Vector3 islandVec = GameSystem.GetVector(islandPos);
+        GameObject islandsFolder = GameObject.Find("Islands");
+        if (islandsFolder != null)
+        {
+            bool found = false;
+            for (int i = 0; i < islandsFolder.transform.childCount; i++)
+            {
+                if (Vector3.Distance(islandVec, islandsFolder.transform.GetChild(i).gameObject.transform.position) < 1f)
+                {
+                    islandObj = islandsFolder.transform.GetChild(i).gameObject;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                Debug.LogWarning("--- IslandUpgradeMenu [GetIslandObject] : no island object matching data location "+islandVec+". will ignore.");
+                return;
+            }
+        }
+
+        islandSavedPosition = islandObj.transform.position;
+        islandCenter = islandObj.transform.position; // TODO: cleanup
+        islandRange = im.islands[pcm.playerData.playerIsland].location.w * 7f;
+    }
+
+    void ParentLooseItemsToIsland()
+    {
+        LooseItemManager[] islandItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+        for (int i = 0; i < islandItems.Length; i++)
+        {
+            if (Vector3.Distance(islandItems[i].transform.position, islandCenter) <= islandRange)
+                islandItems[i].transform.parent = islandObj.transform;
+        }
+    }
+
     void PrepareForGreenerPastures()
     {
         // if we are swapping islands, perform the lowering of island, rising of new island
-
+        // get current island, prepare to revise
+        GetIslandObject();
+        // un-parent this island from the islands folder
+        islandObj.transform.parent = null;
+        // parent loose items within range of island to island for the moment (lowering island)
+        ParentLooseItemsToIsland();
     }
 
     void LaunchGreenerPastures()
     {
-        // TODO: get current island, prepare to revise
-        // prepare to swap tower
-        // prepare to swap farm
-        // prepare to move mail box and teleporter
         greenerMoveUp = false;
         greenerPasturesTimer = GREENERPASTURESTIME;
     }
 
     void PerformReplacementSwaps()
     {
-        // all purchase items held that represent replacement upgrades, swap them
-        // match to trade-in items
+        // set island object to whole number y position
+        Vector3 iPos = islandObj.transform.position;
+        iPos.y = -GREENERDEPTH;
+        islandObj.transform.position = iPos;
+
+        islandRange = 7;
+
+        im.SetCheckProps(false); // suspend checking props
+
+        // -- ISLAND --
+        float radiusDelta = im.islands[pcm.playerData.playerIsland].location.w * 7f; // TODO: find whole number scale
+        Vector3 newIslandScale = Vector3.one;
+        float radiusIncrement = (1f / 7f);
         for (int i = 0; i < purchaseItemsHeld.Length; i++)
         {
-            if (purchaseItemsHeld[i].type == UpgradeType.IslandMedium ||
-                purchaseItemsHeld[i].type == UpgradeType.IslandLarge ||
-                purchaseItemsHeld[i].type == UpgradeType.IslandVeryLarge )
+            if (purchaseItemsHeld[i].type == UpgradeType.IslandSmall)
             {
-                // REVIEW: we would like to do the 'greener pastures' move here
-                // step off the current island (float on color trail spots?)
-                // watch old island sink, watch new island rise
-                // step back on island?
-                
-                // REVIEW: should towers be set already?
-                // REVIEW: should farm be set already?
-                // REVIEW: should outdoor props be set as they were before to start?
-
-
+                newIslandScale = Vector3.one;
+                radiusDelta = 7f - radiusDelta;
+                islandRange = 7;
+            }
+            if (purchaseItemsHeld[i].type == UpgradeType.IslandMedium)
+            {
+                newIslandScale = Vector3.one * (1f + (radiusIncrement * 1f));
+                radiusDelta = 8f - radiusDelta;
+                islandRange = 8;
+            }
+            if (purchaseItemsHeld[i].type == UpgradeType.IslandLarge)
+            {
+                newIslandScale = Vector3.one * (1f + (radiusIncrement * 2f));
+                radiusDelta = 9f - radiusDelta;
+                islandRange = 9;
+            }
+            if (purchaseItemsHeld[i].type == UpgradeType.IslandVeryLarge)
+            {
+                newIslandScale = Vector3.one * (1f + (radiusIncrement * 3f));
+                radiusDelta = 10f - radiusDelta;
+                islandRange = 10;
             }
         }
+        // explain to island manager new island scale
+        im.islands[pcm.playerData.playerIsland].location.w = newIslandScale.x;
+
+        // find and remove ground and under children from island object
+        islandObj.transform.Find("Ground").gameObject.name = "Old Ground";
+        islandObj.transform.Find("Old Ground").parent = null;
+        islandObj.transform.Find("Under").gameObject.name = "Old Under";
+        islandObj.transform.Find("Old Under").parent = null;
+        Destroy(GameObject.Find("Old Ground"));
+        Destroy(GameObject.Find("Old Under"));
+
+        // spawn island
+        GameObject newIsland = GameObject.Instantiate((GameObject)Resources.Load("Test Island"), islandCenter + (Vector3.down * GREENERDEPTH), Quaternion.identity);
+        newIsland.name = islandObj.name;
+        GameObject oldIsland = islandObj;
+        // scale new island
+        newIsland.transform.localScale = newIslandScale;
+        // reset island scale to one while retaining ground and under scale
+        GameObject ground = newIsland.transform.Find("Ground").gameObject;
+        GameObject under = newIsland.transform.Find("Under").gameObject;
+        ground.transform.parent = null;
+        under.transform.parent = null;
+        newIsland.transform.localScale = Vector3.one;
+        ground.transform.parent = newIsland.transform;
+        under.transform.parent = newIsland.transform;
+        // replace island
+        islandObj = newIsland;
+        GameObject[] islandChildren = new GameObject[oldIsland.transform.childCount];
+        int plotCount = 0;
+        for (int i = 0; i < islandChildren.Length; i++)
+        {
+            islandChildren[i] = oldIsland.transform.GetChild(i).gameObject;
+        }
+        for (int i = 0; i < islandChildren.Length; i++)
+        {
+            if (islandChildren[i].GetComponent<TeleportManager>() != null)
+            {
+                // configure island property on teleport nodes
+                islandChildren[i].GetComponent<TeleportManager>().islandObj = newIsland;
+                islandChildren[i].GetComponent<TeleportManager>().islandRadius = islandRange;
+            }
+            if (islandChildren[i].GetComponent<PlotManager>() != null)
+                plotCount++;
+            islandChildren[i].transform.parent = newIsland.transform;
+        }
+        Destroy(oldIsland);
+
+        // -- FARM --
+        // farm plot spawn
+        int newPlotCount = 0;
+        for (int i = 0; i < purchaseItemsHeld.Length; i++)
+        {
+            if (purchaseItemsHeld[i].type == UpgradeType.FarmTiny)
+                newPlotCount = 10;
+            if (purchaseItemsHeld[i].type == UpgradeType.FarmModest)
+                newPlotCount = 16;
+            if (purchaseItemsHeld[i].type == UpgradeType.FarmSizable)
+                newPlotCount = 25;
+            if (purchaseItemsHeld[i].type == UpgradeType.FarmHuge)
+                newPlotCount = 36;
+            if (purchaseItemsHeld[i].type == UpgradeType.FarmVast)
+                newPlotCount = 49;
+        }
+        if (newPlotCount > plotCount)
+        {
+            int side = (int)Mathf.Sqrt((int)newPlotCount);
+            newPlotCount -= plotCount;
+            // use corner of farm
+            Vector3 farmCorner = new Vector3(-1f, 0f, -1f);
+            farmCorner += newIsland.transform.position;
+            if (side >= 5)
+                farmCorner += Vector3.left;
+            if (side >= 6)
+                farmCorner += Vector3.left;
+            if (side >= 7)
+                farmCorner += Vector3.forward; // probably too close to tower (but fits small island)
+            int count = newPlotCount;
+            // add to player's farm data plot array
+            PlotData[] tmp = new PlotData[pcm.playerData.farm.plots.Length + count];
+            for (int q = 0; q < pcm.playerData.farm.plots.Length; q++)
+            {
+                tmp[q] = pcm.playerData.farm.plots[q];
+            }
+            for (int q = pcm.playerData.farm.plots.Length; q < pcm.playerData.farm.plots.Length + count; q++)
+            {
+                tmp[q] = new PlotData();
+                tmp[q].condition = PlotCondition.Wild;
+            }
+            count = pcm.playerData.farm.plots.Length; // REVIEW: this use in data location below
+            pcm.playerData.farm.plots = tmp;
+            // place farm plot-by-plot, ignore existing
+            PlotManager[] plots = GameObject.FindObjectsByType<PlotManager>(FindObjectsSortMode.None);
+            for (int n = 0; n < side; n++)
+            {
+                for (int t = 0; t < side; t++)
+                {
+                    Vector3 pos = farmCorner;
+                    pos.x += t;
+                    pos.z -= n;
+                    bool found = false;
+                    foreach ( PlotManager plot in plots )
+                    {
+                        if (Vector3.Distance(plot.transform.position,pos) <= .5f)
+                        {
+                            found = true;
+                        }
+                    }
+                    if (!found)
+                    {
+                        GameObject newPlot = GameObject.Instantiate((GameObject)Resources.Load("Plot"));
+                        newPlot.name = "Plot";
+                        newPlot.transform.position = pos;
+                        newPlot.transform.parent = islandObj.transform;
+                        newPlot.GetComponent<PlotManager>().data.condition = PlotCondition.Wild;
+                        pcm.playerData.farm.plots[count].location.x = pos.x;
+                        pcm.playerData.farm.plots[count].location.z = pos.z;
+                        newPlot.GetComponent<PlotManager>().data.location = pcm.playerData.farm.plots[count].location;
+                        count++;
+                    }
+                }
+            }
+        }
+
+        // -- TOWER --
+        GameObject newTowerObject = null;
+        Vector3 towerOffset = new Vector3(1f, 1f, 2f);
+        // offset 'forward' for each size up in island radius
+        towerOffset += Vector3.forward * radiusDelta;
+        StructureType towerType = StructureType.Default;
+        // tower spawn
+        for (int i = 0; i < purchaseItemsHeld.Length; i++)
+        {
+            if (purchaseItemsHeld[i].type == UpgradeType.HermitTower)
+            {
+                towerType = StructureType.HermitTower;
+                newTowerObject = GameObject.Instantiate((GameObject)Resources.Load("Hermit Tower"));
+            }
+            if (purchaseItemsHeld[i].type == UpgradeType.WizardTower)
+            {
+                towerType = StructureType.WizardTower;
+                newTowerObject = GameObject.Instantiate((GameObject)Resources.Load("Wizard Tower"));
+            }
+            if (purchaseItemsHeld[i].type == UpgradeType.SorcererTower)
+            {
+                towerType = StructureType.SorcererTower;
+                newTowerObject = GameObject.Instantiate((GameObject)Resources.Load("Sorcerer Tower"));
+            }
+        }
+        if (newTowerObject != null)
+        {
+            // find old tower
+            GameObject oldTowerObject = islandObj.transform.Find("Structure wiz tower").gameObject;
+            // position and name new tower
+            newTowerObject.transform.position = islandObj.transform.position + towerOffset;
+            newTowerObject.transform.parent = islandObj.transform;
+            newTowerObject.name = oldTowerObject.name;
+            // set tower data
+            for (int i = 0; i < im.islands[pcm.playerData.playerIsland].structures.Length; i++)
+            {
+                if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.HermitTower ||
+                    im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.WizardTower ||
+                    im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.SorcererTower)
+                {
+                    im.islands[pcm.playerData.playerIsland].structures[i].type = towerType;
+                    im.islands[pcm.playerData.playerIsland].structures[i].location.z = towerOffset.z;
+                }
+            }
+            // delete old tower
+            Destroy(oldTowerObject);
+            // move tower interior same offset
+            GameObject towerInterior = islandObj.transform.Find("Structure tower interior").gameObject;
+            Vector3 iTPos = towerInterior.transform.position;
+            iTPos.z += towerOffset.z - 2f; // TODO: cannot use +, need solid numbers
+            towerInterior.transform.position = iTPos;
+            // move tower teleporters same offset
+            for (int i =0; i < islandChildren.Length; i++)
+            {
+                if (islandChildren[i].GetComponent<TeleportManager>() != null)
+                {
+                    TeleportManager tm = islandChildren[i].GetComponent<TeleportManager>();
+                    if (tm.teleporterTag == "tower")
+                    {
+                        Vector3 tPos = tm.gameObject.transform.position;
+                        tPos.z += towerOffset.z - 2f;
+                        tm.gameObject.transform.position = tPos;
+                        if (tm.cameraMode == CameraManager.CameraMode.PanFollow)
+                        {            
+                            // move camera settings on teleport node same offset
+                            tm.cameraPanModePosition.z += towerOffset.z - 2f;
+                        }
+                    }
+                }
+            }
+            // adjust data on island manager for these teleporters
+            for (int i = 0; i < im.islands[pcm.playerData.playerIsland].tports.Length; i++)
+            {
+                if (im.islands[pcm.playerData.playerIsland].tports[i].tag == "tower")
+                {
+                    im.islands[pcm.playerData.playerIsland].tports[i].location.z += towerOffset.z - 2f;
+                    if (im.islands[pcm.playerData.playerIsland].tports[i].cameraMode == CameraManager.CameraMode.PanFollow)
+                    {
+                        im.islands[pcm.playerData.playerIsland].tports[i].cameraPosition.z += towerOffset.z - 2f;
+                    }
+                }
+            }
+        }
+
+        // adjust data on island manager for central teleporter
+        PositionData centralPos = new PositionData();
+        for (int i = 0; i < im.islands[pcm.playerData.playerIsland].tports.Length; i++)
+        {
+            if (im.islands[pcm.playerData.playerIsland].tports[i].tag == "centralTport")
+            {
+                Vector3 tv = GameSystem.GetVector(im.islands[pcm.playerData.playerIsland].tports[i].location);
+                tv += (tv - islandCenter).normalized * radiusDelta;
+                tv.y = 0f;
+                im.islands[pcm.playerData.playerIsland].tports[i].location = GameSystem.GetPositionData(tv);
+                centralPos = GameSystem.GetPositionData(tv);
+            }
+        }        
+        // move central teleporter
+        for (int i = 0; i < islandChildren.Length; i++)
+        {
+            if (islandChildren[i].GetComponent<TeleportManager>() != null)
+            {
+                TeleportManager tm = islandChildren[i].GetComponent<TeleportManager>();
+                if (tm.teleporterTag == "centralTport")
+                {
+                    tm.gameObject.transform.localPosition = GameSystem.GetVector(centralPos);
+                }
+            }
+        }
+
+        // -- OUTDOOR PROPS --
+        for (int n = 0; n < im.islands[pcm.playerData.playerIsland].props.Length; n++)
+        {
+            Vector3 pPos = GameSystem.GetVector(im.islands[pcm.playerData.playerIsland].props[n].location);
+            if (im.islands[pcm.playerData.playerIsland].props[n].type < PropType.IntCandleA)
+            {
+                GameObject childProp = null;
+                for (int i = 0; i < islandChildren.Length; i++)
+                {
+                    if (islandChildren[i].transform.localPosition == pPos)
+                        childProp = islandChildren[i];
+                }
+                // push out from center by radiusDelta
+                pPos += (pPos - islandCenter).normalized * radiusDelta;
+                im.islands[pcm.playerData.playerIsland].props[n].location = GameSystem.GetPositionData(pPos);
+                Vector3 cPropPos = childProp.transform.localPosition;
+                cPropPos += (pPos - islandCenter).normalized * radiusDelta;
+                childProp.transform.localPosition = cPropPos;
+            }
+        }
+
+        // outdoor prop spawn
+
+        // indoor prop activation
+
+        // re-parent new island to islands folder
+        GameObject islandFolderObj = GameObject.Find("Islands");
+        islandObj.transform.parent = islandFolderObj.transform;
+
+        // get island manger to re-acquire props for period check
+        im.SetCheckProps(true);
+
+        greenerMoveUp = true;
+        greenerPasturesTimer = GREENERPASTURESTIME;
     }
 
     void LaunchCompositionStage()
@@ -1240,28 +1570,99 @@ public class IslandUpgradeMenu : MonoBehaviour
                 if (salesVisit.menuPlayerResponse)
                 {
                     salesVisit.menuPlayerResponse = false;
-                    salesVisit.MenuVFXBeat(-.5f, 1f);
-                    compositionTimer = 1f;
+                    salesVisit.MenuVFXBeat(-.5f, 0f);
+                    salesVisit.currentBeat.beatPosition.w = -0.5f;
+                    compositionTimer = .1f;
                 }
                 break;
             case 2:
+                salesVisit.menuBeatTimeUp = false;
                 salesVisit.ToggleSalesmanPlatform();
                 compositionTimer = 1f;
                 break;
             case 3:
                 salesVisit.MenuMarkBeat(new Vector3(6.18f,0f,-10f));
-                compositionTimer = 6.18f;
+                compositionTimer = 1f;
                 break;
             case 4:
                 if (salesVisit.menuNpcCallback)
                 {
                     salesVisit.menuNpcCallback = false;
-                    salesVisit.MenuDialogBeat("This part never gets old. I love my job.");
-                    compositionTimer = 2f;
+                    salesVisit.MenuDialogBeat("Now we ask for the grace and assistance of the Genesis Tree.");
+                    compositionTimer = .1f;
                 }
                 break;
             case 5:
-                // 
+                if (salesVisit.menuPlayerResponse)
+                {
+                    salesVisit.menuNpcCallback = false;
+                    salesVisit.MenuDialogBeat("This part never gets old. I love my job.");
+                    compositionTimer = .1f;
+                }
+                break;
+            case 6:
+                if (salesVisit.menuPlayerResponse)
+                {
+                    salesVisit.menuPlayerResponse = false;
+                    salesVisit.MenuVFXBeat(-.5f, 1f);
+                    compositionTimer = 0.9f;
+                    //
+                    PrepareForGreenerPastures();
+                }
+                break;
+            case 7:
+                if (salesVisit.menuBeatTimeUp)
+                {
+                    salesVisit.menuBeatTimeUp = false;
+                    compositionTimer = 4f;
+                    //
+                    LaunchGreenerPastures();
+                }
+                break;
+            case 8:
+                salesVisit.MenuDialogBeat("Wait for it...");
+                compositionTimer = 4f;
+                break;
+            case 9:
+                if (salesVisit.menuPlayerResponse && greenerPasturesTimer == 0f)
+                {
+                    salesVisit.menuPlayerResponse = false;
+                    salesVisit.MenuDialogBeat("There you are, my friend, a refreshed island and greener pastures!");
+                    compositionTimer = 4f;
+                }
+                break;
+            case 10:
+                if (salesVisit.menuPlayerResponse)
+                {
+                    salesVisit.menuPlayerResponse = false;
+                    salesVisit.MenuDialogBeat("Let's go take a look");
+                    compositionTimer = 1f;
+                }
+                break;
+            case 11:
+                if (salesVisit.menuPlayerResponse)
+                {
+                    salesVisit.menuPlayerResponse = false;
+                    salesVisit.MenuMarkBeat(new Vector3(2f, 0f, -6f));
+                    compositionTimer = 6.18f;
+                }
+                break;
+            case 12:
+                if (salesVisit.menuNpcCallback)
+                {
+                    salesVisit.menuNpcCallback = false;
+                    salesVisit.ToggleSalesmanPlatform();
+                    salesVisit.MenuVFXBeat(-.5f, 1f);
+                    pcm.characterFrozen = false;
+                    pcm.freezeCharacterActions = false;
+                    pcm.hidePlayerNameTag = false;
+                    pcm.playerData.island = im.islands[pcm.playerData.playerIsland].location;
+                    pcm.playerData.island.w = islandRange;
+                    compositionTimer = 0.5f;
+
+                    stage = StageOfTransaction.Completion; // temp
+                    validConfig = true; // temp;
+                }
                 break;
         }
     }
@@ -1537,9 +1938,8 @@ public class IslandUpgradeMenu : MonoBehaviour
             r.x = 0.35f * w;
             r.y = 0.55f * h;
             r.width = 0.1f * w;
-            r.height = 0.1f * h;
+            r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.box);
-            g.padding = new RectOffset(0, 0, 30, 0);
             g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
             g.normal.textColor = Color.white;
@@ -1590,6 +1990,24 @@ public class IslandUpgradeMenu : MonoBehaviour
                     // step off island, etc.
                     LaunchCompositionStage();
                 }
+                if (confirmType == ConfirmType.CompleteIsland)
+                {
+                    // temp
+                    float rnd = RandomSystem.FlatRandom01();
+                    if (rnd < .25f)
+                        salesVisit.MenuDialogBeat("It is truly a pleasure to do business with you.");
+                    else if (rnd >= .25f && rnd < .5f)
+                        salesVisit.MenuDialogBeat("Very well, we shall conclude our business then.");
+                    else if (rnd >= .5f && rnd < .75f)
+                        salesVisit.MenuDialogBeat("I am happy to have served you well today.");
+                    else
+                        salesVisit.MenuDialogBeat("Then it's a deal, and a geniune pleasure as well.");
+                    pcm.playerData.gold -= purchaseGoldHeld;
+                    //
+                    ClearPurchaseItemsHeld();
+                    // 
+                    SignalMenuClose();
+                }
                 confirmType = ConfirmType.None;
                 popupTimer = POPTIME;
             }
@@ -1634,6 +2052,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         if (purchaseItemsHeld.Length > 0)
             GUI.Label(r, s, g);
 
+        GUI.enabled = !confirmPopup;
         // purchases complete button
         r.x = 0.225f * w;
         r.y = 0.9f * h;
@@ -1655,6 +2074,26 @@ public class IslandUpgradeMenu : MonoBehaviour
             ConfirmPopup("Are you sure you're done purchasing\neverything you want today?", ConfirmType.ComposeIsland);
         }
 
+        r.x = 0.225f * w;
+        r.y = 0.9f * h;
+        r.width = 0.15f * w;
+        r.height = 0.05f * h;
+        g = new GUIStyle(GUI.skin.button);
+        g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
+        //g.fontStyle = FontStyle.Bold;
+        g.alignment = TextAnchor.MiddleCenter;
+        g.normal.textColor = Color.white;
+        if (usingPad && padButtonSelection == padMaxButton)
+            g.normal.textColor = Color.yellow;
+        g.hover.textColor = Color.yellow;
+        g.active.textColor = Color.white;
+        s = "Complete Transaction";
+        if (stage == StageOfTransaction.Completion && validConfig && (GUI.Button(r, s, g) || (usingPad && padClickButton == padMaxButton)))
+        {
+            ConfirmPopup("Are you satisfied with our transaction?\nMay we close our business for today?", ConfirmType.CompleteIsland);
+        }
+
+
         // config feedback label
         if (feedbackTimer > 0f)
         {
@@ -1674,6 +2113,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             GUI.Label(r, s, g);
         }
 
+        GUI.enabled = !confirmPopup;
         // clear purchase items button
         r.x = 0.775f * w;
         r.y = 0.9f * h;

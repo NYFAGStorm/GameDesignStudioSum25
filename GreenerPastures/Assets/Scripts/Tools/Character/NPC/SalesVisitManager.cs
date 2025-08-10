@@ -272,7 +272,7 @@ public class SalesVisitManager : MonoBehaviour
         beat++;
         visitBeats[beat].name = "salesman off teleporter";
         visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(4.5f, 0f, -3.25f);
+        visitBeats[beat].npcMark = new Vector3(3.75f, 0f, -3.25f);
         visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
         visitBeats[beat].name = "salesman toward farm";
@@ -485,11 +485,11 @@ public class SalesVisitManager : MonoBehaviour
                 {
                     if (currentBeat.action == ScriptedBeatAction.MenuVFX)
                     {
+                        menuBeatTimeUp = true;
                         currentBeat.beatPosition.w = 0f;
                         currentBeat.duration = 0f;
                         currentBeat.transition = ScriptedBeatTransition.MenuClose;
                         beatTimeUp = false;
-                        menuBeatTimeUp = true;
                     }
                     else
                     {
@@ -504,10 +504,10 @@ public class SalesVisitManager : MonoBehaviour
                 {
                     if (currentBeat.action == ScriptedBeatAction.MenuDialog)
                     {
+                        menuPlayerResponse = true;
                         currentBeat.dialogLine = "";
                         currentBeat.transition = ScriptedBeatTransition.MenuClose;
                         playerResponse = false;
-                        menuPlayerResponse = true;
                     }
                     else
                     {
@@ -522,10 +522,10 @@ public class SalesVisitManager : MonoBehaviour
                 {
                     if (currentBeat.action == ScriptedBeatAction.MenuMark)
                     {
+                        menuNpcCallback = true;
                         npcCallback = false;
                         currentBeat.transition = ScriptedBeatTransition.MenuClose;
                         salesman.destinationReached = false;
-                        menuNpcCallback = true;
                     }
                     else
                     {
@@ -732,12 +732,14 @@ public class SalesVisitManager : MonoBehaviour
         }
     }
 
-    public void MenuDialogBeat(string dialog)
+    public void MenuDialogBeat( string dialog )
     {
         currentBeat.actionDone = false;
         currentBeat.action = ScriptedBeatAction.MenuDialog;
         currentBeat.transition = ScriptedBeatTransition.PlayerResponse;
         currentBeat.dialogLine = dialog;
+        //
+        menuPlayerResponse = false;
     }
 
     public void MenuMarkBeat( Vector3 npcTarget )
@@ -746,6 +748,8 @@ public class SalesVisitManager : MonoBehaviour
         currentBeat.action = ScriptedBeatAction.MenuMark;
         currentBeat.transition = ScriptedBeatTransition.SalesmanCallback;
         currentBeat.npcMark = npcTarget;
+        //
+        menuNpcCallback = false;
     }
 
     public void MenuVFXBeat( float vfx, float time )
@@ -757,10 +761,13 @@ public class SalesVisitManager : MonoBehaviour
         currentBeat.beatPosition.z = salesman.gameObject.transform.position.z;
         if (time > 0f)
         {
+            beatTimer = time;
             currentBeat.transition = ScriptedBeatTransition.TimedDuration;
             currentBeat.duration = time;
         }
         currentBeat.beatPosition.w = vfx;
+        //
+        menuBeatTimeUp = false;
     }
 
     public void IslandMenuClosed()
