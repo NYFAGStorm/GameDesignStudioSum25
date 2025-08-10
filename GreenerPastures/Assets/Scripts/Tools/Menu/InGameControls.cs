@@ -21,6 +21,8 @@ public class InGameControls : MonoBehaviour
     private QuitOnEscape qoe;
     private InGameAlmanac iga;
 
+    private bool islandUpgrades;
+
 
     void Start()
     {
@@ -47,12 +49,24 @@ public class InGameControls : MonoBehaviour
         }
     }
 
+    public void SetIslandUpgrades()
+    {
+        islandUpgrades = true;
+    }
+
     void Update()
     {
         if (pcm == null)
             return;
 
-        if (iga.showAlmanac || mm.IsDisplayingMagic())
+        if (islandUpgrades)
+        {
+            IslandUpgradeMenu ium = GameObject.FindFirstObjectByType<IslandUpgradeMenu>();
+            if (ium == null)
+                islandUpgrades = false;
+        }
+
+        if (iga.showAlmanac || mm.IsDisplayingMagic() || islandUpgrades)
         {
             controlsDisplay = false;
             return;

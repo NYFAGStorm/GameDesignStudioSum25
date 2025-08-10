@@ -26,6 +26,8 @@ public class InGameAlmanac : MonoBehaviour
     // private int padSelectionButton = -1;
     // private int padMaxSelection;
 
+    private bool islandUpgrades;
+
     private Texture2D[] buttonTex;
 
     const int ENTRIESPERPAGE = 3;
@@ -63,6 +65,11 @@ public class InGameAlmanac : MonoBehaviour
                 buttonTex[2] = (Texture2D)Resources.Load("Button_Active");
             }
         }
+    }
+
+    public void SetIslandUpgrades()
+    {
+        islandUpgrades = true;
     }
 
     void InitAlmanac()
@@ -145,7 +152,14 @@ public class InGameAlmanac : MonoBehaviour
             }
         }
 
-        if (igc.controlsDisplay || mm.IsDisplayingMagic())
+        if (islandUpgrades)
+        {
+            IslandUpgradeMenu ium = GameObject.FindFirstObjectByType<IslandUpgradeMenu>();
+            if (ium == null)
+                islandUpgrades = false;
+        }
+
+        if (igc.controlsDisplay || mm.IsDisplayingMagic() || islandUpgrades)
         {
             showAlmanac = false;
             return;

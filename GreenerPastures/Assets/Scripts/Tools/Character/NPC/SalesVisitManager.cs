@@ -117,6 +117,21 @@ public class SalesVisitManager : MonoBehaviour
         }
     }
 
+    public void SetNewTeleporterSpot( Vector3 spot )
+    {
+        for (int i = 0; i < visitBeats.Length; i++)
+        {
+            if (visitBeats[i].name.Contains("salesman onto teleporter"))
+            {
+                visitBeats[i].npcMark = spot;
+            }
+            if (visitBeats[i].name.Contains("teleporter vfx (b)"))
+            {
+                visitBeats[i].beatPosition = GameSystem.GetPositionData(spot);
+            }
+        }
+    }
+
     void ValidateVisitBeats()
     {
         string prevName = "";
@@ -256,12 +271,14 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].transition = ScriptedBeatTransition.Default;
         visitBeats[beat].beatPosition.x = 16f;
         visitBeats[beat].beatPosition.z = -16f;
+        visitBeats[beat].beatPosition.w = 0f;
         beat++;
         visitBeats[beat].name = "teleporter vfx (b)";
         visitBeats[beat].action = ScriptedBeatAction.VFXSpawn;
         visitBeats[beat].transition = ScriptedBeatTransition.Default;
         visitBeats[beat].beatPosition.x = 4f;
         visitBeats[beat].beatPosition.z = -4f;
+        visitBeats[beat].beatPosition.w = 0f;
         beat++;
         visitBeats[beat].name = "salesman teleport";
         visitBeats[beat].action = ScriptedBeatAction.TeleportSalesman;
@@ -336,7 +353,7 @@ public class SalesVisitManager : MonoBehaviour
         beat++;
         visitBeats[beat].name = "salesman toward teleporter";
         visitBeats[beat].action = ScriptedBeatAction.SalesmanMark;
-        visitBeats[beat].npcMark = new Vector3(3.5f, 0f, -3f);
+        visitBeats[beat].npcMark = new Vector3(3.5f, 0f, -3.75f);
         visitBeats[beat].transition = ScriptedBeatTransition.SalesmanCallback;
         beat++;
         visitBeats[beat].name = "salesman onto teleporter";
@@ -349,6 +366,7 @@ public class SalesVisitManager : MonoBehaviour
         visitBeats[beat].transition = ScriptedBeatTransition.Default;
         visitBeats[beat].beatPosition.x = 4f;
         visitBeats[beat].beatPosition.z = -4f;
+        visitBeats[beat].beatPosition.w = 0f;
         beat++;
         visitBeats[beat].name = "remove salesman";
         visitBeats[beat].action = ScriptedBeatAction.RemoveNPC;
@@ -471,7 +489,6 @@ public class SalesVisitManager : MonoBehaviour
             case ScriptedBeatTransition.Default:
                 if (currentBeat.action == ScriptedBeatAction.MenuVFX)
                 {
-                    currentBeat.beatPosition.w = 0f;
                     currentBeat.transition = ScriptedBeatTransition.MenuClose;
                 }
                 else
@@ -683,10 +700,14 @@ public class SalesVisitManager : MonoBehaviour
                     {
                         // magic
                         sfxAudio.StartSound("Magic Cast 2", vfx, 0f, 6.18f);
+                        Destroy(sfxTemp, 2.2f);
                         Destroy(vfx, 3.81f);
                     }
                     else
+                    {
+                        Destroy(sfxTemp, 2.2f);
                         Destroy(vfx, 6.18f);
+                    }
                     break;
             }
             currentBeat.actionDone = true;
@@ -752,20 +773,20 @@ public class SalesVisitManager : MonoBehaviour
         menuNpcCallback = false;
     }
 
-    public void MenuVFXBeat( float vfx, float time )
+    public void MenuVFXBeat( float vfxType, float vfxTime )
     {
         currentBeat.actionDone = false;
         currentBeat.action = ScriptedBeatAction.MenuVFX;
         currentBeat.transition = ScriptedBeatTransition.Default;
         currentBeat.beatPosition.x = salesman.gameObject.transform.position.x;
         currentBeat.beatPosition.z = salesman.gameObject.transform.position.z;
-        if (time > 0f)
+        currentBeat.beatPosition.w = vfxType;
+        if (vfxTime > 0f)
         {
-            beatTimer = time;
+            beatTimer = vfxTime;
             currentBeat.transition = ScriptedBeatTransition.TimedDuration;
-            currentBeat.duration = time;
+            currentBeat.duration = vfxTime;
         }
-        currentBeat.beatPosition.w = vfx;
         //
         menuBeatTimeUp = false;
     }

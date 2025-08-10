@@ -216,30 +216,35 @@ public class TimeManager : MonoBehaviour
         else
             dailyDelivery = false;
 
-        if (previousDayProgress > 0.9f && dayProgress <= 0.1f)
+        IslandUpgradeMenu ium = GameObject.FindFirstObjectByType<IslandUpgradeMenu>();
+        if (ium == null)
         {
-            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
-            if (ggm != null)
-                ggm.MidnightTick();
-        }
-        previousDayOfMonth = dayOfMonth;
-        if (previousDayProgress < .25f && dayProgress >= 0.25f)
-        {
-            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
-            if (ggm != null)
-                ggm.MorningTick();
-        }
-        if (dayProgress >= 0.5f && previousDayOfMonth < 0.5f)
-        {
-            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
-            if (ggm != null)
-                ggm.NoonTick();
-        }
-        if (dayProgress >= 0.75f && previousDayProgress < .75f) 
-        {
-            GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
-            if (ggm != null)
-                ggm.EveningTick();
+            // skip timed events while island upgrade menu is up
+            if (previousDayProgress > 0.9f && dayProgress <= 0.1f)
+            {
+                GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                if (ggm != null)
+                    ggm.MidnightTick();
+            }
+            previousDayOfMonth = dayOfMonth;
+            if (previousDayProgress < .25f && dayProgress >= 0.25f)
+            {
+                GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                if (ggm != null)
+                    ggm.MorningTick();
+            }
+            if (dayProgress >= 0.5f && previousDayOfMonth < 0.5f)
+            {
+                GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                if (ggm != null)
+                    ggm.NoonTick();
+            }
+            if (dayProgress >= 0.75f && previousDayProgress < .75f)
+            {
+                GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+                if (ggm != null)
+                    ggm.EveningTick();
+            }
         }
         previousDayProgress = dayProgress;
     }
@@ -330,6 +335,10 @@ public class TimeManager : MonoBehaviour
     {
         if (dailyDelivery)
             return;
+
+        IslandUpgradeMenu ium = GameObject.FindFirstObjectByType<IslandUpgradeMenu>();
+        if (ium != null)
+            return; // cancel post office for today
 
         PostOfficeManager pom = GameObject.FindFirstObjectByType<PostOfficeManager>();
         if (pom != null)

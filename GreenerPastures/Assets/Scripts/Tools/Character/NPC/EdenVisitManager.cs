@@ -558,10 +558,14 @@ public class EdenVisitManager : MonoBehaviour
                     {
                         // magic
                         sfxAudio.StartSound("Magic Cast 2", vfx, 0f, 6.18f);
+                        Destroy(sfxTemp, 2.2f);
                         Destroy(vfx, 3.81f);
                     }
                     else
+                    {
+                        Destroy(sfxTemp, 2.2f);
                         Destroy(vfx, 6.18f);
+                    }
                     break;
                 case ScriptedBeatAction.RemoveNPC:
                     RemoveEden();
