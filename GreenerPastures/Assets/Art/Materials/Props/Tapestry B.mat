@@ -26,11 +26,11 @@ Material:
     - _AccentFill:
         m_Texture: {fileID: 2800000, guid: 9c3f57955be31524593ff9208d67728a, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     - _AltFill:
         m_Texture: {fileID: 2800000, guid: e3a1ae2d4c6f7564b9ed600f335c062c, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -54,11 +54,11 @@ Material:
     - _LineArt:
         m_Texture: {fileID: 2800000, guid: 3097b28f4a8489d42ab88e021f95b12e, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 70cb601090839054288b4e212e10eb69, type: 3}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 0, y: -0.01}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}

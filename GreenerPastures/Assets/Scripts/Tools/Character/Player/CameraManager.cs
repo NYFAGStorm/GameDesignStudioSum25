@@ -184,6 +184,11 @@ public class CameraManager : MonoBehaviour
         rainOn = rainAmount > 0f;
     }
 
+    public void ConfigurePlayerObject( GameObject playerObj )
+    {
+        playerObject = playerObj;
+    }
+
     void ConfigureCamOffsets()
     {
         offsetPositions = new PositionData[8];

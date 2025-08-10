@@ -159,8 +159,9 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     private GameObject[] compositionObjects = new GameObject[0];
     private int currentCompositionObject;
+    private int compositionPropDataIndex;
 
-    const float FEEDBACKTIME = 3f;
+    const float FEEDBACKTIME = 60f;
     const float PULSETIME = 2f;
     const float INVALIDPULSETIME = 1f;
     const float POPTIME = 2f;
@@ -800,6 +801,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         else
             pos += cursorMove * cursorSpeed * Time.deltaTime;
         cursor.transform.position = pos;
+        cursorMove = Vector3.zero;
 
         // cursor bounds (island center and range)
         float dist = Vector3.Distance(cursor.transform.position, islandCenter);
@@ -864,10 +866,31 @@ public class IslandUpgradeMenu : MonoBehaviour
         }
 
         currentConfigObject = obj;
+        compositionPropDataIndex = GetPropDataIndexByName(obj.name);
         Renderer r = currentConfigObject.GetComponentInChildren<Renderer>();
         if (r != null)
             currentObjectColor = r.material.color;
         currentObjectPadding = objectPadding;
+    }
+
+    int GetPropDataIndexByName( string propName )
+    {
+        int retInt = 0;
+        bool found = false;
+        string pName = propName.Replace("Prop ", "");
+        for (int i = 0; i < im.islands[pcm.playerData.playerIsland].props.Length; i++)
+        {
+            if (im.islands[pcm.playerData.playerIsland].props[i].name == pName)
+            {
+                found = true;
+                retInt = i;
+                break;
+            }
+        }
+        if (!found)
+            Debug.LogWarning("--- IslandUpgradeMenu [GetPropDataIndexByLocation] : no prop of name '"+propName+"'. will ignore.");
+
+        return retInt;
     }
 
     void ReleaseCurrentConfigObject()
@@ -957,7 +980,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         // run config pulse
         if (configPulse)
         {
-            configObjectPulse = Mathf.Sin(Time.time * PULSETIME);
+            configObjectPulse = Mathf.Sin(Time.time * PULSETIME * 3f);
             configObjectPulse += 1f;
             configObjectPulse *= 0.5f;
             // handle various config object renderers
@@ -979,18 +1002,29 @@ public class IslandUpgradeMenu : MonoBehaviour
         if (stage == StageOfTransaction.Composition)
             HandleCompositionBeats();
 
-        // cursor move
+        // cursor mode
         if (cursorMode)
         {
             if (!cursor.GetComponent<Renderer>().enabled)
                 SetCursorVisible(true);
             MoveCursor();
             if (currentConfigObject != null)
+            {
+                configPulse = true;
                 currentConfigObject.transform.position = cursor.transform.position;
+                // change data on island manager for this prop
+                if (compositionPropDataIndex > -1 && compositionPropDataIndex < im.islands[pcm.playerData.playerIsland].props.Length)
+                    im.islands[pcm.playerData.playerIsland].props[compositionPropDataIndex].location = GameSystem.GetPositionData(currentConfigObject.transform.position);
+            }
+            else
+                configPulse = false;
         }
         else if (cursor != null &&
             cursor.GetComponent<Renderer>().enabled)
+        {
             SetCursorVisible(false);
+            configPulse = false;
+        }
 
         // gamepad control
         usingPad = false;
@@ -1070,6 +1104,49 @@ public class IslandUpgradeMenu : MonoBehaviour
                 cursorMove.x = -1f;
             if (keyMove == 3)
                 cursorMove.x = 1f;
+
+            if (Input.GetKeyDown(pcm.actionAKey) || usingPad && padMgr.gPadDown[0].aButton)
+            {
+                // next composition object
+                ReleaseCurrentConfigObject();
+                currentCompositionObject++;
+                if (currentCompositionObject > compositionObjects.Length - 1)
+                    currentCompositionObject = 0;
+                SetCursorToObject(compositionObjects[currentCompositionObject]);
+                SetCurrentConfigObject(true, compositionObjects[currentCompositionObject], 1f);
+                CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+                if (cm != null)
+                    cm.ConfigurePlayerObject(compositionObjects[currentCompositionObject]);
+            }
+            if (Input.GetKeyDown(pcm.actionBKey) || usingPad && padMgr.gPadDown[0].bButton)
+            {
+                // previous composition object
+                ReleaseCurrentConfigObject();
+                currentCompositionObject--;
+                if (currentCompositionObject < 0)
+                    currentCompositionObject = compositionObjects.Length - 1;
+                SetCursorToObject(compositionObjects[currentCompositionObject]);
+                SetCurrentConfigObject(true, compositionObjects[currentCompositionObject], 1f);
+                CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+                if (cm != null)
+                    cm.ConfigurePlayerObject(compositionObjects[currentCompositionObject]);
+            }
+            if (Input.GetKeyDown(pcm.actionDKey) || usingPad && padMgr.gPadDown[0].yButton)
+            {
+                // step out of composition mode
+                ReleaseCurrentConfigObject();
+                currentCompositionObject = 0;
+                cursorMode = false;
+                CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+                if (cm != null)
+                    cm.ConfigurePlayerObject(pcm.gameObject);
+                pcm.characterFrozen = false;
+                pcm.freezeCharacterActions = false;
+                pcm.hidePlayerHUD = false;
+                pcm.hidePlayerNameTag = false;
+                stage = StageOfTransaction.Completion;
+                validConfig = true;
+            }
         }
         else
         {
@@ -1909,22 +1986,57 @@ public class IslandUpgradeMenu : MonoBehaviour
             case 13:
                 if (salesVisit.menuBeatTimeUp)
                 {
-                    // TODO: fast-forward if no outdoor props to move
                     salesVisit.menuBeatTimeUp = false;
                     salesVisit.MenuDialogBeat("Let me help you move items around.");
                     compositionTimer = 1f;
+                    string s = "Move items, press E and F to switch items, press V to complete composition.";
+                    if (usingPad)
+                        s = "Move items, press A and B to switch items, press Y to complete composition.";
+                    ConfigFeedback(s);
                 }
                 break;
             case 14:
                 if (salesVisit.menuPlayerResponse)
                 {
-                    SetCursorVisible(true);
                     SetCursorToObject(compositionObjects[0]);
                     SetCurrentConfigObject(true, compositionObjects[0], 1f);
-                    compositionTimer = 1f;
+                    cursorMode = true;
+                    gridLockCursor = true;
+                    compositionTimer = 3f;
+                    pcm.freezeCharacterActions = true;
+                    pcm.characterFrozen = true;
+                    pcm.hidePlayerNameTag = true;
+                    pcm.hidePlayerHUD = true;
+                    CameraManager cm = GameObject.FindFirstObjectByType<CameraManager>();
+                    if (cm != null)
+                        cm.ConfigurePlayerObject(compositionObjects[0]);
                 }
                 break;
             case 15:
+                if (salesVisit.menuBeatTimeUp)
+                {
+                    salesVisit.menuBeatTimeUp = false;
+                    salesVisit.MenuDialogBeat("Go ahead an move this around your island.");
+                    compositionTimer = 1f;
+                }
+                break;
+            case 16:
+                if (salesVisit.menuPlayerResponse)
+                {
+                    salesVisit.menuPlayerResponse = false;
+                    salesVisit.MenuDialogBeat("When you like where it is, press your action button.");
+                    compositionTimer = 3f;
+                }
+                break;
+            case 17:
+                if (salesVisit.menuBeatTimeUp)
+                {
+                    salesVisit.menuBeatTimeUp = false;
+                    salesVisit.MenuDialogBeat("Take your time.");
+                    compositionTimer = 1f;
+                }
+                break;
+            case 18:
                 if (salesVisit.menuPlayerResponse)
                 {
                     stage = StageOfTransaction.Completion; // temp
