@@ -945,7 +945,7 @@ public class MagicCraftingManager : MonoBehaviour
         }
 
         // cauldron bubbles vfx
-        if (craftState == CraftState.Cauldron && cauldronBubbleFrame > -1)
+        if (craftState == CraftState.Cauldron && craftStateTimer == 0f && cauldronBubbleFrame > -1)
         {
             r.x = cauldronBubblePosition.x * w;
             r.y = cauldronBubblePosition.y * h;
