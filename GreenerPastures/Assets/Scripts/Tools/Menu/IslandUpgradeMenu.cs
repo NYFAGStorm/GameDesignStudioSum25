@@ -99,6 +99,7 @@ public class IslandUpgradeMenu : MonoBehaviour
     private Vector3 islandSavedPosition;
     private Vector3 islandCenter;
     private float islandRange = 7f;
+    private bool isUpgradingIsland;
 
     private GameObject currentConfigObject;
     private Color currentObjectColor;
@@ -113,16 +114,16 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     private MultiGamepad padMgr;
     private bool usingPad;
-    public int padButtonSelection = -1;
-    public int padMaxButton = 8;
-    public int padClickButton = -1;
+    private int padButtonSelection = -1;
+    private int padMaxButton = 8;
+    private int padClickButton = -1;
     private int padMove = -1;
 
     private StageOfTransaction stage;
 
     private UpgradeCategory currentCategory;
     private MenuItem[] displayItems;
-    public int menuItemSelection = -1;
+    private int menuItemSelection = -1;
     private int topOfMenuList = 0;
     private int maxDisplayItems = 5;
 
@@ -854,9 +855,9 @@ public class IslandUpgradeMenu : MonoBehaviour
             float dist = Vector3.Distance(cursor.transform.position, GameSystem.GetVector(im.islands[pcm.playerData.playerIsland].structures[i].location));
             float minDist = 1f;
             if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.HermitTower)
-                minDist = 1f;
+                minDist = 2f;
             if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.WizardTower)
-                minDist = 1.5f;
+                minDist = 2f;
             if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.SorcererTower)
                 minDist = 2f;
             if (dist < minDist)
@@ -1561,7 +1562,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         im.SetCheckProps(false); // suspend checking props
 
         // -- ISLAND --
-        float radiusDelta = im.islands[pcm.playerData.playerIsland].location.w * 7f; // TODO: find whole number scale
+        float radiusDelta = im.islands[pcm.playerData.playerIsland].location.w * 7f;
         Vector3 newIslandScale = Vector3.one;
         float radiusIncrement = (1f / 7f);
         for (int i = 0; i < purchaseItemsHeld.Length; i++)
@@ -1809,7 +1810,8 @@ public class IslandUpgradeMenu : MonoBehaviour
             if (im.islands[pcm.playerData.playerIsland].tports[i].tag == "centralTport")
             {
                 Vector3 tv = GameSystem.GetVector(im.islands[pcm.playerData.playerIsland].tports[i].location);
-                tv += (tv - islandCenter).normalized * radiusDelta;
+                if (isUpgradingIsland && radiusDelta != 0f)
+                    tv += (tv - islandCenter).normalized * radiusDelta;
                 tv.y = 0f;
                 im.islands[pcm.playerData.playerIsland].tports[i].location = GameSystem.GetPositionData(tv);
                 centralPos = GameSystem.GetPositionData(tv);
@@ -1842,10 +1844,12 @@ public class IslandUpgradeMenu : MonoBehaviour
                         childProp = islandChildren[i];
                 }
                 // push out from center by radiusDelta
-                pPos += (pPos - islandCenter).normalized * radiusDelta;
+                if (isUpgradingIsland && radiusDelta != 0f)
+                    pPos += (pPos - islandCenter).normalized * radiusDelta;
                 im.islands[pcm.playerData.playerIsland].props[n].location = GameSystem.GetPositionData(pPos);
                 Vector3 cPropPos = childProp.transform.localPosition;
-                cPropPos += (pPos - islandCenter).normalized * radiusDelta;
+                if (isUpgradingIsland && radiusDelta != 0f)
+                    cPropPos += (pPos - islandCenter).normalized * radiusDelta;
                 // set to whole number (grid lock)
                 cPropPos.x = Mathf.RoundToInt(cPropPos.x);
                 cPropPos.y = Mathf.RoundToInt(cPropPos.y);
@@ -2517,6 +2521,8 @@ public class IslandUpgradeMenu : MonoBehaviour
                 {
                     if (currentPurchaseItem != null)
                     {
+                        if (currentPurchaseItem.category == UpgradeCategory.Islands)
+                            isUpgradingIsland = true;
                         AddToPurchaseItemsHeld(currentPurchaseItem, currentTradeInItem);
                         purchaseGoldHeld += currentPurchsePrice;
                         // clear current purchase item consideration
@@ -2537,6 +2543,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                 if (confirmType == ConfirmType.ClearPurchases)
                 {
                     ClearPurchaseItemsHeld();
+                    isUpgradingIsland = false;
                     float rnd = RandomSystem.FlatRandom01();
                     if (rnd < .25f)
                         salesVisit.MenuDialogBeat("We can start again, that's no problem at all.");

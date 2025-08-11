@@ -64,6 +64,11 @@ public class IslandManager : MonoBehaviour
             if (propRenderers[i].material.shader.name == "Unlit/Three Layer Composite")
             {
                 GameObject islandObj = propRenderers[i].gameObject.transform.parent.parent.gameObject;
+                if (islandObj.name == "Deco")
+                {
+                    // this is an interior prop, go up two more parents
+                    islandObj = islandObj.transform.parent.parent.gameObject;
+                }
                 Vector3 pos = islandObj.transform.position;
                 GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
                 if (ggm != null)
