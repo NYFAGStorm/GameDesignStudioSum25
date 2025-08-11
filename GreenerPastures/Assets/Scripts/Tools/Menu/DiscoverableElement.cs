@@ -6,6 +6,13 @@ public class DiscoverableElement : MonoBehaviour
     // Author: Glenn Storm
     // This handles a static screen clickable element
 
+    public enum DiscoverMode
+    {
+        Default,
+        Clickable,
+        Firefly
+    }
+
     public enum RevealTransition
     {
         Default,
@@ -65,9 +72,31 @@ public class DiscoverableElement : MonoBehaviour
 
     private MultiGamepad padMgr;
 
+    private GameObject npcFirefly;
+    private GameObject glassJar;
+    private Renderer jarRenderer;
+    private bool controlJar;
+    private float fireFlyStartTimer;
+    private bool fireFlyActive;
+    private float fireFlyTimer;
+    private float jarCaughtFrameTimer;
+    private int jarCaughtFrame;
+    private Vector3 caughtPosition;
+
+    private DiscoverMode discoverMode;
+
+    public Texture2D jarClosed;
+    public Texture2D[] jarCaught;
+
+    private CreditsScreen cs;
+
     const float CHANCEOFAPPEARANCE = 0.05f; // big rewards mean rare chance of appearance
     const float PLAYERCHECKTIME = 10f;
     const float REWARDTIME = 10f;
+    const float FIREFLYTIME = 6.18f;
+    const float JARSPEED = 3.81f;
+    const float JARPROXIMITY = 1f;
+    const float CAUGHTFRAMETIME = 0.1f;
 
 
     void Start()
@@ -204,6 +233,98 @@ public class DiscoverableElement : MonoBehaviour
 
     void Update()
     {
+        if (storedType == RewardType.Default)
+        {
+            // determine discover mode
+            discoverMode = DiscoverMode.Clickable;
+            if (padMgr.gamepads[0].isActive)
+                discoverMode = DiscoverMode.Firefly;
+        }
+
+        if (discoverMode == DiscoverMode.Firefly && fireFlyActive)
+        {
+            if (fireFlyStartTimer > 0f)
+            {
+                if (cs == null)
+                {
+                    cs = GameObject.FindFirstObjectByType<CreditsScreen>();
+                    cs.enabled = false;
+                }
+                fireFlyStartTimer -= Time.deltaTime;
+                if (fireFlyStartTimer < 0f)
+                {
+                    fireFlyStartTimer = 0f;
+                    // begin firefly catch
+                    SpawnFirefly();
+                    SpawnGlassJar();
+                }
+                return;
+            }
+
+            if (controlJar)
+            {
+                Vector3 pos = glassJar.transform.position;
+                pos.x += padMgr.gamepads[0].XaxisL * JARSPEED * Time.deltaTime;
+                pos.y += padMgr.gamepads[0].YaxisL * JARSPEED * Time.deltaTime;
+                glassJar.transform.position = pos;
+
+                if (padMgr.gamepads[0].aButton)
+                {
+                    controlJar = false;
+                    float dist = Vector3.Distance(glassJar.transform.position, npcFirefly.transform.position);
+                    if (dist < JARPROXIMITY)
+                    {
+                        jarCaughtFrame = 0;
+                        jarRenderer.material.mainTexture = jarCaught[jarCaughtFrame];
+                        jarCaughtFrameTimer = CAUGHTFRAMETIME;
+                        // catch gets reward
+                        StoreReward();
+                        state = DiscoverableState.Discovered;
+                        elementDiscovered = true;
+                        //
+                        caughtPosition = Camera.main.WorldToViewportPoint(caughtPosition);
+                        caughtPosition.y = 1f - caughtPosition.y;
+                        caughtPosition.z = 0f;
+                    }
+                    else
+                        jarRenderer.material.mainTexture = jarClosed;
+                    fireFlyTimer = 3.81f; // completion timer
+                    Destroy(npcFirefly);
+                }
+            }
+            else
+            {
+                // run jar caught frame timer
+                if (jarCaughtFrameTimer > 0f)
+                {
+                    jarCaughtFrameTimer -= Time.deltaTime;
+                    if (jarCaughtFrameTimer < 0f)
+                    {
+                        jarCaughtFrame++;
+                        if (jarCaughtFrame >= jarCaught.Length)
+                            jarCaughtFrame = 0;
+                        jarRenderer.material.mainTexture = jarCaught[jarCaughtFrame];
+                        jarCaughtFrameTimer = CAUGHTFRAMETIME;
+                    }
+                }
+            }
+            // run firefly timer
+            if (fireFlyTimer > 0f)
+            {
+                fireFlyTimer -= Time.deltaTime;
+                if (fireFlyTimer < 0f)
+                {
+                    fireFlyTimer = 0f;
+                    if (npcFirefly != null)
+                        Destroy(npcFirefly);
+                    Destroy(glassJar);
+                    fireFlyActive = false;
+                    if (cs != null)
+                        cs.enabled = true;
+                }
+            }
+        }
+
         if (!elementDiscovered)
             return;
 
@@ -252,7 +373,7 @@ public class DiscoverableElement : MonoBehaviour
                         {
                             ProvideReward();
                             string[] discoverNotifs = new string[2];
-                            discoverNotifs[0] = "You are rewarded for discovering a clickable element!";
+                            discoverNotifs[0] = "You are rewarded for discovering a rare menu element!";
                             switch (reward)
                             {
                                 case RewardType.Gold:
@@ -302,12 +423,18 @@ public class DiscoverableElement : MonoBehaviour
         // activate on credits scene
         if (scene.name == "Credits" && state == DiscoverableState.Default)
         {
-            if (!padMgr.gamepads[0].isActive)
-                state = DiscoverableState.Ready;
+            state = DiscoverableState.Ready;
             // chance of element appearance
             if (state == DiscoverableState.Ready &&
                 RandomSystem.FlatRandom01() < CHANCEOFAPPEARANCE)
+            {
                 state = DiscoverableState.Appear;
+                if (discoverMode == DiscoverMode.Firefly)
+                {
+                    fireFlyActive = true;
+                    fireFlyStartTimer = 1f;
+                }
+            }
         }
         // reward in greenergame scene
         if (scene.name == "GreenerGame" && state == DiscoverableState.Discovered)
@@ -333,6 +460,31 @@ public class DiscoverableElement : MonoBehaviour
             return;
         revealTimer = revealTime;
         elementDiscovered = true;
+    }
+
+    void SpawnFirefly()
+    {
+        npcFirefly = GameObject.Instantiate((GameObject)Resources.Load("NPC Firefly"));
+        Vector3 nudge = Vector3.right;
+        Vector2 rnd = Random.insideUnitCircle * 3.81f;
+        nudge.x += rnd.x;
+        nudge.y += rnd.y;
+        npcFirefly.transform.position = nudge;
+        fireFlyTimer = FIREFLYTIME;
+    }
+
+    void SpawnGlassJar()
+    {
+        glassJar = GameObject.Instantiate((GameObject)Resources.Load("Glass Jar"));
+        Vector3 nudge = Vector3.forward * 0.01f;
+        nudge += Vector3.left;
+        Vector2 rnd = Random.insideUnitCircle * 3.81f;
+        nudge.x += rnd.x;
+        nudge.y += rnd.y;
+        glassJar.transform.position = nudge;
+        jarRenderer = glassJar.GetComponentInChildren<Renderer>();
+
+        controlJar = true;
     }
 
     void StoreReward()
@@ -412,9 +564,6 @@ public class DiscoverableElement : MonoBehaviour
 
     void OnGUI()
     {
-        if (state < DiscoverableState.Appear ||  ( elementDiscovered && revealProgress == 1f ))
-            return;
-
         Rect r = elementSpace;
         float w = Screen.width;
         float h = Screen.height;
@@ -425,6 +574,49 @@ public class DiscoverableElement : MonoBehaviour
         g.active.background = null;
         Color c = Color.white;
         Texture2D t = elementTexture;
+        string s = "";
+
+        if (discoverMode == DiscoverMode.Firefly && state == DiscoverableState.Discovered &&
+            fireFlyTimer > 0f)
+        {
+            r.x = caughtPosition.x + .025f;
+            r.y = caughtPosition.y + (fireFlyTimer / 61.8f);
+            r.x *= w;
+            r.y *= h;
+            r.width *= w;
+            r.height = r.width; // square
+            g = new GUIStyle(GUI.skin.label);
+            g.fontSize = Mathf.RoundToInt(20f * (w / 1024f));
+            g.fontStyle = FontStyle.Bold;
+            g.alignment = TextAnchor.MiddleCenter;
+            s = "+" + rewardAmount + "\n";
+            if (reward == RewardType.Gold)
+                s += "GOLD!";
+            else if (reward == RewardType.XP)
+                s += "XP!";
+            else if (reward == RewardType.Arcana)
+                s += "ARCANA!";
+            else
+                s += "MAGIC ITEM!";
+            // drop shadow (yellow over black)
+            r.x += 0.0008f;
+            r.y += 0.001f;
+            g.normal.textColor = Color.black;
+            g.hover.textColor = Color.black;
+            g.active.textColor = Color.black;
+            GUI.Label(r, s, g);
+            r.x -= 0.0016f;
+            r.y -= 0.002f;
+            g.normal.textColor = Color.yellow;
+            g.hover.textColor = Color.yellow;
+            g.active.textColor = Color.yellow;
+            GUI.Label(r, s, g);
+            return;
+        }
+
+        if (discoverMode != DiscoverMode.Clickable || state < DiscoverableState.Appear || 
+            ( elementDiscovered && revealProgress == 1f ))
+            return;
 
         if (!elementDiscovered)
         {
@@ -450,7 +642,7 @@ public class DiscoverableElement : MonoBehaviour
         g.fontSize = Mathf.RoundToInt( 14f * (w/1024f) );
         g.fontStyle = FontStyle.Bold;
         g.alignment = TextAnchor.MiddleCenter;
-        string s = "+" + rewardAmount + "\n";
+        s = "+" + rewardAmount + "\n";
         if (reward == RewardType.Gold)
             s += "GOLD!";
         else if (reward == RewardType.XP)

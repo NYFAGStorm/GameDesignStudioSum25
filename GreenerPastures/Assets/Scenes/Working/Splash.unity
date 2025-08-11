@@ -806,6 +806,18 @@ MonoBehaviour:
   elementTarget: {x: 1, y: 0.618}
   reward: 1
   rewardAmount: 100
+  jarClosed: {fileID: 2800000, guid: eb9e61aa965a71b4e91e9445b1df1439, type: 3}
+  jarCaught:
+  - {fileID: 2800000, guid: dcf2c75cba2975047a3bf29e583bb973, type: 3}
+  - {fileID: 2800000, guid: 6678680863d344d45975be5e341e6fab, type: 3}
+  - {fileID: 2800000, guid: dd6d181a2950dd042bda4848814ba07a, type: 3}
+  - {fileID: 2800000, guid: a595c6869fc852d4cb563bb825a4dce7, type: 3}
+  - {fileID: 2800000, guid: 9c8d07c27e571ad40b60392c24ba06fd, type: 3}
+  - {fileID: 2800000, guid: 9b060c42797ba6046b5f999bae788e9c, type: 3}
+  - {fileID: 2800000, guid: 1288bb0b35d1326448603b81afb91f5f, type: 3}
+  - {fileID: 2800000, guid: 80d192481d630fc4f913efcef5ef9eae, type: 3}
+  - {fileID: 2800000, guid: ec929716e9ae6064e8d7bf728020a10d, type: 3}
+  - {fileID: 2800000, guid: a432c88180ffdb640856dda070cb1118, type: 3}
 --- !u!4 &768314209 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5894453599269177714, guid: 0805f5472a6acd044bf7853062aa16a6, type: 3}
