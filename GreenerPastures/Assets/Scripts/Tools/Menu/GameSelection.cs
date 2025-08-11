@@ -1110,6 +1110,7 @@ public class GameSelection : MonoBehaviour
             nextButton += 2;
 
         // multiplayer support
+        GUI.enabled = false;
         // show text field
         // show two buttons
         // 'get friend code' and 'enter friend code'
@@ -1165,7 +1166,7 @@ public class GameSelection : MonoBehaviour
             g.active.background = buttonTex[2];
         }
         s = "Get A Friend Code (to HOST a game)";
-        GUI.enabled = (gameLoaded);
+        //GUI.enabled = (gameLoaded);
         if (tinyPopup)
             GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
@@ -1178,7 +1179,7 @@ public class GameSelection : MonoBehaviour
             selectionFeedback = "host code generated";
             feedbackTimer = FEEDBACKTIME;
         }
-        GUI.enabled = true;
+        //GUI.enabled = true;
         //
         nextButton++;
         //
@@ -1188,7 +1189,7 @@ public class GameSelection : MonoBehaviour
             g.normal.textColor = Color.white;
         g.active.textColor = buttonFontColor;
         s = "Submit A Friend Code (to JOIN a game)";
-        GUI.enabled = (!gameLoaded && hostsCode != "");
+        //GUI.enabled = (!gameLoaded && hostsCode != "");
         if (tinyPopup)
             GUI.enabled = false;
         if (GUI.Button(r, s, g) ||
