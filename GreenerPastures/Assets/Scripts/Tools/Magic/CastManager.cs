@@ -290,7 +290,9 @@ public class CastManager : MonoBehaviour
                     {
                         for (int n = 0; n < islandMgr.islands[i].structures.Length; n++)
                         {
-                            if (islandMgr.islands[i].structures[n].type != StructureType.WizardTower)
+                            if (islandMgr.islands[i].structures[n].type != StructureType.HermitTower &&
+                                islandMgr.islands[i].structures[n].type != StructureType.WizardTower &&
+                                islandMgr.islands[i].structures[n].type != StructureType.SorcererTower)
                                 continue;
                             Vector3 towerPosition = GameSystem.GetVector(islandMgr.islands[i].location);
                             towerPosition += GameSystem.GetVector(islandMgr.islands[i].structures[n].location);

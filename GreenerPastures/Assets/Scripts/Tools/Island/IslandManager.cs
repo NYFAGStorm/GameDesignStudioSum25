@@ -109,7 +109,7 @@ public class IslandManager : MonoBehaviour
                     if (islands[i].effects[n] == IslandEffect.SpellStarbloomBurst ||
                         islands[i].effects[n] == IslandEffect.SpellFogOfWar)
                     {
-                        // REVIEW: confirm particular island positoin?
+                        // REVIEW: confirm particular island position?
                         // check casts for matching spell and get position
                         CastManager cm = GameObject.FindFirstObjectByType<CastManager>();
                         if (cm != null)
@@ -151,8 +151,78 @@ public class IslandManager : MonoBehaviour
 
     public void InvokeSplaturnSpell( int islandIndex, int structureIndex )
     {
-        // TODO:
+        // validate
+        if (islandIndex < 0 || islandIndex > islands.Length-1)
+        {
+            Debug.LogError("--- IslandManager [InvokeSplaturnSpell] : invalid island index. aborting.");
+            return;
+        }
+        if (structureIndex < 0 || structureIndex > islands[islandIndex].structures.Length - 1)
+        {
+            Debug.LogError("--- IslandManager [InvokeSplaturnSpell] : invalid structure index for island index #"+islandIndex+". aborting.");
+            return;
+        }
+        if (!islands[islandIndex].structures[structureIndex].name.Contains("wiz tower"))
+            Debug.LogWarning("--- IslandManager [InvokeSplaturnSpell] : structure '"+ islands[islandIndex].structures[structureIndex].name +"' on island index # " +islandIndex+" does not contain 'wiz tower'. will ignore.");
+
+        // find player of island, find player options main color
+        Color playerMainColor = new Color(0.9f, 0.8f, 0.618f);
+        PlayerColor pColor = PlayerColor.Default;
+        GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
+        if (ggm != null)
+        {
+            PlayerData[] playerData = ggm.game.players;
+            for (int n = 0; n < playerData.Length; n++)
+            {
+                if (playerData[n].playerIsland == islandIndex)
+                {
+                    playerMainColor = PlayerSystem.GetPlayerColor(playerData[n].options.mainColor);
+                    pColor = playerData[n].options.mainColor;
+                    break;
+                }
+            }
+        }
+        // find structure that is "Structure wiz tower" on island
+        GameObject islandFolder = GameObject.Find("Islands");
+        GameObject islandObj = null;
+        for (int i = 0; i < islandFolder.transform.childCount; i++)
+        {
+            if (islandFolder.transform.GetChild(i).gameObject.transform.position == GameSystem.GetVector(islands[islandIndex].location))
+                islandObj = islandFolder.transform.GetChild(i).gameObject;
+        }
+        if (islandObj == null)
+        {
+            Debug.LogError("--- IslandManager [InvokeSplaturnSpell] : no island found at " + GameSystem.GetVector(islands[islandIndex].location) + ". aborting.");
+            return;
+        }
+        GameObject towerObject = null;
+        for (int i = 0; i < islandObj.transform.childCount; i++)
+        {
+            if (islandObj.transform.GetChild(i).gameObject.transform.position == GameSystem.GetVector(islands[islandIndex].structures[structureIndex].location))
+                towerObject = islandObj.transform.GetChild(i).gameObject;
+        }
+        if (towerObject == null)
+        {
+            Debug.LogError("--- IslandManager [InvokeSplaturnSpell] : no tower found at " + GameSystem.GetVector(islands[islandIndex].structures[structureIndex].location) + ". aborting.");
+            return;
+        }
+        DoSplaturnColoration(towerObject, (StructureEffect)pColor);
+        // apply this tower color to the structure as an effect
+        islands[islandIndex].structures[structureIndex] = IslandSystem.AddStructureEffect(islands[islandIndex].structures[structureIndex], (StructureEffect)pColor);
+    }
+
+    void DoSplaturnColoration( GameObject towerObject, StructureEffect splaturnColor )
+    {
         // can look for all Util_White and replace with player color based on effect
+        Renderer[] rends = towerObject.GetComponentsInChildren<Renderer>();
+        for (int i = 0; i < rends.Length; i++)
+        {
+            if (rends[i].material.name == "Util_White (Instance)")
+            {
+                print(" material found to color ."+i+". called '"+rends[i].material.name+"'");
+                rends[i].material.SetColor("_Color", PlayerSystem.GetPlayerColor((PlayerColor)splaturnColor));
+            }
+        }
     }
 
     /// <summary>
@@ -318,6 +388,18 @@ public class IslandManager : MonoBehaviour
             structure.transform.position = pos;
             // parent to island
             structure.transform.parent = islandObj.transform;
+            // STRUCTURE EFFECT : MAGIC SPELL : SPLATURN
+            if (sData.effects.Length > 0)
+            {
+                for (int n = 0; n < sData.effects.Length; n++)
+                {
+                    if (sData.effects[n] <= StructureEffect.TowerColorO)
+                    {
+                        DoSplaturnColoration(structure, sData.effects[n]);
+                        break;
+                    }
+                }
+            }
         }
         retBool = true;
 
