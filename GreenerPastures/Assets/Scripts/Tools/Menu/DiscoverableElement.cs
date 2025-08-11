@@ -61,7 +61,7 @@ public class DiscoverableElement : MonoBehaviour
 
     private AudioManager sfxAudio;
 
-    const float CHANCEOFAPPEARANCE = 0.01f; // big rewards mean rare chance of appearance
+    const float CHANCEOFAPPEARANCE = 0.381f; // big rewards mean rare chance of appearance
     const float PLAYERCHECKTIME = 10f;
     const float REWARDTIME = 10f;
 
