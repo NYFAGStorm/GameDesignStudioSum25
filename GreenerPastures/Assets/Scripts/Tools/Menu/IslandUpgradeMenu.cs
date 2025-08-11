@@ -113,16 +113,16 @@ public class IslandUpgradeMenu : MonoBehaviour
 
     private MultiGamepad padMgr;
     private bool usingPad;
-    private int padButtonSelection = -1;
-    private int padMaxButton = 0;
-    private int padClickButton = -1;
+    public int padButtonSelection = -1;
+    public int padMaxButton = 8;
+    public int padClickButton = -1;
     private int padMove = -1;
 
     private StageOfTransaction stage;
 
     private UpgradeCategory currentCategory;
     private MenuItem[] displayItems;
-    private int menuItemSelection = -1;
+    public int menuItemSelection = -1;
     private int topOfMenuList = 0;
     private int maxDisplayItems = 5;
 
@@ -818,8 +818,21 @@ public class IslandUpgradeMenu : MonoBehaviour
     {
         bool retBool = true;
 
-        // check if overlapping critical elements (structures or other props)
+        // check if overlapping critical elements (plots, structures or other props)
         bool found = false;
+        for (int i = 0; i < pcm.playerData.farm.plots.Length; i++)
+        {
+            float dist = Vector3.Distance(cursor.transform.position, GameSystem.GetVector(pcm.playerData.farm.plots[i].location));
+            float minDist = .618f;
+            if (dist < minDist)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            retBool = false;
+        found = false;
         for (int i = 0; i < im.islands[pcm.playerData.playerIsland].props.Length; i++)
         {
             if (compositionPropDataIndex == i)
@@ -1095,7 +1108,35 @@ public class IslandUpgradeMenu : MonoBehaviour
                     padButtonSelection--;
                 if (padMove == 1)
                     padButtonSelection++;
+
+                if (stage == StageOfTransaction.Purchases)
+                {
+                    if (confirmPopup)
+                    {
+                        //if (padMove == 2)
+                        //    padButtonSelection = 0;
+                        //if (padMove == 3)
+                        //    padButtonSelection = 1;
+                        padMaxButton = 1;
+                    }
+                    else
+                    {
+                        // set max pad button to display items length
+                        padMaxButton = displayItems.Length;
+                        if (purchaseItemsHeld.Length > 0)
+                            padMaxButton += 2;
+                    }
+                }
+                // clamp to max button
                 padButtonSelection = Mathf.Clamp(padButtonSelection, 0, padMaxButton);
+                //
+                // menu selection follows pad button selection
+                if (!confirmPopup)
+                    menuItemSelection = padButtonSelection;
+                if (menuItemSelection < 0)
+                    menuItemSelection = 0;
+                if (menuItemSelection > displayItems.Length - 1)
+                    menuItemSelection = displayItems.Length - 1;
             }
             // button press
             if (padMgr.gPadDown[0].aButton)
@@ -1209,7 +1250,8 @@ public class IslandUpgradeMenu : MonoBehaviour
 
         // purchase selection
         if (stage == StageOfTransaction.Purchases && 
-            (Input.GetKeyDown(pcm.actionAKey) || usingPad && padMgr.gPadDown[0].aButton))
+            (Input.GetKeyDown(pcm.actionAKey) || 
+            (usingPad && !confirmPopup && padClickButton == menuItemSelection)))
         {
             if (CanPurchase(displayItems[menuItemSelection]))
             {
@@ -1400,14 +1442,6 @@ public class IslandUpgradeMenu : MonoBehaviour
         return retBool;
     }
 
-    void MakePurchase( MenuItem item )
-    {
-        int thisPrice = item.price;
-        if (hasSalesmanDiscount)
-            thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
-        pcm.playerData.gold -= thisPrice;
-    }
-
     void AddToPurchaseItemsHeld( MenuItem item, MenuItem tradeIn )
     {
         MenuItem[] tmp = new MenuItem[purchaseItemsHeld.Length + 1];
@@ -1498,7 +1532,6 @@ public class IslandUpgradeMenu : MonoBehaviour
         greenerPasturesTimer = GREENERPASTURESTIME;
     }
 
-    // REVIEW: no
     void AddToCompositionObjects( GameObject obj )
     {
         if (obj == null)
@@ -2022,8 +2055,6 @@ public class IslandUpgradeMenu : MonoBehaviour
         if (compositionTimer > 0f)
             return;
 
-        // TODO: fast-forward in composition beats if we are not performing greener pastures
-
         switch (compositionBeat)
         {
             case 1:
@@ -2268,9 +2299,9 @@ public class IslandUpgradeMenu : MonoBehaviour
             r.width = 0.1f * w;
             r.height = 0.05f * h;
             g = new GUIStyle(GUI.skin.button);
+            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
             if (usingPad)
                 g.fontSize = Mathf.RoundToInt(12 * (w / 1024f));
-            g.fontSize = Mathf.RoundToInt(16 * (w / 1024f));
             g.normal.textColor = Color.white;
             g.hover.textColor = Color.yellow;
             g.active.textColor = Color.yellow;
@@ -2289,7 +2320,10 @@ public class IslandUpgradeMenu : MonoBehaviour
 
                 // consuming input, but why?
                 if (usingPad)
+                {
+                    padButtonSelection = 0;
                     padMgr.gPadDown[0].LBump = false;
+                }
             }
             r.x = 0.7f * w;
             s = ">>";
@@ -2307,7 +2341,10 @@ public class IslandUpgradeMenu : MonoBehaviour
 
                 // consuming input, but why?
                 if (usingPad)
+                {
+                    padButtonSelection = 0;
                     padMgr.gPadDown[0].RBump = false;
+                }
             }
         }
 
@@ -2467,13 +2504,14 @@ public class IslandUpgradeMenu : MonoBehaviour
             g.fontSize = Mathf.RoundToInt(18 * (w / 1024f));
             g.fontStyle = FontStyle.Bold;
             g.normal.textColor = Color.white;
-            if (usingPad && padClickButton == 0)
+            if (usingPad && padButtonSelection == 0)
                 g.normal.textColor = Color.yellow;
             g.hover.textColor = Color.yellow;
             g.active.textColor = Color.white;
             s = "ACCEPT";
+            GUI.enabled = (popupTimer == 0f);
             if (GUI.Button(r,s,g) ||
-                (usingPad && padClickButton == 0))
+                (usingPad && padButtonSelection == 0 && padClickButton == 0))
             {
                 if (confirmType == ConfirmType.Purchase)
                 {
@@ -2538,15 +2576,15 @@ public class IslandUpgradeMenu : MonoBehaviour
             // cancel button
             r.x = 0.55f * w;
             g.normal.textColor = Color.white;
-            if (usingPad && padClickButton == 1)
+            if (usingPad && padButtonSelection == 1)
                 g.normal.textColor = Color.yellow;
             g.hover.textColor = Color.yellow;
             g.active.textColor = Color.white;
             s = "CANCEL";
+            GUI.enabled = (popupTimer == 0f);
             if (GUI.Button(r, s, g) ||
-                (usingPad && padClickButton == 1))
+                (usingPad && padButtonSelection == 1 && padClickButton == 1))
             {
-
                 if (confirmType == ConfirmType.Purchase)
                 {                
                     // clear current purchase item consideration
@@ -2592,14 +2630,14 @@ public class IslandUpgradeMenu : MonoBehaviour
                 //g.fontStyle = FontStyle.Bold;
                 g.alignment = TextAnchor.MiddleCenter;
                 g.normal.textColor = Color.white;
-                if (usingPad && padButtonSelection == padMaxButton)
+                if (usingPad && padButtonSelection == padMaxButton - 1)
                     g.normal.textColor = Color.yellow;
                 g.hover.textColor = Color.yellow;
                 g.active.textColor = Color.white;
                 s = "Compose Puchases";
                 if (stage == StageOfTransaction.Completion)
                     s = "End Transaction";
-                if ((GUI.Button(r, s, g) || (usingPad && padClickButton == padMaxButton)))
+                if ((GUI.Button(r, s, g) || (usingPad && padClickButton == padMaxButton - 1)))
                 {
                     if (stage == StageOfTransaction.Purchases)
                         ConfirmPopup("Are you sure you're done purchasing\neverything you want today?", ConfirmType.ComposeIsland);
@@ -2665,12 +2703,12 @@ public class IslandUpgradeMenu : MonoBehaviour
             //g.fontStyle = FontStyle.Bold;
             g.alignment = TextAnchor.MiddleCenter;
             g.normal.textColor = Color.white;
-            if (usingPad && padButtonSelection == padMaxButton - 1)
+            if (usingPad && padButtonSelection == padMaxButton)
                 g.normal.textColor = Color.yellow;
             g.hover.textColor = Color.yellow;
             g.active.textColor = Color.white;
             s = "End Island Upgrades";
-            if (GUI.Button(r, s, g) || (usingPad && padClickButton == padMaxButton - 1))
+            if (GUI.Button(r, s, g) || (usingPad && padClickButton == padMaxButton))
             {
                 SignalMenuClose();
             }
