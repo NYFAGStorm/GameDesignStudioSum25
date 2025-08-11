@@ -191,12 +191,9 @@ public class DiscoverableElement : MonoBehaviour
                             if (sfxAudio != null)
                                 sfxAudio.StartSound("Player Arcana Skill");
                             rewardTimer = 0f;
-                            ggm = null;
-                            playerData = null;
-                            elementDiscovered = false;
-                            state = DiscoverableState.Rewarded;
                         }
                     }
+                    state = DiscoverableState.Rewarded;
                 }
             }
         }
@@ -232,7 +229,13 @@ public class DiscoverableElement : MonoBehaviour
             playerCheckTimer = PLAYERCHECKTIME;
         // reset on splash scene
         if (scene.name == "Splash")
+        {
             state = DiscoverableState.Default;
+            revealProgress = 0f;
+            ggm = null;
+            playerData = null;
+            elementDiscovered = false;
+        }
     }
 
     void RevealElement()
@@ -320,7 +323,7 @@ public class DiscoverableElement : MonoBehaviour
 
     void OnGUI()
     {
-        if (state < DiscoverableState.Appear || ( elementDiscovered && revealProgress == 1f ))
+        if (state < DiscoverableState.Appear ||  ( elementDiscovered && revealProgress == 1f ))
             return;
 
         Rect r = elementSpace;
