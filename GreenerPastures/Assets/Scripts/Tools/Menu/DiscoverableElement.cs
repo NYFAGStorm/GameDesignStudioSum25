@@ -63,7 +63,9 @@ public class DiscoverableElement : MonoBehaviour
 
     private AudioManager sfxAudio;
 
-    const float CHANCEOFAPPEARANCE = 0.05f; // big rewards mean rare chance of appearance
+    private MultiGamepad padMgr;
+
+    const float CHANCEOFAPPEARANCE = 0.95f; // big rewards mean rare chance of appearance
     const float PLAYERCHECKTIME = 10f;
     const float REWARDTIME = 10f;
 
@@ -104,6 +106,12 @@ public class DiscoverableElement : MonoBehaviour
         if (rewardAmount <= 0)
         {
             Debug.LogError("--- DiscoverableElement [Start] : " + gameObject.name + " no reward amount defined. aborting.");
+            enabled = false;
+        }
+        padMgr = GameObject.FindFirstObjectByType<MultiGamepad>();
+        if (padMgr == null)
+        {
+            Debug.LogError("--- DiscoverableElement [Start] : no multi gamepad manager found in scene. aborting.");
             enabled = false;
         }
         GameObject sfxObject = GameObject.Find("AudioMgr SFX");
@@ -294,9 +302,13 @@ public class DiscoverableElement : MonoBehaviour
         // activate on credits scene
         if (scene.name == "Credits" && state == DiscoverableState.Default)
         {
-            state = DiscoverableState.Ready;
+            if (!padMgr.gamepads[0].isActive)
+                state = DiscoverableState.Ready;
+            else
+                print("gamepad active, prevent element");
             // chance of element appearance
-            if ( RandomSystem.FlatRandom01() < CHANCEOFAPPEARANCE )
+            if (state == DiscoverableState.Ready &&
+                RandomSystem.FlatRandom01() < CHANCEOFAPPEARANCE)
                 state = DiscoverableState.Appear;
         }
         // reward in greenergame scene
