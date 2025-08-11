@@ -218,10 +218,7 @@ public class IslandManager : MonoBehaviour
         for (int i = 0; i < rends.Length; i++)
         {
             if (rends[i].material.name == "Util_White (Instance)")
-            {
-                print(" material found to color ."+i+". called '"+rends[i].material.name+"'");
                 rends[i].material.SetColor("_Color", PlayerSystem.GetPlayerColor((PlayerColor)splaturnColor));
-            }
         }
     }
 
