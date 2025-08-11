@@ -757,6 +757,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb9b9dae89947054198741111077c303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomizedTextures:
+  - {fileID: 2800000, guid: 46ffcd67af9a16349a10eebdb43ef8a1, type: 3}
+  - {fileID: 2800000, guid: 28f4e0825e621ce449e8e51edd77404b, type: 3}
+  - {fileID: 2800000, guid: e752e9f6676eb314e8c3059cf3c9af15, type: 3}
+  - {fileID: 2800000, guid: 05d7e46578b687642aec96d88ae34448, type: 3}
+  - {fileID: 2800000, guid: 0b086608f10e437488e3724eab9951a2, type: 3}
+  - {fileID: 2800000, guid: 5ef7a2970eff599488b4ef17c60c083f, type: 3}
+  - {fileID: 2800000, guid: da440a1766563bd4283b40f06e6a5757, type: 3}
+  - {fileID: 2800000, guid: 967b20354d2a5f049af22bbca78c2c76, type: 3}
+  - {fileID: 2800000, guid: bbc37f6bc983f4f4aa735b0efc649d1e, type: 3}
+  - {fileID: 2800000, guid: 3a23c26aeca77d74c9134d92aca5009b, type: 3}
+  - {fileID: 2800000, guid: a082b1ea8723aee4ebf4adaa6981353a, type: 3}
+  - {fileID: 2800000, guid: f0f2c45b49656f144ade84af779a7384, type: 3}
   elementTexture: {fileID: 2800000, guid: f0f2c45b49656f144ade84af779a7384, type: 3}
   elementSpace:
     serializedVersion: 2

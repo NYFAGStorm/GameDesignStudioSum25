@@ -33,6 +33,8 @@ public class DiscoverableElement : MonoBehaviour
         Rewarded
     }
 
+    public Texture2D[] randomizedTextures;
+
     public Texture2D elementTexture;
     [Tooltip("The viewport space this element exists. (percentage of screen space")]
     public Rect elementSpace;
@@ -61,7 +63,7 @@ public class DiscoverableElement : MonoBehaviour
 
     private AudioManager sfxAudio;
 
-    const float CHANCEOFAPPEARANCE = 0.381f; // big rewards mean rare chance of appearance
+    const float CHANCEOFAPPEARANCE = 0.05f; // big rewards mean rare chance of appearance
     const float PLAYERCHECKTIME = 10f;
     const float REWARDTIME = 10f;
 
@@ -115,8 +117,81 @@ public class DiscoverableElement : MonoBehaviour
 
             state = DiscoverableState.Default;
 
+            RandomizeReward();
+            RandomizePosition();
+            RandomizeTexture();
+            RandomizeReveal();
+
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
+    }
+
+    void RandomizeReward()
+    {
+        float rnd = RandomSystem.FlatRandom01();
+        if ( rnd < .25f )
+        {
+            // gold
+            reward = RewardType.Gold;
+            rnd = RandomSystem.WeightedRandom01();
+            rewardAmount = GameSystem.RoundedResult(rnd, 25);
+            rewardAmount *= 10;
+        }
+        else if ( rnd < .5f )
+        {
+            // xp
+            reward = RewardType.XP;
+            rnd = RandomSystem.WeightedRandom01();
+            rewardAmount = GameSystem.RoundedResult(rnd, 10);
+            rewardAmount *= 10;
+        }
+        else if ( rnd < .618f )
+        {
+            // arcana
+            reward = RewardType.Arcana;
+            rewardAmount = 1;
+        }
+        else
+        {
+            // magic item
+            reward = RewardType.MagicItem;
+            rnd = RandomSystem.WeightedRandom01();
+            rewardAmount = GameSystem.RoundedResult(rnd, 3);
+        }
+    }
+
+    void RandomizePosition()
+    {
+        float rnd = RandomSystem.FlatRandom01();
+        if (rnd > .5f)
+        {
+            // h flip
+            elementSpace.x = 1f - elementSpace.x;
+            elementSpace.x -= elementSpace.width;
+            elementTarget.x = 1f - elementTarget.x;
+            elementTarget.x -= elementSpace.width;
+        }
+        rnd = RandomSystem.FlatRandom01();
+        if (rnd > .5f)
+        {
+            // v flip
+            elementTarget.y -= 1f - elementSpace.y;
+            elementSpace.y = 1f - elementSpace.y;
+            elementSpace.y -= elementSpace.height;
+        }
+    }
+
+    void RandomizeTexture()
+    {
+        if (randomizedTextures == null || randomizedTextures.Length == 0)
+            return;
+        int rnd = Random.Range(0, randomizedTextures.Length);
+        elementTexture = randomizedTextures[rnd];
+    }
+
+    void RandomizeReveal()
+    {
+        revealMode = (RevealTransition)(Random.Range(0, 4)+1);
     }
 
     void Update()
@@ -235,6 +310,10 @@ public class DiscoverableElement : MonoBehaviour
             ggm = null;
             playerData = null;
             elementDiscovered = false;
+            RandomizeReward();
+            RandomizePosition();
+            RandomizeTexture();
+            RandomizeReveal();
         }
     }
 
