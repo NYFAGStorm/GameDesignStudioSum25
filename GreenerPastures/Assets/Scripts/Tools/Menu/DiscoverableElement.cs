@@ -65,7 +65,7 @@ public class DiscoverableElement : MonoBehaviour
 
     private MultiGamepad padMgr;
 
-    const float CHANCEOFAPPEARANCE = 0.95f; // big rewards mean rare chance of appearance
+    const float CHANCEOFAPPEARANCE = 0.05f; // big rewards mean rare chance of appearance
     const float PLAYERCHECKTIME = 10f;
     const float REWARDTIME = 10f;
 
@@ -304,8 +304,6 @@ public class DiscoverableElement : MonoBehaviour
         {
             if (!padMgr.gamepads[0].isActive)
                 state = DiscoverableState.Ready;
-            else
-                print("gamepad active, prevent element");
             // chance of element appearance
             if (state == DiscoverableState.Ready &&
                 RandomSystem.FlatRandom01() < CHANCEOFAPPEARANCE)
