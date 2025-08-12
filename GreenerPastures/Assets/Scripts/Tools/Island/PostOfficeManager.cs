@@ -15,6 +15,7 @@ public class PostOfficeManager : MonoBehaviour
     private PlayerMessage[] letterMessages; // player messages saved until read
 
     private GreenerGameManager ggm;
+    private PlayerIntroduction intro;
     private bool mailboxesFound;
 
     private struct ScheduledMessage
@@ -45,6 +46,12 @@ public class PostOfficeManager : MonoBehaviour
         if (ggm == null)
         {
             Debug.LogError("--- PostOfficeManager [Start] : no game manager found in scene. aborting.");
+            enabled = false;
+        }
+        intro = GameObject.FindFirstObjectByType<PlayerIntroduction>();
+        if (intro == null)
+        {
+            Debug.LogError("--- PostOfficeManager [Start] : no player introduction found in scene. aborting.");
             enabled = false;
         }
         // initialze
@@ -341,6 +348,8 @@ public class PostOfficeManager : MonoBehaviour
     public void DailyDelivery( int day, WorldMonth month )
     {
         if (day <= latestDailyDelivery)
+            return;
+        if (intro.introRunning)
             return;
 
         // send player effect messages to players who have not had them sent yet

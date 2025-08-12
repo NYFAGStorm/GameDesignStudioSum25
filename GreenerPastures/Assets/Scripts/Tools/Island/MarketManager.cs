@@ -1007,7 +1007,8 @@ public class MarketManager : MonoBehaviour
         if (item == null || item.type == ItemType.Default)
             return 0;
 
-        return GetAdjustedSellValue(item, GetMarketSellValue(item.type, item.plant));
+        // only return at zero or more
+        return Mathf.Max(0, GetAdjustedSellValue(item, GetMarketSellValue(item.type, item.plant)));
     }
 
     int GetAdjustedSellValue( ItemData item, int baseValue )

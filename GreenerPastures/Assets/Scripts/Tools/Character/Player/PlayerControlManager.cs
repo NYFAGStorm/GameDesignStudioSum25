@@ -935,6 +935,14 @@ public class PlayerControlManager : MonoBehaviour
                             {
                                 int rndspell = GameSystem.RoundedResult(RandomSystem.FlatRandom01(), 
                                     playerData.magic.library.spellBook.Length) - 1;
+                                int safety = 50;
+                                // ensure potion clears spell cooldowns not skills
+                                while (safety > 0 && (playerData.magic.library.spellBook[rndspell].cooldownDuration <= 0.1f))
+                                {
+                                    safety--;
+                                    rndspell = GameSystem.RoundedResult(RandomSystem.FlatRandom01(),
+                                        playerData.magic.library.spellBook.Length) - 1;
+                                }
                                 playerData.magic.library.spellBook[rndspell].cooldown = 0.1f;
                                 potionNotify[1] = playerData.magic.library.spellBook[rndspell].name + "\ncooldown is CLEARED!";
                             }
