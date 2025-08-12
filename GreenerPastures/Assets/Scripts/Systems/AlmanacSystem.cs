@@ -316,67 +316,1397 @@ public static class AlmanacSystem
         {
             retData.entries[i] = InitializeEntry();
 
+            string title = "";
+            bool revealed = false;
+            string icon = "GenesisTree";
+            string subtitle = "";
+            string description = "";
+            string detailA = "";
+            string detailB = "";
+            string detailC = "";
+            string detailD = "";
+            string detailE = "";
+
             if (i < loreEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Lore;
                 // LORE
-                if (i == 0)
+                switch(i)
                 {
-                    // (generic almanac entry format with optional fields for data)
-                    // set revealed to false if this should be hidden
-                    // use 'genesistree' as icon name for now, we need icons
-                    retData.entries[i].title = "The Sample Almanac Entry";
-                    retData.entries[i].revealed = false;
-                    retData.entries[i].icon = "GenesisTree";
-                    retData.entries[i].subtitle = "Every journey begins with a single step.";
-                    retData.entries[i].description = "Once upon a time, a squirrel found a nut in the tallest tree in the forest. This nut was so marvelous he vowed to fetch it and become king of all squirrels. So, he climbed and climbed, and he was never seen again.";
-                    retData.entries[i].details = new string[3];
-                    retData.entries[i].details[0] = "Nut";
-                    retData.entries[i].details[1] = "Squirrel";
-                    retData.entries[i].details[2] = "Tree";
+                    case 0:
+                        title = "The Genesis Tree";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The Source of All Life and Magic";
+                        description = "The great Genesis Tree, from where all magic in the world flows to and from. Nobody knows where it came from or how it grew into the towering plant it is today. Regardless, it is the sacred duty of the Biomancers to ensure the growth of the Genesis Tree continues to remain eternal.";
+                        detailA = "Mythology";
+                        detailB = "History";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "The Mystic Magistrate";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Council of Supreme Biomancers";
+                        description = " Guardians of the Genesis Tree, overseers of all biomancers, and the most responsible magic users you can find in Empyrea. The Mystic Magistrate watches over all biomancers and provides them guidance when necessary. You can always rely on them to help whenever you’re feeling lost.";
+                        detailA = "History";
+                        detailB = "Guidance";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "Arcana";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Our Magical Currency";
+                        description = "Biomancers are serving a purpose for the Genesis Tree by cultivating Arcana from sunlight, other natural resources and their magical practice. The Arcana each biomancer earns strengthens the Genesis Tree, and in turn, our community. With Arcana, a biomancer becomes more skilled and gains advanced abilities.";
+                        detailA = "Mythology";
+                        detailB = "Arcana Skills";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
                 }
             }
             else if (i < peopleEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.People;
                 // PEOPLE
+                switch (i - loreEntries)
+                {
+                    case 0:
+                        title = "Magister Eden";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Magister of Gardens";
+                        description = "The most knowledgeable of the three Mystic Magistrate members, Magister Eden is a very kindhearted lady. Her knowledge of the plants that can be found in Empyrea is staggering. She enjoys helping new biomancers adjust to their positions and grants them an island to begin their life in Empyrea as well.";
+                        detailA = "Magistrate";
+                        detailB = "Biomancers";
+                        detailC = "Plants";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "Magister Salesman";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Magister of Arcana";
+                        description = "The ever punctual Magister Salesman. Magister Salesman is in charge of sending islands to the Genesis Tree when they are deemed refined of all their magic. He said once before that what he loves most is the smiles on his customers' faces when they see their new island.";
+                        detailA = "Magistrate";
+                        detailB = "Merchant";
+                        detailC = "Island Upgrades";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "Magister Shady";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Magister of Curses";
+                        description = "The Magister with perhaps the most mystery surrounding him out of them all. Magister Shady usually stays out of the way, watching Empyrea’s activities from a distance. Every now and then he’ll take interest in a biomancer and offer them some rather unique curses. For a price of course, much to Magister Eden’s dismay.";
+                        detailA = "Magistrate";
+                        detailB = "Curses";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 3:
+                        title = "Mr. Sells Alat";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The Most Successful Sale-Cat";
+                        description = "The best merchant through all the skies of Empyrea. Perhaps even the greatest merchant in the entire world, or so he’ll try to get you to believe. Mr. Salesalot is a longstanding member of Empyrea’s community of biomancers. Though he isn’t one himself, he sells all the things necessary to Biomancer life. Just don’t question why he wears different hats at different stalls and you’ll get along great.";
+                        detailA = "Merchant";
+                        detailB = "Market";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
             else if (i < placeEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Places;
                 // PLACES
+                switch (i-peopleEntries)
+                {
+                    case 0:
+                        title = "Empyrea";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The Biomancer Skies";
+                        description = "Rather than a single designated area, Empyrea is the general name for the airspace belonging to the Biomancers. It stretches far beyond the horizon yet is never out of reach. Here, you’ve made your home and will continue to grow it as a member of the Empyrea community.";
+                        detailA = "The Skies";
+                        detailB = "Biomancers";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "The Skyport";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The Central Marketplace";
+                        description = "Where most of the activity in Empyrea occurs. The Skyport is where biomancers come to converse amongst each other, purchase goods from the market, and other important daily activities. If you ever need something, the Skyport is where you can find it.";
+                        detailA = "The Skies";
+                        detailB = "Market";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
             else if (i < itemEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Items;
                 // ITEMS
+                switch (i-placeEntries)
+                {
+                    case 0:
+                        title = "Seed";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "A small package for big things";
+                        description = "All seeds appear similar before growing into their own. Seeds can be planted manually by holding them and working the land. Seeds can also be planted by broadcasting, dropping them on tilled plots.";
+                        detailA = "Plant";
+                        detailB = "Growing";
+                        detailC = "Crafting";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "Plant";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "A singular piece of life";
+                        description = "A grown plant from seed. Plants may be harvested for their fruit, and some plants will continue to grow, to re-fruit. Most plants need sunlight, but some (Dark Plants) need moonlight. All plants need water and good soil quality to grow healthy. Healthy plants produce better harvested fruit quality.";
+                        detailA = "Plant";
+                        detailB = "Harvesting";
+                        detailC = "Crafting";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "Stalk";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Supportive structure";
+                        description = "A stalk is left over after a plant is harvested, but plants that re-fruit do not have left-over stalks. A stalk will continue to drain soil quality and water from a plot after harvesting. A stalk in a plot can be grafted to a fruit of another plant, creating a new, more rare, plant type.";
+                        detailA = "Plant";
+                        detailB = "Grafting";
+                        detailC = "Crafting";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 3:
+                        title = "Fruit";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Flowering beauty and bounty";
+                        description = "A fruit or flower is the product of a harvested plant. Quality of a fruit translates to a higher value when selling at the market. A fruit in hand can be grafted to a stalk of another plant, creating a new, more rare, plant type.";
+                        detailA = "Plant";
+                        detailB = "Grafting";
+                        detailC = "Selling";
+                        detailD = "Crafting";
+                        detailE = "";
+                        break;
+                    case 4:
+                        title = "Fertilizer";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Grounding element";
+                        description = "A necessary part of gardening, the product of the compost bin after ‘cooking’ plant material. It improves soil quality dramatically when placed in plots that have been uprooted.";
+                        detailA = "Compost";
+                        detailB = "Soil Quality";
+                        detailC = "Crafting";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 5:
+                        title = "Rock";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Simple and solid";
+                        description = "A small rock. ‘Funny thing is, sometimes it’s there and sometimes it isn’t.";
+                        detailA = "Crafting";
+                        detailB = "Secret life";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 6:
+                        title = "Gold Coin";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "All that glitters";
+                        description = "A single gold piece, and the basis for currency at the market and with island upgrades. Gold may be spent on goods at the market or with the traveling salesman, or you may bet gold on chicken races near the market. There are other means to acquire gold coins.";
+                        detailA = "Currency";
+                        detailB = "Market";
+                        detailC = "Island upgrades";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 7:
+                        title = "Gold Pouch";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Hold the purse strings";
+                        description = "A gold pouch appears when many gold coins are dropped at once. Picking up a gold pouch immediately transfers all the gold within to your purse.";
+                        detailA = "Currency";
+                        detailB = "Market";
+                        detailC = "Island upgrades";
+                        detailD = "Consumable";
+                        detailE = "";
+                        break;
+                    case 8:
+                        title = "Package";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Special delivery";
+                        description = " Packages hold many items, and when picking up a package, all the items within appear. If you purchase more items at the market than your inventory can hold, the market will deliver a package to your mailbox with those items inside.";
+                        detailA = "Mail";
+                        detailB = "Consumable";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 9:
+                        title = "Letter";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Greetings and well wishes";
+                        description = "Letters are small personal messages to you from others. They often contain helpful ideas or reminders.";
+                        detailA = "Mail";
+                        detailB = "Consumable";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 10:
+                        title = "Coupon";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Valuable discount";
+                        description = "A coupon can be held while purchasing at the market for a discount on that item. The amount of discount can be as high as 100%. Upon buying an item at the market, the coupon is exchanged for that item.";
+                        detailA = "Market";
+                        detailB = "Trade";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 11:
+                        title = "Scroll";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Magical powerup";
+                        description = "A magic scroll contains a single spell charge, to be transferred directly to your spell book without having to craft. You read the scroll by picking it up. Upon reading the scroll, the charge is added to your spell book and the scroll disappears.";
+                        detailA = "Magic";
+                        detailB = "Spell Charge";
+                        detailC = "Consumable";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 12:
+                        title = "Potion";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Counter cooldowns";
+                        description = "A magic potion clears spell cooldowns. Grey potions will clear one spell charge at random within your spell book. White potions will clear all spell charges in your spell book. You drink the potion by picking it up. Upon drinking the potion, it will disappear.";
+                        detailA = "Magic";
+                        detailB = "Spell Cooldown";
+                        detailC = "Consumable";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
             else if (i < farmEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Farming;
                 // FARMING
+                switch (i- itemEntries)
+                {
+                    case 0:
+                        title = "Plots of Land";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Foundation for growth";
+                        description = "A square of ground that is able to hold a plant for growing, harvesting and grafting. Plots of land begin as wild, and must be worked to be tilled and ready for planting. Digging a hole in the plot uproots plants and allows fertilizer to be dropped in.";
+                        detailA = "Planting";
+                        detailB = "Harvesting";
+                        detailC = "Grafting";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "Working the Land";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Good work pays off";
+                        description = "Plots are able to be worked from wild to dirt, to tilled and planted, and after harvest, to be uprooted, so it can be cycled back to dirt and tilled again. Working the land improves the soil quality. Neglecting a plot with a plant or stalk in it will drain plot resources.";
+                        detailA = "Tilling";
+                        detailB = "Digging";
+                        detailC = "Enriching";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "Sun and Moon";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Light of day and night";
+                        description = "A key resource for plants is light. Most plants need sunlight to grow, but some (Dark Plants) need moonlight. While sunlight is available during each day, moonlight can be much dimmer during the new moon in the middle of each month. All light is dimmed with clouds.";
+                        detailA = "Resource";
+                        detailB = "Plants";
+                        detailC = "Dark Plants";
+                        detailD = "Moon Phases";
+                        detailE = "";
+                        break;
+                    case 3:
+                        title = "Water";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Source of growth";
+                        description = "Plants need water to grow as well. When watering a plot, it will immediately be full, but begin to drain. A plot with a plant in it will drain water faster. Rain will automatically add to each plot’s water resource.";
+                        detailA = "Resource";
+                        detailB = "Plants";
+                        detailC = "Watering";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 4:
+                        title = "Soil";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Rich nutrients make rich farms";
+                        description = "Soil quality is improved by working the land or adding fertilizer to a plot that has been uprooted. Fertilizer improves the soil quality dramatically. Soil quality is drained over time when a plot has a growing plant in it.";
+                        detailA = "Resource";
+                        detailB = "Plants";
+                        detailC = "Fertilizer";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
             else if (i < plantEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Plants;
                 // PLANTS
+                switch (i - farmEntries)
+                {
+                    // COMMON (10)
+                    case 0:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 3:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 4:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 5:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 6:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 7:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 8:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 9:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    // UNCOMMON (11)
+                    case 10:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 11:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 12:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 13:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 14:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 15:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 16:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 17:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 18:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 19:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 20:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    // RARE (10)
+                    case 21:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 22:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 23:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 24:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 25:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 26:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 27:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 28:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 29:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 30:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    // SPECIAL (10)
+                    case 31:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 32:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 33:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 34:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 35:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 36:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 37:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 38:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 39:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 40:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    // UNIQUE (9)
+                    case 41:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 42:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 43:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 44:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 45:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 46:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 47:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 48:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 49:
+                        title = "";
+                        revealed = false;
+                        icon = "GenesisTree";
+                        subtitle = "";
+                        description = "";
+                        detailA = "";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
             else if (i < magicEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Magic;
                 // MAGIC
+                switch (i - plantEntries)
+                {
+                    case 0:
+                        title = "Crafting Magic Spells";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Biomancer skills";
+                        description = "A biomancer uses magic to enrich the world, from their farm to the community around them. Every biomancer uses their spell library and crafting table, found in their wizard tower. To craft magic spells involves collection of ingredients and careful thinking.";
+                        detailA = "Magic Spells";
+                        detailB = "Crafting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "The Grimoire";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The book of knowledge";
+                        description = "When biomancers need to craft new spells, they consult the Grimoire, their collection of spell recipes. As one gains experience, the Grimoire will fill with new recipes. One needs to follow the recipes in order to craft its spell charge.";
+                        detailA = "Magic Spells";
+                        detailB = "Crafting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "Spell Recipes";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Quality ingredients";
+                        description = "Each spell requires special ingredients, carefully selected and brought to the crafting table. Specific types of ingredients are listed in each spell recipe. Once a biomancer has the ingredients in hand, the spell may be crafted using the Magic Cauldron.";
+                        detailA = "Crafting";
+                        detailB = "Ingredients";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 3:
+                        title = "The Magic Cauldron";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Bubble, bubble";
+                        description = " Ingredients for spells must be combined in unique ways for the spell charge to be created. The Magic Cauldron has the necessary heat and magic to place all the ingredients in the order required. Once all ingredients are in, a spell charge can be crafted.";
+                        detailA = "Crafting";
+                        detailB = "Ingredients";
+                        detailC = "Spell Charges";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 4:
+                        title = "The Magic Book";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Personal spell storage";
+                        description = "Every biomancer carries with them a Magic Book, a collection of the spell charges they have crafted. Every charge in the spell book represents a single magical cast the biomancer can invoke as long as that spell type is not on cooldown.";
+                        detailA = "Magic Casting";
+                        detailB = "Spell Charges";
+                        detailC = "Arcana Magic Skills";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 5:
+                        title = "Spell Charges";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "One can never have too many";
+                        description = "The crafting of magic creates a spell charge that is stored in the biomancer’s Magic Book. The biomancer may cast the spell at any time. Once cast, the charge is spent and that spell type will be on cooldown.";
+                        detailA = "Magic Casting";
+                        detailB = "Spell Cooldowns";
+                        detailC = "Scrolls";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 6:
+                        title = "Casting Magic Spells";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Abracadabra and hocus pocus";
+                        description = "When a biomancer opens their Magic Book, and they read a spell charge from it, they are able to cast the spell out into the world. Their ability to direct the spell cast to any point means they can control what plot, plant, person or object is affected by the spell.";
+                        detailA = "Spell Book";
+                        detailB = "Spell Charges";
+                        detailC = "Spell Cooldowns";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 7:
+                        title = "Spell Casts";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Magical life";
+                        description = "After a spell is cast, it lives in the world on its own. Some spells are instant, while others last a very long time. Some spells are even permanent. When a spell cast expires, its effect is undone.";
+                        detailA = "Magic Casting";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 8:
+                        title = "Spell Cooldowns";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Gather your strength";
+                        description = "After a biomancer has cast a spell of a particular type, it is unavailable for a time, while the biomancer regains their strength. This cooldown time can be different for each spell. A cooldown can be eliminated with a potion.";
+                        detailA = "Magic Casting";
+                        detailB = "Spell Book";
+                        detailC = "Potions";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 9:
+                        title = "Plot Spells";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Enchanted ground";
+                        description = "Spells that affect plots are able to increase soil quality, to keep the ground saturated with water, or even to shine sunlight upon it through a portal. Some spells are able to work the land, harvest or uproot plots.";
+                        detailA = "Magic Spells";
+                        detailB = "Magic Casting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 10:
+                        title = "Plant Spells";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Charmed life";
+                        description = "Plant magic includes the ability to force plants to grow faster or slower, to cause their harvest quality to be greater or lesser, or even to cause a plant to produce more fruit. Some spells can force plants to re-fruit or guarantee seeds will also drop with harvest.";
+                        detailA = "Magic Spells";
+                        detailB = "Magic Casting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 11:
+                        title = "People Spells";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "There’s something about you";
+                        description = "Care must be taken when casting spells on others. Typically, a spell designed to affect people is used by the biomancer on themselves. These spells include the ability to change appearance, leave a color trail or shine a light overhead.";
+                        detailA = "Magic Spells";
+                        detailB = "Magic Casting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 12:
+                        title = "Place Spells";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Sacred structure";
+                        description = "Rare magic can affect larger structures, and often this comes in the form of cosmetic decoration for more festive times. These spells include displays in the sky and changing the color of a biomancer’s tower.";
+                        detailA = "Magic Spells";
+                        detailB = "Magic Casting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 13:
+                        title = "Item Spells";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Transformation and evolution";
+                        description = "A biomancer will commonly use magic to affect items that need attention. Some spells can gather plant material and deposit it into the compost bin, or gather harvest items and transport them to market.";
+                        detailA = "Magic Spells";
+                        detailB = "Magic Casting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 14:
+                        title = "Active Magic Skills";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Biomancer cantrips";
+                        description = "Some advanced Arcana skills include active magic. These act like spells in a biomancer’s Magic Book, but their charges are never depleted and they have no cooldown time.";
+                        detailA = "Arcana Skills";
+                        detailB = "Magic Casting";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
             else if (i < eventEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Events;
                 // EVENTS
+                switch (i - magicEntries)
+                {
+                    case 0:
+                        title = "Morning";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Rise and shine";
+                        description = "When the sun rises on the horizon, the start of a new day is at hand. The morning time may include special events for those keen enough to listen. It is the time when one may have a sense that a wild plant is growing nearby.";
+                        detailA = "Dawn";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "Noon";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Heat of the day";
+                        description = "Most biomancers find this time of day to be the most productive. It is also the time of day when the traveling salesman pays a visit, but only on the first of each month.";
+                        detailA = "Day";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "Mail Delivery";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Neither snow, nor rain,..";
+                        description = "A biomancer’s mailbox springs to life at this time of day, and you may be lucky enough to receive well wishes and greetings in the form of letters or even care packages. Remember to check your mailbox every day.";
+                        detailA = "Package";
+                        detailB = "Letter";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 3:
+                        title = "Evening";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Pretty sunsets";
+                        description = "As the sun goes down and day turns to night, one may be lucky enough to get a visit to their farm from the seed fairy. At this time of day, it is common for winds to blow.";
+                        detailA = "Dusk";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 4:
+                        title = "Midnight";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The dark of night";
+                        description = "In the middle of the night, while no one is watching, some things move that normally do not move. Also, there is a rare chance of a farm visit from the gold fairy. The market will also change their daily specials at the stroke of midnight.";
+                        detailA = "Night";
+                        detailB = "";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 5:
+                        title = "Daily";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Every day is a new beginning";
+                        description = "To make the most of each day, a biomancer surveys the bounty of the land, takes note of the opportunities at the market, and follows their intuition. A biomancer finds their way each day by deciding to start and not deciding to stop.";
+                        detailA = "Market";
+                        detailB = "Visitors";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 6:
+                        title = "Weather";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Unpredictable";
+                        description = "Some days and nights are clear and calm. Others are filled with blustering winds or covered with dark clouds and sheets of rain. Some biomancers enjoy the variable weather, even when it is dramatic. Others prefer to find activities indoors, like at the chicken races, crafting magic or just cozying up to a warm fireplace.";
+                        detailA = "Wind";
+                        detailB = "Clouds";
+                        detailC = "Rain";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 7:
+                        title = "New Moon";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Extra dark";
+                        description = "The moon can be full and bright, lighting up the night sky and shining lots of moonlight on dark plants. But, in the middle of each month, the moon is covered in shadow and shines almost no moonlight at all. Dark plants grow very slowly during the new moon.";
+                        detailA = "Market";
+                        detailB = "Moon Phases";
+                        detailC = "Dark Plant";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 8:
+                        title = "Monthly";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Mark your calendar";
+                        description = "Each month brings a full moon, a new moon and a fresh new set of days to work with. In a single month, a biomancer can get a lot done, and amass quite a lot of gold. On the first day of each month, the traveling salesman comes to visit at noon.";
+                        detailA = "Island Upgrades";
+                        detailB = "Full Moon";
+                        detailC = "Dark Plant";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 9:
+                        title = "Seasons";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Turn, turn, turn";
+                        description = "Some plants grow better at night, or during the day. Some plants grow better during particular seasons. As the seasons change, the weather may get warmer or cooler, and your plants will change as well. The market is likely to offer specials based on season.";
+                        detailA = "Plants";
+                        detailB = "Market";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
             else if (i < secretEntries)
             {
                 retData.entries[i].category = AlmanacCateogory.Secrets;
                 // SECRETS
+                switch (i - eventEntries)
+                {
+                    case 0:
+                        title = "No Stone Unturned";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The secret life of rocks";
+                        description = "This rock is just a rock. Or, is it? Wasn’t this rock over there? Wait, there’s another rock. Where did that other rock go? Maybe this rock will make a good pet.";
+                        detailA = "Rock";
+                        detailB = "Midnight";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 1:
+                        title = "Poor Biomancer";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "A small helping hand";
+                        description = "Accidents happen. It’s okay, and we can grow from setbacks as easily as we grow any other time. When one needs help, they need only look to those who enjoy helping others.";
+                        detailA = "Fairy";
+                        detailB = "Gold";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 2:
+                        title = "Uniquely Yours";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "More rare than rare";
+                        description = "The unique mysteries in life are endless. Wonder springs everywhere, if one simply looks for it. Enjoy the rarest of gifts, including that of enjoyment itself.";
+                        detailA = "Plants";
+                        detailB = "Unique";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 3:
+                        title = "Pumpkin Eater";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "The secret of cheats";
+                        description = "Tsk, tsk, tsk.";
+                        detailA = "Cheat";
+                        detailB = "Codes";
+                        detailC = "";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                }
             }
 
+            retData.entries[i].title = title;
+            retData.entries[i].revealed = revealed;
+            retData.entries[i].icon = icon;
+            retData.entries[i].subtitle = subtitle;
+            retData.entries[i].description = description;
+            int numDetails = 0;
+            if (detailA != "")
+                numDetails++;
+            if (detailB != "")
+                numDetails++;
+            if (detailC != "")
+                numDetails++;
+            if (detailD != "")
+                numDetails++;
+            if (detailE != "")
+                numDetails++;
+            retData.entries[i].details = new string[numDetails];
+            if (numDetails > 0)
+                retData.entries[i].details[0] = detailA;
+            if (numDetails > 1)
+                retData.entries[i].details[1] = detailB;
+            if (numDetails > 2)
+                retData.entries[i].details[2] = detailC;
+            if (numDetails > 3)
+                retData.entries[i].details[3] = detailD;
+            if (numDetails > 4)
+                retData.entries[i].details[4] = detailE;
+
+            
+            /*
             if (i > 0 && (!retData.entries[i].revealed || retData.entries[i].title == ""))
             {
                 // temp lorem entries for debug (will use lorem to hide entries)
@@ -394,6 +1724,8 @@ public static class AlmanacSystem
                     retData.entries[i].details[n] = GenerateLoremIpsum(rnd, "").TrimEnd(char.Parse("."));
                 }
             }
+            */
+            
         }
 
         return retData;
