@@ -84,34 +84,11 @@ public class InGameAlmanac : MonoBehaviour
     {
         startingEntry = new int[10];
         entriesInCategory = new int[10];
-        int totalEntryCount = -1;
-        int categoryCount = 0;
-        bool newCategory = true;
-        AlmanacCategory currentCategory = AlmanacCategory.Default;
         for (int i = 0; i < almanac.entries.Length; i++)
         {
-            if (newCategory)
-            {
-                startingEntry[categoryCount] = totalEntryCount;
-                currentCategory = almanac.entries[i].category;
-                categoryCount++;
-                newCategory = false;
-            }
-            if (almanac.entries[i].category != currentCategory)
-                newCategory = true;
-            totalEntryCount++;
-            entriesInCategory[((int)currentCategory)-1]++;
-        }
-
-        // TEMP: stupid fix
-        startingEntry[0]++;
-        entriesInCategory[0]--;
-
-        print("out of "+almanac.entries.Length+" almanac entries ...");
-        for (int i = 0; i < 9; i++)
-        {
-            string categoryName = ((AlmanacCategory)i + 1).ToString();
-            print(". category '"+categoryName+"' includes " + entriesInCategory[i] +" entries, beginning at " + startingEntry[i]);
+            entriesInCategory[(int)almanac.entries[i].category]++;
+            if (i > 0 && almanac.entries[i].category != almanac.entries[i - 1].category)
+                startingEntry[(int)almanac.entries[i].category] = i;
         }
     }
 
@@ -335,10 +312,6 @@ public class InGameAlmanac : MonoBehaviour
             {
                 currentCategory = i;
                 currentEntry = startingEntry[currentCategory-1];
-
-                print(" . current category is "+ ((AlmanacCategory)i).ToString() + 
-                    " with starting entry at " + startingEntry[currentCategory-1] + 
-                    " and having " + entriesInCategory[currentCategory-1] + " entries in category.");
             }
             r.x += 0.075f * w;
         }
@@ -352,10 +325,10 @@ public class InGameAlmanac : MonoBehaviour
         g.normal.textColor = Color.black;
         g.hover.textColor = Color.black;
         g.active.textColor = Color.black;
-        // FIXME: all of it
         for ( int n = 0; n < ENTRIESPERPAGE; n++ )
         {
-            if (n > startingEntry[currentCategory - 1] + entriesInCategory[currentCategory - 1] - 1)
+            if (currentEntry + n >= 
+                startingEntry[currentCategory] + entriesInCategory[currentCategory])
                 continue;
 
             AlmanacEntry displayEntry = almanac.entries[currentEntry + n];
@@ -422,27 +395,25 @@ public class InGameAlmanac : MonoBehaviour
             g.active.background = buttonTex[2];
         }
         s = "UP";
-        //if (currentCategory > 0)
-        //    GUI.enabled = (currentEntry > startingEntry[currentCategory-1]); 
+        GUI.enabled = (currentEntry > startingEntry[currentCategory]);
         if (GUI.Button(r,s,g))
             currentEntry--;
         r.y += r.width + (0.05f * h);
         g.alignment = TextAnchor.MiddleCenter;
         s = "DOWN";
-        //if (currentCategory > 0)
-        //    GUI.enabled = (currentEntry < startingEntry[currentCategory-1] + entriesInCategory[currentEntry-1] - 1);
+        GUI.enabled = (currentEntry + ENTRIESPERPAGE < startingEntry[currentCategory] + entriesInCategory[currentCategory]);
         if (GUI.Button(r, s, g))
             currentEntry++;
         GUI.enabled = true;
 
         currentEntry = Mathf.Clamp(currentEntry, 
-            startingEntry[currentCategory-1], 
-            startingEntry[currentCategory-1] + entriesInCategory[currentCategory-1]-1);
+            startingEntry[currentCategory], 
+            startingEntry[currentCategory] + entriesInCategory[currentCategory]-1);
 
         // NAV LABEL
-        r.x = 0.3f * w;
+        r.x = 0.2f * w;
         r.y = 0.755f * h;
-        r.width = 0.4f * w;
+        r.width = 0.6f * w;
         r.height = 0.1f * h;
         g = new GUIStyle(GUI.skin.label);
         g.fontSize = Mathf.RoundToInt(18f * (w / 1024f));
@@ -452,7 +423,8 @@ public class InGameAlmanac : MonoBehaviour
         g.active.textColor = Color.white;
         g.alignment = TextAnchor.MiddleCenter;
         GUI.color = Color.white;
-        s = "Almanac entries ";// + (currentEntry + 1 - startingEntry[currentCategory-1]) + "-" + (currentEntry + 1 - startingEntry[currentCategory-1] + ENTRIESPERPAGE) + " of " + (entriesInCategory[currentCategory-1] + ENTRIESPERPAGE);
+        int entNum = currentEntry - startingEntry[currentCategory] + 1;
+        s = "Almanac entries "+entNum+"-"+ Mathf.Min(entNum + ENTRIESPERPAGE - 1, entriesInCategory[currentCategory]) + " of " + entriesInCategory[currentCategory] + " in Category: " + ((AlmanacCategory)currentCategory).ToString();
         GUI.Label(r, s, g);
     }
 }
