@@ -291,7 +291,7 @@ public static class AlmanacSystem
         int peopleEntries = 4;
         int placeEntries = 2;
         int itemEntries = 13;
-        int farmEntries = 5;
+        int farmEntries = 9;
         int plantEntries = 50;
         int magicEntries = 15;
         int eventEntries = 10;
@@ -686,6 +686,54 @@ public static class AlmanacSystem
                         detailA = "Resource";
                         detailB = "Plants";
                         detailC = "Fertilizer";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 5:
+                        title = "Planting";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Begin at the beginning";
+                        description = "Seeds can be planted manually by holding them and working the land when the plot is tilled. Seeds can also be planted by broadcasting, dropping them on tilled plots.";
+                        detailA = "Seed";
+                        detailB = "Plants";
+                        detailC = "Working the Land";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 6:
+                        title = "Harvesting";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "What you sow";
+                        description = "Taking the fruit or flower of a fully grown plant produces a harvest. The quality of the harvested fruit is dependent on the conditions the plant grew under before harvest. To maximize harvest quality, biomancers care for the plant by maintaining its necessary resources, like sun, water and soil quality.";
+                        detailA = "Plants";
+                        detailB = "Fruit";
+                        detailC = "Stalk";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 7:
+                        title = "Transplanting";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "Moving day";
+                        description = "By digging up a plot with a plant, you extract the plant and leave a hole in the plot. The uprooted plant can be moved to another plot with a hole, and dropped into the hole. The plant will continue to grow in its new plot. Biomancers also use this technique to fertilize a plot with a re-fruiting plant.";
+                        detailA = "Plants";
+                        detailB = "Digging";
+                        detailC = "Enriching";
+                        detailD = "";
+                        detailE = "";
+                        break;
+                    case 8:
+                        title = "Grafting";
+                        revealed = true;
+                        icon = "GenesisTree";
+                        subtitle = "More than the sum";
+                        description = "A biomancer may combine the stalk of one plant and the fruit of another to form a more rare plant variety, but the two must be compatible. To graft, the biomancer holds a fruit and approaches a stalk that is currently growing in a plot. The resulting new plant will then grow.";
+                        detailA = "Stalk";
+                        detailB = "Fruit";
+                        detailC = "";
                         detailD = "";
                         detailE = "";
                         break;

@@ -376,7 +376,7 @@ public class InGameAlmanac : MonoBehaviour
             GUI.Label(r, s, g);
             // description
             r.y += 0.06f * h;
-            r.height = 0.04f * w;
+            r.height = 0.0425f * w;
             g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
             g.fontStyle = FontStyle.Normal;
             g.alignment = TextAnchor.UpperLeft;
