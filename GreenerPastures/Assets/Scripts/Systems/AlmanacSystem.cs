@@ -287,15 +287,15 @@ public static class AlmanacSystem
     {
         AlmanacData retData = new AlmanacData();
 
-        int loreEntries = 5;
-        int peopleEntries = 3;
-        int placeEntries = 4;
-        int itemEntries = 7;
+        int loreEntries = 3;
+        int peopleEntries = 4;
+        int placeEntries = 2;
+        int itemEntries = 13;
         int farmEntries = 5;
-        int plantEntries = 42;
+        int plantEntries = 50;
         int magicEntries = 15;
-        int eventEntries = 12;
-        int secretEntries = 7;
+        int eventEntries = 10;
+        int secretEntries = 4;
 
         int totalEntries = loreEntries + peopleEntries + placeEntries + 
             itemEntries + farmEntries + plantEntries + magicEntries + 
