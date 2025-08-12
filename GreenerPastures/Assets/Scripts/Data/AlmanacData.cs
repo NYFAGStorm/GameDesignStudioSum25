@@ -1,6 +1,6 @@
 // REVIEW: necessary namespaces
 
-public enum AlmanacCateogory
+public enum AlmanacCategory
 {
     Default,
     Lore,
@@ -18,7 +18,7 @@ public enum AlmanacCateogory
 public struct AlmanacEntry
 {
     public string title;
-    public AlmanacCateogory category;
+    public AlmanacCategory category;
     public bool revealed;
     public string icon; // art reference
     public string subtitle;

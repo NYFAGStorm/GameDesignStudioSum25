@@ -11,7 +11,7 @@ public static class AlmanacSystem
         AlmanacEntry retEntry = new AlmanacEntry();
 
         retEntry.title = "";
-        retEntry.category = AlmanacCateogory.Default;
+        retEntry.category = AlmanacCategory.Default;
         retEntry.revealed = false;
         retEntry.icon = "";
         retEntry.subtitle = "";
@@ -329,7 +329,7 @@ public static class AlmanacSystem
 
             if (i < loreEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Lore;
+                retData.entries[i].category = AlmanacCategory.Lore;
                 // LORE
                 switch(i)
                 {
@@ -373,7 +373,7 @@ public static class AlmanacSystem
             }
             else if (i < peopleEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.People;
+                retData.entries[i].category = AlmanacCategory.People;
                 // PEOPLE
                 switch (i - loreEntries)
                 {
@@ -429,7 +429,7 @@ public static class AlmanacSystem
             }
             else if (i < placeEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Places;
+                retData.entries[i].category = AlmanacCategory.Places;
                 // PLACES
                 switch (i-peopleEntries)
                 {
@@ -461,7 +461,7 @@ public static class AlmanacSystem
             }
             else if (i < itemEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Items;
+                retData.entries[i].category = AlmanacCategory.Items;
                 // ITEMS
                 switch (i-placeEntries)
                 {
@@ -625,7 +625,7 @@ public static class AlmanacSystem
             }
             else if (i < farmEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Farming;
+                retData.entries[i].category = AlmanacCategory.Farming;
                 // FARMING
                 switch (i- itemEntries)
                 {
@@ -741,7 +741,7 @@ public static class AlmanacSystem
             }
             else if (i < plantEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Plants;
+                retData.entries[i].category = AlmanacCategory.Plants;
                 // PLANTS
                 switch (i - farmEntries)
                 {
@@ -1354,7 +1354,7 @@ public static class AlmanacSystem
             }
             else if (i < magicEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Magic;
+                retData.entries[i].category = AlmanacCategory.Magic;
                 // MAGIC
                 switch (i - plantEntries)
                 {
@@ -1542,7 +1542,7 @@ public static class AlmanacSystem
             }
             else if (i < eventEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Events;
+                retData.entries[i].category = AlmanacCategory.Events;
                 // EVENTS
                 switch (i - magicEntries)
                 {
@@ -1670,7 +1670,7 @@ public static class AlmanacSystem
             }
             else if (i < secretEntries)
             {
-                retData.entries[i].category = AlmanacCateogory.Secrets;
+                retData.entries[i].category = AlmanacCategory.Secrets;
                 // SECRETS
                 switch (i - eventEntries)
                 {

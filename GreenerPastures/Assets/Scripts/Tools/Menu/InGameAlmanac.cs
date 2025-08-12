@@ -87,7 +87,7 @@ public class InGameAlmanac : MonoBehaviour
         int totalEntryCount = -1;
         int categoryCount = 0;
         bool newCategory = true;
-        AlmanacCateogory currentCategory = AlmanacCateogory.Default;
+        AlmanacCategory currentCategory = AlmanacCategory.Default;
         for (int i = 0; i < almanac.entries.Length; i++)
         {
             if (newCategory)
@@ -110,7 +110,7 @@ public class InGameAlmanac : MonoBehaviour
         print("out of "+almanac.entries.Length+" almanac entries ...");
         for (int i = 0; i < 9; i++)
         {
-            string categoryName = ((AlmanacCateogory)i + 1).ToString();
+            string categoryName = ((AlmanacCategory)i + 1).ToString();
             print(". category '"+categoryName+"' includes " + entriesInCategory[i] +" entries, beginning at " + startingEntry[i]);
         }
     }
@@ -330,13 +330,13 @@ public class InGameAlmanac : MonoBehaviour
                 g.normal.textColor = Color.white;
             else
                 g.normal.textColor = c;
-            s = ((AlmanacCateogory)i).ToString().ToUpper();
+            s = ((AlmanacCategory)i).ToString().ToUpper();
             if (GUI.Button(r, s, g))
             {
                 currentCategory = i;
                 currentEntry = startingEntry[currentCategory-1];
 
-                print(" . current category is "+ ((AlmanacCateogory)i).ToString() + 
+                print(" . current category is "+ ((AlmanacCategory)i).ToString() + 
                     " with starting entry at " + startingEntry[currentCategory-1] + 
                     " and having " + entriesInCategory[currentCategory-1] + " entries in category.");
             }
