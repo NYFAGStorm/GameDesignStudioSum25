@@ -54,7 +54,7 @@ public class InGameAlmanac : MonoBehaviour
         // initialize
         if (enabled)
         {
-            //InitAlmanac();
+            currentCategory = 1;
 
             // GUI Button Textures for build
             if (!Application.isEditor)
@@ -75,7 +75,7 @@ public class InGameAlmanac : MonoBehaviour
     void InitAlmanac()
     {
         almanac = AlmanacSystem.InitializeAlmanac();
-        currentCategory = 0;
+        currentCategory = 1;
         currentEntry = 0;
         ConfigureEntryCount();
     }
@@ -355,6 +355,9 @@ public class InGameAlmanac : MonoBehaviour
         // FIXME: all of it
         for ( int n = 0; n < ENTRIESPERPAGE; n++ )
         {
+            if (n > startingEntry[currentCategory - 1] + entriesInCategory[currentCategory - 1] - 1)
+                continue;
+
             AlmanacEntry displayEntry = almanac.entries[currentEntry + n];
 
             // TODO: icon display
@@ -419,19 +422,17 @@ public class InGameAlmanac : MonoBehaviour
             g.active.background = buttonTex[2];
         }
         s = "UP";
-        GUI.enabled = !(startingEntry[currentCategory-1] == currentEntry);
+        //if (currentCategory > 0)
+        //    GUI.enabled = (currentEntry > startingEntry[currentCategory-1]); 
         if (GUI.Button(r,s,g))
-        {
             currentEntry--;
-        }
         r.y += r.width + (0.05f * h);
         g.alignment = TextAnchor.MiddleCenter;
         s = "DOWN";
-        GUI.enabled = !(startingEntry[currentCategory-1] + entriesInCategory[currentCategory-1] - 1 == currentEntry);
+        //if (currentCategory > 0)
+        //    GUI.enabled = (currentEntry < startingEntry[currentCategory-1] + entriesInCategory[currentEntry-1] - 1);
         if (GUI.Button(r, s, g))
-        {
             currentEntry++;
-        }
         GUI.enabled = true;
 
         currentEntry = Mathf.Clamp(currentEntry, 
