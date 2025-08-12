@@ -332,6 +332,7 @@ public class InGameAlmanac : MonoBehaviour
                 continue;
 
             AlmanacEntry displayEntry = almanac.entries[currentEntry + n];
+            GUI.enabled = pcm.playerData.almanac.revealed[currentEntry + n];
 
             // TODO: icon display
             r.x = 0.175f * w;
@@ -378,6 +379,7 @@ public class InGameAlmanac : MonoBehaviour
             }
             r.y += 0.0325f * h;
         }
+        GUI.enabled = true;
 
         // NAVIGATION BUTTONS (up and down)
         r.x = 0.8125f * w;

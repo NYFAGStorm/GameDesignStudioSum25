@@ -164,8 +164,8 @@ public class GreenerGameManager : MonoBehaviour
                 saveMgr.GetCurrentProfile().state = ProfileState.Playing;
                 game = GameSystem.SetPlayerNowPlaying(game, GameSystem.GetProfilePlayer(game, saveMgr.GetCurrentProfile()), true);
                 // if not remote, remind player they are a host
-                if (!saveMgr.IsRemoteClient())
-                    AddNotification("You are considered a host and are 'pinging' to network.");
+                //if (!saveMgr.IsRemoteClient())
+                //    AddNotification("You are considered a host and are 'pinging' to network.");
 
                 if (firstRunDetected)
                 {

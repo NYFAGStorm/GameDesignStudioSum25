@@ -154,7 +154,7 @@ public static class AlmanacSystem
                 variationC = RandomSystem.FlatRandom01();
             }
 
-            int idx = UnityEngine.Mathf.RoundToInt(variationA * (float)total);
+            int idx = GameSystem.RoundedResult(variationA, total);
             if (i < loremWords - 4 && commaInterval > baseCommaInterval + ((baseCommaInterval * variationB * variance) - baseCommaInterval / 2f))
             {
                 retLorem += words[idx] + ", ";
@@ -175,6 +175,7 @@ public static class AlmanacSystem
                 }
                 else
                     retLorem += words[idx] + " ";
+
             }
             commaInterval++;
             periodInterval++;
@@ -350,7 +351,7 @@ public static class AlmanacSystem
                         revealed = true;
                         icon = "GenesisTree";
                         subtitle = "Council of Supreme Biomancers";
-                        description = " Guardians of the Genesis Tree, overseers of all biomancers, and the most responsible magic users you can find in Empyrea. The Mystic Magistrate watches over all biomancers and provides them guidance when necessary. You can always rely on them to help whenever you’re feeling lost.";
+                        description = "Guardians of the Genesis Tree, overseers of all biomancers, and the most responsible magic users you can find in Empyrea. The Mystic Magistrate watches over all biomancers and provides them guidance when necessary. You can always rely on them to help whenever you’re feeling lost.";
                         detailA = "History";
                         detailB = "Guidance";
                         detailC = "";
@@ -527,7 +528,7 @@ public static class AlmanacSystem
                         break;
                     case 5:
                         title = "Rock";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Simple and solid";
                         description = "A small rock. ‘Funny thing is, sometimes it’s there and sometimes it isn’t.";
@@ -563,7 +564,7 @@ public static class AlmanacSystem
                         break;
                     case 8:
                         title = "Package";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special delivery";
                         description = " Packages hold many items, and when picking up a package, all the items within appear. If you purchase more items at the market than your inventory can hold, the market will deliver a package to your mailbox with those items inside.";
@@ -575,7 +576,7 @@ public static class AlmanacSystem
                         break;
                     case 9:
                         title = "Letter";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Greetings and well wishes";
                         description = "Letters are small personal messages to you from others. They often contain helpful ideas or reminders.";
@@ -587,7 +588,7 @@ public static class AlmanacSystem
                         break;
                     case 10:
                         title = "Coupon";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Valuable discount";
                         description = "A coupon can be held while purchasing at the market for a discount on that item. The amount of discount can be as high as 100%. Upon buying an item at the market, the coupon is exchanged for that item.";
@@ -599,7 +600,7 @@ public static class AlmanacSystem
                         break;
                     case 11:
                         title = "Scroll";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Magical powerup";
                         description = "A magic scroll contains a single spell charge, to be transferred directly to your spell book without having to craft. You read the scroll by picking it up. Upon reading the scroll, the charge is added to your spell book and the scroll disappears.";
@@ -611,7 +612,7 @@ public static class AlmanacSystem
                         break;
                     case 12:
                         title = "Potion";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Counter cooldowns";
                         description = "A magic potion clears spell cooldowns. Grey potions will clear one spell charge at random within your spell book. White potions will clear all spell charges in your spell book. You drink the potion by picking it up. Upon drinking the potion, it will disappear.";
@@ -715,7 +716,7 @@ public static class AlmanacSystem
                         break;
                     case 7:
                         title = "Transplanting";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Moving day";
                         description = "By digging up a plot with a plant, you extract the plant and leave a hole in the plot. The uprooted plant can be moved to another plot with a hole, and dropped into the hole. The plant will continue to grow in its new plot. Biomancers also use this technique to fertilize a plot with a re-fruiting plant.";
@@ -727,7 +728,7 @@ public static class AlmanacSystem
                         break;
                     case 8:
                         title = "Grafting";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "More than the sum";
                         description = "A biomancer may combine the stalk of one plant and the fruit of another to form a more rare plant variety, but the two must be compatible. To graft, the biomancer holds a fruit and approaches a stalk that is currently growing in a plot. The resulting new plant will then grow.";
@@ -760,7 +761,7 @@ public static class AlmanacSystem
                         break;
                     case 1:
                         title = "Tomato";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "Very useful bad joke repellent.";
@@ -772,7 +773,7 @@ public static class AlmanacSystem
                         break;
                     case 2:
                         title = "Carrot";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "Be careful, one of these could be a rabbit hole trap!";
@@ -784,7 +785,7 @@ public static class AlmanacSystem
                         break;
                     case 3:
                         title = "Poppy";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "Despite Magister Eden’s best efforts, beginner biomancers are constantly trying to use these for explosion spells.";
@@ -796,7 +797,7 @@ public static class AlmanacSystem
                         break;
                     case 4:
                         title = "Rose";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "They’re shockingly flame resistant and are often used in fire spells. For some reason, while burning, they give off a sweet scent.";
@@ -808,7 +809,7 @@ public static class AlmanacSystem
                         break;
                     case 5:
                         title = "Sunflower";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "Filled with the might of the sun! For some reason, a few biomancers often call these Superflowers.";
@@ -820,7 +821,7 @@ public static class AlmanacSystem
                         break;
                     case 6:
                         title = "Moonflower";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "Filled with the might of the moon! Which is technically the might of the sun, but don’t bring that up in front of Magister Shady.";
@@ -832,7 +833,7 @@ public static class AlmanacSystem
                         break;
                     case 7:
                         title = "Apple";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "Land dwellers eat these to ward off doctors. It’s a strange tradition that Magisters have been studying for years.";
@@ -844,7 +845,7 @@ public static class AlmanacSystem
                         break;
                     case 8:
                         title = "Orange";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "If you keep them in the sun too long, these plants are said to change into an entirely different fruit. This has been proven false, but some biomancers try it anyway.";
@@ -856,7 +857,7 @@ public static class AlmanacSystem
                         break;
                     case 9:
                         title = "Lemon";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Common Plant";
                         description = "This nefarious plant has the power to turn the face of any who eats it inside out. And shockingly, it’s not even magical!";
@@ -869,7 +870,7 @@ public static class AlmanacSystem
                     // UNCOMMON (11)
                     case 10:
                         title = "Lotus";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "A plant that blooms beautifully and glows with Arcana. An ancient biomancer brought this flower from another world.";
@@ -881,7 +882,7 @@ public static class AlmanacSystem
                         break;
                     case 11:
                         title = "Marigold";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "The gold flower of the celestial trio. It’s been used in many get rich quick schemes because many amateur biomancers think it’s made of actual gold.";
@@ -893,7 +894,7 @@ public static class AlmanacSystem
                         break;
                     case 12:
                         title = "Magnolia";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "The black flower of the celestial trio. Nobody really knows where it came from and everybody is too scared of learning the answer to find out.";
@@ -905,7 +906,7 @@ public static class AlmanacSystem
                         break;
                     case 13:
                         title = "Myosotis";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "The blue flower of the celestial trio. These are often used in mourning ceremonies to honor passing biomancers and dying lands.";
@@ -917,7 +918,7 @@ public static class AlmanacSystem
                         break;
                     case 14:
                         title = "Chrystalia";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "A sacred flower once found at the peak of a mountain so high it rose above the skies of Empyrea! Not really, a biomancer got bored and made a flower out of glass. But the other idea was much cooler, right?";
@@ -929,7 +930,7 @@ public static class AlmanacSystem
                         break;
                     case 15:
                         title = "Pumpkin";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "A big orange plant with a face on it. A lot of biomancers enjoy hollowing these out and using them as decorations. Some, however, swear the plants whisper to them in the dark.";
@@ -941,7 +942,7 @@ public static class AlmanacSystem
                         break;
                     case 16:
                         title = "Underbloom";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "Plants from a darker world. They look strikingly similar to sunflowers yet are far darker and only grow in the dark. Their use in curses has earned them a negative reputation.";
@@ -953,7 +954,7 @@ public static class AlmanacSystem
                         break;
                     case 17:
                         title = "Water Lily";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "Named after a magister of the past, these plants are easy to grow in water and make excellent dye. Growing these for a significant other has become a popular practice in Empyrea.";
@@ -965,7 +966,7 @@ public static class AlmanacSystem
                         break;
                     case 18:
                         title = "Snowgrace";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "These flowers look similar to snowflakes and grow in great amounts. Unlike snowflakes, every one of them looks the same. However, they all have different magic patterns, so they’re still close enough.";
@@ -977,7 +978,7 @@ public static class AlmanacSystem
                         break;
                     case 19:
                         title = "Popcorn";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "Delicious popcorn on the cob. One brave biomancer from many years ago decided to magically create this tasty treat. Other biomancers worshipped them as a deity for a few days for their achievement.";
@@ -989,7 +990,7 @@ public static class AlmanacSystem
                         break;
                     case 20:
                         title = "Eclipse Flower";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Uncommon Plant";
                         description = "Flowers of night and day, glowing brightly like an eclipse. Each flower reflects a different type of eclipse depending on the time of day.";
@@ -1002,7 +1003,7 @@ public static class AlmanacSystem
                     // RARE (10)
                     case 21:
                         title = "Golden Apple";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "An apple that gleams as if it were made of gold. And technically, they are! These apples contain real gold in them, yet are still edible and taste delicious. Quite the expensive snack.";
@@ -1014,7 +1015,7 @@ public static class AlmanacSystem
                         break;
                     case 22:
                         title = "Hollowbloom";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "These flowers are completely hollow and dark inside. Yet, when touched, they feel soft and almost squishy. This is because the shadows inside the flower’s hollow spaces become tangible. This has baffled biomancers for ages.";
@@ -1026,7 +1027,7 @@ public static class AlmanacSystem
                         break;
                     case 23:
                         title = "Mandrake";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "A legendary plant of old. Well, not quite. These plants were called mystical for looking like humans and all sorts of stories began circulating around them. But they aren’t actually that magical, just a bit hard to find.";
@@ -1038,7 +1039,7 @@ public static class AlmanacSystem
                         break;
                     case 24:
                         title = "Frost Lily";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "An evolved species of the Lily flower line that’s cold as ice. Touching one with your tongue will cause it to stick, so be careful when messing with one. These plants glimmer brightly in the light.";
@@ -1050,7 +1051,7 @@ public static class AlmanacSystem
                         break;
                     case 25:
                         title = "Banana";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "A classic and tasty treat that many biomancers love to enjoy. Bananas are very healthy and recommended to be eaten as a morning snack. But be careful to not let them become cursed, or they’ll wreck havoc on your stomach.";
@@ -1062,7 +1063,7 @@ public static class AlmanacSystem
                         break;
                     case 26:
                         title = "Coconut";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "An incredibly hard fruit that contains tons of magic inside. Biomancers have discovered that putting more magic into one and throwing it can cause it to violently explode. Perfect for pranks. (Note from Magister Eden: 'Do NOT use these as a prank!')";
@@ -1074,7 +1075,7 @@ public static class AlmanacSystem
                         break;
                     case 27:
                         title = "Mysteria";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "The mysterious Mysteria, which come in a multitude of mesmerizing and mystical colors so magical they might make many marvel at their majesty.";
@@ -1086,7 +1087,7 @@ public static class AlmanacSystem
                         break;
                     case 28:
                         title = "Nightshade";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "Dangerous and magical plants that contain a magic poison. Anybody who ingests one is unable to use magic for a while, so it’s recommended that only experienced biomancers handle them. Thankfully, most biomancers are immune to the poison thanks to the Genesis Tree’s blessings.";
@@ -1098,7 +1099,7 @@ public static class AlmanacSystem
                         break;
                     case 29:
                         title = "Crystal Rose";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "A rose that has come into contact with a certain type of magic. It is still being researched what this special magic is, but its effect on the rose is evident. The entire inner structure of the rose crystalizes and is yet still able to grow as a plant. This special magic can be found in Chrystalia plants, so biomancers use the two for research.";
@@ -1110,7 +1111,7 @@ public static class AlmanacSystem
                         break;
                     case 30:
                         title = "Yarrow";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Rare Plant";
                         description = "An intriguing plant, not for its appearance but because of its special magic. Yarrow plants are said to be able to heal anything with their special magic. So far this has proven true, but Magister Shady has taken on the task of finding this plant’s limits.";
@@ -1123,7 +1124,7 @@ public static class AlmanacSystem
                     // SPECIAL (10)
                     case 31:
                         title = "Dragonroot";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "This root is said to be born at the same time as a dragon. In truth, they just look like a dragon curled up in sleep, but the story has become so popular that the plant is celebrated on Dragon Day. Maybe that itself is a form of magic.";
@@ -1135,7 +1136,7 @@ public static class AlmanacSystem
                         break;
                     case 32:
                         title = "Winter Rose";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "Containing the beauty and mysticism of winter itself, these special roses are the masterpiece of the late Magister Lily. She once said that they are a tribute to the comfort one can find in the cold.";
@@ -1147,7 +1148,7 @@ public static class AlmanacSystem
                         break;
                     case 33:
                         title = "Fleur-De-Lis";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "A rather strange plant that was once used as the symbol of an ancient nation. Many biomancers theorize that it was created by the biomancers of that era, so they may forever be immortalized in the world.";
@@ -1159,7 +1160,7 @@ public static class AlmanacSystem
                         break;
                     case 34:
                         title = "Tropicus";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "A favorite for many biomancers, this special fruit is used as edible decorations in the summer for their incredible resilience to heat. There was once an overflow of these in the market because everybody wanted to grow them. Now, they are actually quite rare to find.";
@@ -1171,7 +1172,7 @@ public static class AlmanacSystem
                         break;
                     case 35:
                         title = "Mourning Nyx";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "Despite its name, the Mourning Nyx does not inherently cause sorrow or demise. Rather, it’s an incredible ingredient in making curses, so the curses it is used to make are responsible for the tears of hundreds of biomancers.";
@@ -1183,7 +1184,7 @@ public static class AlmanacSystem
                         break;
                     case 36:
                         title = "Blast Apple";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "An explosive apple.That’s pretty much it. Handle with absolute care!";
@@ -1195,7 +1196,7 @@ public static class AlmanacSystem
                         break;
                     case 37:
                         title = "Pixie Plumeria";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "These plants are called as such because they are so popular among the pixie community. They are used for almost everything. Decoration, consumption, medicine, and even magic conduction. A plant of all trades indeed.";
@@ -1207,7 +1208,7 @@ public static class AlmanacSystem
                         break;
                     case 38:
                         title = "Fae Foxglove";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "A royal plant that was first cultivated by the royal fae of old. They don’t actually do much, but are very nice to look at and can be used in some spells as ingredients.";
@@ -1219,7 +1220,7 @@ public static class AlmanacSystem
                         break;
                     case 39:
                         title = "Druid’s Lotus";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "These plants are very popular among biomancers because they can be grown in almost any conditions. They are said to contain the resilience of the forest itself.";
@@ -1231,7 +1232,7 @@ public static class AlmanacSystem
                         break;
                     case 40:
                         title = "Splat Berry";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special Plant";
                         description = "Younger biomancers used to love throwing these around because they burst and spread a very thin layer of magical juice. However, this juice is incredibly sticky, so it’s a pain to get off of anything without magic.";
@@ -1244,7 +1245,7 @@ public static class AlmanacSystem
                     // UNIQUE (9)
                     case 41:
                         title = "Jazzmyne";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "These plants are unexpected, but unstoppable. They just keep surprising us.";
@@ -1256,7 +1257,7 @@ public static class AlmanacSystem
                         break;
                     case 42:
                         title = "Mashroom";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "This grand fungus springs from the remains of an old stump to dominate the forest nights.";
@@ -1268,7 +1269,7 @@ public static class AlmanacSystem
                         break;
                     case 43:
                         title = "Herbal Pert";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "This one-of-a-kind plant has a way of making us move.";
@@ -1280,7 +1281,7 @@ public static class AlmanacSystem
                         break;
                     case 44:
                         title = "Firefly Trap";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "Inviting and open until it is not. This plant harvests more than just the flower.";
@@ -1292,7 +1293,7 @@ public static class AlmanacSystem
                         break;
                     case 45:
                         title = "Betting Hedge";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "This plant is timeless and mesmerizing. It may be difficult to walk away from it.";
@@ -1304,7 +1305,7 @@ public static class AlmanacSystem
                         break;
                     case 46:
                         title = "Bawn Sigh";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "There is a subtle punishment about this plant. Guard against it.";
@@ -1316,7 +1317,7 @@ public static class AlmanacSystem
                         break;
                     case 47:
                         title = "Willow Wisp";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "It comes once in a blue moon, and when you see it, you know it was special.";
@@ -1328,7 +1329,7 @@ public static class AlmanacSystem
                         break;
                     case 48:
                         title = "Walking Stick";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "This plant grows a face and eyes that seem to follow you. A wise biomancer once enchanted their staff to become this form plant. Its magical fruit is very valuable.";
@@ -1340,7 +1341,7 @@ public static class AlmanacSystem
                         break;
                     case 49:
                         title = "Genesis Sapling";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Unique Plant";
                         description = "Renewal is a part of life, and so it is with the Genesis Tree. If you are lucky enough to witness the birth of a Genesis Sapling, consider yourself blessed.";
@@ -1372,7 +1373,7 @@ public static class AlmanacSystem
                         break;
                     case 1:
                         title = "The Grimoire";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "The book of knowledge";
                         description = "When biomancers need to craft new spells, they consult the Grimoire, their collection of spell recipes. As one gains experience, the Grimoire will fill with new recipes. One needs to follow the recipes in order to craft its spell charge.";
@@ -1384,7 +1385,7 @@ public static class AlmanacSystem
                         break;
                     case 2:
                         title = "Spell Recipes";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Quality ingredients";
                         description = "Each spell requires special ingredients, carefully selected and brought to the crafting table. Specific types of ingredients are listed in each spell recipe. Once a biomancer has the ingredients in hand, the spell may be crafted using the Magic Cauldron.";
@@ -1396,7 +1397,7 @@ public static class AlmanacSystem
                         break;
                     case 3:
                         title = "The Magic Cauldron";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Bubble, bubble";
                         description = " Ingredients for spells must be combined in unique ways for the spell charge to be created. The Magic Cauldron has the necessary heat and magic to place all the ingredients in the order required. Once all ingredients are in, a spell charge can be crafted.";
@@ -1408,7 +1409,7 @@ public static class AlmanacSystem
                         break;
                     case 4:
                         title = "The Magic Book";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Personal spell storage";
                         description = "Every biomancer carries with them a Magic Book, a collection of the spell charges they have crafted. Every charge in the spell book represents a single magical cast the biomancer can invoke as long as that spell type is not on cooldown.";
@@ -1420,7 +1421,7 @@ public static class AlmanacSystem
                         break;
                     case 5:
                         title = "Spell Charges";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "One can never have too many";
                         description = "The crafting of magic creates a spell charge that is stored in the biomancer’s Magic Book. The biomancer may cast the spell at any time. Once cast, the charge is spent and that spell type will be on cooldown.";
@@ -1432,7 +1433,7 @@ public static class AlmanacSystem
                         break;
                     case 6:
                         title = "Casting Magic Spells";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Abracadabra and hocus pocus";
                         description = "When a biomancer opens their Magic Book, and they read a spell charge from it, they are able to cast the spell out into the world. Their ability to direct the spell cast to any point means they can control what plot, plant, person or object is affected by the spell.";
@@ -1444,7 +1445,7 @@ public static class AlmanacSystem
                         break;
                     case 7:
                         title = "Spell Casts";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Magical life";
                         description = "After a spell is cast, it lives in the world on its own. Some spells are instant, while others last a very long time. Some spells are even permanent. When a spell cast expires, its effect is undone.";
@@ -1456,7 +1457,7 @@ public static class AlmanacSystem
                         break;
                     case 8:
                         title = "Spell Cooldowns";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Gather your strength";
                         description = "After a biomancer has cast a spell of a particular type, it is unavailable for a time, while the biomancer regains their strength. This cooldown time can be different for each spell. A cooldown can be eliminated with a potion.";
@@ -1528,7 +1529,7 @@ public static class AlmanacSystem
                         break;
                     case 14:
                         title = "Active Magic Skills";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Biomancer cantrips";
                         description = "Some advanced Arcana skills include active magic. These act like spells in a biomancer’s Magic Book, but their charges are never depleted and they have no cooldown time.";
@@ -1676,7 +1677,7 @@ public static class AlmanacSystem
                 {
                     case 0:
                         title = "No Stone Unturned";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "The secret life of rocks";
                         description = "This rock is just a rock. Or, is it? Wasn’t this rock over there? Wait, there’s another rock. Where did that other rock go? Maybe this rock will make a good pet.";
@@ -1688,7 +1689,7 @@ public static class AlmanacSystem
                         break;
                     case 1:
                         title = "Poor Biomancer";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "A small helping hand";
                         description = "Accidents happen. It’s okay, and we can grow from setbacks as easily as we grow any other time. When one needs help, they need only look to those who enjoy helping others.";
@@ -1700,7 +1701,7 @@ public static class AlmanacSystem
                         break;
                     case 2:
                         title = "Uniquely Yours";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "More rare than rare";
                         description = "The unique mysteries in life are endless. Wonder springs everywhere, if one simply looks for it. Enjoy the rarest of gifts, including that of enjoyment itself.";
@@ -1712,7 +1713,7 @@ public static class AlmanacSystem
                         break;
                     case 3:
                         title = "Pumpkin Eater";
-                        revealed = true;
+                        revealed = false;
                         icon = "GenesisTree";
                         subtitle = "The secret of cheats";
                         description = "Tsk, tsk, tsk.";
