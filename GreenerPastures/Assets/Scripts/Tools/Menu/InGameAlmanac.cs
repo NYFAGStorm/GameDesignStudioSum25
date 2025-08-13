@@ -192,6 +192,9 @@ public class InGameAlmanac : MonoBehaviour
     {
         int retInt = -1;
 
+        if (entryTitles == null || entryTitles.Length == 0)
+            return retInt;
+
         for (int i = 0; i < entryTitles.Length; i++)
         {
             if (entryTitles[i] == title)

@@ -808,6 +808,9 @@ public class PlotManager : MonoBehaviour
                         harvestNumber *= 2;
                     if (FarmSystem.PlotHasEffect(data, PlotEffect.ProsperousII))
                         harvestNumber *= 3;
+                    InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                    if (iga != null && iga.IsEntryHidden(data.plant.plantName))
+                        iga.AlmanacReveal(data.plant.plantName);
                     // iterate to harvest multiple
                     for ( int i = 0; i < harvestNumber; i++ )
                     {

@@ -753,6 +753,8 @@ public class MarketManager : MonoBehaviour
                         currentCustomer.playerData.gold -= menuItems[menuItemSelection].buyItemValue;
                     currentCustomer.AwardXP(PlayerData.XP_BUYFROMSHOP);
 
+                    
+
                     // try place in inventory, (do not spawn to the side)
                     if (InventorySystem.InvHasSlot(currentCustomer.playerData.inventory))
                     {

@@ -792,8 +792,16 @@ public class PlayerControlManager : MonoBehaviour
             activeItem.looseItem.inv.items[0].type == ItemType.Stalk ||
             activeItem.looseItem.inv.items[0].type == ItemType.Fruit)
         {
-            if (iga != null && iga.IsEntryHidden(PlantSystem.InitializePlant(activeItem.looseItem.inv.items[0].plant).plantName))
-                iga.AlmanacReveal(PlantSystem.InitializePlant(activeItem.looseItem.inv.items[0].plant).plantName);
+            ItemData iData = activeItem.looseItem.inv.items[0];
+            if (iData != null)
+            {
+                PlantData pData = PlantSystem.InitializePlant(activeItem.looseItem.inv.items[0].plant);
+                if (pData != null)
+                {
+                    if (iga != null && iga.IsEntryHidden(pData.plantName))
+                        iga.AlmanacReveal(pData.plantName);
+                }
+            }
         }
 
         // before normal loose item pickup, check if active item type is special ...
