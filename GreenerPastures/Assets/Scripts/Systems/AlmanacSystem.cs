@@ -543,7 +543,7 @@ public static class AlmanacSystem
                         revealed = true;
                         icon = "GenesisTree";
                         subtitle = "All that glitters";
-                        description = "A single gold piece, and the basis for currency at the market and with island upgrades. Gold may be spent on goods at the market or with the traveling salesman, or you may bet gold on chicken races near the market. There are other means to acquire gold coins.";
+                        description = "A single gold piece, and the basis for currency at the market and with island upgrades. Gold may be spent on goods at the market or with the traveling salesman, or one may bet gold on chicken races near the market. There are other means to acquire gold coins.";
                         detailA = "Currency";
                         detailB = "Market";
                         detailC = "Island upgrades";
@@ -555,7 +555,7 @@ public static class AlmanacSystem
                         revealed = true;
                         icon = "GenesisTree";
                         subtitle = "Hold the purse strings";
-                        description = "A gold pouch appears when many gold coins are dropped at once. Picking up a gold pouch immediately transfers all the gold within to your purse.";
+                        description = "A gold pouch appears when many gold coins are dropped at once. Picking up a gold pouch immediately transfers all the gold within to one's purse.";
                         detailA = "Currency";
                         detailB = "Market";
                         detailC = "Island upgrades";
@@ -567,7 +567,7 @@ public static class AlmanacSystem
                         revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Special delivery";
-                        description = " Packages hold many items, and when picking up a package, all the items within appear. If you purchase more items at the market than your inventory can hold, the market will deliver a package to your mailbox with those items inside.";
+                        description = "Packages hold many items, and when picking up a package, all the items within appear. If one purchases more items at the market than their inventory can hold, the market will deliver a package to their mailbox with those items inside.";
                         detailA = "Mail";
                         detailB = "Consumable";
                         detailC = "";
@@ -579,7 +579,7 @@ public static class AlmanacSystem
                         revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Greetings and well wishes";
-                        description = "Letters are small personal messages to you from others. They often contain helpful ideas or reminders.";
+                        description = "Letters are small personal messages from others. They often contain helpful ideas or reminders.";
                         detailA = "Mail";
                         detailB = "Consumable";
                         detailC = "";
@@ -603,7 +603,7 @@ public static class AlmanacSystem
                         revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Magical powerup";
-                        description = "A magic scroll contains a single spell charge, to be transferred directly to your spell book without having to craft. You read the scroll by picking it up. Upon reading the scroll, the charge is added to your spell book and the scroll disappears.";
+                        description = "A magic scroll contains a single spell charge, to be transferred directly to one's spell book without having to craft. One reads the scroll by picking it up. Upon reading the scroll, the charge is added to a spell book and the scroll disappears.";
                         detailA = "Magic";
                         detailB = "Spell Charge";
                         detailC = "Consumable";
@@ -615,7 +615,7 @@ public static class AlmanacSystem
                         revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Counter cooldowns";
-                        description = "A magic potion clears spell cooldowns. Grey potions will clear one spell charge at random within your spell book. White potions will clear all spell charges in your spell book. You drink the potion by picking it up. Upon drinking the potion, it will disappear.";
+                        description = "A magic potion clears spell cooldowns. Grey potions will clear one spell charge at random within a spell book. White potions will clear all spell charges in a spell book. One drinks the potion by picking it up. Upon drinking the potion, it will disappear.";
                         detailA = "Magic";
                         detailB = "Spell Cooldown";
                         detailC = "Consumable";
@@ -1400,7 +1400,7 @@ public static class AlmanacSystem
                         revealed = false;
                         icon = "GenesisTree";
                         subtitle = "Bubble, bubble";
-                        description = " Ingredients for spells must be combined in unique ways for the spell charge to be created. The Magic Cauldron has the necessary heat and magic to place all the ingredients in the order required. Once all ingredients are in, a spell charge can be crafted.";
+                        description = "Ingredients for spells must be combined in unique ways for the spell charge to be created. The Magic Cauldron has the necessary heat and magic to place all the ingredients in the order required. Once all ingredients are in, a spell charge can be crafted.";
                         detailA = "Crafting";
                         detailB = "Ingredients";
                         detailC = "Spell Charges";

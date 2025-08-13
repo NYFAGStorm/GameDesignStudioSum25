@@ -82,6 +82,7 @@ public class MagicCraftingManager : MonoBehaviour
     private ArtLibraryManager alm;
     private QuitOnEscape qoe; // disable to suspend use of start button during crafting
     private AudioManager sfxAudio;
+    private InGameAlmanac iga;
 
     private MultiGamepad padMgr;
     // a button down to turn on padDragOn, with padDragOn true detect a button unpressed to turn off
@@ -129,6 +130,12 @@ public class MagicCraftingManager : MonoBehaviour
         GameObject sfxObj = GameObject.Find("AudioMgr SFX");
         if (sfxObj != null)
             sfxAudio = sfxObj.GetComponent<AudioManager>();
+        iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+        if (iga == null)
+        {
+            Debug.LogError("--- MagicCraftingManager [Start] : no in game almanac found in scene. aborting.");
+            enabled = false;
+        }
         // initialize
         if (enabled)
         {
@@ -289,6 +296,8 @@ public class MagicCraftingManager : MonoBehaviour
                         craftStateTimer = CRAFTSTATETIMERMAX;
                         fadingOverlay = true;
                         qoe.enabled = false;
+                        if (iga.IsEntryHidden("The Grimoire"))
+                            iga.AlmanacReveal("The Grimoire");
                         break;
                     case LibraryState.Active:
                         pcm.characterFrozen = false;
@@ -392,11 +401,15 @@ public class MagicCraftingManager : MonoBehaviour
                         fadingOverlay = false;
                         if (sfxAudio != null && sfxAudio.IsSoundPlaying("Magic Cauldron Bubble Loop"))
                             sfxAudio.StopSound("Magic Cauldron Bubble Loop");
+                        if (pcm.playerData.magic.library.grimoire.Length > 0 && iga.IsEntryHidden("Spell Recipes"))
+                            iga.AlmanacReveal("Spell Recipes");
                         break;
                     case CraftState.Cauldron:
                         fadingOverlay = false;
                         if (sfxAudio != null && !sfxAudio.IsSoundPlaying("Magic Cauldron Bubble Loop"))
                             sfxAudio.StartSound("Magic Cauldron Bubble Loop");
+                        if (iga.IsEntryHidden("The Magic Cauldron"))
+                            iga.AlmanacReveal("The Magic Cauldron");
                         break;
                     case CraftState.Exiting:
                         libraryStateTimer = (LIBRARYSTATETIMERMAX/2f); // exit faster
@@ -1503,6 +1516,9 @@ public class MagicCraftingManager : MonoBehaviour
                 if (sfxAudio != null)
                     sfxAudio.StartSound("Magic Cauldron Charge Crafted");
                 pcm.AwardXP(PlayerData.XP_CRAFTMAGIC);
+
+                if (iga.IsEntryHidden("The Magic Book"))
+                    iga.AlmanacReveal("The Magic Book");
 
                 // remove all cauldron inventory items from player inventory
                 RemoveAllIngredientsFromPlayer();

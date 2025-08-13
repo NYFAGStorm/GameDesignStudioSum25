@@ -233,6 +233,10 @@ public class CheatManager : MonoBehaviour
     {
         //Debug.Log("--- CheatManager [PerformValidCode] : performing cheat code "+validCode+" '"+codes[validCode].name+"'.");
 
+        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+        if (iga != null && iga.IsEntryHidden("Pumpkin Eater"))
+            iga.AlmanacReveal("Pumpkin Eater");
+
         ItemSpawnManager ism;
 
         // time bump codes
@@ -365,8 +369,7 @@ public class CheatManager : MonoBehaviour
                 cheatDisplayTimer = CHEATDISPLAYTIME;
                 break;
             case 15:
-                // unlock all almanac entries
-                InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                // unlock all almanac entries (just a peek, not saved data)
                 if (iga != null)
                 {
                     for (int i = 0; i < iga.almanac.entries.Length; i++)

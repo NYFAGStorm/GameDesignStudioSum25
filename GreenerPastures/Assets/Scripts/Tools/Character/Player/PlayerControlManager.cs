@@ -781,6 +781,21 @@ public class PlayerControlManager : MonoBehaviour
     {
         bool retBool = false;
 
+        // check in with almanac to see if entry can be unlocked
+        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+        if (iga == null)
+            Debug.LogWarning("--- PlayerControlManager [HandlePlayerTakeItem] : no in game almanac found in scene. will ignore.");
+
+        // check almanac if plant entry revealed
+        if (activeItem.looseItem.inv.items[0].type == ItemType.Seed ||
+            activeItem.looseItem.inv.items[0].type == ItemType.Plant ||
+            activeItem.looseItem.inv.items[0].type == ItemType.Stalk ||
+            activeItem.looseItem.inv.items[0].type == ItemType.Fruit)
+        {
+            if (iga != null && iga.IsEntryHidden(PlantSystem.InitializePlant(activeItem.looseItem.inv.items[0].plant).plantName))
+                iga.AlmanacReveal(PlantSystem.InitializePlant(activeItem.looseItem.inv.items[0].plant).plantName);
+        }
+
         // before normal loose item pickup, check if active item type is special ...
         // ... and meant to perform an action upon 'take', detect andd handle by type
         // (gold coin, gold sack, package, letter, coupon), destroyed upon handling
@@ -790,7 +805,6 @@ public class PlayerControlManager : MonoBehaviour
         {
             case ItemType.GoldCoin:
                 playerData.gold++;
-                // REVIEW: is this technically 'earned gold'?
                 playerData.stats.totalGoldEarned++;
                 skipPickup = true;
                 break;
@@ -799,6 +813,7 @@ public class PlayerControlManager : MonoBehaviour
                 {
                     // with so many gold coins, just collect gold directly
                     playerData.gold += activeItem.looseItem.inv.items.Length - 1;
+                    playerData.stats.totalGoldEarned += activeItem.looseItem.inv.items.Length - 1;
                     // sfx collect gold
                     if (sfxAudio != null)
                         sfxAudio.StartSound("Player Pickup GoldSack");
@@ -807,9 +822,21 @@ public class PlayerControlManager : MonoBehaviour
                     unpackLooseItem = true;
                 skipPickup = true;
                 break;
+            case ItemType.Rock:
+                if (iga != null)
+                {
+                    if (iga.IsEntryHidden("Rock"))
+                        iga.AlmanacReveal("Rock");
+                }
+                break;
             case ItemType.Package:
                 unpackLooseItem = true;
                 skipPickup = true;
+                if (iga != null)
+                {
+                    if (iga.IsEntryHidden("Package"))
+                        iga.AlmanacReveal("Package");
+                }
                 break;
             case ItemType.Letter:
                 characterFrozen = true;
@@ -819,6 +846,18 @@ public class PlayerControlManager : MonoBehaviour
                 letterMessage = pom.GetLetterMessage(activeItem.looseItem.inv.items[0].quality);
                 letterPopupTimer = LETTERPOPUPTIME;
                 skipPickup = true;
+                if (iga != null)
+                {
+                    if (iga.IsEntryHidden("Letter"))
+                        iga.AlmanacReveal("Letter");
+                }
+                break;
+            case ItemType.Coupon:
+                if (iga != null)
+                {
+                    if (iga.IsEntryHidden("Coupon"))
+                        iga.AlmanacReveal("Coupon");
+                }
                 break;
             case ItemType.Scroll:
                 // detect scroll effect
@@ -892,6 +931,11 @@ public class PlayerControlManager : MonoBehaviour
                 scrollNotify[1] = "Charge added to spell book!\n" + scrollAddsCharge.ToString() + " ADDED!";
                 ggm.StackNotifications(scrollNotify);
                 skipPickup = true;
+                if (iga != null)
+                {
+                    if (iga.IsEntryHidden("Scroll"))
+                        iga.AlmanacReveal("Scroll");
+                }
                 break;
             case ItemType.Potion:
                 // detect potion effect
@@ -962,6 +1006,11 @@ public class PlayerControlManager : MonoBehaviour
                 }
                 else
                     Debug.LogWarning("--- PlayerControlManager [HandlePlayerTakeItem] : potion pickup failed due to lack of potion effects. will ignore.");
+                if (iga != null)
+                {
+                    if (iga.IsEntryHidden("Potion"))
+                        iga.AlmanacReveal("Potion");
+                }
                 break;
         }
         if (unpackLooseItem)

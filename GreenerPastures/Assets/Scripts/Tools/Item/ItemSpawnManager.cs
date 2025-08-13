@@ -317,6 +317,12 @@ public class ItemSpawnManager : MonoBehaviour
                 retBool = true;
                 if (!drops[index].remoteDrop)
                     plots[i].DropAwardXP(PlayerData.XP_BROADCASTPLANT);
+                if (plots[i].data.plant.type >= PlantType.Jazzmyne)
+                {
+                    InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                    if (iga != null && iga.IsEntryHidden("Uniquely Yours"))
+                        iga.AlmanacReveal("Uniquely Yours");
+                }
                 break;
             }
         }
@@ -357,6 +363,9 @@ public class ItemSpawnManager : MonoBehaviour
                 retBool = true;
                 if (!drops[index].remoteDrop)
                     plots[i].DropAwardXP(PlayerData.XP_TRANSPLANT);
+                InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                if (iga != null && iga.IsEntryHidden("Transplanting"))
+                    iga.AlmanacReveal("Transplanting");
                 break;
             }
         }

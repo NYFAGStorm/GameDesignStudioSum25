@@ -312,7 +312,7 @@ public static class PlayerSystem
     public static int GetXPLevelInterval( int currentLevel )
     {
         // int xpToNextLevel = 600 + (UnityEngine.Mathf.Max(currentLevel,0) * 300);
-        int xpToNextLevel = 450 + (UnityEngine.Mathf.Max(currentLevel,0) * 350);
+        int xpToNextLevel = 500 + (UnityEngine.Mathf.Max(currentLevel,0) * 500);
 
         return xpToNextLevel;
     }

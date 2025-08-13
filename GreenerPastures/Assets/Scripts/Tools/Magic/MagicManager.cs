@@ -165,6 +165,9 @@ public class MagicManager : MonoBehaviour
                     case SpellCastMode.Exiting:
                         mode = SpellCastMode.Default;
                         PlayerControlsAllowed(true);
+                        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                        if (iga != null && iga.IsEntryHidden("Spell Casts"))
+                            iga.AlmanacReveal("Spell Casts");
                         break;
                     default:
                         break;
@@ -212,6 +215,9 @@ public class MagicManager : MonoBehaviour
 
         if (MagicSystem.SpellBookHasCharge(spell, pcm.playerData.magic.library))
         {
+            InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+            if (iga != null && iga.IsEntryHidden("Spell Charges"))
+                iga.AlmanacReveal("Spell Charges");
             if (MagicSystem.CastSpellFromBook(spell, pcm.playerData.magic.library, out pcm.playerData.magic.library))
             {
                 SpellBookData spellData = MagicSystem.GetSpellBookEntry(spell, pcm.playerData.magic.library);
@@ -246,6 +252,8 @@ public class MagicManager : MonoBehaviour
                         cData.rangeAOE *= 2f;
                     castMgr.AcquireNewCast(cData);
                     pcm.AwardXP(PlayerData.XP_CASTMAGIC);
+                    if (iga != null && iga.IsEntryHidden("Spell Cooldowns"))
+                        iga.AlmanacReveal("Spell Cooldowns");
                     retBool = true;
                 }
                 else
@@ -338,7 +346,7 @@ public class MagicManager : MonoBehaviour
 
     void ExitCastingPresentation()
     {
-        // TODO: 
+        // TODO:
     }
 
     void SpawnCastCursor()
@@ -503,6 +511,9 @@ public class MagicManager : MonoBehaviour
         selectedSpellCharge = 0;
         invalidSelection = -1;
         selectionInvalidTimer = 0f;
+        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+        if (iga != null && iga.IsEntryHidden("Casting Magic Spells"))
+            iga.AlmanacReveal("Casting Magic Spells");
     }
 
     string DisplayCooldownTime( float cooldown )

@@ -452,6 +452,9 @@ public class ArcanaSkilManager : MonoBehaviour
                 currentPlayer.freezeCharacterActions = true;
                 currentPlayer.hidePlayerNameTag = true;
                 playerCheckTimer = 0f;
+                InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                if (iga != null && iga.IsEntryHidden("Active Magic Skills"))
+                    iga.AlmanacReveal("Active Magic Skills");
             }
         }
 

@@ -1850,6 +1850,16 @@ MonoBehaviour:
     pitchVariance: 0.05
     volume: 1
     volumeVariance: 0
+  - name: Player Almanac Reveal
+    clip: {fileID: 8300000, guid: 40d478a5b29434f4babc9f5bf75cbb22, type: 3}
+    type: 0
+    delay: 0
+    maxDelay: 0
+    spaceBlend: 0
+    pitch: 0
+    pitchVariance: 0.05
+    volume: 1
+    volumeVariance: 0
   musicCrossFadeTime: 3.81
 --- !u!1001 &918166386300932168
 PrefabInstance:

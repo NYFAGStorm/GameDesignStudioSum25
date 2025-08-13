@@ -17,16 +17,17 @@ public class InGameAlmanac : MonoBehaviour
     private bool updateAlmanac;
     private int revealedEntryIndex = -1;
 
+    private string[] entryTitles; // pre-lorem titles
+
     private PlayerControlManager pcm;
     private MagicManager mm;
     private MultiGamepad padMgr;
     private QuitOnEscape qoe;
     private InGameControls igc;
 
-    // private int padSelectionButton = -1;
-    // private int padMaxSelection;
-
     private bool islandUpgrades;
+
+    private AudioManager sfxAudio;
 
     private Texture2D[] buttonTex;
 
@@ -51,6 +52,9 @@ public class InGameAlmanac : MonoBehaviour
             Debug.LogError("--- InGameAlmanac [Start] : no in game controls tool found in scene. aborting.");
             enabled = false;
         }
+        GameObject sfxObj = GameObject.Find("AudioMgr SFX");
+        if (sfxObj != null)
+            sfxAudio = sfxObj.GetComponent<AudioManager>();
         // initialize
         if (enabled)
         {
@@ -75,6 +79,11 @@ public class InGameAlmanac : MonoBehaviour
     void InitAlmanac()
     {
         almanac = AlmanacSystem.InitializeAlmanac();
+        entryTitles = new string[almanac.entries.Length];
+        for (int i = 0; i < almanac.entries.Length; i++)
+        {
+            entryTitles[i] = almanac.entries[i].title;
+        }
         currentCategory = 1;
         currentEntry = 0;
         ConfigureEntryCount();
@@ -132,9 +141,8 @@ public class InGameAlmanac : MonoBehaviour
             {
                 GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
                 if (ggm != null)
-                    ggm.AddNotification("Almanac entry REVEALED\nin category "+almanac.entries[revealedEntryIndex].category.ToString()+"\n'" + almanac.entries[revealedEntryIndex].title +"'");
+                    ggm.AddNotification(almanac.entries[revealedEntryIndex].category.ToString().ToUpper() + " Almanac entry\nREVEALED '" + almanac.entries[revealedEntryIndex].title +"'");
                 revealedEntryIndex = -1;
-
             }
         }
 
@@ -180,19 +188,55 @@ public class InGameAlmanac : MonoBehaviour
         updateAlmanac = true;
     }
 
+    int GetAlmanacEntryIndex(string title)
+    {
+        int retInt = -1;
+
+        for (int i = 0; i < entryTitles.Length; i++)
+        {
+            if (entryTitles[i] == title)
+            {
+                retInt = i;
+                break;
+            }
+        }
+        if (retInt == -1)
+            Debug.LogWarning("--- InGameAlmanac [GetAlmanacEntryIndex] : no entry with title '"+title+"' found. will return -1.");
+
+        return retInt;
+    }
+
+    /// <summary>
+    /// Returns true if the almanac entry has not yet been revealed
+    /// </summary>
+    /// <param name="entryTitle">title of almanac entry (pre-lorem)</param>
+    /// <returns>true if entry is not revealed, false if revealed</returns>
+    public bool IsEntryHidden(string entryTitle)
+    {
+        bool retBool = false;
+
+        int idx = GetAlmanacEntryIndex(entryTitle);
+        if (idx > -1 && !almanac.entries[idx].revealed)
+            retBool = true;
+
+        return retBool;
+    }
+
     /// <summary>
     /// Sets an entry in the Biomancer's Almanac to be revealed for the local player
     /// </summary>
     /// <param name="entryTitle">the entry title</param>
     public void AlmanacReveal(string entryTitle)
     {
-        int idx = AlmanacSystem.GetAlmanacEntryIndex(almanac, entryTitle);
+        int idx = GetAlmanacEntryIndex(entryTitle);
         if (pcm != null && pcm.playerData != null &&
             pcm.playerData.almanac.revealed.Length > 0)
         {
             pcm.playerData.almanac.revealed[idx] = true;
             updateAlmanac = true;
             revealedEntryIndex = idx;
+            if (sfxAudio != null)
+                sfxAudio.StartSound("Player Almanac Reveal");
         }
     }
 
@@ -208,6 +252,8 @@ public class InGameAlmanac : MonoBehaviour
             pcm.playerData.almanac.revealed[entryIndex] = true;
             updateAlmanac = true;
             revealedEntryIndex = entryIndex;
+            if (sfxAudio != null)
+                sfxAudio.StartSound("Player Almanac Reveal");
         }
     }
 
@@ -282,6 +328,27 @@ public class InGameAlmanac : MonoBehaviour
         GUI.color = c;
         GUI.Box(r, "", g);
 
+        if (padMgr.gamepads[0].isActive)
+        {
+            // GAMEPAD CONTROL LABELS
+            r.x = 0.125f * w;
+            r.y = 0.1625f * h;
+            r.width = 0.15f * w;
+            r.height = 0.05f * h;
+            g = new GUIStyle(GUI.skin.label);
+            g.normal.textColor = Color.white;
+            g.hover.textColor = Color.white;
+            g.active.textColor = Color.white;
+            g.alignment = TextAnchor.MiddleCenter;
+            g.fontSize = Mathf.RoundToInt(12f * (w / 1024f));
+            GUI.color = Color.white;
+            s = "L Bump / R Bump\nchange categories";
+            GUI.Label(r, s, g);
+            r.x = .725f * w;
+            s = "Right Stick\nUp Down Entry List";
+            GUI.Label(r, s, g);
+        }
+
         // CATEGORY TABS (press to begin at top of category)
         r.x = 0.1625f * w;
         r.y = 0.225f * h;
@@ -312,6 +379,27 @@ public class InGameAlmanac : MonoBehaviour
             {
                 currentCategory = i;
                 currentEntry = startingEntry[currentCategory-1];
+            }
+            if (padMgr.gamepads[0].isActive)
+            {
+                bool changed = false;
+                if (padMgr.gPadDown[0].LBump)
+                {
+                    changed = true;
+                    currentCategory--;
+                }
+                if (padMgr.gPadDown[0].RBump)
+                {
+                    changed = true;
+                    currentCategory++;
+                }
+                if (changed)
+                {
+                    currentCategory = Mathf.Clamp(currentCategory, 1, 9);
+                    currentEntry = startingEntry[currentCategory - 1];
+                    padMgr.gPadDown[0].LBump = false;
+                    padMgr.gPadDown[0].RBump = false;
+                }
             }
             r.x += 0.075f * w;
         }
@@ -398,14 +486,30 @@ public class InGameAlmanac : MonoBehaviour
         }
         s = "UP";
         GUI.enabled = (currentEntry > startingEntry[currentCategory]);
-        if (GUI.Button(r,s,g))
-            currentEntry--;
+        if (GUI.Button(r,s,g) || padMgr.gamepads[0].isActive && padMgr.gPadDown[0].YaxisR > 0f)
+        {
+            if (GUI.enabled)
+                currentEntry--;
+
+            // consuming input, por qua?
+            if (padMgr.gamepads[0].isActive)
+                padMgr.gPadDown[0].YaxisR = 0f;
+        }
+
         r.y += r.width + (0.05f * h);
         g.alignment = TextAnchor.MiddleCenter;
         s = "DOWN";
         GUI.enabled = (currentEntry + ENTRIESPERPAGE < startingEntry[currentCategory] + entriesInCategory[currentCategory]);
-        if (GUI.Button(r, s, g))
-            currentEntry++;
+        if (GUI.Button(r, s, g) || padMgr.gamepads[0].isActive && padMgr.gPadDown[0].YaxisR < 0f)
+        {
+            if (GUI.enabled)
+                currentEntry++;
+
+            // consuming input, por qua?
+            if (padMgr.gamepads[0].isActive)
+                padMgr.gPadDown[0].YaxisR = 0f;
+        }
+
         GUI.enabled = true;
 
         currentEntry = Mathf.Clamp(currentEntry, 

@@ -317,6 +317,9 @@ public class GreenerGameManager : MonoBehaviour
                     // player is out of economy (send gold fairy)
                     GoldFairyVisit(game.players[i].playerIsland, minimumGold, false);
                     goldFairHelpPauseTimer = GOLDFAIRYHELPPAUSE;
+                    InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                    if (iga != null && iga.IsEntryHidden("Poor Biomancer"))
+                        iga.AlmanacReveal("Poor Biomancer");
                 }
             }
         }
@@ -371,6 +374,13 @@ public class GreenerGameManager : MonoBehaviour
             if (ism != null)
             {
                 ism.SpawnItem(rockData, pos, pos, true);
+                Vector3 view = Camera.main.WorldToViewportPoint(pos);
+                if ( view.x > 0f && view.x < 1f && view.y > 0f && view.y < 1f )
+                {
+                    InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                    if (iga != null && iga.IsEntryHidden("No Stone Unturned"))
+                        iga.AlmanacReveal("No Stone Unturned");
+                }
             }
         }
         else

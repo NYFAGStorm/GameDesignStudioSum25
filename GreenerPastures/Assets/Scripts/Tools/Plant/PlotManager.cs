@@ -705,6 +705,12 @@ public class PlotManager : MonoBehaviour
                     data.plant.plantEffects = new PlantEffect[1];
                     data.plant.plantEffects[0] = PlantEffect.WalkingStickScrollHarvest;
                 }
+                if (data.plant.type >= PlantType.Jazzmyne)
+                {
+                    InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+                    if (iga != null && iga.IsEntryHidden("Uniquely Yours"))
+                        iga.AlmanacReveal("Uniquely Yours");
+                }
                 break;
             case PlotCondition.Uprooted:
                 // change ground texture
@@ -1122,6 +1128,10 @@ public class PlotManager : MonoBehaviour
             return;
         }
         action = CurrentAction.Grafting;
+
+        InGameAlmanac iga = GameObject.FindFirstObjectByType<InGameAlmanac>();
+        if (iga != null && iga.IsEntryHidden("Grafting"))
+            iga.AlmanacReveal("Grafting");
 
         if (!ActionComplete(GRAFTWINDOW, "GRAFTING..."))
             return;
