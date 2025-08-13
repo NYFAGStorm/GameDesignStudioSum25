@@ -1838,7 +1838,7 @@ MonoBehaviour:
     spaceBlend: 0
     pitch: 0
     pitchVariance: 0
-    volume: 1
+    volume: 0
     volumeVariance: 0
   - name: Player Pickup GoldSack
     clip: {fileID: 8300000, guid: 4042bbc353fafd5419774ad130208c11, type: 3}
@@ -1848,7 +1848,7 @@ MonoBehaviour:
     spaceBlend: 0
     pitch: 0
     pitchVariance: 0.05
-    volume: 1
+    volume: 0
     volumeVariance: 0
   - name: Player Almanac Reveal
     clip: {fileID: 8300000, guid: 40d478a5b29434f4babc9f5bf75cbb22, type: 3}
@@ -1857,8 +1857,8 @@ MonoBehaviour:
     maxDelay: 0
     spaceBlend: 0
     pitch: 0
-    pitchVariance: 0.05
-    volume: 1
+    pitchVariance: 0
+    volume: 0
     volumeVariance: 0
   musicCrossFadeTime: 3.81
 --- !u!1001 &918166386300932168
