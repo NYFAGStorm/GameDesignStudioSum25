@@ -233,7 +233,7 @@ public class TimeManager : MonoBehaviour
                 if (ggm != null)
                     ggm.MorningTick();
             }
-            if (dayProgress >= 0.5f && previousDayProgress < 0.5f)
+            if (previousDayProgress < 0.5f && dayProgress >= 0.5f)
             {
                 GreenerGameManager ggm = GameObject.FindFirstObjectByType<GreenerGameManager>();
                 if (ggm != null)

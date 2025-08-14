@@ -1562,33 +1562,35 @@ public class IslandUpgradeMenu : MonoBehaviour
         im.SetCheckProps(false); // suspend checking props
 
         // -- ISLAND --
-        float radiusDelta = im.islands[pcm.playerData.playerIsland].location.w * 7f;
+        float radiusDelta = 0f;
+        float radiusOld = im.islands[pcm.playerData.playerIsland].location.w * 7f;
         Vector3 newIslandScale = Vector3.one;
         float radiusIncrement = (1f / 7f);
         for (int i = 0; i < purchaseItemsHeld.Length; i++)
         {
+            // only changing scale if player bought an island
             if (purchaseItemsHeld[i].type == UpgradeType.IslandSmall)
             {
                 newIslandScale = Vector3.one;
-                radiusDelta = 7f - radiusDelta;
+                radiusDelta = 7f - radiusOld;
                 islandRange = 7;
             }
             if (purchaseItemsHeld[i].type == UpgradeType.IslandMedium)
             {
                 newIslandScale = Vector3.one * (1f + (radiusIncrement * 1f));
-                radiusDelta = 8f - radiusDelta;
+                radiusDelta = 8f - radiusOld;
                 islandRange = 8;
             }
             if (purchaseItemsHeld[i].type == UpgradeType.IslandLarge)
             {
                 newIslandScale = Vector3.one * (1f + (radiusIncrement * 2f));
-                radiusDelta = 9f - radiusDelta;
+                radiusDelta = 9f - radiusOld;
                 islandRange = 9;
             }
             if (purchaseItemsHeld[i].type == UpgradeType.IslandVeryLarge)
             {
                 newIslandScale = Vector3.one * (1f + (radiusIncrement * 3f));
-                radiusDelta = 10f - radiusDelta;
+                radiusDelta = 10f - radiusOld;
                 islandRange = 10;
             }
         }

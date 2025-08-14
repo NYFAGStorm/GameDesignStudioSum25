@@ -29,7 +29,7 @@ public class CheatManager : MonoBehaviour
     private float cheatDisplayTimer;
     private string cheatDisplayString;
 
-    const int TOTALCHEATCODES = 16;
+    const int TOTALCHEATCODES = 18;
     const float CHEATCODEWINDOW = 1f;
     const float CHEATDISPLAYTIME = 20f;
 
@@ -145,7 +145,7 @@ public class CheatManager : MonoBehaviour
             if (currentCode == codes[i].name)
             {
                 validCode = i;
-                Debug.Log("--- CheatManager [DetectCode] : cheat code '" + codes[i].name +"' ["+validCode+"] detected.");
+                //Debug.Log("--- CheatManager [DetectCode] : cheat code '" + codes[i].name +"' ["+validCode+"] detected.");
                 ggMgr.AddNotification("cheat code '" + codes[i].name + "' detected.");
                 ResetCurrentCode();
                 break;
@@ -221,6 +221,14 @@ public class CheatManager : MonoBehaviour
             case 15:
                 n = "revealalmanac";
                 d = "Reveals all entries in the Biomancer's Almanac";
+                break;
+            case 16:
+                n = "makeitrain";
+                d = "Provides far too much gold to the player";
+                break;
+            case 17:
+                n = "heysalesman";
+                d = "Calls the traveling salesman to the player's farm for an unscheduled visit";
                 break;
             default:
                 n = "-";
@@ -378,6 +386,14 @@ public class CheatManager : MonoBehaviour
                     }
                 }
                 break;
+            case 16:
+                playerControlMgr = GameObject.FindFirstObjectByType<PlayerControlManager>();
+                playerControlMgr.playerData.gold += 25000;
+                break;
+            case 17:
+                GameObject extraSalesVisit = GameObject.Instantiate((GameObject)Resources.Load("Salesman Monthly Visit"));
+                extraSalesVisit.name = "cheating sales visit";
+                break;
             default:
                 Debug.LogWarning("--- CheatManager [PerformValidCode] : code index "+validCode+" undefined. will ignore.");
                 break;
@@ -396,9 +412,9 @@ public class CheatManager : MonoBehaviour
         float h = Screen.height;
 
         r.x = 0.25f * w;
-        r.y = 0.2f * h;
+        r.y = 0.1375f * h;
         r.width = 0.5f * w;
-        r.height = 0.8f * h;
+        r.height = 0.875f * h;
 
         GUIStyle g = new GUIStyle(GUI.skin.label);
         g.fontSize = Mathf.RoundToInt(12f * (w/1024f));
