@@ -147,6 +147,8 @@ public class TimeManager : MonoBehaviour
     void Update()
     {
         dayProgress += Time.deltaTime * (WORLDTIMEMULTIPLIER * cheatTimeScale) * (1f/(60f*60f*24f));
+        if (previousDayProgress == 0f && dayProgress > 0.1f)
+            previousDayProgress = dayProgress; // initialized day progress
         if ( dayProgress > 1f )
         {
             dayProgress = 0f;

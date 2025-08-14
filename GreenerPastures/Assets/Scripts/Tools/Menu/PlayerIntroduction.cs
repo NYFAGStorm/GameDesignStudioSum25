@@ -1220,6 +1220,13 @@ public class PlayerIntroduction : MonoBehaviour
             cancelIntro = false;
             dialogPop = false;
             canSkipIntro = false;
+            SalesmanIntroduction sIntro = GameObject.FindFirstObjectByType<SalesmanIntroduction>();
+            if (sIntro != null)
+            {
+                GameObject salesmanObj = sIntro.salesman.gameObject;
+                Destroy(salesmanObj);
+                Destroy(sIntro.gameObject);
+            }
             switch (currentBeatIndex)
             {
                 case < 10:

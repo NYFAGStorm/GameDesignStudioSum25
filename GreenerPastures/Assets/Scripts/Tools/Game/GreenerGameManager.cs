@@ -475,13 +475,16 @@ public class GreenerGameManager : MonoBehaviour
     {
         // determine if it is the 1st of the month (and intro not running)
         PlayerIntroduction playerIntro = GameObject.FindFirstObjectByType<PlayerIntroduction>();
-        if (playerIntro != null && !playerIntro.introRunning)
+        if (playerIntro != null && !playerIntro.introRunning && Time.timeSinceLevelLoad > 1f)
         {
             TimeManager tim = GameObject.FindFirstObjectByType<TimeManager>();
             if (tim != null)
             {
                 if (tim.dayOfMonth == 1)
                 {
+                    // confirm actually noon (prevent immediate salesman launch)
+                    if (tim.dayProgress < 0.49f || tim.dayProgress > 0.51f)
+                        return;
                     // spawn traveling salesman visit manager (it will remove itself when done)
                     GameObject.Instantiate((GameObject)Resources.Load("Salesman Monthly Visit"));
                 }
