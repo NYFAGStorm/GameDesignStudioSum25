@@ -350,7 +350,7 @@ public class ItemSpawnManager : MonoBehaviour
                 PlantData plant = PlantSystem.InitializePlant(iData.plant);
                 plots[i].data.plant = plant;
                 // configure individual plant properties from item data
-                plots[i].data.plant.growth = Mathf.Clamp01(0.01f+iData.size); // some growth to trigger grow art
+                plots[i].data.plant.growth = Mathf.Clamp01(iData.size-0.01f);
                 plots[i].data.plant.health = iData.health;
                 plots[i].data.plant.quality = iData.quality;
                 plots[i].data.plant.isHarvested = (iData.type == ItemType.Stalk || (iData.type == ItemType.Plant && plant.canReFruit));
