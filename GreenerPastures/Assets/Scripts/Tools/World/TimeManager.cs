@@ -535,7 +535,7 @@ public class TimeManager : MonoBehaviour
         if (future.worldDayOfMonth == 0)
             future.worldDayOfMonth = 1; // REVIEW: prevents day 0
         // REVIEW: due to int
-        future.worldMonth += Mathf.RoundToInt((daysAhead/30f));
+        future.worldMonth += Mathf.RoundToInt((daysAhead/30f) - 0.5f);
         future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);
         // set season
         future.worldSeason = WorldSeason.Winter;
