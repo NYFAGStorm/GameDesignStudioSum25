@@ -323,7 +323,7 @@ public class MarketManager : MonoBehaviour
 
         // menu categories
         int top = 0;
-        menuCategories = new MenuCategory[6];
+        menuCategories = new MenuCategory[7];
         menuCategories[0].name = "General Items";
         menuCategories[0].topOfMenu = top;
         menuCategories[0].bottomOfMenu = top + generalItems;
@@ -347,10 +347,10 @@ public class MarketManager : MonoBehaviour
         menuCategories[5].name = "Special Plants";
         menuCategories[5].topOfMenu = top;
         menuCategories[5].bottomOfMenu = top + (specialPlants * plantItemTypes);
-        //top += (specialPlants * plantItemTypes);
-        //menuCategories[6].name = "Unique Plants";
-        //menuCategories[6].topOfMenu = top;
-        //menuCategories[6].bottomOfMenu = top + (uniquePlants * plantItemTypes);
+        top += (specialPlants * plantItemTypes);
+        menuCategories[6].name = "Unique Plants";
+        menuCategories[6].topOfMenu = top;
+        menuCategories[6].bottomOfMenu = top + (uniquePlants * plantItemTypes);
 
         // category labels
         prevCategoryLabel = "Special Plants";
@@ -1544,7 +1544,9 @@ public class MarketManager : MonoBehaviour
 
             if (i < topOfMenuList || i > topOfMenuList + MENUITEMSINLIST)
                 continue;
-            if (i > maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level, 0, 9)])
+            if ((customerMode != CustomerMode.Sell || menuItemSelection != i ||
+                currentCustomer.GetPlayerCurrentItemSelection() == null) && 
+                i > maxMenuListPerLevel[Mathf.Clamp(currentCustomer.playerData.level, 0, 9)])
                 continue;
 
             c = new Color(0.381f, 0.381f, 0.381f, 0.618f);
