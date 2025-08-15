@@ -2462,10 +2462,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Writing Desk
       objectReference: {fileID: 0}
-    - target: {fileID: 1926464976706807017, guid: 2f20dcd06610e7d42982cbb19a438674, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2618,10 +2614,6 @@ PrefabInstance:
     - target: {fileID: 1752179265131897024, guid: 86344e011dc9daf479c2ade6ccafb5ea, type: 3}
       propertyPath: m_Name
       value: Bookshelf
-      objectReference: {fileID: 0}
-    - target: {fileID: 1752179265131897024, guid: 86344e011dc9daf479c2ade6ccafb5ea, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6097326168416127999, guid: 86344e011dc9daf479c2ade6ccafb5ea, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2926,10 +2918,6 @@ PrefabInstance:
     - target: {fileID: 3632511224472745895, guid: a9dc1b3bac7582c4ca6979936cbc4162, type: 3}
       propertyPath: m_Name
       value: Fireplace Prop
-      objectReference: {fileID: 0}
-    - target: {fileID: 3632511224472745895, guid: a9dc1b3bac7582c4ca6979936cbc4162, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
