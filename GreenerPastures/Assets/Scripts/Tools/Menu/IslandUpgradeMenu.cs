@@ -1318,7 +1318,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         int thisPrice = item.price;
         
         if (hasSalesmanDiscount)
-            thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
+            thisPrice = Mathf.RoundToInt(thisPrice * 0.9f);
 
         return thisPrice;
     }
@@ -1339,7 +1339,7 @@ public class IslandUpgradeMenu : MonoBehaviour
         // answer is yes if have gold
         int thisPrice = item.price;
         if (hasSalesmanDiscount)
-            thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
+            thisPrice = Mathf.RoundToInt(thisPrice * 0.9f);
         retBool = ((pcm.playerData.gold - purchaseGoldHeld) >= thisPrice);
         if (!retBool)
             notEnoughGold = true;
@@ -1684,6 +1684,7 @@ public class IslandUpgradeMenu : MonoBehaviour
             {
                 tmp[q] = new PlotData();
                 tmp[q].condition = PlotCondition.Wild;
+                tmp[q].soil = 0.5f;
             }
             count = pcm.playerData.farm.plots.Length; // REVIEW: this use in data location below
             pcm.playerData.farm.plots = tmp;
@@ -1714,6 +1715,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                         pcm.playerData.farm.plots[count].location.x = pos.x;
                         pcm.playerData.farm.plots[count].location.z = pos.z;
                         newPlot.GetComponent<PlotManager>().data.location = pcm.playerData.farm.plots[count].location;
+                        newPlot.GetComponent<PlotManager>().data.soil = 0.5f;
                         count++;
                     }
                 }
@@ -1750,11 +1752,47 @@ public class IslandUpgradeMenu : MonoBehaviour
         {
             // find old tower
             GameObject oldTowerObject = islandObj.transform.Find("Structure wiz tower").gameObject;
+
+            // get tower interior and un-parent for positioning
+            towerInterior = islandObj.transform.Find("Structure tower interior").gameObject;
+            towerInterior.transform.parent = null;
+
             // position and name new tower
             newTowerObject.transform.position = islandObj.transform.position + towerOffset;
-            newTowerObject.transform.parent = islandObj.transform;
             newTowerObject.name = oldTowerObject.name;
+
+            // find any loose item within island radius, lower then interior y (inside interior)
+            LooseItemManager[] interiorItems = GameObject.FindObjectsByType<LooseItemManager>(FindObjectsSortMode.None);
+            for (int i = 0; i < interiorItems.Length; i++)
+            {
+                float dist = Vector3.Distance(islandObj.transform.position, interiorItems[i].gameObject.transform.position);
+                if (dist < islandRange && interiorItems[i].transform.position.y < towerInterior.transform.position.y)
+                {
+                    // parent to interior for re-positioning
+                    interiorItems[i].transform.parent = towerInterior.transform;
+                }
+            }
+
+            // place tower interior based on tower (world position)
+            Vector3 iTPos = newTowerObject.transform.position;
+            Vector3 interiorOffset = new Vector3(-1f, -3f, -2f); // the constant interior offset from tower
+            iTPos += interiorOffset;
+            towerInterior.transform.position = iTPos;
+
+            // re-parent interior loose items to 'Items' folder object
+            GameObject itemsFolderObj = GameObject.Find("Items");
+            for (int i = 0; i < interiorItems.Length; i++)
+            {
+                float dist = Vector3.Distance(islandObj.transform.position, interiorItems[i].gameObject.transform.position);
+                if (dist < islandRange && interiorItems[i].transform.position.y < towerInterior.transform.position.y)
+                {
+                    // re-parent to island object
+                    interiorItems[i].transform.parent = islandObj.transform;
+                }
+            }
+
             // set tower data
+            // set tower interior data
             for (int i = 0; i < im.islands[pcm.playerData.playerIsland].structures.Length; i++)
             {
                 if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.HermitTower ||
@@ -1762,17 +1800,24 @@ public class IslandUpgradeMenu : MonoBehaviour
                     im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.SorcererTower)
                 {
                     im.islands[pcm.playerData.playerIsland].structures[i].type = towerType;
-                    im.islands[pcm.playerData.playerIsland].structures[i].location.z = towerOffset.z;
+                    im.islands[pcm.playerData.playerIsland].structures[i].location = GameSystem.GetPositionData(newTowerObject.transform.position + (Vector3.up * GREENERDEPTH));
+                }
+                if (im.islands[pcm.playerData.playerIsland].structures[i].type == StructureType.WizardInterior)
+                {
+                    im.islands[pcm.playerData.playerIsland].structures[i].location = GameSystem.GetPositionData(towerInterior.transform.position + (Vector3.up * GREENERDEPTH));
                 }
             }
-            // delete old tower
-            Destroy(oldTowerObject);
-            // move tower interior same offset
-            towerInterior = islandObj.transform.Find("Structure tower interior").gameObject;
-            Vector3 iTPos = towerInterior.transform.position;
-            iTPos.z += towerOffset.z - 2f; // TODO: cannot use +, need solid numbers
-            towerInterior.transform.position = iTPos;
-            // move tower teleporters same offset
+
+            // use constant offsets from tower position for teleporters
+            Vector3 towerTportIn = new Vector3(0.3f, -1f, -1.25f);
+            Vector3 towerTportOut = new Vector3(0f, -4.67f, -4.5f);
+            Vector3 towerTportOutCam = new Vector3(0f, -2.618f, -5f);
+            // use saved (world) positions for island data
+            Vector3 savedTportInPos = Vector3.zero;
+            Vector3 savedTportOutPos = Vector3.zero;
+            Vector3 savedCamPos = Vector3.zero;
+
+            // move tower teleporters using constant offsets
             for (int i =0; i < islandChildren.Length; i++)
             {
                 if (islandChildren[i].GetComponent<TeleportManager>() != null)
@@ -1780,14 +1825,29 @@ public class IslandUpgradeMenu : MonoBehaviour
                     TeleportManager tm = islandChildren[i].GetComponent<TeleportManager>();
                     if (tm.teleporterTag == "tower")
                     {
-                        Vector3 tPos = tm.gameObject.transform.position;
-                        tPos.z += towerOffset.z - 2f;
-                        tm.gameObject.transform.position = tPos;
+                        // un-parent for positioning
+                        tm.gameObject.transform.parent = null;
+                        // start with tower position, determine which teleporter this is
+                        Vector3 tPos = newTowerObject.transform.position;
                         if (tm.cameraMode == CameraManager.CameraMode.PanFollow)
-                        {            
-                            // move camera settings on teleport node same offset
-                            tm.cameraPanModePosition.z += towerOffset.z - 2f;
+                        {
+                            // interior teleporter
+                            tPos += towerTportOut;
+                            savedTportOutPos = tPos + (Vector3.up * GREENERDEPTH);
+                            // move camera settings on teleport node
+                            tm.cameraPanModePosition = newTowerObject.transform.position + (Vector3.up * GREENERDEPTH);
+                            tm.cameraPanModePosition += towerTportOutCam;
+                            savedCamPos = tm.cameraPanModePosition;
                         }
+                        else
+                        {
+                            // exterior telepoter
+                            tPos += towerTportIn;
+                            savedTportInPos = tPos + (Vector3.up * GREENERDEPTH);
+                        }
+                        tm.gameObject.transform.position = tPos;
+                        // re-parent to island
+                        tm.gameObject.transform.parent = islandObj.transform;
                     }
                 }
             }
@@ -1796,13 +1856,24 @@ public class IslandUpgradeMenu : MonoBehaviour
             {
                 if (im.islands[pcm.playerData.playerIsland].tports[i].tag == "tower")
                 {
-                    im.islands[pcm.playerData.playerIsland].tports[i].location.z += towerOffset.z - 2f;
                     if (im.islands[pcm.playerData.playerIsland].tports[i].cameraMode == CameraManager.CameraMode.PanFollow)
                     {
-                        im.islands[pcm.playerData.playerIsland].tports[i].cameraPosition.z += towerOffset.z - 2f;
+                        im.islands[pcm.playerData.playerIsland].tports[i].location = GameSystem.GetPositionData(savedTportOutPos);
+                        im.islands[pcm.playerData.playerIsland].tports[i].cameraPosition = GameSystem.GetPositionData(savedCamPos);
+                    }
+                    else
+                    {
+                        im.islands[pcm.playerData.playerIsland].tports[i].location = GameSystem.GetPositionData(savedTportInPos);
                     }
                 }
             }
+
+            // parent tower and interior
+            newTowerObject.transform.parent = islandObj.transform;
+            towerInterior.transform.parent = islandObj.transform;
+
+            // delete old tower
+            Destroy(oldTowerObject);
         }
 
         // adjust data on island manager for central teleporter
@@ -2425,7 +2496,7 @@ public class IslandUpgradeMenu : MonoBehaviour
                 g.fontStyle = FontStyle.Bold;
                 int thisPrice = displayItems[i].price;
                 if (hasSalesmanDiscount)
-                    thisPrice = Mathf.RoundToInt(thisPrice * 0.75f);
+                    thisPrice = Mathf.RoundToInt(thisPrice * 0.9f);
                 s = thisPrice.ToString();
                 r.x += 0.0008f * w;
                 r.y += 0.001f * w;

@@ -521,7 +521,7 @@ public class TimeManager : MonoBehaviour
         // crank world data forward from Mar 1st at noon
         WorldData future = new WorldData();
         future.worldTimeOfDay = 0.5f;
-        future.worldDayOfMonth = 1;
+        future.worldDayOfMonth = 0;
         future.worldMonth = WorldMonth.Mar;
 
         float daysAhead = (float)(realSecondsForward / (60 * 24));
@@ -532,9 +532,8 @@ public class TimeManager : MonoBehaviour
         //
         future.worldDayOfMonth += Mathf.RoundToInt(daysAhead);
         future.worldDayOfMonth %= 30;
-        if (future.worldDayOfMonth == 0)
-            future.worldDayOfMonth = 1; // REVIEW: prevents day 0
-        // REVIEW: due to int
+        future.worldDayOfMonth++; // REVIEW: prevents day 0
+        // 
         future.worldMonth += Mathf.RoundToInt((daysAhead/30f) - 0.5f);
         future.worldMonth = (WorldMonth)((int)future.worldMonth % 12);
         // set season

@@ -7,7 +7,7 @@ public class ArcanaSkilManager : MonoBehaviour
     // This also manages the skill tree, a node network of skills with one parent each
     // This also manages communication to magic manager for purposes of 'casting' active magic skills
 
-    // TODO: same engagement and state manaement pattern used in crafting, market, chicken race
+    // same engagement and state manaement pattern used in crafting, market, chicken race
     // (... this lives on Eden?)
 
     private PlayerControlManager currentPlayer;
@@ -121,7 +121,7 @@ public class ArcanaSkilManager : MonoBehaviour
             "The Gold Fairy visits your farm most nights.", PlayerEffect.SkillFriendsGoldFairy, 1);
         skillTree = SkillSystem.AddTreeNode(skillTree, skill, "Friends of the Chicken");
         skill = SkillSystem.InitializeSkill("Friends of the Salesman",
-            "Your salesman purchases on island upgrades are at a 25% discount.", PlayerEffect.SkillFriendsSalesman, 1);
+            "Your salesman purchases on island upgrades are at a 10% discount.", PlayerEffect.SkillFriendsSalesman, 1);
         skillTree = SkillSystem.AddTreeNode(skillTree, skill, "Friends of the Merchant");
         skill = SkillSystem.InitializeSkill("Midas Biomancer",
             "Harvesting each plant has a 5% chance of dropping a gold sack instead, worth twice the fruit value.", PlayerEffect.SkillMidasBiomancer, 1);
